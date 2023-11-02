@@ -1,0 +1,39 @@
+{
+	"Index": {
+		"title": "Hello world!"
+	},
+	"Header": {
+		"chat-center": "Chat center",
+		"notification": "Notification",
+		"profile": "Profile",
+		"logout": "Logout",
+		"setting": "Setting"
+	},
+
+	"Sidebar": {
+		"overview": "Overview",
+		"customer": "Customer",
+		"lead": "Lead",
+		"organization": "Organization",
+		"employee": "Employee",
+		"sale": "Sale",
+		"order": "Order",
+		"reservation": "Reservation",
+		"marketing": "Marketing",
+		"campaign": "Campaign",
+		"automated-message": "Automated message",
+		"message-template": "Message template",
+		"target-list": "Target list",
+		"bussiness": "Bussiness",
+		"product": "Product",
+		"news": "News",
+		"voucher": "Voucher",
+		"information": "Information",
+		"report": "Report",
+		"crm-report": "CRM Report",
+		"bussiness-report": "Bussiness report",
+		"chat-center": "Chat center"
+	},
+
+	"Overview": {}
+}
