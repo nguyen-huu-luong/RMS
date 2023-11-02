@@ -1,0 +1,21 @@
+$primary-color: #4A58EC;
+$white-color: #fff;
+$dark-color: #000;
+$text-color: #333;
+$bg-secondary-color: #E7E9FD ;
+$border-color: #DADAD9 ;
+$default-bg-color: #F8F8F8 ;
+$place-hoder-color: #666666 ;
+$link-color: #2892F4 ;
+ 
+:export {
+    primaryColor: $primary-color;
+    whiteColor: $white-color;
+    darkColor: $dark-color;
+    textColor: $text-color;
+    backgroundSecondaryColor: $bg-secondary-color;
+    borderColor: $border-color ;
+    defaultBackgroundColor: $default-bg-color;
+    placehoderColor: $place-hoder-color ;
+    linkColor:  $link-color;
+}

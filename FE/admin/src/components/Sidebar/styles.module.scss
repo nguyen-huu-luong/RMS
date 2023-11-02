@@ -1,0 +1,57 @@
+@tailwind components;
+@import "@/app/variables.module.scss";
+
+
+
+.sidebar-navigation {
+    @apply flex flex-col space-y-1 my-3 mx-3;
+
+
+    .sidebar-navigation-items {
+        @apply flex w-full items-center px-3 py-2 rounded-2xl text-neutral-900 text-base font-medium cursor-pointer hover:bg-bgsecondary;
+
+        &.active {
+            @apply bg-primary text-white hover:bg-primary;
+        }
+    }
+
+    .sidebar-navigation-sub-items {
+        @apply flex flex-row w-5/6 float-right py-1 rounded-lg text-neutral-600 text-base font-medium cursor-pointer transition-all delay-150 duration-300;
+        position: relative;
+
+        &::before {
+            content: "";
+            display: block;
+            position: absolute;
+            height: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 4px 0;
+            left: -12px;
+            border-right: 3px solid $border-color;
+        }
+
+        &.active {
+            @apply bg-bgsecondary text-black;
+        }
+
+        &:hover {
+            @apply bg-bgsecondary text-black;
+
+            &::before {
+                border-right: 3px solid $primary-color;
+            }
+        }
+
+        &.active::before {
+            border-right: 3px solid $primary-color;
+        }
+    }
+
+
+}
+
+
+/* Start purging... */
+@tailwind utilities;
+/* Stop purging. */

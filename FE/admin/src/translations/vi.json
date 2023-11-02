@@ -1,0 +1,39 @@
+{
+	"Index": {
+		"title": "Xin chào!"
+	},
+	"Header": {
+		"chat-center": "Tin nhắn",
+		"notification": "Thông báo",
+		"profile": "Hồ sơ của tôi",
+		"logout": "Đăng xuất",
+		"setting": "Cài đặt"
+	},
+
+	"Sidebar": {
+		"overview": "Tổng quan",
+		"customer": "Khách hàng",
+		"lead": "Khách hàng tiềm năng",
+		"organization": "Tổ chức",
+		"employee": "Nhân viên",
+		"sale": "Bán hàng",
+		"order": "Đơn hàng",
+		"reservation": "Đặt bàn",
+		"marketing": "Tiếp thị",
+		"campaign": "Chiến dịch",
+		"automated-message": "Tin nhắn tự động",
+		"message-template": "Mẫu tin nhắn",
+		"target-list": "Danh sách mục tiêu",
+		"bussiness": "Kinh doanh",
+		"product": "Sản phẩm",
+		"news": "Tin tức",
+		"voucher": "Khuyến mãi",
+		"information": "Thông tin",
+		"report": "Báo cáo",
+		"crm-report": "Báo cáo CRM",
+		"bussiness-report": "Báo cáo kinh doanh",
+		"chat-center": "Tin nhắn"
+	},
+
+	"Overview": {}
+}
