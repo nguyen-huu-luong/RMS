@@ -20,6 +20,11 @@ class Message {
         const result: String = this.preProcess(req, status);
         console.log(result);
     }
+
+    public queryError(err: any) {
+        console.log("Query is failed!");
+        console.log(`Err: ${err}`);
+    }
 }
 
 const message = new Message();

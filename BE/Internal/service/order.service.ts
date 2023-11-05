@@ -1,22 +1,59 @@
 import { Request, Response } from 'express';
 import message from '../define/message';
+import OrderRepository from '../repository/order.repository';
+import statusCode from '../define/status';
+import statusMess from '../define/statusMess';
 
 class OrderService {
-    public viewOrder(req: Request, res: Response) {
-        res.send("View order");
-        message.logMessage(req, 200);
+
+    protected orderRepository: OrderRepository;
+
+    constructor() {
+        this.orderRepository = new OrderRepository();
     }
 
-    public createOrder() {
-        console.log("Create order");
+    public async viewOrders(req: Request, res: Response) {
+        try {
+            const status: any = statusCode.Success;
+            const data = await this.orderRepository.viewOrders();
+            res.status(status).send(data);
+            message.logMessage(req, status);
+        }
+        catch (err) {
+            const status: any = statusCode.BadRequest;
+            message.logMessage(req, status);
+            res.send({ 'Err': err });
+        }
     }
 
-    public updateOrder() {
-        console.log("Update order");
+    public async createOrder(req: Request, res: Response) {
+        try {
+            const status: any = statusCode.Success;
+            const data: any = req.body;
+            await this.orderRepository.createOrder(data);
+            res.status(status).send(statusMess.Success);
+            message.logMessage(req, status)
+        }
+        catch (err) {
+            const status: any = statusCode.BadRequest;
+            message.logMessage(req, status);
+            res.send({ 'Err': err });
+        }
     }
 
-    public deleteOrder() {
-        console.log("Delete order");
+    public async assignOrder(req: Request, res: Response) {
+        try {
+            const status: any = statusCode.Success;
+            const data: any = req.body;
+            await this.orderRepository.assignOrder(data);
+            res.status(status).send(statusMess.Success);
+            message.logMessage(req, status)
+        }
+        catch (err) {
+            const status: any = statusCode.BadRequest;
+            message.logMessage(req, status);
+            res.send({ 'Err': err });
+        }
     }
 
 }

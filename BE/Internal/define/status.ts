@@ -35,5 +35,6 @@ class StatusCode {
 }
 
 const statusObj = new StatusCode();
+const statusCode = statusObj.getStatus();
 
-export default statusObj.getStatus();
+export default statusCode;

@@ -4,7 +4,7 @@ import bodyParse from 'body-parser';
 import cors from 'cors';
 import http from 'http';
 import Loader from './loader';
-import seqObj from './define/sequenlize';
+import Tables from './model';
 
 import router from './router';
 
@@ -40,15 +40,16 @@ class Server {
     try {
         const server: any = new Server();
         const loader: any = new Loader();
-        const sequelize: any = seqObj.getSequenlize();
-        
+        const tables: any = new Tables();
+
         await server.initial();
         await router.initialize(server.getApp());
-        await loader.load(sequelize); 
+        await loader.load();
+        await tables.createTables();
 
         server.start();
     }
-    catch(err) {
+    catch (err) {
         console.log("Connect to server failed!");
         console.log(`Error: ${err}`);
     }
