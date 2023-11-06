@@ -1,8 +1,9 @@
 import DBConnect from "./db";
 import seqObj from "../define/sequenlize";
+import { Sequelize } from 'sequelize';
 
 class Loader {
-    protected connection: any;
+    protected connection: DBConnect;
     public static sequenlize: any = seqObj.getSequenlize();
 
     constructor() {

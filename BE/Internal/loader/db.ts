@@ -1,14 +1,15 @@
 import { Connection, Pool } from 'pg';
+import { Sequelize } from 'sequelize';
 
 class DBConnect {
     public async checkDB() {
         try {
-            const connection = new Pool({
+            const connection: Pool = new Pool({
                 host: process.env.HOST,
                 user: process.env.USER,
                 password: process.env.PASSWORD,
             });
-            const query = `SELECT FROM pg_database WHERE datname = '${process.env.DATABASE}'`;
+            const query: string = `SELECT FROM pg_database WHERE datname = '${process.env.DATABASE}'`;
             const dbQuery = await connection.query(query);
 
             if (dbQuery.rows.length === 0) {
@@ -23,7 +24,7 @@ class DBConnect {
         }
     }
 
-    public async connect(sequenlize: any) {
+    public async connect(sequenlize: Sequelize) {
         try {
             await sequenlize.authenticate();
             console.log("Connect to database successfully!");

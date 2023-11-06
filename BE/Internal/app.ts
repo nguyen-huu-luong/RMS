@@ -11,17 +11,19 @@ import router from './router';
 dotenv.config();
 
 class Server {
-    protected app: any;
+    protected app: Application;
     protected server: any;
 
+    public constructor() {
+        this.app = express();
+    }
+
     public initial() {
-        const app: Application = express();
-        app.use(bodyParse());
-        app.use(cors({
+        this.app.use(bodyParse());
+        this.app.use(cors({
             origin: "*",
             credentials: true,
         }))
-        this.app = app;
         this.server = new http.Server(this.app);
     }
 
@@ -38,9 +40,9 @@ class Server {
 
 (async () => {
     try {
-        const server: any = new Server();
-        const loader: any = new Loader();
-        const tables: any = new Tables();
+        const server: Server = new Server();
+        const loader: Loader = new Loader();
+        const tables: Tables = new Tables();
 
         await server.initial();
         await router.initialize(server.getApp());
