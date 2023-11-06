@@ -1,5 +1,5 @@
 import OrderController from '../controller/order.controller';
-import { Request, Response } from 'express'
+import { Request, Response, Router } from 'express'
 
 class OrderRouter {
     protected orderController: OrderController;
@@ -8,7 +8,7 @@ class OrderRouter {
         this.orderController = new OrderController();
     }
 
-    public initialize(router: any) {
+    public initialize(router: Router) {
         router.route('/order/all')
             .get((req: Request, res: Response) => this.orderController.viewOrders(req, res))
 

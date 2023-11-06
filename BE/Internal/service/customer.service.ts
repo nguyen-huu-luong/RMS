@@ -14,13 +14,13 @@ class CustomerService {
 
     public async viewCustomers(req: Request, res: Response) {
         try {
-            const status: any = statusCode.Success;
+            const status: number = statusCode.Success;
             const data = await this.customerRepository.viewCustomers();
             res.status(status).send(data);
             message.logMessage(req, status);
         }
         catch (err) {
-            const status: any = statusCode.BadRequest;
+            const status: number = statusCode.BadRequest;
             message.logMessage(req, status);
             res.send({ 'Err': err });
         }
@@ -28,14 +28,14 @@ class CustomerService {
 
     public async createCustomer(req: Request, res: Response) {
         try {
-            const status: any = statusCode.Success;
+            const status: number = statusCode.Success;
             const data: any = req.body;
             await this.customerRepository.createCustomer(data);
             res.status(status).send(statusMess.Success);
             message.logMessage(req, status);
         }
         catch (err) {
-            const status: any = statusCode.BadRequest;
+            const status: number = statusCode.BadRequest;
             message.logMessage(req, status);
             res.send({ 'Err': err });
         }

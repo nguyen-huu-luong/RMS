@@ -10,7 +10,7 @@ class CustomerRepository {
 
     public async viewCustomers() {
         try {
-            const allCustomer: any = await this.customer.findAll();
+            const allCustomer: Customer = await this.customer.findAll();
             return JSON.stringify(allCustomer)
         }
         catch (err) {

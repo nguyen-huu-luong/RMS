@@ -9,15 +9,15 @@ class OrderController {
         this.orderService = new OrderService();
     }
 
-    public viewOrders(req: Request, res: Response): any {
+    public viewOrders(req: Request, res: Response) {
         this.orderService.viewOrders(req, res);
     }
 
-    public createOrder(req: Request, res: Response): any {
+    public createOrder(req: Request, res: Response) {
         this.orderService.createOrder(req, res);
     }
 
-    public assignOrder(req: Request, res: Response): any {
+    public assignOrder(req: Request, res: Response) {
         this.orderService.assignOrder(req, res);
     }
 

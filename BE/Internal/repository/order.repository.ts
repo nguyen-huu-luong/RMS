@@ -13,8 +13,8 @@ class OrderRepository {
 
     public async viewOrders() {
         try {
-            const allCustomer: any = await this.order.findAll();
-            return JSON.stringify(allCustomer)
+            const allOrder: Order = await this.order.findAll();
+            return JSON.stringify(allOrder)
         }
         catch (err) {
             message.queryError(err);
@@ -34,12 +34,12 @@ class OrderRepository {
         try {
             const orderId = data.order;
             const userId = data.user;
-            const order: any = await this.order.findOne({
+            const order: Order = await this.order.findOne({
                 where: {
                     id: orderId
                 }
             })
-            const user: any = await this.customer.findOne({
+            const user: Customer = await this.customer.findOne({
                 where: {
                     id: userId
                 }

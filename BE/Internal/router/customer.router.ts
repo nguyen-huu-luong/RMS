@@ -1,5 +1,5 @@
 import CustomerController from '../controller/customer.controller';
-import { Request, Response } from 'express'
+import { Request, Response, Router } from 'express'
 
 class CustomerRouter {
     protected customerController: CustomerController;
@@ -8,7 +8,7 @@ class CustomerRouter {
         this.customerController = new CustomerController();
     }
 
-    public initialize(router: any) {
+    public initialize(router: Router) {
         router.route('/customer')
             .post((req: Request, res: Response) => this.customerController.createCustomer(req, res))
 
