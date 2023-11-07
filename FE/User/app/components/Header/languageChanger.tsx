@@ -42,7 +42,7 @@ const LanguageChanger = ({ params }: { params: { locale: string } }) => {
 
     return (
         <Dropdown menu={{ items }} placement='bottom' trigger={["click"]}>
-            <div className='flex-row justify-between align-middle cursor-pointer p-1 px-2 hover:bg-orange-50 rounded-lg transition duration-300 ease-in-out'>
+            <div className='flex-row justify-between align-middle cursor-pointer p-1 px-2 hover:bg-primary-100 rounded-lg transition duration-300 ease-in-out'>
                 {params.locale === "vi" ? (
                     <Image
                         src='/vietnam.png'

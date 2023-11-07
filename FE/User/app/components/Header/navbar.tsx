@@ -50,7 +50,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
     const t = useTranslations("NavBar");
     return (
         <>
-            <nav className='sticky top-0 w-full h-16 shadow-md z-10 bg-white'>
+            <nav className='sticky top-0 w-full h-16 shadow-md z-10 bg-primary-white'>
                 <Container>
                     <div className='w-full h-full flex flex-row font-bold'>
                         {/* Left header */}
@@ -118,7 +118,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                                     {MENU_LISTS.map((item) => (
                                         <Link
                                             href={`/${params.locale}/${item.href}`}
-                                            className='hover:text-orange-500 transition-all ease-in-out duration-200'
+                                            className='hover:text-primary transition-all ease-in-out duration-200'
                                             key={item.name}
                                         >
                                             {t(item.name)}
@@ -132,7 +132,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                             <div
                                 className={`${
                                     search ? "block" : "hidden"
-                                } flex w-auto h-auto hover:text-orange-500 rounded-full p-2 hover:bg-orange-50 transition duration-300 ease-in-out`}
+                                } flex w-auto h-auto hover:text-primary rounded-full p-2 hover:bg-primary-100 transition duration-300 ease-in-out`}
                             >
                                 <SearchOutlined
                                     onClick={toggleSearch}
@@ -148,7 +148,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                                         type='text'
                                         placeholder={t("Search-placeholder")}
                                         className='rounded-full border-gray-100 font-normal
-                                        border-2 text-slate-600  pl-4 p-2 w-24 focus:bg-white
+                                        border-2 text-placeholder  pl-4 p-2 w-24 focus:bg-primary-white
                                         focus:cursor-text focus:border-orange-300 outline-none focus:pr-4
                                         transition-all duration-500 transform focus:w-full focus:lg:w-3/5
                                         '
@@ -163,7 +163,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                                     <LanguageChanger
                                         params={{ locale: params.locale }}
                                     ></LanguageChanger>
-                                    <div className='hover:text-orange-500 cursor-pointer w-auto flex p-2 rounded-full hover:bg-orange-50 transition duration-300 ease-in-out'>
+                                    <div className='hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'>
                                         <ShoppingCartOutlined
                                             style={{ fontSize: "1.6rem" }}
                                         />
@@ -173,7 +173,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                                         placement='bottom'
                                         trigger={["click"]}
                                     >
-                                        <div className='cursor-pointer p-2 rounded-full hover:bg-orange-50 transition duration-300 ease-in-out'>
+                                        <div className='cursor-pointer p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'>
                                             <Avatar
                                                 size={32}
                                                 icon={<UserOutlined />}
@@ -189,7 +189,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                 </Container>
             </nav>
             {click ? (
-                <div className='block lg:hidden w-full h-auto flex-col p-4 bg-white transition-2 duration-250 transition-all'>
+                <div className='block lg:hidden w-full h-auto flex-col p-4 bg-primary-white transition-2 duration-250 transition-all'>
                     {MENU_LISTS.map((item) => (
                         <Link
                             key={item.name}
@@ -197,7 +197,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                             onClick={(click) => {
                                 setClick(!click);
                             }}
-                            className='block font-bold pl-3 p-2 hover:text-white hover:bg-orange-500 rounded-md ease-in-out duration-200 hover:translate-x-2 transition-all w-full'
+                            className='block font-bold pl-3 p-2 hover:text-item-white hover:bg-primary rounded-md ease-in-out duration-200 hover:translate-x-2 transition-all w-full'
                         >
                             {t(item.name)}
                         </Link>
