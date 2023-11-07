@@ -11,12 +11,12 @@ import {
 const Footer = ({ params }: { params: { locale: string } }) => {
     const t = useTranslations("Footer");
     return (
-        <div className='bg-orange-500 h-auto text-white pt-10'>
+        <div className='bg-primary h-auto text-item-white pt-10'>
             <Container>
-                <div className=''>
-                    <div className=' pl-10 md:pl-0 h-auto w-auto flex flex-col md:flex-row gap-4 justify-around items-start'>
+                <div className='w-auto'>
+                    <div className='h-auto w-auto flex flex-col md:flex-row gap-4 justify-around items-center md:items-start'>
                         {/* ABOUT US */}
-                        <div className='flex-initial flex flex-col text-left'>
+                        <div className='flex flex-col text-center md:text-left'>
                             <div className='w-auto h-auto font-extrabold text-lg pb-6'>
                                 <Link
                                     href={`/${params.locale}/about`}
@@ -59,7 +59,7 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                         </div>
                         {/* Contacts */}
-                        <div className='flex-initial flex flex-col text-left'>
+                        <div className='flex flex-col text-center md:text-left'>
                             <div className='w-auto h-auto font-extrabold text-lg pb-6'>
                                 {t("Contacts")}
                             </div>
@@ -72,7 +72,7 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             <div className='w-auto h-auto py-2'>
                                 {t("Social")}:
                             </div>
-                            <div className='w-auto h-auto py-2 flex flex-row justify-start gap-2'>
+                            <div className='w-auto h-auto py-2 flex flex-row justify-center md:justify-start gap-2'>
                                 <a
                                     className='w-auto h-auto items-center'
                                     href='https://www.facebook.com/profile.php?id=61550025038542'
@@ -106,7 +106,7 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                         </div>
                         {/* Actions */}
-                        <div className='flex-initial flex flex-col text-left'>
+                        <div className='flex flex-col text-center md:text-left'>
                             <div className='w-auto h-auto font-extrabold text-lg pb-6'>
                                 {t("Action")}
                             </div>
@@ -144,41 +144,41 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                         </div>
                         {/* Receive information */}
-                        <div className='flex-initial flex flex-col text-left'>
+                        <div className='flex flex-col text-center md:text-left'>
                             <div className='w-auto h-auto font-extrabold text-lg pb-4'>
                                 {t("Receive-info")}
                             </div>
-                            <div className='w-auto h-auto py-2 flex flex-row gap-1'>
+                            <div className='w-auto h-auto py-2 flex flex-row gap-1 items-center'>
                                 <span className='w-auto'>{t("Name")}:</span>
                                 <input
                                     type='text'
                                     placeholder={t("Name-plh")}
-                                    className='rounded-lg w-full px-2 focus:bg-white
-                  focus:cursor-text outline-none text-slate-600'
+                                    className='rounded-md w-full p-2 focus:bg-white
+                  focus:cursor-text outline-none text-placeholder'
                                 ></input>
                             </div>
-                            <div className='w-auto h-auto py-2 flex flex-row gap-1'>
+                            <div className='w-auto h-auto py-2 flex flex-row gap-1 items-center'>
                                 <span className='whitespace-nowrap w-auto'>
                                     {t("Phone")}:{" "}
                                 </span>
                                 <input
                                     type='text'
                                     placeholder={t("Phone-plh")}
-                                    className='rounded-lg w-full px-2 focus:bg-white
-                  focus:cursor-text outline-none text-slate-600'
+                                    className='rounded-md w-full p-2 focus:bg-primary-white
+                  focus:cursor-text outline-none text-placeholder'
                                 ></input>
                             </div>
-                            <div className='w-auto h-auto py-2 flex flex-row gap-1'>
+                            <div className='w-auto h-auto py-2 flex flex-row gap-1 items-center'>
                                 <span className='w-auto'>Email:</span>
                                 <input
                                     type='text'
                                     placeholder={t("Email-plh")}
-                                    className='rounded-lg w-full px-2 focus:bg-white
-                  focus:cursor-text outline-none text-slate-600'
+                                    className='rounded-md w-full p-2 focus:bg-primary-white
+                  focus:cursor-text outline-none text-placeholder'
                                 ></input>
                             </div>
                             <div className='w-auto h-auto py-2'>
-                                <button className='w-full bg-white hover:bg-orange-100 transition-all duration-200 text-orange-500 rounded-lg'>
+                                <button className='w-full bg-primary-white hover:bg-primary-100 transition-all p-2 duration-200 text-primary rounded-md'>
                                     {t("Send")}
                                 </button>
                             </div>
