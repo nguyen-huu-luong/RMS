@@ -1,11 +1,12 @@
 import Association from "./Associations";
 import Loader from "../loader";
+import Customer from "./customer";
 
 class Tables {
     public async createTables() {
         try {
             await Association.initialize();
-            await Loader.sequenlize.sync({ alert: true });
+            await Loader.sequenlize.sync({ alter: true });
         }
         catch (err) {
             console.log("Create all tables failed!");
