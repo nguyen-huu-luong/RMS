@@ -1,6 +1,5 @@
 import Association from "./Associations";
 import Loader from "../loader";
-import Customer from "./customer";
 
 class Tables {
     public async createTables() {
