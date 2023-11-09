@@ -1,4 +1,6 @@
 import express, { Application, Request, Response } from 'express';
+import swaggerUI from 'swagger-ui-express'
+import * as swaggerDocument from './swagger/swagger.json'
 import * as dotenv from 'dotenv';
 import bodyParse from 'body-parser';
 import cors from 'cors';
@@ -24,6 +26,7 @@ class Server {
             origin: "*",
             credentials: true,
         }))
+        this.app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
         this.server = new http.Server(this.app);
     }
 
