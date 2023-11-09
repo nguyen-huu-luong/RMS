@@ -5,16 +5,16 @@ class DBConnect {
     public async checkDB() {
         try {
             const connection: Pool = new Pool({
-                host: process.env.HOST,
-                user: process.env.USER,
-                password: process.env.PASSWORD,
+                host: process.env.DB_HOST,
+                user: process.env.DB_USERNAME,
+                password: process.env.DB_PASSWORD,
             });
-            const query: string = `SELECT FROM pg_database WHERE datname = '${process.env.DATABASE}'`;
+            const query: string = `SELECT FROM pg_database WHERE datname = '${process.env.DB_DATABASE}'`;
             const dbQuery = await connection.query(query);
 
             if (dbQuery.rows.length === 0) {
                 // Database does not exist, make it:
-                await connection.query(`CREATE DATABASE "${process.env.DATABASE}"`);
+                await connection.query(`CREATE DATABASE "${process.env.DB_DATABASE}"`);
             }
             await connection.end();
         }

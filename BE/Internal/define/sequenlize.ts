@@ -7,11 +7,11 @@ class SeqObject {
     protected sequenlize: Sequelize;
     
     constructor() {
-        const database: string = process.env.DATABASE as string;
-        const user: string = process.env.USER as string;
-        const pswd: string = process.env.PASSWORD as string;
-        const dialect: Dialect = process.env.DIALECT as Dialect;
-        const host: string = process.env.HOST as string;
+        const database = process.env.DB_DATABASE as string;
+        const user = process.env.DB_USERNAME as string;
+        const pswd = process.env.DB_PASSWORD as string;
+        const dialect = process.env.DB_DIALECT as Dialect;
+        const host = process.env.DB_HOST ;
         this.sequenlize = new Sequelize(
             database, user, pswd, {
             host: host,

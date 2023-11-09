@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
 import message from '../define/message';
-import CustomerRepository from '../repository/customer.repository';
+import {CustomerRepository} from '../repository/implementation/customer.repository';
 import statusCode from '../define/status';
 import statusMess from '../define/statusMess';
+import { container } from '../config';
+import { ICustomerRepository } from '../repository/ICustomerRepository';
+import { TYPES } from '../repository/type';
 
 class CustomerService {
-
-    protected customerRepository: CustomerRepository;
-
-    constructor() {
-        this.customerRepository = new CustomerRepository();
-    }
+    constructor(
+        private customerRepository = container.get<ICustomerRepository>(TYPES.ICustomerRepository)
+    ) {}
 
     public async viewCustomers(req: Request, res: Response) {
         try {
