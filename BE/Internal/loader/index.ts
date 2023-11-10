@@ -4,7 +4,7 @@ import { Sequelize } from 'sequelize';
 
 class Loader {
     protected connection: DBConnect;
-    public static sequenlize: any = seqObj.getSequenlize();
+    public static sequelize = seqObj.getSequelize();
 
     constructor() {
         this.connection = new DBConnect();
@@ -12,8 +12,8 @@ class Loader {
     public async load() {
         try {
             await this.connection.checkDB();
-            await this.connection.connect(Loader.sequenlize);
-            await Loader.sequenlize.authenticate();
+            await this.connection.connect(Loader.sequelize);
+            await Loader.sequelize.authenticate();
             console.log("Load resources successfully!");
         }
         catch (err) {

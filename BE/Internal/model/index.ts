@@ -5,7 +5,7 @@ class Tables {
     public async createTables() {
         try {
             await Association.initialize();
-            await Loader.sequenlize.sync({ alter: true, });
+            // await Loader.sequelize.sync({ alter: true, });
         }
         catch (err) {
             console.log("Create all tables failed!");

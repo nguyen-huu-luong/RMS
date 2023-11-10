@@ -29,6 +29,6 @@ Table.init({
     capacity: DataTypes.INTEGER,
     floor: DataTypes.INTEGER,
     num_reserved: DataTypes.INTEGER,
-}, { sequelize: Loader.sequenlize })
+}, { sequelize: Loader.sequelize })
 
 export default Table

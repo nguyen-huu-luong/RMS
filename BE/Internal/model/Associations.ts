@@ -1,4 +1,4 @@
-import Customer from "./customer";
+import Customer from "./Client";
 import Order from "./order";
 import Table from "./table";
 import ClientAccount from "./clientAccount";

@@ -5,7 +5,7 @@ import { TYPES } from "../repository/type";
 import { CustomerRepository } from "../repository/implementation/customer.repository";
 import { IOrderRepository } from "../repository/IOrderRepository";
 
-export class InversifyContainer {
+class InversifyContainer {
     private container ;
 
     constructor() {
@@ -24,6 +24,6 @@ export class InversifyContainer {
     }
 }
 
-export const containerObj = new InversifyContainer()
-
-export default containerObj.getContainer();
+const containerObj = new InversifyContainer()
+const container = containerObj.getContainer()
+export default container;

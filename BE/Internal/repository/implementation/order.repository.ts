@@ -1,5 +1,5 @@
 import Order from "../../model/order";
-import Customer from "../../model/customer";
+import Customer from "../../model/Client";
 import message from "../../define/message";
 import { injectable } from "inversify";
 import "reflect-metadata";
