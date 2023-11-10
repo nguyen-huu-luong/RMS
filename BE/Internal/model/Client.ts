@@ -9,9 +9,7 @@ import {
 	type HasOneSetAssociationMixin,
 	type HasOneCreateAssociationMixin,
 } from "sequelize";
-import Order from "./order";
 import Loader from "../loader";
-import ClientAccount from "./clientAccount";
 
 class Client extends Model {
 	// declare getOrders: HasManyGetAssociationsMixin<Order>;
