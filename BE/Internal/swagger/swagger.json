@@ -1,0 +1,169 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "API document of RMS system",
+        "description": "This is a API application made with Express, Typescript, Sequenlize and documented with Swagger"
+    },
+    "license": {
+        "name": "MIT",
+        "url": "https://spdx.org/licenses/MIT.html"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3003/api/v1",
+            "description": "Local Dev"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Order",
+            "description": "API for order in the system"
+        },
+        {
+            "name": "Customer",
+            "description": "API for customer in the system"
+        }
+    ],
+    "paths": {
+        "/customer/all": {
+            "get": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Returns a list of all customers",
+                "responses": {
+                    "200": {
+                        "description": "A JSON array of customers",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Customer"
+                                    }
+                                },
+                                "example": [
+                                    {
+                                        "firstname": "Tony",
+                                        "lastname": "Nguyen",
+                                        "gender": "Male",
+                                        "birthday": "23/4/2023",
+                                        "avatar": "1000001111000111",
+                                        "score": 0,
+                                        "address": "Thu Duc City"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request from user"
+                    }
+                }
+            }
+        },
+        "/order": {
+            "post": {
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Create new order",
+                "requestBody": {
+                    "description": "Order object",
+                    "required": "True",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Order"
+                            },
+                            "example": {
+                                "status": "Processing",
+                                "descriptions": "First order",
+                                "pre_discount_ammount": 0,
+                                "shipping_address": "Thu Duc City",
+                                "amount": 0,
+                                "num_items": 2,
+                                "num_completed": 0
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create order successfully"
+                    },
+                    "400": {
+                        "description": "Create order failed"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Customer": {
+                "type": "object",
+                "properties": {
+                    "firstname": {
+                        "type": "string"
+                    },
+                    "lastname": {
+                        "type": "string"
+                    },
+                    "gender": {
+                        "type": "string"
+                    },
+                    "birthday": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "avatar": {
+                        "type": "string"
+                    },
+                    "score": {
+                        "type": "integer"
+                    },
+                    "address": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Order": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string"
+                    },
+                    "descriptions": {
+                        "type": "string"
+                    },
+                    "pre_discount_ammount": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "shipping_address": {
+                        "type": "string"
+                    },
+                    "payment_time": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "payment_method": {
+                        "type": "integer"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "num_items": {
+                        "type": "integer"
+                    },
+                    "num_completed": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}
