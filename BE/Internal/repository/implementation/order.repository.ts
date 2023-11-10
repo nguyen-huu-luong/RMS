@@ -1,4 +1,4 @@
-import Order from "../../model/order";
+import Order from "../../model/Order";
 import Customer from "../../model/Client";
 import message from "../../define/message";
 import { injectable } from "inversify";
