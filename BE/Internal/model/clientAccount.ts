@@ -4,20 +4,20 @@ import {
     type BelongsToGetAssociationMixin,
     type BelongsToSetAssociationMixin
 } from 'sequelize';
-import Customer from './customer';
+import Client from './Client';
 import Loader from '../loader';
 
 class ClientAccount extends Model {
-    declare setCustomer: BelongsToSetAssociationMixin<Customer, Customer>;
-    declare getCustomer: BelongsToGetAssociationMixin<Customer>;
-    declare createCustomer: BelongsToCreateAssociationMixin<Customer>;
+    declare setClient: BelongsToSetAssociationMixin<Client, Client>;
+    declare getClient: BelongsToGetAssociationMixin<Client>;
+    declare createClient: BelongsToCreateAssociationMixin<Client>;
 
     public static association() {
-        ClientAccount.assocCustomer();
+        ClientAccount.assocClient();
     }
 
-    public static assocCustomer() {
-        ClientAccount.belongsTo(Customer);
+    public static assocClient() {
+        ClientAccount.belongsTo(Client);
     }
 }
 
@@ -28,6 +28,6 @@ ClientAccount.init({
     encrypted_password: DataTypes.STRING,
     is_active: DataTypes.BOOLEAN,
     language: DataTypes.STRING,
-}, { sequelize: Loader.sequenlize })
+}, { sequelize: Loader.sequelize })
 
 export default ClientAccount;

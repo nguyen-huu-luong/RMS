@@ -1,16 +1,14 @@
 import { Request, Response } from 'express';
 import message from '../define/message';
-import OrderRepository from '../repository/order.repository';
+import OrderRepository from '../repository/implementation/order.repository';
 import statusCode from '../define/status';
 import statusMess from '../define/statusMess';
+import { container } from '../config';
+import { IOrderRepository } from '../repository/IOrderRepository';
+import { TYPES } from '../repository/type';
 
 class OrderService {
-
-    protected orderRepository: OrderRepository;
-
-    constructor() {
-        this.orderRepository = new OrderRepository();
-    }
+    constructor(private orderRepository = container.get<IOrderRepository>(TYPES.IOrderRepository)) {}
 
     public async viewOrders(req: Request, res: Response) {
         try {

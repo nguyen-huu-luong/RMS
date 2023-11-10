@@ -9,29 +9,29 @@ import {
     type BelongsToSetAssociationMixin
 } from 'sequelize';
 import Loader from '../loader';
-import Customer from './customer';
+import Client from './Client';
 import Table from './table';
 
 class Order extends Model {
-    declare setTables: BelongsToManySetAssociationsMixin<Table, Table>;
-    declare getTables: BelongsToManyGetAssociationsMixin<Table>;
-    declare addTables: BelongsToManyAddAssociationMixin<Table, Table>;
-    declare removeTables: BelongsToManyRemoveAssociationMixin<Table, Table>;
-    declare setCustomer: BelongsToSetAssociationMixin<Customer, Customer>;
-    declare getCustomer: BelongsToGetAssociationMixin<Customer>;
-    declare createCustomer: BelongsToCreateAssociationMixin<Customer>;
+    // declare setTables: BelongsToManySetAssociationsMixin<Table, Table>;
+    // declare getTables: BelongsToManyGetAssociationsMixin<Table>;
+    // declare addTables: BelongsToManyAddAssociationMixin<Table, Table>;
+    // declare removeTables: BelongsToManyRemoveAssociationMixin<Table, Table>;
+    // declare setClient: BelongsToSetAssociationMixin<Client, Client>;
+    // declare getClient: BelongsToGetAssociationMixin<Client>;
+    // declare createClient: BelongsToCreateAssociationMixin<Client>;
 
     public static association() {
-        Order.assocCustomer();
-        Order.assocTable();
+        // Order.assocClient();
+        // Order.assocTable();
     }
 
-    public static assocCustomer() {
-        Order.belongsTo(Customer)
+    public static assocClient() {
+        // Order.belongsTo(Client)
     }
 
     public static assocTable() {
-        Order.belongsToMany(Table, { through: "Table_order" });
+        // Order.belongsToMany(Table, { through: "Table_order" });
     }
 }
 
@@ -46,6 +46,6 @@ Order.init({
     num_items: DataTypes.INTEGER,
     num_completed: DataTypes.INTEGER,
 
-}, { sequelize: Loader.sequenlize })
+}, { sequelize: Loader.sequelize })
 
 export default Order;

@@ -1,19 +1,16 @@
-import Order from "../model/order";
-import Customer from "../model/customer";
-import message from "../define/message";
+import Order from "../../model/order";
+import Customer from "../../model/Client";
+import message from "../../define/message";
+import { injectable } from "inversify";
+import "reflect-metadata";
+import { IOrderRepository } from "../IOrderRepository";
 
-class OrderRepository {
-    protected order: any;
-    protected customer: any
-
-    constructor() {
-        this.order = Order;
-        this.customer = Customer
-    }
-
+@injectable()
+class OrderRepository implements IOrderRepository {
+    
     public async viewOrders() {
         try {
-            const allOrder: Order = await this.order.findAll();
+            const allOrder = await Order.findAll();
             return JSON.stringify(allOrder)
         }
         catch (err) {
@@ -23,7 +20,8 @@ class OrderRepository {
 
     public async createOrder(data: any) {
         try {
-            await this.order.create(data);
+            const order = await Order.create(data);
+            console.log(order.getDataValue('id'))
         }
         catch (err) {
             message.queryError(err);
@@ -34,17 +32,19 @@ class OrderRepository {
         try {
             const orderId = data.order;
             const userId = data.user;
-            const order: Order = await this.order.findOne({
+            const order = await Order.findOne({
                 where: {
                     id: orderId
                 }
             })
-            const user: Customer = await this.customer.findOne({
+            const user = await Customer.findOne({
                 where: {
                     id: userId
                 }
             })
-            await order.setCustomer(user);
+            if (order && user) {
+                // await order.setCustomer(user);
+            }
         }
         catch (err) {
             message.queryError(err);
