@@ -21,13 +21,31 @@ class ClientAccount extends Model {
     }
 }
 
-ClientAccount.init({
-    username: DataTypes.STRING,
-    phone: DataTypes.INTEGER,
-    email: DataTypes.STRING,
-    encrypted_password: DataTypes.STRING,
-    is_active: DataTypes.BOOLEAN,
-    language: DataTypes.STRING,
-}, { sequelize: Loader.sequelize })
+ClientAccount.init(    {
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    hashedPassword: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    isRegistered: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+    language: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  }, { sequelize: Loader.sequelize })
 
 export default ClientAccount;
