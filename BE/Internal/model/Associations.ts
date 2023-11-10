@@ -6,10 +6,10 @@ import ClientAccount from "./clientAccount";
 class Association {
     public static async initialize() {
         try {
-            await Customer.association();
-            await Order.association();
-            await Table.association();
-            await ClientAccount.association();
+            // await Customer.association();
+            // await Order.association();
+            // await Table.association();
+            // await ClientAccount.association();
         }
         catch (err) {
             console.log("Initialize association failed!");

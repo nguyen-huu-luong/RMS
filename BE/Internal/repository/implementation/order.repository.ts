@@ -43,7 +43,7 @@ class OrderRepository implements IOrderRepository {
                 }
             })
             if (order && user) {
-                await order.setCustomer(user);
+                // await order.setCustomer(user);
             }
         }
         catch (err) {
