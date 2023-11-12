@@ -67,7 +67,12 @@ npx sequelize-cli migration:generate --name add-campaign-targetList-association
 # Campaign has many EmailCampaign (1:N)
 npx sequelize-cli migration:generate --name add-campaignId-to-email-campaign
 
+# Cart vs Product (M:N) --> CartItems
+npx sequelize-cli migration:generate --name add-cart-product-association
 
+
+# Order vs Product (M:N) --> OrderItem
+npx sequelize-cli migration:generate --name add-order-product-association
 
 
 
