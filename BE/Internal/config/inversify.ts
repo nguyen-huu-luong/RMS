@@ -1,9 +1,11 @@
 import { Container } from "inversify";
-import OrderRepository from "../repository/implementation/order.repository";
-import { ICustomerRepository } from "../repository/ICustomerRepository";
+import OrderRepository from "../repository/implementation/OrderRepository";
 import { TYPES } from "../repository/type";
-import { CustomerRepository } from "../repository/implementation/customer.repository";
 import { IOrderRepository } from "../repository/IOrderRepository";
+import { IClientRepository } from "../repository/IClientRepository";
+import { ClientRepository } from "../repository/implementation/ClientRepository";
+import { EmployeeRepository } from "../repository/implementation/EmployeeRepository";
+import { IEmployeeRepository } from "../repository/IEmployeeRepository";
 
 class InversifyContainer {
     private container ;
@@ -19,8 +21,10 @@ class InversifyContainer {
 
     public register() {
         // register repository here
-        this.container.bind<ICustomerRepository>(TYPES.ICustomerRepository).to(CustomerRepository)
+        this.container.bind<IClientRepository>(TYPES.IClientRepository).to(ClientRepository)
         this.container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository)
+        this.container.bind<IEmployeeRepository>(TYPES.IEmployeeRepository).to(EmployeeRepository)
+        // this.container.bind<IBaseRepository>(TYPES.IBaseRepository).to(BaseRepository)
     }
 }
 

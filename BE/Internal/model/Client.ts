@@ -9,6 +9,7 @@ import {
 	type HasOneSetAssociationMixin,
 	type HasOneCreateAssociationMixin,
 } from "sequelize";
+import bcrypt from "bcrypt";
 import Loader from "../loader";
 import Order from "./Order";
 import Cart from "./Cart";
@@ -24,6 +25,11 @@ class Client extends Model {
 	declare getClient: HasOneGetAssociationMixin<Client>;
 	declare setClient: HasOneSetAssociationMixin<Client, Client>;
 	declare createClient: HasOneCreateAssociationMixin<Client>;
+
+	declare isRegistered: boolean;
+	declare firstname: string;
+	declare lastname: string;
+	declare hashedPassword: string;
 
 	public static associate() {
 		Client.hasMany(Order, {
@@ -54,6 +60,11 @@ class Client extends Model {
 			foreignKey: "clientId",
 			otherKey: "targetListId",
 		});
+	}
+
+	async checkPassword(password: string) {
+		const result = await bcrypt.compare(password, this.hashedPassword);
+		return result;
 	}
 }
 

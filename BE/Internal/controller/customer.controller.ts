@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import CustomerService from '../service/customer.service';
+import CustomerService from '../service/Client.service';
 
 class CustomerController {
     protected customerService: CustomerService;
