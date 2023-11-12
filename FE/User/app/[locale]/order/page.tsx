@@ -3,6 +3,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-export default function Order({ params }: { params: { locale: string } }) {
+export default function Order() {
     return <div>Order</div>;
 }
