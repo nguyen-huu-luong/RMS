@@ -1,29 +1,29 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('ClientAccounts', {
+    await queryInterface.createTable('EmailCampaigns', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      username: {
+      name: {
         type: Sequelize.STRING
       },
-      role: {
+      status: {
         type: Sequelize.STRING
       },
-      hashedPassword: {
+      startDate: {
+        type: Sequelize.DATE
+      },
+      subject: {
         type: Sequelize.STRING
       },
-      isRegisterd: {
-        type: Sequelize.BOOLEAN
+      sendFrom: {
+        type: Sequelize.STRING
       },
-      isActive: {
-        type: Sequelize.BOOLEAN
-      },
-      language: {
+      sendTo: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -37,6 +37,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('ClientAccounts');
+    await queryInterface.dropTable('EmailCampaigns');
   }
 };

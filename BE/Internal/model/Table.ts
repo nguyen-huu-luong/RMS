@@ -1,34 +1,38 @@
-import {
-    Model, DataTypes,
-    type BelongsToManySetAssociationsMixin,
-    type BelongsToManyAddAssociationMixin,
-    type BelongsToManyGetAssociationsMixin,
-    type BelongsToManyRemoveAssociationMixin
-} from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import Loader from '../loader';
-import Order from './order';
 
 class Table extends Model {
-    declare setOrders: BelongsToManySetAssociationsMixin<Order, Order>;
-    declare getOrders: BelongsToManyGetAssociationsMixin<Order>;
-    declare addOrders: BelongsToManyAddAssociationMixin<Order, Order>;
-    declare removeOrders: BelongsToManyRemoveAssociationMixin<Order, Order>;
-
-    public static association() {
-        Table.assocOrder();
-    }
-
-    public static assocOrder() {
-        Table.belongsToMany(Order, { through: "Table_order" });
-    }
+  static associate() {}
 }
 
-Table.init({
-    name: DataTypes.STRING,
-    status: DataTypes.STRING,
-    capacity: DataTypes.INTEGER,
-    floor: DataTypes.INTEGER,
-    num_reserved: DataTypes.INTEGER,
-}, { sequelize: Loader.sequelize })
+Table.init(
+  {
+    name: {
+      type: DataTypes.STRING,
+    },
+    type: {
+      type: DataTypes.STRING,
+    },
+    status: {
+      type: DataTypes.STRING,
+    },
+    startDate: {
+      type: DataTypes.DATE,
+    },
+    endDate: {
+      type: DataTypes.DATE,
+    },
+    budget: {
+      type: DataTypes.FLOAT,
+    },
+    unit: {
+      type: DataTypes.STRING,
+    },
+    totalSent: {
+      type: DataTypes.INTEGER,
+    },
+  },
+  { sequelize: Loader.sequelize }
+);
 
-export default Table
+export default Table;

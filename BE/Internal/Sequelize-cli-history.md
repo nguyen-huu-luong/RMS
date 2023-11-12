@@ -5,10 +5,10 @@ https://codebysamgan.com/sequelize-cli-commands
 npx sequelize-cli model:generate --name Client --attributes email:string,phone:string,firstname:string,lastname:string,gender:boolean,birthday:date,avatar:blob,score:integer,address:string,source:string,type:string
 
 # ClientAccout
-npx sequelize-cli model:generate --name ClientAccount --attributes username:string, role:string, hashedPassword:string, isRegisterd: boolean, isActive:boolean, language:string
+npx sequelize-cli model:generate --name ClientAccount --attributes username:string,role:string, hashedPassword:string,isRegisterd:boolean,isActive:boolean,language:string
 
 # Employee 
-npx sequelize-cli model:generate --name Employee --attributes email:string,phone:string,firstname:string,lastname:string,gender:boolean,birthday:date,avatar:blob, role:string, hashedPassword:string, isActive: boolean, language:string
+npx sequelize-cli model:generate --name Employee --attributes email:string,phone:string,firstname:string,lastname:string,gender:boolean,birthday:date,avatar:blob,role:string, hashedPassword:string,isActive:boolean,language:string
  
 # Order
 npx sequelize-cli model:generate --name Order --attributes status:string,descriptions:string,discountAmount:float,amount:float,num_items:integer,shippingAddress:string,paymentMethod:string
@@ -39,15 +39,42 @@ npx sequelize-cli model:generate --name TargetList --attributes name:string,desc
 npx sequelize-cli model:generate --name ChatMessage --attributes // Thêm thuộc tính cho ChatMessage tại đây
 
 # ChatMessage
-npx sequelize-cli model:generate --name ChatMessage --attributes // Thêm thuộc tính cho ChatMessage tại đây
+npx sequelize-cli model:generate --name ChatMessage --attributes 
+
+# EmailCampaign
+npx sequelize-cli model:generate --name EmailCampaign --attributes name:string,status:string,startDate:date,subject:string,sendFrom:string,sendTo:string
+
+
+###### Association
+
+# Client has many order
+npx sequelize-cli migration:generate --name add-client-id-to-orders
+
+# Client has one cart
+npx sequelize-cli migration:generate --name add-client-id-to-carts
+
+
+# Employee create many Client
+npx sequelize-cli migration:generate --name add-creator-id-to-clients
+
+# Target list vs Client (M:N)
+npx sequelize-cli migration:generate --name add-client-targetList-association
+
+
+# Target list vs Campaign (M:N)
+npx sequelize-cli migration:generate --name add-campaign-targetList-association
+
+# Campaign has many EmailCampaign (1:N)
+npx sequelize-cli migration:generate --name add-campaignId-to-email-campaign
 
 
 
 
-npx sequelize-cli model:generate --name Employee --attributes email:string,phone:string,firstname:string,lastname:string,gender:boolean,birthday:date,avatar:string,language:string,is_active:boolean,username:string,role:string,created_at:date,updated_at:date
-
-
-npx sequelize-cli model:generate --name Order --attributes status:string,descriptions:string,pre_discount_amount:float,amount:float,num_items:integer,num_completed:integer,shipping_address:string,payment_time:timestamp,payment_method:string,customer_id:integer,voucher_id:integer,table_id:integer,created_at:date,updated_at:date
 
 
 
+### Update:
+# 12/11/2023
+- Delete ClientAccout
+- Not using AdminAccount
+- Merge Account attributes to Client, Employee

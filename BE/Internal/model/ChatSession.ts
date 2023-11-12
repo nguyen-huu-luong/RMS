@@ -9,7 +9,6 @@ import {
 	type HasOneSetAssociationMixin,
 	type HasOneCreateAssociationMixin,
 } from "sequelize";
-import Order from "./order";
 import Loader from "../loader";
   class ChatSession extends Model {
      public static association() {

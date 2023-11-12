@@ -41,6 +41,21 @@ module.exports = {
       type: {
         type: Sequelize.STRING
       },
+      role: {
+        type: Sequelize.STRING
+      },
+      hashedPassword: {
+        type: Sequelize.STRING
+      },
+      isRegistered: {
+        type: Sequelize.BOOLEAN
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN
+      },
+      language: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

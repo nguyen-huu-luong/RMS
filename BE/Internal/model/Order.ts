@@ -1,8 +1,21 @@
 import { Model, DataTypes } from "sequelize";
 import Loader from "../loader";
+import { Product, Client, OrderItem } from ".";
 
 class Order extends Model {
-	static associate() {}
+	static associate() {
+		Order.belongsTo(Client, {
+			foreignKey: {
+				name: "clientId",
+			},
+		});
+
+		Order.belongsToMany(Product, {
+			through: OrderItem,
+			foreignKey: "orderId",
+			otherKey: "productId",
+		});
+	}
 }
 
 Order.init(
@@ -18,4 +31,4 @@ Order.init(
 	{ sequelize: Loader.sequelize }
 );
 
-export default Order ;
+export default Order;

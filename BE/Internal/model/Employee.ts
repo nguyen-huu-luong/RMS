@@ -10,6 +10,7 @@ import {
 	type HasOneCreateAssociationMixin,
 } from "sequelize";
 import Loader from "../loader";
+import Client from "./Client";
 
   class Employee extends Model {
     /**
@@ -18,8 +19,12 @@ import Loader from "../loader";
      * The `models/index` file will call this method automatically.
      */
      public static association() {
-      // Client.assocOrder();
-      // Client.assocAccount();
+        Employee.hasMany(Client, {
+            foreignKey: {
+                name: "creatorId",
+                allowNull: true
+            }
+        })
     }
   };
 

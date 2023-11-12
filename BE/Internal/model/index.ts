@@ -1,12 +1,12 @@
 import Association from "./Associations";
 import Loader from "../loader";
+import Cart from "./Cart";
 
 class Tables {
     public async createTables() {
         try {
             await Association.initialize();
-            // await Loader.sequelize.sync({ alter: true, });
-
+            // await Loader.sequelize.sync({alter: true});
         }
         catch (err) {
             console.log("Create all tables failed!");
@@ -16,3 +16,21 @@ class Tables {
 }
 
 export default Tables;
+
+export {default as Client} from './Client'
+export {default as Employee} from './Employee'
+export {default as Campaign} from './Campaign'
+export {default as Cart} from './Cart'
+export {default as ChatMessage} from './ChatMessage'
+export {default as ChatSession} from './ChatSession'
+export {default as Messagetemplate} from './Messagetemplate'
+export {default as Order} from './Order'
+export {default as Product} from './Product'
+export {default as Reservation} from './Reservation'
+export {default as Table} from './Table'
+export {default as Targetlist} from './Targetlist'
+export {default as ClientTargetList} from './ClientTargetList'
+export {default as CampaignTargetList} from './CampaignTargetList'
+export {default as EmailCampaign} from './EmailCampaign'
+export {default as CartItem} from './CartItem'
+export {default as OrderItem} from './OrderItem'

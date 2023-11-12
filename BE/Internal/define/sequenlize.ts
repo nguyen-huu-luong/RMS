@@ -17,7 +17,10 @@ class SeqObject {
             database, user, pswd, {
                 host: host,
                 dialect: dialect,
-                logging: false
+                logging: false,
+                define: {
+                    underscored: false
+                }
             });
         }
         
