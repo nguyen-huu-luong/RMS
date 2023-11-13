@@ -10,6 +10,7 @@ import {
 	Product,
 	Targetlist,
 } from ".";
+import Token from "./Token";
 
 class Association {
 	public static initialize() {
@@ -21,11 +22,13 @@ class Association {
 			Campaign.associate();
 			EmailCampaign.associate();
 			Product.associate();
+            Token.associate() ;
 
 		} catch (err) {
 			console.log("Initialize association failed!");
 			console.log(`Err: ${err}`);
-		}
+		} 
+
 	}
 }
 

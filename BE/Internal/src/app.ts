@@ -1,4 +1,5 @@
 import express, { Application, NextFunction, Request, Response } from "express";
+import cookieParser from 'cookie-parser'
 import swaggerUI from "swagger-ui-express";
 import * as swaggerDocument from "../swagger/swagger.json";
 import * as dotenv from "dotenv";
@@ -16,6 +17,7 @@ declare global {
     namespace Express {
       interface Request {
         userId: number;
+        token: string;
       }
     }
   }
@@ -35,6 +37,7 @@ class Server {
 				credentials: true,
 			})
 		);
+        this.app.use(cookieParser())
 
         // router to api documentation
 		this.app.use(

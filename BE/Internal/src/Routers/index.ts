@@ -1,36 +1,42 @@
-import express, { Application, NextFunction, Request, Response, Router } from 'express';
-import OrderRouter from './Order.router';
-import CustomerRouter from './Client.router';
-import AuthRouter from './Auth.router';
-import { HttpStatusCode } from '../Constants';
+import express, {
+	Application,
+	NextFunction,
+	Request,
+	Response,
+	Router,
+} from "express";
+import OrderRouter from "./Order.router";
+import CustomerRouter from "./Client.router";
+import AuthRouter from "./Auth.router";
+import { HttpStatusCode } from "../Constants";
+import { NotFoundError } from "../Errors";
 
 class Routers {
-    public initialize(app: Application) {
-        const router = express.Router();
-        const orderRouter = new OrderRouter();
-        const customerRouter = new CustomerRouter();
-        const authRouter = new AuthRouter() ;
-        // declare your router here
-
-        orderRouter.initialize(router);
-        customerRouter.initialize(router);
-        // router.use("/athe", authMiddleware.verifyToken, orderRouter.getRouter();)
-        
-        app.use("/auth", authRouter.initialize()) ;
-        // initialize your router here
-        app.use("/api/v1", router)
+	public initialize(app: Application) {
+		const router = Router();
+		const orderRouter = new OrderRouter();
+		const customerRouter = new CustomerRouter();
+		const authRouter = new AuthRouter();
+		// declare your router here
+		app.use("/auth", authRouter.initialize());
 
         
-        router.all('*', (request: Request, response: Response, next: NextFunction) => {
-            response.status(HttpStatusCode.NotFound).send({
-                success: false,
-                msg: "API Not found"
-            })
-        });
+		orderRouter.initialize(router);
+		customerRouter.initialize(router);
+		app.use("/api/v1", router);
 
+		app._router.all(
+			"*",
+			(request: Request, response: Response, next: NextFunction) => {
+				let err = new NotFoundError("Không có api");
+				response.status(HttpStatusCode.NotFound).send(err.toPlainObject());
+			}
+		);
+		// // router.use("/athe", authMiddleware.verifyToken, orderRouter.getRouter();)
 
-        
-    }
+		// // initialize your router here
+		// app.use("/api/v1", router);
+	}
 }
 
 const router = new Routers();

@@ -23,7 +23,7 @@ abstract class BaseMiddleware {
       return this.handle();
     }
   
-    private static setProperties(
+    protected static setProperties(
       request: Request, response: Response, next: NextFunction, error?: any,
     ): any {
       this.error = error;
