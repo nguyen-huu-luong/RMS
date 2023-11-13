@@ -1,32 +1,24 @@
 import { NextFunction, Request, Response } from "express";
-import { Token } from "../Utils";
+import { TokenUtil } from "../Utils";
+import { BaseMiddleware } from "./BaseMiddleware";
 
-class AuthMiddleware {
-    public async verifyToken (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ){
-        let token =
-            req.body["token"] ||
-            req.query["token"] ||
-            req.headers.x_authorization ||
-            req.headers.authorization  || "";
-        if (token.startsWith("Bearer ")) {
-            token = token.split(" ")[1];
-        }
+class AuthMiddleware extends BaseMiddleware {
+	protected static handle(): any {
+		this.verifyToken();
+	}
 
-        try {
-            const decoded = await Token.verify(token) 
-            console.log(decoded) ;
-        } catch (error: any) {
-            res.send({
-                success: false,
-                message: error?.message || "Something went wrong!"
-            })
-        }        
-    };
+	private static async verifyToken(): Promise<any> {
+		let token = this.request.headers.authorization || "";
+		if (token.startsWith("Bearer ")) {
+			token = token.split(" ")[1];
+		}
+		try {
+			const decoded = await TokenUtil.verify(token);
+			console.log(decoded);
+		} catch (error: any) {
+			this.next(error);
+		}
+	}
 }
 
-
-export default new AuthMiddleware();
+export { AuthMiddleware };

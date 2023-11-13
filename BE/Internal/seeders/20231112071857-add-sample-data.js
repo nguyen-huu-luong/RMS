@@ -21,7 +21,7 @@ module.exports = {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		}));        
-
+        await queryInterface.bulkInsert('Clients', clients);
 	},
 
 	down: async (queryInterface, Sequelize) => {

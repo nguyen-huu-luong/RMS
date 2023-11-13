@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import crypto from 'crypto';
 class TokenUtil {
 	static async verify(token: string): Promise<any> {
 		const secket_key = process.env.SECRET_KEY;
@@ -18,16 +19,13 @@ class TokenUtil {
 		);
 	}
 
-	static sign(data: any, expiresIn: string | number) {
-		const secket_key = process.env.SECRET_KEY;
-		if (!secket_key) {
-			throw Error("Can't found serket key!");
-		}
-		const token = jwt.sign({ data }, secket_key, {
-			expiresIn,
-		});
-		return token;
-	}
+	static hash(token: string, secret: string) {
+        if (!secret) {
+            throw new Error("Secket key required")
+        }
+        const hash = crypto.createHmac('sha256', secret).update(token).digest('hex');
+        return hash;
+    }
 }
 
-export default TokenUtil;
+export {TokenUtil};
