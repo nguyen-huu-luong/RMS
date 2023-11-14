@@ -1,32 +1,44 @@
 import { NextFunction, Request, Response } from "express";
-import { Token } from "../Utils";
+import { TokenUtil } from "../Utils";
+import { BaseMiddleware } from "./BaseMiddleware";
+import { BadRequestError, CustomError, UnauthorizedError } from "../Errors";
+import {TokenExpiredError, JsonWebTokenError} from "jsonwebtoken";
+import { HttpStatusCode } from "../Constants";
 
-class AuthMiddleware {
-    public async verifyToken (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ){
-        let token =
-            req.body["token"] ||
-            req.query["token"] ||
-            req.headers.x_authorization ||
-            req.headers.authorization  || "";
-        if (token.startsWith("Bearer ")) {
-            token = token.split(" ")[1];
-        }
+class AuthMiddleware extends BaseMiddleware {
+	protected static handle(): any {
+		this.verifyToken();
+	}
 
-        try {
-            const decoded = await Token.verify(token) 
-            console.log(decoded) ;
-        } catch (error: any) {
-            res.send({
-                success: false,
-                message: error?.message || "Something went wrong!"
-            })
-        }        
-    };
+	public static initialize = (
+		request: Request,
+		response: Response,
+		next: NextFunction
+	) => {
+		this.setProperties(request, response, next);
+		return this.handle();
+	};
+
+	private static async verifyToken(): Promise<any> {
+		const authHeader = this.request.header("Authorization");
+		if (!authHeader?.startsWith("Bearer ")) {
+			throw new UnauthorizedError("You are unauthenticated!");
+		}
+		let token = authHeader.split(" ")[1];
+
+		try {
+			const decoded = await TokenUtil.verify(token);
+			console.log(decoded);
+			this.request.userId = decoded.id;
+			this.request.token = token;
+			this.next();
+		} catch (error: any) {
+            if (error instanceof TokenExpiredError || JsonWebTokenError) {
+                this.next(new UnauthorizedError(error.message, error.stack))
+            } 
+			this.next(error);
+		}
+	}
 }
 
-
-export default new AuthMiddleware();
+export { AuthMiddleware };

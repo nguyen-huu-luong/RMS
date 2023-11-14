@@ -12,5 +12,9 @@ export class EmployeeRepository extends BaseRepository<Employee> implements IEmp
         super(Employee);
     }
 
+    public async findByUsername(username: string) {
+        return await this._model.findOne({where: {username}})
+    }
+
     
 }

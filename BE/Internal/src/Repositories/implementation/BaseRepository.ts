@@ -3,7 +3,7 @@ import { IBaseRepository } from "../IBaseRepository";
 import { injectable, unmanaged } from "inversify";
 
 @injectable()
-export abstract class BaseRepository<M extends Model> implements IBaseRepository {
+export abstract class BaseRepository<M extends Model> implements IBaseRepository<M> {
     protected _model: ModelStatic<M> ;
 	constructor(@unmanaged() model: ModelStatic<M>
     ) {

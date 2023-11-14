@@ -1,33 +1,25 @@
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { ACCESS_TOKEN } from "../Constants";
 class TokenUtil {
 	static async verify(token: string): Promise<any> {
-		const secket_key = process.env.SECRET_KEY;
+		const secket_key = ACCESS_TOKEN.secret;
 		if (!secket_key) {
 			throw Error("Can't found serket key!");
 		}
-		jwt.verify(
-			token,
-			secket_key,
-			(err: jwt.VerifyErrors | null, decoded: any) => {
-				if (err) {
-					throw err;
-				} else {
-					return decoded;
-				}
-			}
-		);
+		return jwt.verify(token, secket_key);
 	}
 
-	static sign(data: any, expiresIn: string | number) {
-		const secket_key = process.env.SECRET_KEY;
-		if (!secket_key) {
-			throw Error("Can't found serket key!");
+	static hash(token: string, secret: string) {
+		if (!secret) {
+			throw new Error("Secket key required");
 		}
-		const token = jwt.sign({ data }, secket_key, {
-			expiresIn,
-		});
-		return token;
+		const hash = crypto
+			.createHmac("sha256", secret)
+			.update(token)
+			.digest("hex");
+		return hash;
 	}
 }
 
-export default TokenUtil;
+export { TokenUtil };
