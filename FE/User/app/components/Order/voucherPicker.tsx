@@ -17,12 +17,12 @@ const VoucherPicker = ({
             description: string;
             category: string;
         }[];
+        closeModal: () => void;
     };
 }) => {
-    const [option, selectOption] = useState(null);
     const condition: boolean = true;
     return (
-        <div className='h-auto w-auto max-w-md p-5 bg-primary-white rounded-xl flex flex-col gap-2'>
+        <div className='h-auto w-auto max-w-md absolute top-5 right-0 p-5 bg-primary-white rounded-xl flex flex-col gap-2 shadow-lg transition-all duration-300'>
             <span className='font-extrabold text-item-black'>
                 Pick a voucher
             </span>
@@ -86,10 +86,16 @@ const VoucherPicker = ({
                 ))}
             </div>
             <div className='flex flex-row justify-end gap-3 w-full'>
-                <button className='text-item-white rounded-lg p-2 bg-slate-400 hover:bg-slate-300 font-bold transition-all ease-in duration-300'>
+                <button
+                    onClick={params.closeModal}
+                    className='text-item-white rounded-lg p-2 bg-slate-400 hover:bg-slate-300 font-bold transition-all ease-in duration-300'
+                >
                     CANCEL
                 </button>
-                <button className='text-item-white rounded-lg p-2 bg-primary hover:bg-primary-400 font-bold transition-all ease-in duration-300'>
+                <button
+                    onClick={params.closeModal}
+                    className='text-item-white rounded-lg p-2 bg-primary hover:bg-primary-400 font-bold transition-all ease-in duration-300'
+                >
                     CONFIRM
                 </button>
             </div>
