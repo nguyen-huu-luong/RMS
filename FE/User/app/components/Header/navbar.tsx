@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import LanguageChanger from "./languageChanger";
 import Container from "../container";
 import Image from "next/image";
-import Link from "next/link";
+import Link from 'next-intl/link';
+import { useLocale } from "next-intl";
 import {
     SearchOutlined,
     ShoppingCartOutlined,
@@ -13,7 +14,9 @@ import {
 import { Avatar, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 
-const NavBar = ({ params }: { params: { locale: string } }) => {
+const NavBar = () => {
+    const locale = useLocale();
+
     const [click, setClick] = useState(false);
     const [search, setSearch] = useState(true);
     const MENU_LISTS = [
@@ -27,7 +30,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
         {
             key: "profile",
             label: (
-                <Link key={"profile"} href={`/${params.locale}/account`}>
+                <Link key={"profile"} href={`/account`} locale={locale}>
                     Profile
                 </Link>
             ),
@@ -35,7 +38,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
         {
             key: "logout",
             label: (
-                <Link key={"logout"} href={`/${params.locale}/login`}>
+                <Link key={"logout"} href={`/login`} locale={locale}>
                     Log Out
                 </Link>
             ),
@@ -50,7 +53,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
     const t = useTranslations("NavBar");
     return (
         <>
-            <nav className='sticky top-0 w-full h-16 shadow-md z-10 bg-primary-white'>
+            <nav className='sticky top-0 w-full h-16 shadow-md z-50 bg-primary-white'>
                 <Container>
                     <div className='w-full h-full flex flex-row font-bold'>
                         {/* Left header */}
@@ -61,7 +64,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                         >
                             {/* Restaurant logo */}
                             <div className='hidden md:block h-full w-auto flex-none'>
-                                <Link href={`/${params.locale}`}>
+                                <Link href={`/`} locale={locale}>
                                     <Image
                                         src='/restaurant-logo.png'
                                         alt='Restaurant logo'
@@ -117,7 +120,8 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                                 <div className='flex flex-row justify-between gap-5 w-full'>
                                     {MENU_LISTS.map((item) => (
                                         <Link
-                                            href={`/${params.locale}/${item.href}`}
+                                            href={`/${item.href}`}
+                                            locale={locale}
                                             className='hover:text-primary transition-all ease-in-out duration-200'
                                             key={item.name}
                                         >
@@ -160,9 +164,7 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
 
                             {search ? (
                                 <>
-                                    <LanguageChanger
-                                        params={{ locale: params.locale }}
-                                    ></LanguageChanger>
+                                    <LanguageChanger/>
                                     <div className='hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'>
                                         <ShoppingCartOutlined
                                             style={{ fontSize: "1.6rem" }}
@@ -193,10 +195,11 @@ const NavBar = ({ params }: { params: { locale: string } }) => {
                     {MENU_LISTS.map((item) => (
                         <Link
                             key={item.name}
-                            href={`/${params.locale}/${item.href}`}
+                            href={`/${item.href}`}
                             onClick={(click) => {
                                 setClick(!click);
                             }}
+                            locale={locale}
                             className='block font-bold pl-3 p-2 hover:text-item-white hover:bg-primary rounded-md ease-in-out duration-200 hover:translate-x-2 transition-all w-full'
                         >
                             {t(item.name)}
