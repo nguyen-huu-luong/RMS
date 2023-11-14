@@ -19,7 +19,7 @@ import Employee from "./Employee";
 import TargetList from "./Targetlist";
 import ClientTargetList from "./ClientTargetList";
 import Token from "./Token";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../Constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN, Role } from "../Constants";
 import jwt from "jsonwebtoken";
 import { TokenUtil } from "../Utils";
 
@@ -91,6 +91,7 @@ class Client extends Model {
 				id: user.id.toString(),
 				fullName: `${user.firstname} ${user.lastname}`,
 				email: user.email,
+                role: Role.USER
 			},
 			ACCESS_TOKEN.secret,
 			{

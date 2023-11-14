@@ -1,6 +1,7 @@
 export enum Role {
     MANAGER = 'manager',
     EMPLOYEE = 'employee',
+    USER = 'user'
 } 
 
 export enum ClientType {
