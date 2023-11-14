@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import LanguageChanger from "./languageChanger";
 import Container from "../container";
 import Image from "next/image";
-import Link from 'next-intl/link';
+import Link from "next-intl/link";
 import { useLocale } from "next-intl";
 import {
     SearchOutlined,
@@ -53,7 +53,7 @@ const NavBar = () => {
     const t = useTranslations("NavBar");
     return (
         <>
-            <nav className='sticky top-0 w-full h-16 shadow-md z-50 bg-primary-white'>
+            <nav className='sticky top-0 w-full h-16 shadow-md z-10 bg-primary-white'>
                 <Container>
                     <div className='w-full h-full flex flex-row font-bold'>
                         {/* Left header */}
@@ -164,12 +164,16 @@ const NavBar = () => {
 
                             {search ? (
                                 <>
-                                    <LanguageChanger/>
-                                    <div className='hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'>
+                                    <LanguageChanger />
+                                    <Link
+                                        href={"/cart"}
+                                        locale={locale}
+                                        className='hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'
+                                    >
                                         <ShoppingCartOutlined
                                             style={{ fontSize: "1.6rem" }}
                                         />
-                                    </div>
+                                    </Link>
                                     <Dropdown
                                         menu={{ items }}
                                         placement='bottom'
