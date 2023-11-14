@@ -18,12 +18,12 @@ class Routers {
 		const customerRouter = new CustomerRouter();
 		const authRouter = new AuthRouter();
 		// declare your router here
-		app.use("/auth", authRouter.initialize());
-
+        
         
 		orderRouter.initialize(router);
 		customerRouter.initialize(router);
-		app.use("/api/v1", router);
+		app.use("/api/users", authRouter.initialize());
+		app.use("/api", router);
 
 		app._router.all(
 			"*",
@@ -32,10 +32,6 @@ class Routers {
 				response.status(HttpStatusCode.NotFound).send(err.toPlainObject());
 			}
 		);
-		// // router.use("/athe", authMiddleware.verifyToken, orderRouter.getRouter();)
-
-		// // initialize your router here
-		// app.use("/api/v1", router);
 	}
 }
 

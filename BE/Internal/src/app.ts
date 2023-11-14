@@ -1,5 +1,5 @@
 import express, { Application, NextFunction, Request, Response } from "express";
-import cookieParser from 'cookie-parser'
+import cookieParser from "cookie-parser";
 import swaggerUI from "swagger-ui-express";
 import * as swaggerDocument from "../swagger/swagger.json";
 import * as dotenv from "dotenv";
@@ -12,15 +12,17 @@ import Tables from "./Models";
 import router from "./Routers";
 import { ErrorHandler } from "./Middlewares";
 
-dotenv.config()
+dotenv.config();
 declare global {
-    namespace Express {
-      interface Request {
-        userId: number;
-        token: string;
-      }
-    }
-  }
+	namespace Express {
+		interface Request {
+			userId: number;
+			token: string;
+			role: string;
+			action: string;
+		}
+	}
+}
 class Server {
 	protected app: Application;
 	protected server: any;
@@ -37,19 +39,19 @@ class Server {
 				credentials: true,
 			})
 		);
-        this.app.use(cookieParser())
+		this.app.use(cookieParser());
 
-        // router to api documentation
+		// router to api documentation
 		this.app.use(
 			"/api-docs",
 			swaggerUI.serve,
 			swaggerUI.setup(swaggerDocument)
 		);
 
-        // set app router
+		// set app router
 		router.initialize(this.app);
 
-        // error handler
+		// error handler
 		this.app.use((err: any, req: Request, res: Response, next: NextFunction) =>
 			ErrorHandler.initializeErrorHandler(err, req, res, next)
 		);

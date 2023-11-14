@@ -8,6 +8,8 @@ import {
     EmployeeRepository,
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
+import { IPermissionRepository } from "../Repositories/IPermissionRepository";
+import { PermissionRepository } from "../Repositories/implementation/PermissionRepository";
 
 class InversifyContainer {
 	private container;
@@ -26,6 +28,7 @@ class InversifyContainer {
 		this.container.bind<IClientRepository>(TYPES.IClientRepository).to(ClientRepository);
 		this.container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository);
 		this.container.bind<IEmployeeRepository>(TYPES.IEmployeeRepository).to(EmployeeRepository);
+		this.container.bind<IPermissionRepository>(TYPES.IPermissionRepository).to(PermissionRepository);
 	}
 }
 

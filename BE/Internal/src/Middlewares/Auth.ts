@@ -31,6 +31,7 @@ class AuthMiddleware extends BaseMiddleware {
 			console.log(decoded);
 			this.request.userId = decoded.id;
 			this.request.token = token;
+            this.request.role = decoded.role;
 			this.next();
 		} catch (error: any) {
             if (error instanceof TokenExpiredError || JsonWebTokenError) {
