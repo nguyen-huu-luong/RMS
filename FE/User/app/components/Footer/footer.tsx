@@ -1,25 +1,27 @@
 "use client";
 import Container from "../container";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
+import Link from "next-intl/link";
 import {
     FacebookOutlined,
     YoutubeOutlined,
     InstagramOutlined,
 } from "@ant-design/icons";
 
-const Footer = ({ params }: { params: { locale: string } }) => {
+const Footer = () => {
+    const locale = useLocale();
     const t = useTranslations("Footer");
     return (
-        <div className='bg-primary h-auto text-item-white pt-10'>
-            <Container>
+        <div className='bg-primary h-auto text-item-white pt-10 z-40'>
+            <Container> 
                 <div className='w-auto'>
                     <div className='h-auto w-auto flex flex-col md:flex-row gap-4 justify-around items-center md:items-start'>
                         {/* ABOUT US */}
                         <div className='flex flex-col text-center md:text-left'>
                             <div className='w-auto h-auto font-extrabold text-lg pb-6'>
                                 <Link
-                                    href={`/${params.locale}/about`}
+                                    href={`/about`}
+                                    locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
                                     {t("About")}
@@ -27,7 +29,8 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                             <div className='w-auto h-auto py-2 font-thin'>
                                 <Link
-                                    href={`/${params.locale}/about`}
+                                    href={`/about`}
+                                    locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
                                     {t("Restaurant-info")}
@@ -35,7 +38,8 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/${params.locale}/about`}
+                                    href={`/about`}
+                                    locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
                                     {t("Policies")}
@@ -43,7 +47,8 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/${params.locale}/about`}
+                                    href={`/about`}
+                                    locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
                                     {t("Shipping")}
@@ -51,7 +56,8 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/${params.locale}/about`}
+                                    href={`/about`}
+                                    locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
                                     {t("Term")}
@@ -112,7 +118,8 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                             <div className='w-auto h-auto py-2 font-thin'>
                                 <Link
-                                    href={`/${params.locale}/account`}
+                                    href={`/account`}
+                                    locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
                                     {t("Account")}
@@ -120,7 +127,8 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/${params.locale}/cart`}
+                                    href={`/cart`}
+                                    locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
                                     {t("Cart")}
@@ -128,7 +136,8 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/${params.locale}/order`}
+                                    href={`/order`}
+                                    locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
                                     {t("Order")}
@@ -136,7 +145,8 @@ const Footer = ({ params }: { params: { locale: string } }) => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/${params.locale}/feedback`}
+                                    href={`/feedback`}
+                                    locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
                                     {t("Feedback")}
