@@ -21,7 +21,7 @@ class AuthController {
 		res: Response,
 		next: NextFunction
 	) => {
-		this.authService.usersignUp(req, res, next);
+		await this.authService.usersignUp(req, res, next);
 	};
 
 	public adminLogin = async (
@@ -30,13 +30,21 @@ class AuthController {
 		next: NextFunction
 	) => {};
 
-	public logout = async (req: Request, res: Response, next: NextFunction) => {};
+	public logout = async (req: Request, res: Response, next: NextFunction) => {
+		await this.authService.logout(req, res, next);
+	};
+
+    public logoutAllDevices = async (req: Request, res: Response, next: NextFunction) => {
+		await this.authService.logoutAllDevices(req, res, next);
+	};
 
 	public refreshToken = async (
 		req: Request,
 		res: Response,
 		next: NextFunction
-	) => {};
+	) => {
+        await this.authService.refreshToken(req, res, next)
+    };
 }
 
 export default AuthController;

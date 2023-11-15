@@ -1,5 +1,7 @@
 import OrderController from '../Controllers/Order.controller';
 import { Request, Response, Router } from 'express'
+import { Authorization } from '../Middlewares/Authorization';
+import { AuthMiddleware } from '../Middlewares';
 
 class OrderRouter {
     protected orderController: OrderController;
@@ -10,7 +12,7 @@ class OrderRouter {
 
     public initialize(router: Router) {
         router.route('/order/all')
-            .get((req: Request, res: Response) => this.orderController.viewOrders(req, res))
+            .get(AuthMiddleware.initialize,Authorization.initialize, (req: Request, res: Response) => this.orderController.viewOrders(req, res))
 
         router.route('/order')
             .post((req: Request, res: Response) => this.orderController.createOrder(req, res))

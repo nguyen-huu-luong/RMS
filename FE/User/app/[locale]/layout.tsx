@@ -40,8 +40,8 @@ export default async function RootLayout({
                     messages={messages}
                 >
                     <div className='flex flex-col min-h-screen'>
-                        <NavBar params={{ locale: params.locale }} />
-                        <main className='flex-grow'>
+                        <NavBar/>
+                        <main className='flex-grow overflow-hidden'>
                             <Container>
                                 <div className='w-full h-full py-4'>
                                     {children}
@@ -49,7 +49,7 @@ export default async function RootLayout({
                             </Container>
                         </main>
                         <ChatIcon />
-                        <Footer params={{ locale: params.locale }} />
+                        <Footer/>
                     </div>
                 </NextIntlClientProvider>
             </body>

@@ -2,10 +2,12 @@ import { useRouter, usePathname } from "next-intl/client";
 import Image from "next/image";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
+import { useLocale } from "next-intl";
 
-const LanguageChanger = ({ params }: { params: { locale: string } }) => {
+const LanguageChanger = () => {
     const router = useRouter();
     const pathname = usePathname();
+    const locale = useLocale();
     function handleChange(location: string) {
         router.push(pathname, { locale: location });
     }
@@ -43,7 +45,7 @@ const LanguageChanger = ({ params }: { params: { locale: string } }) => {
     return (
         <Dropdown menu={{ items }} placement='bottom' trigger={["click"]}>
             <div className='flex-row justify-between align-middle cursor-pointer p-1 px-2 hover:bg-primary-100 rounded-lg transition duration-300 ease-in-out'>
-                {params.locale === "vi" ? (
+                {locale === "vi" ? (
                     <Image
                         src='/vietnam.png'
                         alt='Vietnam Flag'
