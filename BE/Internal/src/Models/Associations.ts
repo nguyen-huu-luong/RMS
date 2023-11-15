@@ -15,6 +15,7 @@ import {
 	ChatMessage,
 	ChatSession
 } from ".";
+import Token from "./Token";
 
 class Association {
 	public static initialize() {
@@ -31,11 +32,13 @@ class Association {
 			Employee.associate();
 			ChatSession.associate();
 			ChatMessage.associate();
+            Token.associate() ;
 
 		} catch (err) {
 			console.log("Initialize association failed!");
 			console.log(`Err: ${err}`);
-		}
+		} 
+
 	}
 }
 
