@@ -1,7 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import Loader from "../Loaders";
-import { Product, Client, OrderItem } from ".";
-
+import { Product, Client, OrderItem, Table } from ".";
+import TableOrder from "./TableOrder";
 class Order extends Model {
 	static associate() {
 		Order.belongsTo(Client, {
@@ -14,6 +14,12 @@ class Order extends Model {
 			through: OrderItem,
 			foreignKey: "orderId",
 			otherKey: "productId",
+		});
+
+		Order.belongsToMany(Table, {
+			through: TableOrder,
+			foreignKey: "orderId",
+			otherKey: "tableId",
 		});
 	}
 }

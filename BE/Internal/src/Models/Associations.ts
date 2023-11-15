@@ -9,6 +9,11 @@ import {
 	OrderItem,
 	Product,
 	Targetlist,
+	Reservation,
+	Table,
+	Employee,
+	ChatMessage,
+	ChatSession
 } from ".";
 
 class Association {
@@ -21,6 +26,11 @@ class Association {
 			Campaign.associate();
 			EmailCampaign.associate();
 			Product.associate();
+			Reservation.associate();
+			Table.associate();
+			Employee.associate();
+			ChatSession.associate();
+			ChatMessage.associate();
 
 		} catch (err) {
 			console.log("Initialize association failed!");

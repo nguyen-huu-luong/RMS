@@ -16,7 +16,8 @@ import Cart from "./Cart";
 import Employee from "./Employee";
 import TargetList from "./Targetlist";
 import ClientTargetList from "./ClientTargetList";
-
+import Reservation from "./Reservation";
+import ChatSession from "./ChatSession";
 class Client extends Model {
 	declare getOrders: HasManyGetAssociationsMixin<Order>;
 	declare setOrders: HasManySetAssociationsMixin<Order, Order>;
@@ -60,6 +61,23 @@ class Client extends Model {
 			foreignKey: "clientId",
 			otherKey: "targetListId",
 		});
+
+		Client.hasMany(Reservation, {
+			foreignKey: {
+				name: "clientId",
+				allowNull: false,
+			},
+			sourceKey: "id",
+		});
+
+		Client.hasMany(ChatSession, {
+			foreignKey: {
+				name: "clientId",
+				allowNull: false,
+			},
+			sourceKey: "id",
+		});
+
 	}
 
 	async checkPassword(password: string) {
