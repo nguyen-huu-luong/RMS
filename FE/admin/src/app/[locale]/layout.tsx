@@ -8,6 +8,8 @@ import { ReactNode } from 'react'
 import { NextIntlClientProvider, useLocale, useMessages } from 'next-intl'
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation'
+import { DynamicBreadcrumb } from '@/components'
+import {variables} from '@/app'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -35,7 +37,6 @@ export default function LocaleLayout({children, params}: LocaleLayoutProps) {
 
     const locale = useLocale();
     const messages = useMessages();
-    console.log(locale, params.locale)
 
     // Validate that the incoming `locale` parameter is a valid locale
     if (params.locale !== locale) {
@@ -46,11 +47,14 @@ export default function LocaleLayout({children, params}: LocaleLayoutProps) {
         <html lang={locale} >
             <body className={inter.className} suppressHydrationWarning={true}>
             <NextIntlClientProvider locale={locale} messages={messages}>
-                <div className="flex relative" style={{backgroundColor: Colors.defaultBackgroundColor }}>
+                <div className="flex relative justify-center h-screen" style={{backgroundColor: Colors.defaultBackgroundColor }}>
                     <Sidebar />
-                    <div className="main-content flex-1">
-                        <Header />
-                        {children}
+                    <Header />
+                    <div className="min-h-screen ps-sidebar mx-4 flex flex-col items-center w-full space-y-2" style={{
+                        paddingTop: `calc(${variables.headerHeight} + 8px)`
+                    }}>
+                        <DynamicBreadcrumb />
+                        <div className='flex-1 w-full'>{children}  </div>
                     </div>
                 </div>
             </NextIntlClientProvider>

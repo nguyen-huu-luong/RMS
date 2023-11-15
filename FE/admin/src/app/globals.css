@@ -3,6 +3,23 @@
 @tailwind utilities;
 
 
-html, body, label {
+html,
+body,
+label {
     font-family: 'Roboto', sans-serif;
-  }
+}
+
+@layer utilities {
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+}

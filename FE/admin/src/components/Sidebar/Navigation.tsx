@@ -6,14 +6,17 @@ import NavItem, { INavItemProps } from "./NavItem";
 export type ISideNavProps = {
 	items: INavItemProps[];
 	activeItemId: string;
+    type: string;
 };
 
-const Navigation: React.FC<ISideNavProps> = ({ activeItemId, items }) => {
+const Navigation: React.FC<ISideNavProps> = ({ activeItemId, items, type }) => {
 	return (
-		<>
+		<div className="overflow-y-scroll no-scrollbar" style={{
+            maxHeight: "calc(100vh - 80px)"
+        }}>
 			{items.length > 0 && (
 				<div
-					className={styles["sidebar-navigation"] + " overflow-hidden"}
+					className={styles["sidebar-navigation"]}
 					role="navigation"
 					aria-label="side-navigation"
 				>
@@ -22,7 +25,7 @@ const Navigation: React.FC<ISideNavProps> = ({ activeItemId, items }) => {
 					))}
 				</div>
 			)}
-		</>
+		</div>
 	);
 };
 
