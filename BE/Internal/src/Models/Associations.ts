@@ -9,6 +9,11 @@ import {
 	OrderItem,
 	Product,
 	Targetlist,
+	Reservation,
+	Table,
+	Employee,
+	ChatMessage,
+	ChatSession
 } from ".";
 import Token from "./Token";
 
@@ -22,6 +27,11 @@ class Association {
 			Campaign.associate();
 			EmailCampaign.associate();
 			Product.associate();
+			Reservation.associate();
+			Table.associate();
+			Employee.associate();
+			ChatSession.associate();
+			ChatMessage.associate();
             Token.associate() ;
 
 		} catch (err) {

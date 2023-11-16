@@ -18,6 +18,8 @@ import Cart from "./Cart";
 import Employee from "./Employee";
 import TargetList from "./Targetlist";
 import ClientTargetList from "./ClientTargetList";
+import Reservation from "./Reservation";
+import ChatSession from "./ChatSession";
 import Token from "./Token";
 import { ACCESS_TOKEN, REFRESH_TOKEN, Role } from "../Constants";
 import jwt from "jsonwebtoken";
@@ -70,6 +72,22 @@ class Client extends Model {
 			through: ClientTargetList,
 			foreignKey: "clientId",
 			otherKey: "targetListId",
+		});
+
+		Client.hasMany(Reservation, {
+			foreignKey: {
+				name: "clientId",
+				allowNull: false,
+			},
+			sourceKey: "id",
+		});
+
+		Client.hasMany(ChatSession, {
+			foreignKey: {
+				name: "clientId",
+				allowNull: false,
+			},
+			sourceKey: "id",
 		});
 
 		Client.hasMany(Token, { foreignKey: "clientId" });

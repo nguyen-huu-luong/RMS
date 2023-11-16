@@ -1,8 +1,22 @@
 import { Model, DataTypes } from 'sequelize';
 import Loader from '../Loaders';
-
+import Reservation from './Reservation';
+import TableOrder from './TableOrder';
+import TableReservation from './TableReservation';
+import Order from './Order';
 class Table extends Model {
-  static associate() {}
+  static associate() {
+    Table.belongsToMany(Reservation, {
+      through: TableReservation,
+      foreignKey: "tableId",
+      otherKey: "reservationId",
+    });
+    Table.belongsToMany(Order, {
+      through: TableOrder,
+      foreignKey: "tableId",
+      otherKey: "orderId",
+    });
+  }
 }
 
 Table.init(
