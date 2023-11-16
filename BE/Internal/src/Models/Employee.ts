@@ -35,7 +35,7 @@ class Employee extends Model {
         Client.hasMany(ChatSession, {
             foreignKey: {
                 name: "employeeId",
-                allowNull: false,
+                allowNull: true,
             },
             sourceKey: "id",
         });

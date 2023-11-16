@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      cutomerCount: {
+      customerCount: {
         type: Sequelize.INTEGER
       },
       status: {

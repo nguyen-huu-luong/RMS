@@ -24,7 +24,7 @@ class ChatSession extends Model {
         ChatSession.belongsTo(Employee, {
             foreignKey: {
                 name: "employeeId",
-                allowNull: false,
+                allowNull: true,
             },
         });
         ChatSession.hasMany(ChatMessage, {
