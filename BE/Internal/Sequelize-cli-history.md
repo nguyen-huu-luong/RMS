@@ -74,9 +74,25 @@ npx sequelize-cli migration:generate --name add-cart-product-association
 # Order vs Product (M:N) --> OrderItem
 npx sequelize-cli migration:generate --name add-order-product-association
 
+# A client has many reservations
+npx sequelize-cli migration:generate --name add-clientId-to-reservation
 
+# An employee creates many reservations
+npx sequelize-cli migration:generate --name add-employeeID-to-reservation
 
+# Reservation vs Table (M:N)
+npx sequelize-cli migration:generate --name add-reservation-table-association
 
+# Table vs Order (M:N)
+npx sequelize-cli migration:generate --name add-table-order-association
+
+# Client has many ChatSession (1:N)
+npx sequelize-cli migration:generate --name add-client-id-to-chat-session
+
+# Employee has many ChatSession (1:N)
+npx sequelize-cli migration:generate --name add-employee-id-to-chat-session
+# Chatsession has many ChatMessage (1:N)
+npx sequelize-cli migration:generate --name add-session-id-to-chat-message
 
 ### Update:
 # 12/11/2023
