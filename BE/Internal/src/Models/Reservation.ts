@@ -23,7 +23,7 @@ import TableReservation from "./TableReservation";
       });
       Reservation.belongsTo(Employee, {
         foreignKey: {
-          name: "creatorID",
+          name: "creatorId",
         },
       });
       Reservation.belongsToMany(Table, {
