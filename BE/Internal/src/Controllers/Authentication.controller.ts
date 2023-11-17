@@ -28,7 +28,9 @@ class AuthController {
 		req: Request,
 		res: Response,
 		next: NextFunction
-	) => {};
+	) => {
+        await this.authService.adminLogin(req,res,next)
+    };
 
 	public logout = async (req: Request, res: Response, next: NextFunction) => {
 		await this.authService.logout(req, res, next);

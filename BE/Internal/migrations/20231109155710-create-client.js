@@ -41,9 +41,6 @@ module.exports = {
       type: {
         type: Sequelize.STRING
       },
-      role: {
-        type: Sequelize.STRING
-      },
       hashedPassword: {
         type: Sequelize.STRING
       },

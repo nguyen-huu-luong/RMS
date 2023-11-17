@@ -12,15 +12,13 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: false,
         },
-        clientId: {
+        tokenableId: {
           type: Sequelize.INTEGER,
           allowNull: false,
-          references: {
-            model: 'Clients', 
-            key: 'id', 
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE',
+        },
+        tokenableType: {
+            type: Sequelize.STRING,
+            allowNull: false
         },
         createdAt: {
           allowNull: false,

@@ -1,169 +1,405 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-        "version": "1.0.0",
-        "title": "API document of RMS system",
-        "description": "This is a API application made with Express, Typescript, Sequenlize and documented with Swagger"
-    },
-    "license": {
-        "name": "MIT",
-        "url": "https://spdx.org/licenses/MIT.html"
-    },
-    "servers": [
-        {
-            "url": "http://localhost:3003/api/v1",
-            "description": "Local Dev"
-        }
-    ],
-    "tags": [
-        {
-            "name": "Order",
-            "description": "API for order in the system"
-        },
-        {
-            "name": "Customer",
-            "description": "API for customer in the system"
-        }
-    ],
-    "paths": {
-        "/customer/all": {
-            "get": {
-                "tags": [
-                    "Customer"
-                ],
-                "summary": "Returns a list of all customers",
-                "responses": {
-                    "200": {
-                        "description": "A JSON array of customers",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Customer"
-                                    }
-                                },
-                                "example": [
-                                    {
-                                        "firstname": "Tony",
-                                        "lastname": "Nguyen",
-                                        "gender": "Male",
-                                        "birthday": "23/4/2023",
-                                        "avatar": "1000001111000111",
-                                        "score": 0,
-                                        "address": "Thu Duc City"
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request from user"
-                    }
-                }
-            }
-        },
-        "/order": {
-            "post": {
-                "tags": [
-                    "Order"
-                ],
-                "summary": "Create new order",
-                "requestBody": {
-                    "description": "Order object",
-                    "required": "True",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Order"
-                            },
-                            "example": {
-                                "status": "Processing",
-                                "descriptions": "First order",
-                                "pre_discount_ammount": 0,
-                                "shipping_address": "Thu Duc City",
-                                "amount": 0,
-                                "num_items": 2,
-                                "num_completed": 0
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Create order successfully"
-                    },
-                    "400": {
-                        "description": "Create order failed"
-                    }
-                }
-            }
-        }
-    },
-    "components": {
-        "schemas": {
-            "Customer": {
-                "type": "object",
-                "properties": {
-                    "firstname": {
-                        "type": "string"
-                    },
-                    "lastname": {
-                        "type": "string"
-                    },
-                    "gender": {
-                        "type": "string"
-                    },
-                    "birthday": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "avatar": {
-                        "type": "string"
-                    },
-                    "score": {
-                        "type": "integer"
-                    },
-                    "address": {
-                        "type": "string"
-                    }
-                }
-            },
-            "Order": {
-                "type": "object",
-                "properties": {
-                    "status": {
-                        "type": "string"
-                    },
-                    "descriptions": {
-                        "type": "string"
-                    },
-                    "pre_discount_ammount": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "shipping_address": {
-                        "type": "string"
-                    },
-                    "payment_time": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "payment_method": {
-                        "type": "integer"
-                    },
-                    "amount": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "num_items": {
-                        "type": "integer"
-                    },
-                    "num_completed": {
-                        "type": "integer"
-                    }
-                }
-            }
-        }
-    }
+	"openapi": "3.0.0",
+	"info": {
+		"version": "1.0.0",
+		"title": "API document of RMS system",
+		"description": "This is a API application made with Express, Typescript, Sequenlize and documented with Swagger"
+	},
+	"license": {
+		"name": "MIT",
+		"url": "https://spdx.org/licenses/MIT.html"
+	},
+	"servers": [
+		{
+			"url": "http://localhost:3003/api",
+			"description": "Local Dev"
+		}
+	],
+	"tags": [
+		{
+			"name": "Authentication",
+			"description": "API for authentication"
+		},
+		{
+			"name": "Order",
+			"description": "API for order in the system"
+		},
+		{
+			"name": "Customer",
+			"description": "API for customer in the system"
+		}
+	],
+	"paths": {
+		"/users/signup": {
+			"post": {
+				"tags": ["Authentication"],
+				"summary": "Sign up new account with email, password, firstname, lastname",
+				"requestBody": {
+					"description": "Object of fisrtname, lastname, username and password",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SignUp"
+							},
+							"example": {
+								"firstname": "minh",
+								"lastname": "vuong",
+								"email": "test@gmail.com",
+								"password": "password"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+		"/users/signin": {
+			"post": {
+				"tags": ["Authentication"],
+				"summary": "Login with email and password",
+				"requestBody": {
+					"description": "Object of username and password",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Login"
+							},
+							"example": {
+								"email": "test@gmail.com",
+								"password": "password"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+        "/users/admin/signin": {
+			"post": {
+				"tags": ["Authentication"],
+				"summary": "Admin Login with username and password",
+				"requestBody": {
+					"description": "Object of username and password",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Login"
+							},
+							"example": {
+								"username": "manager",
+								"password": "manager"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"firstname": "manager",
+							"lastname": "manager",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+        "/users/logout": {
+			"delete": {
+				"tags": ["Authentication"],
+				"summary": "Log out account",
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+
+        "/users/logout/all": {
+			"delete": {
+				"tags": ["Authentication"],
+				"summary": "Log out account from all devices",
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+        "/users/refresh": {
+			"post": {
+				"tags": ["Authentication"],
+				"summary": "Refresh access tokens",
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+
+		"/customer/all": {
+			"get": {
+				"tags": ["Customer"],
+				"summary": "Returns a list of all customers",
+				"responses": {
+					"200": {
+						"description": "A JSON array of customers",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Customer"
+									}
+								},
+								"example": [
+									{
+										"firstname": "Tony",
+										"lastname": "Nguyen",
+										"gender": "Male",
+										"birthday": "23/4/2023",
+										"avatar": "1000001111000111",
+										"score": 0,
+										"address": "Thu Duc City"
+									}
+								]
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request from user"
+					}
+				}
+			}
+		},
+		"/order": {
+			"post": {
+				"tags": ["Order"],
+				"summary": "Create new order",
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Order"
+							},
+							"example": {
+								"status": "Processing",
+								"descriptions": "First order",
+								"pre_discount_ammount": 0,
+								"shipping_address": "Thu Duc City",
+								"amount": 0,
+								"num_items": 2,
+								"num_completed": 0
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Create order successfully"
+					},
+					"400": {
+						"description": "Create order failed"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"securitySchemes": {
+			"JWT": {
+				"type": "apiKey",
+				"name": "authorization",
+				"in": "header",
+				"description": "",
+				"scheme": "bearer"
+			}
+		},
+
+		"schemas": {
+			"Login": {
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				}
+			},
+			"SignUp": {
+				"type": "object",
+				"properties": {
+					"firstname": {
+						"type": "string"
+					},
+					"lastname": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				}
+			},
+			"Customer": {
+				"type": "object",
+				"properties": {
+					"firstname": {
+						"type": "string"
+					},
+					"lastname": {
+						"type": "string"
+					},
+					"gender": {
+						"type": "string"
+					},
+					"birthday": {
+						"type": "string",
+						"format": "date"
+					},
+					"avatar": {
+						"type": "string"
+					},
+					"score": {
+						"type": "integer"
+					},
+					"address": {
+						"type": "string"
+					}
+				}
+			},
+			"Order": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "string"
+					},
+					"descriptions": {
+						"type": "string"
+					},
+					"pre_discount_ammount": {
+						"type": "number",
+						"format": "double"
+					},
+					"shipping_address": {
+						"type": "string"
+					},
+					"payment_time": {
+						"type": "string",
+						"format": "date"
+					},
+					"payment_method": {
+						"type": "integer"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"num_items": {
+						"type": "integer"
+					},
+					"num_completed": {
+						"type": "integer"
+					}
+				}
+			}
+		}
+	}
 }

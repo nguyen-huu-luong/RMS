@@ -27,7 +27,7 @@ class Authorization extends BaseMiddleware {
 		);
 
 		const resource = this.request.originalUrl.split("/")[2];
-		const allPermissions = await permissionRepository.findAllByRole("client");
+		const allPermissions = await permissionRepository.findAllByRole(this.request.role);
 		const resquestAction = this.getAction();
 		let actions = allPermissions
 			.filter((p: Permission) => p.getDataValue("resource") === resource)
@@ -39,6 +39,7 @@ class Authorization extends BaseMiddleware {
 		}
 
 		this.request.action = actions[0];
+        console.log("Authorization successfully!", "role:", this.request.role, ", actions:", actions)
 		this.next();
 	}
 
