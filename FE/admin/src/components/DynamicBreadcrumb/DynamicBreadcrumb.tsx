@@ -19,7 +19,7 @@ export default function DynamicBreadcrumb() {
   }));
 
   return (
-    <div className="w-full flex items-center bg-white py-2 space-x-2 px-10 mx-2 my-2 rounded shadow-md">
+    <div className="w-full flex items-center bg-white py-2 space-x-2 px-10 mx-2 my-2 rounded border">
       <Breadcrumb items={items} />
     </div>
   );

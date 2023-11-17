@@ -22,4 +22,14 @@ label {
         scrollbar-width: none;
         /* Firefox */
     }
+} 
+.ant-pagination.ant-table-pagination {
+    display: flex;
+}
+.ant-pagination.ant-table-pagination > .ant-pagination-total-text {
+    margin-right: auto;
+}
+
+.ant-pagination.ant-table-pagination > .ant-pagination-options {
+    margin-left:  auto;
 }

@@ -13,7 +13,7 @@ import { Button } from "antd";
 export default function Sidebar() {
 	const t = useTranslations("Sidebar");
 	return (
-		<main className="flex-col h-screen shadow-[0px_2px_10px_1px_rgba(0,0,0,0.2)] bg-white fixed left-0 top-0 w-sidebar">
+		<main className="flex-col h-screen border-r  bg-white fixed left-0 top-0 w-sidebar">
 			<h2 className="text-center font-bold my-4 text-2xl"> Admin dashboard</h2>
 			<div className="flex-1 h-full">
 				<Navigation
