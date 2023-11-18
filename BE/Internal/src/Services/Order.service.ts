@@ -5,9 +5,31 @@ import statusMess from '../Constants/statusMess';
 import { container } from '../Configs';
 import { IOrderRepository } from '../Repositories/IOrderRepository';
 import { TYPES } from '../Repositories/type';
-
+import { RecordNotFoundError } from '../Errors';
 export class OrderService { 
     constructor(private orderRepository = container.get<IOrderRepository>(TYPES.IOrderRepository)) {}
+
+    public async viewOrderItems(req: Request, res: Response,  next: NextFunction) {
+        try {
+            const status: number = HttpStatusCode.Success;
+            let data: any;
+            if (req.action === "read:own"){
+                data = await this.orderRepository.getOrderItems(parseInt(req.params.id), req.userId); 
+            } else {
+                console.log(parseInt(req.params.id))
+                data = await this.orderRepository.getOrderItems(parseInt(req.params.id));
+            }
+            if (!data) {
+				throw new RecordNotFoundError("Order do not exist");
+			}
+            res.status(status).send(data);
+            Message.logMessage(req, status);
+        }
+        catch (err) {
+            console.log(err)
+            next(err)
+        }
+    }
 
     public async viewOrders(req: Request, res: Response,  next: NextFunction) {
         try {
@@ -31,7 +53,7 @@ export class OrderService {
         try {
             const status: number = HttpStatusCode.Success;
             let data: any;
-            if (req.action === "read:own"){
+            if (req.action === "create:own"){
                 await this.orderRepository.createOrder(req.userId, req.body); 
             } else {
                 await this.orderRepository.adminCreateOrder(req.body);
@@ -48,7 +70,7 @@ export class OrderService {
     public async removeOrder(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            await this.orderRepository.removeOrder(parseInt(req.params.id));
+            await this.orderRepository.removeOrder(req.body);
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status)
         }

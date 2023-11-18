@@ -9,6 +9,10 @@ class OrderController {
         this.orderService = new OrderService();
     }
 
+    public viewOrderItems(req: Request, res: Response, next:NextFunction) {
+        this.orderService.viewOrderItems(req, res, next);
+    }
+
     public viewOrders(req: Request, res: Response, next:NextFunction) {
         this.orderService.viewOrders(req, res, next);
     }

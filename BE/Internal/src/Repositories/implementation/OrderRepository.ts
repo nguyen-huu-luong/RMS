@@ -7,6 +7,8 @@ import { injectable } from "inversify";
 import "reflect-metadata";
 import { IOrderRepository } from "../IOrderRepository";
 import { BaseRepository } from "./BaseRepository";
+import { ForbiddenError, RecordNotFoundError } from "../../Errors";
+import { where } from "sequelize";
 @injectable()
 export class OrderRepository
     extends BaseRepository<Order>
@@ -71,7 +73,6 @@ export class OrderRepository
     public async adminCreateOrder(data: any) {
         try {
             const {products, ...orderData} = data;
-            const clientId = orderData.clientId;
             const order = await Order.create(orderData);
             await Promise.all(
                 products.map(async (item: any) => {
@@ -114,19 +115,54 @@ export class OrderRepository
                 },
             });
             await order?.update({ status: status });
+            if (!order){
+                throw new RecordNotFoundError("Order does not exist!")
+            }
             return await order?.save();
         } catch (err) {
             message.queryError(err);
         }
     }
-    public async removeOrder(orderId: number) {
+    public async removeOrder(data: any) {
         try {
             const order = await Order.findOne({
                 where: {
-                    id: orderId,
+                    id: data.orderId,
                 },
             });
+            if (!order){
+                throw new RecordNotFoundError("Order does not exist!")
+            }
             return await order?.destroy();
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+
+    public async getOrderItems(orderId?: number, userId?:number) {
+        try {
+            if (userId){
+                const order = await Order.findOne({where:{
+                    id: orderId,
+                    clientId: userId
+                }});
+                if (order){
+                    const items = await OrderItem.findAll({where:{
+                        orderId: orderId
+                    }})
+                    return items;
+                }
+                return;
+            } else {
+                const order = await Order.findByPk(orderId);
+                if (!order){
+                    throw new RecordNotFoundError("Order does not exist!")
+                }
+                const items = await OrderItem.findAll({where:{
+                    orderId: orderId
+                }})
+                return items
+            }
         } catch (err) {
             message.queryError(err);
         }

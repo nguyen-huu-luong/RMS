@@ -1,7 +1,7 @@
 import ProductController from "../Controllers/Product.controller";
 import { Request, Response, Router, NextFunction } from "express";
 import { Authorization } from "../Middlewares/Authorization";
-import { AuthMiddleware } from "../Middlewares";
+import { AuthMiddleware, ProductValidators } from "../Middlewares";
 
 class ProductRouter {
     protected productController: ProductController;
@@ -24,12 +24,12 @@ class ProductRouter {
             .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.productController.deleteProduct(req, res, next)
             )
-            .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
+            .put(AuthMiddleware.initialize, Authorization.initialize, ProductValidators.createProductValidator, (req: Request, res: Response, next: NextFunction) =>
                 this.productController.updateProduct(req, res, next)
             );
         router
             .route("/products")
-            .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
+            .post(AuthMiddleware.initialize, Authorization.initialize, ProductValidators.createProductValidator, (req: Request, res: Response, next: NextFunction) =>
                 this.productController.createProduct(req, res, next)
             );
     }

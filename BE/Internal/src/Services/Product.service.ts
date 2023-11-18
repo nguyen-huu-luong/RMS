@@ -35,6 +35,9 @@ export class ProductService {
         try {
             const status: number = HttpStatusCode.Success;
             const data = await this.productRepository.update(parseInt(req.params.id), req.body);
+            if (!data) {
+				throw new RecordNotFoundError("Product do not exist");
+			}
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         }
@@ -47,6 +50,9 @@ export class ProductService {
         try {
             const status: number = HttpStatusCode.Success;
             const data = await this.productRepository.create(req.body);
+            if (!data) {
+				throw new RecordNotFoundError("Product do not exist");
+			}
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         }
@@ -59,6 +65,9 @@ export class ProductService {
         try {
             const status: number = HttpStatusCode.Success;
             const data = await this.productRepository.delete(parseInt(req.params.id));
+            if (!data) {
+				throw new RecordNotFoundError("Product do not exist");
+			}
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status)
         }
@@ -70,6 +79,7 @@ export class ProductService {
     public async getProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
+            console.log(req.params.id)
             const data = await this.productRepository.findById(parseInt(req.params.id));
             if (!data) {
 				throw new RecordNotFoundError("Product do not exist");
