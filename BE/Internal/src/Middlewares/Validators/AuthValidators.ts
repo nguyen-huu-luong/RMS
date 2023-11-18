@@ -11,6 +11,14 @@ class AuthValidators {
 		body("password").notEmpty().withMessage("Password CANNOT be empty"),
 	];
 
+    static adminLoginValidator = [
+		body("username")
+			.trim()
+			.notEmpty()
+			.withMessage("Username CANNOT be empty"),
+		body("password").notEmpty().withMessage("Password CANNOT be empty"),
+	];
+
 	static signUpValidator = [
 		body("email")
 			.trim()
