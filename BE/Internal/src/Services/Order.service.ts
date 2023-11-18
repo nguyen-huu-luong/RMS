@@ -12,7 +12,12 @@ export class OrderService {
     public async viewOrders(req: Request, res: Response,  next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data = await this.orderRepository.viewOrders();
+            let data: any;
+            if (req.action === "read:own"){
+                data = await this.orderRepository.viewOrders(req.userId); 
+            } else {
+                data = await this.orderRepository.adminViewOrders();
+            }
             res.status(status).send(data);
             Message.logMessage(req, status);
         }
@@ -25,8 +30,12 @@ export class OrderService {
     public async createOrder(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data: any = req.body;
-            await this.orderRepository.createOrder(data);
+            let data: any;
+            if (req.action === "read:own"){
+                await this.orderRepository.createOrder(req.userId, req.body); 
+            } else {
+                await this.orderRepository.adminCreateOrder(req.body);
+            }
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status)
         }

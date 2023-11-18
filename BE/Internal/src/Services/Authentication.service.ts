@@ -110,7 +110,7 @@ export class AuthService {
 					isRegistered: true,
 					type: ClientType.LEAD,
 				});
-				const cart = this.cartRepository.create({
+				const cart = await this.cartRepository.create({
 					total: 0,
 					amount: 0,
 					clientId: user.getDataValue('id')

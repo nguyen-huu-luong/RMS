@@ -12,12 +12,11 @@ class OrderRouter {
 
     public initialize(router: Router) {
         router.route('/orders/all')
-            .get((req: Request, res: Response, next: NextFunction) => this.orderController.viewOrders(req, res, next))
-        router.route('/orders/:id')
-            .delete((req: Request, res: Response, next: NextFunction) => this.orderController.removeOrder(req, res, next))
+            .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.viewOrders(req, res, next))
         router.route('/orders')
-            .post((req: Request, res: Response, next: NextFunction) => this.orderController.createOrder(req, res, next))
-            .put((req: Request, res: Response, next: NextFunction) => this.orderController.updateStatus(req, res, next))
+            .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.removeOrder(req, res, next))
+            .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.createOrder(req, res, next))
+            .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.updateStatus(req, res, next))
     }
 }
 

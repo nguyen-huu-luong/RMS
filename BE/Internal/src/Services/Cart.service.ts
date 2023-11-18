@@ -12,7 +12,7 @@ export class CartService {
     public async getCart(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data = await this.cartRepository.findById(parseInt(req.params.id));
+            const data = await this.cartRepository.getCart(req.userId);
             if (!data) {
 				throw new RecordNotFoundError("Cart do not exist");
 			}
@@ -27,7 +27,7 @@ export class CartService {
     public async addProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data = await this.cartRepository.addProduct(req.body);
+            const data = await this.cartRepository.addProduct(req.userId, req.body);
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         }
@@ -39,7 +39,7 @@ export class CartService {
     public async removeProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data = await this.cartRepository.removeProduct(req.body);
+            const data = await this.cartRepository.removeProduct(req.userId, req.body);
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         }
@@ -51,7 +51,7 @@ export class CartService {
     public async updateProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data = await this.cartRepository.updateProduct(req.body);
+            const data = await this.cartRepository.updateProduct(req.userId, req.body);
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         }
@@ -63,7 +63,7 @@ export class CartService {
     public async getCartItems(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data = await this.cartRepository.getCartItems(req.body);
+            const data = await this.cartRepository.getCartItems(req.userId);
             res.status(status).send(data);
             Message.logMessage(req, status);
         }

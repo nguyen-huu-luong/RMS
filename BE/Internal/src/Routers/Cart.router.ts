@@ -12,25 +12,25 @@ class ProductRouter {
 
     public initialize(router: Router) {
         router
-            .route("/carts/:id")
-            .get(
-                (req: Request, res: Response, next: NextFunction) =>
-                    this.cartController.getCart(req, res, next)
+            .route("/carts/item")
+            .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
+                this.cartController.getCartItems(req, res, next)
             );
         router
             .route("/carts")
-            .post((req: Request, res: Response, next: NextFunction) =>
+            .get(AuthMiddleware.initialize, Authorization.initialize, 
+                (req: Request, res: Response, next: NextFunction) =>
+                    this.cartController.getCart(req, res, next)
+            )
+            .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.cartController.addProduct(req, res, next)
             )
-            .put((req: Request, res: Response, next: NextFunction) =>
+            .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.cartController.updateProduct(req, res, next)
             )
-            .delete((req: Request, res: Response, next: NextFunction) =>
+            .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.cartController.removeProduct(req, res, next)
             )
-            .get((req: Request, res: Response, next: NextFunction) =>
-                this.cartController.getCartItems(req, res, next)
-            );
     }
 }
 

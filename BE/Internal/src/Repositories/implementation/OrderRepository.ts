@@ -1,7 +1,7 @@
 import Order from "../../Models/Order";
 import Customer from "../../Models/Client";
 import Cart from "../../Models/Cart";
-import { CartItem, OrderItem } from "../../Models";
+import { CartItem, OrderItem, Product } from "../../Models";
 import message from "../../Utils/Message";
 import { injectable } from "inversify";
 import "reflect-metadata";
@@ -12,20 +12,31 @@ export class OrderRepository
     extends BaseRepository<Order>
     implements IOrderRepository
 {
-    public async viewOrders() {
+    public async viewOrders(userId: number) {
         try {
-            const allOrder = await Order.findAll();
-            return JSON.stringify(allOrder);
+            const allOrders = await Order.findAll({where:{
+                clientId: userId
+            }});
+            return JSON.stringify(allOrders);
         } catch (err) {
             message.queryError(err);
         }
     }
 
-    public async createOrder(data: any) {
+    public async adminViewOrders() {
         try {
-            const order = await Order.create(data);
+            const allOrders = await Order.findAll({});
+            return JSON.stringify(allOrders);
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+
+    public async createOrder(userId: number, data: any) {
+        try {
+            const order = await Order.create({...data, clientId: userId});
             const cart = await Cart.findOne({
-                where: { clientId: data.clientId },
+                where: { clientId: userId },
             });
             await order.update({
                 num_items: cart?.getDataValue("total"),
@@ -52,6 +63,42 @@ export class OrderRepository
                 amount: 0,
                 updatedAt: new Date()
             });
+            return await order.save();
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+    public async adminCreateOrder(data: any) {
+        try {
+            const {products, ...orderData} = data;
+            const clientId = orderData.clientId;
+            const order = await Order.create(orderData);
+            await Promise.all(
+                products.map(async (item: any) => {
+                    let product = await Product.findByPk(item.productId)
+                    await OrderItem.create({
+                        orderId: order.getDataValue("id"),
+                        productId: item.productId,
+                        quantity: item.quantity,
+                        amount: product?.getDataValue("price") * item.quantity,
+                    });
+                })
+            );
+            const orderItems = await OrderItem.findAll({
+                where: {
+                    orderId: order.getDataValue("id"),
+                },
+            });
+            const totalItems = orderItems.reduce(
+                (total, orderItems) =>
+                    total + orderItems.getDataValue("quantity"),
+                0
+            );
+            const totalAmount = orderItems.reduce(
+                (sum, orderItems) => sum + orderItems.getDataValue("amount"),
+                0
+            );
+            await order.update({ num_items: totalItems, amount: totalAmount });
             return await order.save();
         } catch (err) {
             message.queryError(err);

@@ -13,33 +13,45 @@ export class CartRepository
     constructor() {
         super(Cart);
     }
-    public async addProduct(data: any) {
+    public async addProduct(userId: number, data: any) {
         try {
-            const cartId = data.cartId;
-            const productId = data.productId;
+            const cart = await Cart.findOne({
+                where: {
+                    clientId: userId,
+                },
+            });
+            const cartId = cart?.getDataValue("id");
+            const product = await Product.findByPk(data.productId);
+            const productId = product?.getDataValue('id');
             const quantity = data.quantity;
             const [cartItem] = await CartItem.findOrCreate({
                 where: {
                     cartId: cartId,
                     productId: productId,
-                }
+                },
             });
-			const product = await Product.findByPk(productId)
             if (!cartItem.isNewRecord) {
                 await cartItem.update({
                     quantity: cartItem.getDataValue("quantity") + quantity,
-					amount: (cartItem.getDataValue("quantity") + quantity) * product?.getDataValue('price')
+                    amount:
+                        (cartItem.getDataValue("quantity") + quantity) *
+                        product?.getDataValue("price"),
                 });
             }
-			await this.updateCart(cartId);
-            return await cartItem.save()
+            await this.updateCart(cartId);
+            return await cartItem.save();
         } catch (err) {
             message.queryError(err);
         }
     }
-    public async removeProduct(data: any) {
+    public async removeProduct(userId: number, data: any) {
         try {
-            const cartId = data.cartId;
+            const cart = await Cart.findOne({
+                where: {
+                    clientId: userId,
+                },
+            });
+            const cartId = cart?.getDataValue("id");
             const productId = data.productId;
             const cartItem = await CartItem.findOne({
                 where: {
@@ -48,14 +60,19 @@ export class CartRepository
                 },
             });
             await cartItem?.destroy();
-			await this.updateCart(cartId);
+            await this.updateCart(cartId);
         } catch (err) {
             message.queryError(err);
         }
     }
-    public async updateProduct(data: any) {
+    public async updateProduct(userId: number, data: any) {
         try {
-            const cartId = data.cartId;
+            const cart = await Cart.findOne({
+                where: {
+                    clientId: userId,
+                },
+            });
+            const cartId = cart?.getDataValue("id");
             const productId = data.productId;
             const quantity = data.quantity;
             const cartItem = await CartItem.findOne({
@@ -64,23 +81,28 @@ export class CartRepository
                     productId: productId,
                 },
             });
-			const product = await Product.findByPk(productId)
+            const product = await Product.findByPk(productId);
             if (quantity === 0) {
-                await this.removeProduct(data);
+                await this.removeProduct(userId, data);
             } else {
                 await cartItem?.update({
                     quantity: quantity,
-					amount: quantity * product?.getDataValue('price')
+                    amount: quantity * product?.getDataValue("price"),
                 });
             }
-			await this.updateCart(cartId);
+            await this.updateCart(cartId);
         } catch (err) {
             message.queryError(err);
         }
     }
-    public async getCartItems(data: any) {
+    public async getCartItems(userId: number) {
         try {
-            const cartId = data.cartId;
+            const cart = await Cart.findOne({
+                where: {
+                    clientId: userId,
+                },
+            });
+            const cartId = cart?.getDataValue("id");
             const cartItem = await CartItem.findAll({
                 where: {
                     cartId: cartId,
@@ -99,11 +121,30 @@ export class CartRepository
                     cartId: cartId,
                 },
             });
-            const totalItems = cartItems.reduce((total, cartItems) => total + cartItems.getDataValue('quantity'), 0);
-			const totalAmount = cartItems.reduce((sum, cartItems) => sum + cartItems.getDataValue('amount'), 0);
-			const cart = await this.findById(cartId);
-			await cart.update({total: totalItems, amount: totalAmount });
+            const totalItems = cartItems.reduce(
+                (total, cartItems) =>
+                    total + cartItems.getDataValue("quantity"),
+                0
+            );
+            const totalAmount = cartItems.reduce(
+                (sum, cartItems) => sum + cartItems.getDataValue("amount"),
+                0
+            );
+            const cart = await this.findById(cartId);
+            await cart.update({ total: totalItems, amount: totalAmount });
             return;
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+    public async getCart(userId: number) {
+        try {
+            const cart = await Cart.findOne({
+                where: {
+                    clientId: userId,
+                },
+            });
+            return cart;
         } catch (err) {
             message.queryError(err);
         }

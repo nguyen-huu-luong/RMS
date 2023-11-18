@@ -21,15 +21,15 @@ class ProductRouter {
             .get((req: Request, res: Response, next: NextFunction) =>
                 this.productController.getProduct(req, res, next)
             )
-            .delete((req: Request, res: Response, next: NextFunction) =>
+            .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.productController.deleteProduct(req, res, next)
             )
-            .put((req: Request, res: Response, next: NextFunction) =>
+            .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.productController.updateProduct(req, res, next)
             );
         router
             .route("/products")
-            .post((req: Request, res: Response, next: NextFunction) =>
+            .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.productController.createProduct(req, res, next)
             );
     }

@@ -7,6 +7,8 @@ module.exports = {
             { role: 'user', resource: 'products', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'carts', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'carts', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'carts', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'carts', action: 'delete:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'profile', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'profile', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'orders', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
