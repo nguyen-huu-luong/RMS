@@ -25,13 +25,4 @@ export class ClientRepository
 
 		return await user.save();
 	}
-
-    public async clearTokens(userId: number): Promise<any> {
-        const user = await this._model.findByPk(userId) ;
-        const tokensToremove = (await user?.getTokens())
-        tokensToremove?.forEach((token) => token.destroy())
-    }
-
-    
-
 }

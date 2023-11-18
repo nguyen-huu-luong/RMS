@@ -2,11 +2,11 @@ import { CookieOptions, NextFunction, Request, Response } from "express";
 import { container } from "../Configs";
 import { IClientRepository } from "../Repositories/IClientRepository";
 import { TYPES } from "../Repositories/type";
-import { Client } from "../Models";
+import { Client, Employee } from "../Models";
 import { Password, TokenUtil } from "../Utils";
-import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
+import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import {
-    ACCESS_TOKEN,
+	ACCESS_TOKEN,
 	ClientType,
 	ErrorName,
 	HttpStatusCode,
@@ -25,6 +25,7 @@ import {
 } from "../Errors";
 import Token from "../Models/Token";
 import { ICartRepository } from "../Repositories";
+import { IEmployeeRepository, ITokenRepository } from "../Repositories";
 
 export class AuthService {
 	constructor(
@@ -36,6 +37,12 @@ export class AuthService {
 		),
 		private cartRepository = container.get<ICartRepository>(
 			TYPES.ICartRepository
+		),
+		private employeeRepository = container.get<IEmployeeRepository>(
+			TYPES.IEmployeeRepository
+		),
+        private tokenRepository = container.get<ITokenRepository>(
+			TYPES.ITokenRepository
 		)
 	) {} 
 
@@ -60,7 +67,7 @@ export class AuthService {
 				throw new RecordNotFoundError("User not exist");
 			}
 
-			const isCorrectPassword = user.checkPassword(password);
+			const isCorrectPassword = await user.checkPassword(password);
 			if (!isCorrectPassword) {
 				throw new BadRequestError("Password is incorrect");
 			}
@@ -120,18 +127,39 @@ export class AuthService {
 		req: Request,
 		res: Response,
 		next: NextFunction
-	) => {};
+	) => {
+		try {
+			const errors = validationResult(req);
+			if (!errors.isEmpty()) {
+				throw new ValidationError(errors.array()[0].msg);
+			}
+
+			const { username, password } = req.body;
+			const user = await this.employeeRepository.findByUsername(username);
+			if (!user) {
+				throw new RecordNotFoundError("User not exist");
+			}
+
+			const isCorrectPassword = await user.checkPassword(password);
+			if (!isCorrectPassword) {
+				throw new BadRequestError("Password is incorrect");
+			}
+
+			this.sendToken(res, user);
+		} catch (error) {
+			next(error);
+		}
+	};
 
 	public logout = async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const userId = req.userId;
-			const user = await this.clientRepository.findById(userId);
 
 			const cookies = req.cookies;
 			const refreshToken = cookies[REFRESH_TOKEN.cookie.name];
 
 			const rTknHash = TokenUtil.hash(refreshToken, REFRESH_TOKEN.secret || "");
-			const result = await this.clientRepository.removeToken(rTknHash, user);
+			const result = await this.tokenRepository.removeToken(rTknHash, userId);
 			console.log(result.email);
 
 			const expireCookieOptions = Object.assign(
@@ -164,7 +192,7 @@ export class AuthService {
 			const userId = req.userId;
 			const user = await this.clientRepository.findById(userId);
 
-			await this.clientRepository.clearTokens(userId);
+			await this.tokenRepository.clearTokens(userId);
 
 			// Set cookie expiry to past date to mark for destruction
 			const expireCookieOptions = Object.assign(
@@ -202,16 +230,16 @@ export class AuthService {
 			}
 			if (!authHeader?.startsWith("Bearer ")) {
 				throw new UnauthorizedError(
-					"Authentication Error! Invalid Access Token.",
+					"Authentication Error! Invalid Access Token."
 				);
 			}
 
 			const accessTokenParts = authHeader.split(" ");
 			const staleAccessTkn = accessTokenParts[1];
 
-            if (!ACCESS_TOKEN.secret) {
-                throw new Error("Can not found access token secket key")
-            }
+			if (!ACCESS_TOKEN.secret) {
+				throw new Error("Can not found access token secket key");
+			}
 			const decodedExpiredAccessTkn = jwt.verify(
 				staleAccessTkn,
 				ACCESS_TOKEN.secret,
@@ -221,12 +249,14 @@ export class AuthService {
 			);
 
 			const rfTkn = cookies[REFRESH_TOKEN.cookie.name];
-            // @ts-ignore
-			const decodedRefreshTkn = await jwt.verify(rfTkn, REFRESH_TOKEN.secret); //
-            console.log(decodedRefreshTkn)
-            
-            // @ts-ignore
-			const userWithRefreshTkn = await this.clientRepository.findById(decodedExpiredAccessTkn.id)
+			// @ts-ignore
+			const decodedRefreshTkn = await jwt.verify(rfTkn, REFRESH_TOKEN.secret);
+			console.log(decodedRefreshTkn);
+
+			const userWithRefreshTkn = await this.clientRepository.findById(
+				// @ts-ignore
+				decodedExpiredAccessTkn.id
+			);
 			if (!userWithRefreshTkn) {
 				throw new UnauthorizedError(
 					"Authentication Error. You are unauthenticated!"
@@ -245,13 +275,13 @@ export class AuthService {
 		} catch (error: any) {
 			console.log(error);
 			if (error instanceof TokenExpiredError || JsonWebTokenError) {
-                next(new UnauthorizedError(error.message, error.stack))
-            } 
+				next(new UnauthorizedError(error.message, error.stack));
+			}
 			next(error);
 		}
 	};
 
-	private async sendToken(res: Response, user: Client, message?: string) {
+	private async sendToken(res: Response, user: Client | Employee, message?: string) {
 		const accessToken = user.generateAccessToken();
 		const refreshToken = await user.generateRefreshToken();
 

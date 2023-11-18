@@ -4,14 +4,14 @@ module.exports = {
     up: async (queryInterface, Sequelize) => {
         let d = new Date();
         return queryInterface.bulkInsert('Permissions', [
-            { role: 'user', resource: 'product', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'user', resource: 'cart', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'user', resource: 'cart', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'products', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'carts', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'carts', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'profile', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'profile', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'user', resource: 'order', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'user', resource: 'order', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'user', resource: 'order', action: 'update:own', attributes: 'status', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'orders', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'orders', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'orders', action: 'update:own', attributes: 'status', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'chatMessage', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
 
             { role: 'employee', resource: 'customers', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
@@ -95,8 +95,8 @@ module.exports = {
             { role: 'manager', resource: 'conversations', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
-            { role: 'chef', resource: 'order', action: 'update:any', attributes: 'status', createdAt: d, updatedAt: d },
-            { role: 'chef', resource: 'order', action: 'read:any', attributes: 'order.items', createdAt: d, updatedAt: d },
+            { role: 'chef', resource: 'orders', action: 'update:any', attributes: 'status', createdAt: d, updatedAt: d },
+            { role: 'chef', resource: 'orders', action: 'read:any', attributes: 'order.items', createdAt: d, updatedAt: d },
             // Thêm dữ liệu cho các role khác tương tự ở đây
         ], {});
     },

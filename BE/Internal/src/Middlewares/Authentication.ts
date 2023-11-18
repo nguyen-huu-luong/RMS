@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { TokenUtil } from "../Utils";
 import { BaseMiddleware } from "./BaseMiddleware";
 import { BadRequestError, CustomError, UnauthorizedError } from "../Errors";
-import {TokenExpiredError, JsonWebTokenError} from "jsonwebtoken";
+import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 import { HttpStatusCode } from "../Constants";
 
 class AuthMiddleware extends BaseMiddleware {
@@ -20,23 +20,28 @@ class AuthMiddleware extends BaseMiddleware {
 	};
 
 	private static async verifyToken(): Promise<any> {
-		const authHeader = this.request.header("Authorization");
-		if (!authHeader?.startsWith("Bearer ")) {
-			throw new UnauthorizedError("You are unauthenticated!");
-		}
-		let token = authHeader.split(" ")[1];
-
 		try {
+			const authHeader = this.request.header("Authorization");
+			if (!authHeader?.startsWith("Bearer ")) {
+				throw new UnauthorizedError("You are unauthenticated!");
+			}
+			let token = authHeader.split(" ")[1];
 			const decoded = await TokenUtil.verify(token);
-			console.log(decoded);
 			this.request.userId = decoded.id;
 			this.request.token = token;
-            this.request.role = decoded.role;
+			this.request.role = decoded.role;
+			console.log(
+				"Authentication successfully! ",
+				"id:",
+				decoded.id,
+				", role:",
+				decoded.role
+			);
 			this.next();
 		} catch (error: any) {
-            if (error instanceof TokenExpiredError || JsonWebTokenError) {
-                this.next(new UnauthorizedError(error.message, error.stack))
-            } 
+			if (error instanceof TokenExpiredError || JsonWebTokenError) {
+				this.next(new UnauthorizedError(error.message, error.stack));
+			}
 			this.next(error);
 		}
 	}
