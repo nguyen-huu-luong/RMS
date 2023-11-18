@@ -24,6 +24,7 @@ import {
 	ValidationError,
 } from "../Errors";
 import Token from "../Models/Token";
+import { ICartRepository } from "../Repositories";
 
 export class AuthService {
 	constructor(
@@ -32,8 +33,11 @@ export class AuthService {
 		),
 		private EmployeeRepository = container.get<IClientRepository>(
 			TYPES.IClientRepository
+		),
+		private cartRepository = container.get<ICartRepository>(
+			TYPES.ICartRepository
 		)
-	) {}
+	) {} 
 
 	public userLogin = async (
 		req: Request,
@@ -99,7 +103,11 @@ export class AuthService {
 					isRegistered: true,
 					type: ClientType.LEAD,
 				});
-
+				const cart = this.cartRepository.create({
+					total: 0,
+					amount: 0,
+					clientId: user.getDataValue('id')
+				})
 				this.sendToken(res, user);
 			}
 		} catch (err) {
