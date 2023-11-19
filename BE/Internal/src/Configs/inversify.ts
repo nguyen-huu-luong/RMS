@@ -6,12 +6,16 @@ import {
 	IClientRepository,
 	IEmployeeRepository,
     EmployeeRepository,
+	IProductRepository,
+	ICartRepository,
     ITokenRepository,
     TokenRepository,
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
 import { PermissionRepository } from "../Repositories/implementation/PermissionRepository";
+import { ProductRepository } from "../Repositories";
+import { CartRepository } from "../Repositories";
 
 class InversifyContainer {
 	private container;
@@ -31,6 +35,8 @@ class InversifyContainer {
 		this.container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository);
 		this.container.bind<IEmployeeRepository>(TYPES.IEmployeeRepository).to(EmployeeRepository);
 		this.container.bind<IPermissionRepository>(TYPES.IPermissionRepository).to(PermissionRepository);
+		this.container.bind<IProductRepository>(TYPES.IProductRepository).to(ProductRepository);
+		this.container.bind<ICartRepository>(TYPES.ICartRepository).to(CartRepository);
 		this.container.bind<ITokenRepository>(TYPES.ITokenRepository).to(TokenRepository);
 	}
 }

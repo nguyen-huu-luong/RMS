@@ -23,6 +23,8 @@ import {
 	UnauthorizedError,
 	ValidationError,
 } from "../Errors";
+import Token from "../Models/Token";
+import { ICartRepository } from "../Repositories";
 import { IEmployeeRepository, ITokenRepository } from "../Repositories";
 
 export class AuthService {
@@ -30,13 +32,19 @@ export class AuthService {
 		private clientRepository = container.get<IClientRepository>(
 			TYPES.IClientRepository
 		),
+		private EmployeeRepository = container.get<IClientRepository>(
+			TYPES.IClientRepository
+		),
+		private cartRepository = container.get<ICartRepository>(
+			TYPES.ICartRepository
+		),
 		private employeeRepository = container.get<IEmployeeRepository>(
 			TYPES.IEmployeeRepository
 		),
         private tokenRepository = container.get<ITokenRepository>(
 			TYPES.ITokenRepository
 		)
-	) {}
+	) {} 
 
 	public userLogin = async (
 		req: Request,
@@ -102,7 +110,11 @@ export class AuthService {
 					isRegistered: true,
 					type: ClientType.LEAD,
 				});
-
+				const cart = await this.cartRepository.create({
+					total: 0,
+					amount: 0,
+					clientId: user.getDataValue('id')
+				})
 				this.sendToken(res, user);
 			}
 		} catch (err) {

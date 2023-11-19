@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 import {OrderService} from "../Services";
 
@@ -9,19 +9,25 @@ class OrderController {
         this.orderService = new OrderService();
     }
 
-    public viewOrders(req: Request, res: Response) {
-        this.orderService.viewOrders(req, res);
+    public viewOrderItems(req: Request, res: Response, next:NextFunction) {
+        this.orderService.viewOrderItems(req, res, next);
     }
 
-    public createOrder(req: Request, res: Response) {
-        this.orderService.createOrder(req, res);
+    public viewOrders(req: Request, res: Response, next:NextFunction) {
+        this.orderService.viewOrders(req, res, next);
     }
 
-    public assignOrder(req: Request, res: Response) {
-        this.orderService.assignOrder(req, res);
+    public createOrder(req: Request, res: Response, next:NextFunction) {
+        this.orderService.createOrder(req, res, next);
     }
 
+    public removeOrder(req: Request, res: Response, next:NextFunction) { 
+        this.orderService.removeOrder(req, res, next);
+    }
 
+    public updateStatus(req: Request, res: Response, next:NextFunction) { 
+        this.orderService.updateStatus(req, res, next);
+    }
 }
 
 export default OrderController;

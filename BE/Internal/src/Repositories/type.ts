@@ -4,6 +4,8 @@ const TYPES = {
     IOrderRepository: Symbol.for("IOrderRepository"),
     IEmployeeRepository: Symbol.for("EmployeeRepository"),
     IPermissionRepository: Symbol.for("IPermissionRepository"),
+    IProductRepository: Symbol.for("IProductRepository"),
+    ICartRepository: Symbol.for("ICartRepository"),
     ITokenRepository: Symbol.for("ITokenRepository")
 };
 

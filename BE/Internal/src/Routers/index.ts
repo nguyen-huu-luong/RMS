@@ -8,6 +8,8 @@ import express, {
 import OrderRouter from "./Order.router";
 import CustomerRouter from "./Client.router";
 import AuthRouter from "./Auth.router";
+import ProductRouter from "./Product.router";
+import CartRouter from "./Cart.router"
 import { HttpStatusCode } from "../Constants";
 import { NotFoundError } from "../Errors";
 
@@ -17,11 +19,15 @@ class Routers {
 		const orderRouter = new OrderRouter();
 		const customerRouter = new CustomerRouter();
 		const authRouter = new AuthRouter();
+		const productRouter = new ProductRouter();
+		const cartRouter = new CartRouter();
 		// declare your router here
         
         
 		orderRouter.initialize(router);
 		customerRouter.initialize(router);
+		productRouter.initialize(router);
+		cartRouter.initialize(router);
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 
