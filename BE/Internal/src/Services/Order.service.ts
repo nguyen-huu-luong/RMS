@@ -6,28 +6,17 @@ import { container } from "../Configs";
 import { IOrderRepository } from "../Repositories/IOrderRepository";
 import {
     ICartRepository,
-    IOrderItemRepository,
-    ICartItemRepository,
     IProductRepository,
 } from "../Repositories";
 import { TYPES } from "../Repositories/type";
 import { RecordNotFoundError } from "../Errors";
-import { or } from "sequelize";
-import { OrderItem } from "../Models";
-import { param } from "express-validator";
 export class OrderService {
     constructor(
         private orderRepository = container.get<IOrderRepository>(
             TYPES.IOrderRepository
         ),
-        private orderItemRepository = container.get<IOrderItemRepository>(
-            TYPES.IOrderItemRepository
-        ),
         private cartRepository = container.get<ICartRepository>(
             TYPES.ICartRepository
-        ),
-        private cartItemRepository = container.get<ICartItemRepository>(
-            TYPES.ICartItemRepository
         ),
         private productRepository = container.get<IProductRepository>(
             TYPES.IProductRepository
@@ -47,13 +36,12 @@ export class OrderService {
                     req.userId,
                     parseInt(req.params.id)
                 );
-                data = await this.orderItemRepository.getAll(
-                    parseInt(req.params.id)
-                );
+                data = await order.getProducts();
             } else {
-                data = await this.orderItemRepository.getAll(
+                const order = await this.orderRepository.findById(
                     parseInt(req.params.id)
                 );
+                data = await order.getProducts()
             }
             if (!data) {
                 throw new RecordNotFoundError("Order do not exist");
@@ -96,22 +84,21 @@ export class OrderService {
                     num_items: cart?.getDataValue("total"),
                     amount: cart?.getDataValue("amount"),
                 });
-                const cartItems = await this.cartItemRepository.getAll(
-                    cart?.getDataValue("id")
-                );
+                const cartItems = await cart.getProducts();
                 await Promise.all(
-                    cartItems.map(async (cartItem: any) => {
-                        await this.orderItemRepository.create({
-                            orderId: order.getDataValue("id"),
-                            productId: cartItem.getDataValue("productId"),
-                            quantity: cartItem.getDataValue("quantity"),
-                            amount: cartItem.getDataValue("amount"),
-                        });
+                    cartItems.map(async (item: any) => {
+                        await order.addProduct(item,{
+                            through: {
+                                quantity: item.CartItem.quantity,
+                                amount: item.CartItem.amount,
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                            },
+                        })
                     })
                 );
-                await this.cartItemRepository.deleteAll(
-                    cart?.getDataValue("id")
-                );
+                await cart.setProducts([]);
+                console.log(await order.getProducts())
                 await this.cartRepository.update(cart?.getDataValue("id"), {
                     total: 0,
                     amount: 0,
@@ -122,26 +109,37 @@ export class OrderService {
                 const order = await this.orderRepository.create(orderData);
                 await Promise.all(
                     products.map(async (item: any) => {
-                        let product = await this.productRepository.findById(item.productId);
-                        await this.orderItemRepository.create({
-                            orderId: order.getDataValue("id"),
-                            productId: item.productId,
-                            quantity: item.quantity,
-                            amount: item.quantity * product.getDataValue('price'),      
+                        let product = await this.productRepository.findById(
+                            item.productId
+                        );
+                        if (!product) {
+                            throw new RecordNotFoundError("Product do not exist");
+                        }
+                        await order.addProduct(product,{
+                            through: {
+                                quantity: item.quantity,
+                                amount: item.quantity * product.getDataValue('price'),
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                            },
                         })
                     })
                 );
-                const orderItems = await this.orderItemRepository.getAll(order.getDataValue('id'));
+                const orderItems = await order.getProducts()
                 const totalItems = orderItems.reduce(
-                    (total: number, orderItems: any) =>
-                        total + orderItems.getDataValue("quantity"),
+                    (total: any, item: any) =>
+                        total + item.OrderItem.quantity,
                     0
                 );
                 const totalAmount = orderItems.reduce(
-                    (sum: number, orderItems: any) => sum + orderItems.getDataValue("amount"),
+                    (sum: any, item: any) =>
+                        sum + item.OrderItem.amount,
                     0
                 );
-                await this.orderRepository.update(order.getDataValue('id'), { num_items: totalItems, amount: totalAmount })
+                await this.orderRepository.update(order.getDataValue("id"), {
+                    num_items: totalItems,
+                    amount: totalAmount,
+                });
             }
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);

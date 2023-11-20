@@ -3,7 +3,6 @@ import { Message } from "../Utils";
 import { HttpStatusCode } from "../Constants";
 import { container } from "../Configs";
 import { ICartRepository } from "../Repositories/ICartRepository";
-import { ICartItemRepository } from "../Repositories/ICartItemRepository";
 import { IProductRepository } from "../Repositories";
 import { TYPES } from "../Repositories/type";
 import statusMess from "../Constants/statusMess";
@@ -12,9 +11,6 @@ export class CartService {
     constructor(
         private cartRepository = container.get<ICartRepository>(
             TYPES.ICartRepository
-        ),
-        private cartItemRepository = container.get<ICartItemRepository>(
-            TYPES.ICartItemRepository
         ),
         private productRepository = container.get<IProductRepository>(
             TYPES.IProductRepository
@@ -39,20 +35,39 @@ export class CartService {
         try {
             const status: number = HttpStatusCode.Success;
             const cart = await this.cartRepository.getCart(req.userId);
-            const cartId = cart?.getDataValue("id");
             const product = await this.productRepository.findById(
                 req.body.productId
             );
             if (!product) {
                 throw new RecordNotFoundError("Product do not exist");
             }
-            const cartItem = await this.cartItemRepository.createItem({
-                cartId: cartId,
-                productId: req.body.productId,
-                quantity: req.body.quantity,
-                price: product.getDataValue("price"),
+            const cartItem = await cart.getProducts({
+                where: { id: req.body.productId },
             });
-            await this.updateCartDetail(cartId);
+            if (cartItem.length > 0) {
+                await cart.addProduct(product, {
+                    through: {
+                        quantity:
+                            cartItem[0].CartItem.quantity + req.body.quantity,
+                        amount:
+                            product.getDataValue("price") *
+                            (cartItem[0].CartItem.quantity + req.body.quantity),
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                });
+            } else {
+                await cart.addProduct(product, {
+                    through: {
+                        quantity: req.body.quantity,
+                        amount:
+                            product.getDataValue("price") * req.body.quantity,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                });
+            }
+            await this.updateCartDetail(cart);
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         } catch (err) {
@@ -68,15 +83,14 @@ export class CartService {
         try {
             const status: number = HttpStatusCode.Success;
             const cart = await this.cartRepository.getCart(req.userId);
-            const cartId = cart?.getDataValue("id");
             const product = await this.productRepository.findById(
                 req.body.productId
             );
             if (!product) {
                 throw new RecordNotFoundError("Product do not exist");
             }
-            await this.cartItemRepository.deleteOne(cartId, req.body.productId);
-            await this.updateCartDetail(cartId);
+            await cart.removeProduct(product);
+            await this.updateCartDetail(cart);
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         } catch (err) {
@@ -100,21 +114,14 @@ export class CartService {
                 throw new RecordNotFoundError("Product do not exist");
             }
             if (req.body.quantity === 0) {
-                await this.cartItemRepository.deleteOne(
-                    cartId,
-                    req.body.productId
-                );
+                await cart.removeProduct(product);
             } else {
-                await this.cartItemRepository.updateOne(
-                    cartId,
-                    req.body.productId,
-                    {
-                        amount: req.body.quantity * product?.getDataValue("price"),
-                        quantity: req.body.quantity,
-                    }
-                );
+                await cart.addProduct(product, {
+                    amount: req.body.quantity * product?.getDataValue("price"),
+                    quantity: req.body.quantity,
+                });
             }
-            await this.updateCartDetail(cartId);
+            await this.updateCartDetail(cart);
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         } catch (err) {
@@ -126,28 +133,27 @@ export class CartService {
         try {
             const status: number = HttpStatusCode.Success;
             const cart = await this.cartRepository.getCart(req.userId);
-            const cartItems = await this.cartItemRepository.getAll(cart.getDataValue('id'))
-            res.status(status).send(cartItems);
+            res.status(status).send(await cart.getProducts());
             Message.logMessage(req, status);
         } catch (err) {
             console.log(err);
             next(err);
         }
     }
-    public async updateCartDetail(cartId: number) {
+    public async updateCartDetail(cart: any) {
         try {
-            const cartItems = await this.cartItemRepository.getAll(cartId);
+            const cartItems = await cart.getProducts();
             const totalItems = cartItems.reduce(
-                (total: any, cartItems: any) =>
-                    total + cartItems.getDataValue("quantity"),
+                (total: any, item: any) =>
+                    total + item.CartItem.quantity,
                 0
             );
             const totalAmount = cartItems.reduce(
-                (sum: any, cartItems: any) =>
-                    sum + cartItems.getDataValue("amount"),
+                (sum: any, item: any) =>
+                    sum + item.CartItem.amount,
                 0
             );
-            await this.cartRepository.update(cartId, {
+            await this.cartRepository.update(cart.getDataValue('id'), {
                 total: totalItems,
                 amount: totalAmount,
             });
