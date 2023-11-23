@@ -7,10 +7,10 @@ const FoodItem = ({
     params: {
         food: {
             name: string;
-            image: string;
+            thumbnails: string;
             description: string;
             price: number;
-            category: string;
+            categoryId: string;
         };
         size: string;
         openModal: (food: typeof params.food) => void;
@@ -24,7 +24,7 @@ const FoodItem = ({
         >
             <div className='w-auto h-auto rounded-lg overflow-hidden cursor-pointer' onClick={() => params.openModal(params.food)}>
                 <Image
-                    src={params.food.image}
+                    src={params.food.thumbnails}
                     alt={params.food.name}
                     width={200}
                     height={200}

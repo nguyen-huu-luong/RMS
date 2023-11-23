@@ -3,11 +3,12 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import FoodItem from "@/app/components/Menu/foodItem";
+import FoodItem from "@/app/components/menu/foodItem";
 import { Pagination, ConfigProvider } from "antd";
 import type { PaginationProps } from "antd";
-import FoodDetail from "@/app/components/Menu/foodDetail";
-import { Alert } from 'antd';
+import FoodDetail from "@/app/components/menu/foodDetail";
+import useSWR from "swr";
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function Menu() {
     const searchParams = useSearchParams();
@@ -17,20 +18,32 @@ export default function Menu() {
         currentCategory !== null ? currentCategory : "Pizza"
     );
     const [currentPage, setCurrentPage] = useState(1);
+
+    const {
+        data: foods,
+        error: foodError,
+        isLoading: foodLoading,
+    } = useSWR(`${process.env.BASE_URL}/products/all`, fetcher);
+    const {
+        data: categories,
+        error: categoryError,
+        isLoading: categoryLoading,
+    } = useSWR(`${process.env.BASE_URL}/categories/all`, fetcher);
+
     // Modal for food detail
     const [modal, setModal] = useState<boolean>(false);
     const [detail, setDetail] = useState<{
         name: string;
-        image: string;
+        thumbnails: string;
         description: string;
         price: number;
-        category: string;
+        categoryId: string;
     }>({
         name: "",
-        image: "",
+        thumbnails: "",
         description: "",
         price: 0,
-        category: "",
+        categoryId: "",
     });
     const openModal = (item: typeof detail) => {
         setDetail(item)
@@ -42,49 +55,27 @@ export default function Menu() {
     const onChange: PaginationProps["onChange"] = (page) => {
         setCurrentPage(page);
     };
-    const categories: string[] = [
-        "Pizza",
-        "Drink",
-        "Fruits",
-        "Hotdog",
-        "Snacks",
-        "Burger",
-        "Veggies",
-    ];
-    const foods: {
-        name: string;
-        image: string;
-        description: string;
-        price: number;
-        category: string;
-    }[] = categories.flatMap((item) => {
-        return Array.from({ length: 20 }, (_, index) => ({
-            name: `${item} ${index}`,
-            image: "https://img.dominos.vn/cach-lam-pizza-thap-cam-2.jpg",
-            description:
-                "Pizza, dish of Italian origin consisting of a flattened disk of bread dough topped with some combination of olive oil, oregano, tomato, olives, mozzarella or other cheese, and many other ingredients",
-            price: 50000,
-            category: item,
-        }));
-    });
+    if (foodError) return <div>Failed to load</div>;
+    if (categoryError) return <div>Failed to load</div>;
+    if (foodLoading || categoryLoading) return <div>Loading...</div>;
     return (
         <div className='w-full h-auto flex flex-col justify-start gap-10'>
             <div className='w-full h-auto rounded-3xl border-2 border-orange-100 bg-primary-white p-2 flex flex-wrap justify-around'>
-                {categories.map((item, index) => {
+                {categories.map((item: any) => {
                     return (
                         <div
-                            key={`Category ${index}`}
+                            key={`Category ${item.name}`}
                             onClick={() => {
-                                setCategory(item);
+                                setCategory(item.name);
                                 setCurrentPage(1);
                             }}
                             className={`font-bold cursor-pointer p-2 px-4 rounded-3xl ${
-                                category === item
+                                category === item.name
                                     ? "bg-primary text-item-white"
                                     : "bg-none text-menu"
                             } transition-all duration-200`}
                         >
-                            {item}
+                            {item.name}
                         </div>
                     );
                 })}
@@ -92,12 +83,12 @@ export default function Menu() {
             <div className='w-full h-auto flex flex-col justify-center items-center gap-5'>
                 <div className='w-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10'>
                     {foods
-                        .filter((item) => item.category === category)
+                        .filter((item: any) => category  === categories[parseInt(item.categoryId) - 1]?.name)
                         .slice((currentPage - 1) * 8, currentPage * 8)
-                        .map((item, index) => {
+                        .map((item: any) => {
                             return (
                                 <div
-                                    key={`Food ${item.category} ${index}`}
+                                    key={`Food ${item.category} ${item.id}`}
                                     className='duration-300 transition-all ease-in-out w-auto'
                                 >
                                     <FoodItem
@@ -120,7 +111,7 @@ export default function Menu() {
                         current={currentPage}
                         onChange={onChange}
                         total={
-                            foods.filter((food) => category === food.category)
+                            foods.filter((food: any) => category === categories[parseInt(food.categoryId) - 1]?.name)
                                 .length
                         }
                         pageSize={8}
