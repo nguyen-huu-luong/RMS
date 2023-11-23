@@ -8,6 +8,7 @@ import "../globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import ChatIcon from "../components/chaticon";
+import Provider from "../components/SessionProvider";
 
 export function generateStaticParams() {
     return [{ locale: "vi" }, { locale: "en" }];
@@ -39,18 +40,20 @@ export default async function RootLayout({
                     locale={params.locale}
                     messages={messages}
                 >
-                    <div className='flex flex-col min-h-screen'>
-                        <NavBar/>
-                        <main className='flex-grow overflow-hidden'>
-                            <Container>
-                                <div className='w-full h-full py-4'>
-                                    {children}
-                                </div>
-                            </Container>
-                        </main>
-                        <ChatIcon />
-                        <Footer/>
-                    </div>
+                   <Provider>
+                        <div className='flex flex-col min-h-screen'>
+                            <NavBar/>
+                            <main className='flex-grow overflow-hidden'>
+                                <Container>
+                                    <div className='w-full h-full py-4'>
+                                        {children}
+                                    </div>
+                                </Container>
+                            </main>
+                            <ChatIcon />
+                            <Footer/>
+                        </div>
+                   </Provider>
                 </NextIntlClientProvider>
             </body>
         </html>

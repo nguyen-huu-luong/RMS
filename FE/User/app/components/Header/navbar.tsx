@@ -13,6 +13,7 @@ import {
 } from "@ant-design/icons";
 import { Avatar, Dropdown } from "antd";
 import type { MenuProps } from "antd";
+import { signOut } from "next-auth/react";
 
 const NavBar = () => {
     const locale = useLocale();
@@ -37,11 +38,8 @@ const NavBar = () => {
         },
         {
             key: "logout",
-            label: (
-                <Link key={"logout"} href={`/login`} locale={locale}>
-                    Log Out
-                </Link>
-            ),
+            label: "Log out",
+            onClick: () => signOut()
         },
     ];
     const toggleNav = () => {
