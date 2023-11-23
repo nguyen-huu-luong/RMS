@@ -44,6 +44,8 @@ npx sequelize-cli model:generate --name ChatMessage --attributes
 # EmailCampaign
 npx sequelize-cli model:generate --name EmailCampaign --attributes name:string,status:string,startDate:date,subject:string,sendFrom:string,sendTo:string
 
+# Category
+npx sequelize-cli model:generate --name Category --attributes name:string,description:string,thumnails:blob
 
 ###### Association
 
@@ -91,9 +93,12 @@ npx sequelize-cli migration:generate --name add-client-id-to-chat-session
 
 # Employee has many ChatSession (1:N)
 npx sequelize-cli migration:generate --name add-employee-id-to-chat-session
+
 # Chatsession has many ChatMessage (1:N)
 npx sequelize-cli migration:generate --name add-session-id-to-chat-message
 
+# Category has many Product (1:N)
+npx sequelize-cli migration:generate --name add-category-id-to-product
 ### Update:
 # 12/11/2023
 - Delete ClientAccout

@@ -13,7 +13,8 @@ import {
 	Table,
 	Employee,
 	ChatMessage,
-	ChatSession
+	ChatSession,
+	Category
 } from ".";
 import Token from "./Token";
 
@@ -33,7 +34,7 @@ class Association {
 			ChatSession.associate();
 			ChatMessage.associate();
             Token.associate() ;
-
+			Category.associate() ;
 		} catch (err) {
 			console.log("Initialize association failed!");
 			console.log(`Err: ${err}`);

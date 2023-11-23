@@ -11,6 +11,7 @@ import {
 } from "sequelize";
 import Loader from "../Loaders";
 import { Cart, Order, OrderItem, CartItem } from ".";
+import Category from "./Category";
 class Product extends Model {
 	public static associate() {
 		Product.belongsToMany(Cart, {
@@ -23,6 +24,12 @@ class Product extends Model {
 			foreignKey: "productId",
 			otherKey: "orderId",
 		});
+		Product.belongsTo(Category, {
+            foreignKey: {
+                name: "categoryId",
+                allowNull: false,
+            },
+        });
 	}
 }
 Product.init(
