@@ -1,13 +1,14 @@
 import React from "react";
-import { LoginForm } from "@/app/components/LoginForm";
+import { LoginForm } from "@/components/LoginForm";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect, useRouter } from "next/navigation";
+import RegistrationForm from "@/components/RegisterForm";
 
-const SignIn: React.FC = async () => {
+const Register: React.FC = async () => {
     const session = await getServerSession(authOptions) ;
     if (session) {
-        redirect("/profile")
+        redirect("/")
     }
 
     return (
@@ -16,10 +17,10 @@ const SignIn: React.FC = async () => {
                 <img alt="" src="/Login/food2.svg" width={"100%"} />
             </div>
             <div className="h-[600px] rounded-lg w-full md:w-2/5 flex items-center justify-center">
-              <LoginForm />
+              <RegistrationForm />
             </div>
         </main>
     );
 };
 
-export default SignIn;
+export default Register;

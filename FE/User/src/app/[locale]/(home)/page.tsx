@@ -1,11 +1,11 @@
 "use client";
 import Link from "next-intl/link";
 import { useLocale, useTranslations } from "next-intl";
-import Category from "../components/menu/category";
-import FoodItem from "../components/menu/foodItem";
-import FoodDetail from "../components/menu/foodDetail";
-import Slider from "../components/home/slider";
-import WelcomeImage from "../components/home/welcome";
+import Category from "@/components/menu/category";
+import FoodItem from "@/components/menu/foodItem";
+import FoodDetail from "@/components/menu/foodDetail";
+import Slider from "@/components/home/slider";
+import WelcomeImage from "@/components/home/welcome";
 import { RightCircleFilled } from "@ant-design/icons";
 import { useState } from "react";
 import useSWR from "swr";

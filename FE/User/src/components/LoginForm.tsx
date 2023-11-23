@@ -25,7 +25,7 @@ export const LoginForm: React.FC = () => {
                 console.log(error)
             }   
         } else {
-            router.push("/")
+            router.push("/profile")
         }
     };
     const signInGoogle = () => {

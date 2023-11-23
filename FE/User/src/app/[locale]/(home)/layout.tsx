@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
-import Footer from "../components/footer/footer";
-import NavBar from "../components/header/navbar";
-import Container from "../components/container";
-import "../globals.css";
+import Footer from "@/components/footer/footer";
+import NavBar from "@/components/header/navbar";
+import Container from "@/components/container";
 //Internationalization
 import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
-import ChatIcon from "../components/chaticon";
-import Provider from "../components/SessionProvider";
+import ChatIcon from "@/components/chaticon";
+import Provider from "@/components/SessionProvider";
+import "@/app/globals.css"
 
 export function generateStaticParams() {
     return [{ locale: "vi" }, { locale: "en" }];
@@ -29,7 +29,7 @@ export default async function RootLayout({
 }) {
     let messages;
     try {
-        messages = (await import(`../../messages/${params.locale}.json`)).default;
+        messages = (await import(`@/messages/${params.locale}.json`)).default;
     } catch (error) {
         notFound();
     }

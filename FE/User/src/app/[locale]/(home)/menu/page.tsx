@@ -3,10 +3,10 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import FoodItem from "@/app/components/menu/foodItem";
+import FoodItem from "@/components/menu/foodItem";
 import { Pagination, ConfigProvider } from "antd";
 import type { PaginationProps } from "antd";
-import FoodDetail from "@/app/components/menu/foodDetail";
+import FoodDetail from "@/components/menu/foodDetail";
 import useSWR from "swr";
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 

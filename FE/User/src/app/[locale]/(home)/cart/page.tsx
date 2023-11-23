@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -9,13 +8,13 @@ import {
     CloseCircleFilled,
 } from "@ant-design/icons";
 import Image from "next/image";
-import moneyFormatter from "@/app/components/function/moneyFormatter";
+import moneyFormatter from "@/components/function/moneyFormatter";
 import useSWR from "swr";
 const cartFetcher = async (url: string) => {
     try {
         const response = await fetch(url, {
             headers: {
-              'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQxIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzAwNzIzMTE0LCJleHAiOjE3MDA3MjM3MTR9.k2qYZMqFVx78VpvwcS-bL7Ls_2MSjDM0YGkr8MKDJEk`,
+              'Authorization': `Bearer ${1}`,
               'Content-Type': 'application/json',
             },
           })
@@ -25,15 +24,21 @@ const cartFetcher = async (url: string) => {
     }
 
 };
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import { getServerSession } from "next-auth";
 
 
-export default function Cart() {
-    const locale = useLocale();
-    const {
-        data: cartItems,
-        error: cartItemsError,
-        isLoading: cartItemsLoading,
-    } = useSWR(`${process.env.BASE_URL}/carts/item`, cartFetcher);
+
+export default async function Cart() {
+    const getSession = await getServerSession(authOptions);
+    //const locale = useLocale();
+    console.log(getSession?.user && getSession.user.accessToken)
+
+    // const {
+    //     data: cartItems,
+    //     error: cartItemsError,
+    //     isLoading: cartItemsLoading
+    // } = useSWR(`http://localhost:3003/api/carts/item`, cartFetcher);
     // Order step
     const current: number = 0;
     const steps = [
@@ -80,9 +85,9 @@ export default function Cart() {
     // Check if cart is empty
     //const isCartEmpty = cart.length === 0;
 
-    if (cartItemsError) return <div>Failed to load</div>;
-    if (cartItemsLoading) return <div>Loading...</div>;
-    console.log(cartItems)
+    // if (cartItemsError) return <div>Failed to load</div>;
+    // if (cartItemsLoading) return <div>Loading...</div>;
+    // console.log(cartItems)
     return <></>
     // return isCartEmpty ? (
     //     <div className='w-full h-auto flex flex-col justify-center items-center gap-5 p-20 bg-primary-white rounded-3xl transition-all duration-300'>

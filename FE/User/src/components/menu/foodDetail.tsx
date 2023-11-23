@@ -8,7 +8,7 @@ import {
     CloseCircleFilled,
 } from "@ant-design/icons";
 import { message } from "antd";
-import styles from "../../styles.module.css";
+import styles from "@/app/styles.module.css";
 const FoodDetail = ({
     food,
     closeModal,
