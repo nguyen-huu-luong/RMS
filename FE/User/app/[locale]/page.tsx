@@ -1,37 +1,43 @@
 "use client";
-import Image from "next/image";
 import Link from "next-intl/link";
 import { useLocale, useTranslations } from "next-intl";
-import Category from "../components/Menu/category";
-import FoodItem from "../components/Menu/foodItem";
-import FoodDetail from "../components/Menu/foodDetail";
-import Progress from "../components/Order/progressBar";
-import VoucherPicker from "../components/Order/voucherPicker";
-import Slider from "../components/Home/slider";
-import WelcomeImage from "../components/Home/welcome";
+import Category from "../components/menu/category";
+import FoodItem from "../components/menu/foodItem";
+import FoodDetail from "../components/menu/foodDetail";
+import Slider from "../components/home/slider";
+import WelcomeImage from "../components/home/welcome";
 import { RightCircleFilled } from "@ant-design/icons";
 import { useState } from "react";
-import path from "path";
-
+import useSWR from "swr";
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 export default function Home() {
     const locale = useLocale();
     const t = useTranslations("Home");
     const [currentCategory, setCurrentCategory] = useState<string>("Pizza");
-
+    const {
+        data: food,
+        error: foodError,
+        isLoading: foodLoading,
+    } = useSWR(`${process.env.BASE_URL}/products/all`, fetcher);
+    const {
+        data: category,
+        error: categoryError,
+        isLoading: categoryLoading,
+    } = useSWR(`${process.env.BASE_URL}/categories/all`, fetcher);
     // Modal for food detail
     const [modal, setModal] = useState<boolean>(false);
     const [detail, setDetail] = useState<{
         name: string;
-        image: string;
+        thumbnails: string;
         description: string;
         price: number;
-        category: string;
+        categoryId: string;
     }>({
         name: "",
-        image: "",
+        thumbnails: "",
         description: "",
         price: 0,
-        category: "",
+        categoryId: "",
     });
     const openModal = (item: typeof detail) => {
         setDetail(item);
@@ -40,50 +46,6 @@ export default function Home() {
     const closeModal = () => {
         setModal(false);
     };
-
-    const vouchers: {
-        name: string;
-        code: string;
-        amount: number;
-        description: string;
-        category: string;
-    }[] = [
-        {
-            name: "Voucher 1",
-            code: "VCH123",
-            amount: 50000,
-            description: "Discount on selected items",
-            category: "pizza",
-        },
-        {
-            name: "Voucher 2",
-            code: "VCH456",
-            amount: 20000,
-            description: "Special discount for members",
-            category: "pizza",
-        },
-        {
-            name: "Voucher 3",
-            code: "VCH789",
-            amount: 30000,
-            description: "Limited time offer",
-            category: "drink",
-        },
-        {
-            name: "Voucher 10",
-            code: "VCHXYZ",
-            amount: 25000,
-            description: "Weekend sale",
-            category: "drink",
-        },
-        {
-            name: "Voucher 10",
-            code: "VCHXaYZ",
-            amount: 25000,
-            description: "Weekend sale",
-            category: "drink",
-        },
-    ];
     const images: string[] = [
         "https://ict-imgs.vgcloud.vn/2022/05/13/17/shopeefood-ngay-15-sale-dong-gia-kham-pha-ngay-bo-suu-tap-mon-ngon-chi-tu-1-000-dong-2.jpg",
         "https://ict-imgs.vgcloud.vn/2022/05/13/17/shopeefood-ngay-15-sale-dong-gia-kham-pha-ngay-bo-suu-tap-mon-ngon-chi-tu-1-000-dong-1.jpg",
@@ -92,32 +54,9 @@ export default function Home() {
         "https://ict-imgs.vgcloud.vn/2022/05/13/17/shopeefood-ngay-15-sale-dong-gia-kham-pha-ngay-bo-suu-tap-mon-ngon-chi-tu-1-000-dong-2.jpg",
         "https://ict-imgs.vgcloud.vn/2022/05/13/17/shopeefood-ngay-15-sale-dong-gia-kham-pha-ngay-bo-suu-tap-mon-ngon-chi-tu-1-000-dong-1.jpg",
     ];
-    const category: string[] = [
-        "Pizza",
-        "Drink",
-        "Fruits",
-        "Hotdog",
-        "Snacks",
-        "Burger",
-        "Veggies",
-    ];
-    const foods: {
-        name: string;
-        image: string;
-        description: string;
-        price: number;
-        category: string;
-    }[] = category.flatMap((item) => {
-        return Array.from({ length: 6 }, (_, index) => ({
-            name: `${item} ${index}`,
-            image: "https://img.dominos.vn/cach-lam-pizza-thap-cam-2.jpg",
-            description:
-                "Pizza, dish of Italian origin consisting of a flattened disk of bread dough topped with some combination of olive oil, oregano, tomato, olives, mozzarella or other cheese, and many other ingredients",
-            price: 50000,
-            category: item,
-        }));
-    });
-
+    if (foodError) return <div>Failed to load</div>;
+    if (categoryError) return <div>Failed to load</div>;
+    if (foodLoading || categoryLoading) return <div>Loading...</div>;
     return (
         <div className='h-auto py-4 flex flex-col justify-center items-center gap-10'>
             {/* Home welcome and carousel banner */}
@@ -150,16 +89,19 @@ export default function Home() {
                 </div>
                 <div className='w-full h-auto flex flex-col justify-center items-center'>
                     <div className='w-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-6 lg:gap-10 items-center'>
-                        {category.map((item, index) => {
+                        {category.map((item: any) => {
                             return (
                                 <div
-                                    key={`Category ${index}`}
-                                    onClick={() => setCurrentCategory(item)}
+                                    key={`Category ${item.id}`}
+                                    onClick={() =>
+                                        setCurrentCategory(item.name)
+                                    }
                                 >
                                     <Category
                                         params={{
-                                            category: item,
-                                            state: item !== currentCategory,
+                                            category: item.name,
+                                            state:
+                                                item.name !== currentCategory,
                                         }}
                                     />
                                 </div>
@@ -170,13 +112,13 @@ export default function Home() {
 
                 <div className='w-full h-auto flex flex-col justify-center items-center'>
                     <div className='w-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 lg:gap-10 items-center'>
-                        {foods
-                            .filter((item) => item.category === currentCategory)
+                        {food
+                            .filter((item: any) => currentCategory  === category[parseInt(item.categoryId) - 1]?.name)
                             .slice(0, 6)
-                            .map((item, index) => {
+                            .map((item: any) => {
                                 return (
                                     <div
-                                        key={`Food ${item.category} ${index}`}
+                                        key={`Food ${item.category} ${item.id}`}
                                         className='duration-300 transition-all ease-in-out'
                                         onClick={() => setDetail(item)}
                                     >
@@ -202,13 +144,12 @@ export default function Home() {
                 </div>
                 <div className='w-full h-auto flex flex-col justify-center items-center'>
                     <div className='w-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 lg:gap-10 items-center'>
-                        {foods
-                            .filter((item) => item.category === currentCategory)
+                        {food
                             .slice(0, 6)
-                            .map((item, index) => {
+                            .map((item: any) => {
                                 return (
                                     <div
-                                        key={`Food ${item.category} ${index}`}
+                                        key={`Food ${item.categoryId} ${item.id}`}
                                         className='duration-300 transition-all ease-in-out'
                                         onClick={() => setDetail(item)}
                                     >
@@ -226,12 +167,6 @@ export default function Home() {
                 </div>
             </div>
             {modal && <FoodDetail food={detail} closeModal={closeModal} />}
-            {/*             
-            <FoodDetail params={{ food: foods[0] }} />
-            <br></br>
-            <Progress />
-            <br></br>
-            <VoucherPicker params={{ vouchers: vouchers }} /> */}
         </div>
     );
 }

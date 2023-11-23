@@ -1,0 +1,1006 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"version": "1.0.0",
+		"title": "API document of RMS system",
+		"description": "This is a API application made with Express, Typescript, Sequenlize and documented with Swagger"
+	},
+	"license": {
+		"name": "MIT",
+		"url": "https://spdx.org/licenses/MIT.html"
+	},
+	"servers": [
+		{
+			"url": "http://localhost:3003/api",
+			"description": "Local Dev"
+		}
+	],
+	"tags": [
+		{
+			"name": "Authentication",
+			"description": "API for authentication"
+		},
+		{
+			"name": "Order",
+			"description": "API for order in the system"
+		},
+		{
+			"name": "Customer",
+			"description": "API for customer in the system"
+		},
+		{
+			"name": "Product",
+			"description": "API for product in the system"
+		},
+		{
+			"name": "Cart",
+			"description": "API for cart in the system"
+		}
+	],
+	"paths": {
+		"/users/signup": {
+			"post": {
+				"tags": ["Authentication"],
+				"summary": "Sign up new account with email, password, firstname, lastname",
+				"requestBody": {
+					"description": "Object of fisrtname, lastname, username and password",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SignUp"
+							},
+							"example": {
+								"firstname": "minh",
+								"lastname": "vuong",
+								"email": "test@gmail.com",
+								"password": "password"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+		"/users/signin": {
+			"post": {
+				"tags": ["Authentication"],
+				"summary": "Login with email and password",
+				"requestBody": {
+					"description": "Object of username and password",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Login"
+							},
+							"example": {
+								"email": "test@gmail.com",
+								"password": "password"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+        "/users/admin/signin": {
+			"post": {
+				"tags": ["Authentication"],
+				"summary": "Admin Login with username and password",
+				"requestBody": {
+					"description": "Object of username and password",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Login"
+							},
+							"example": {
+								"username": "manager",
+								"password": "manager"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"firstname": "manager",
+							"lastname": "manager",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+        "/users/logout": {
+			"delete": {
+				"tags": ["Authentication"],
+				"summary": "Log out account",
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+
+        "/users/logout/all": {
+			"delete": {
+				"tags": ["Authentication"],
+				"summary": "Log out account from all devices",
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+        "/users/refresh": {
+			"post": {
+				"tags": ["Authentication"],
+				"summary": "Refresh access tokens",
+				"responses": {
+					"200": {
+						"success": true,
+						"accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMwIiwiZnVsbE5hbWUiOiJtaW5oIHZ1b25nIiwiZW1haWwiOiJuc3MxQGdtYWlsLmNvbSIsImlhdCI6MTY5OTg5MjMxMSwiZXhwIjoxNjk5ODkyMzQxfQ.ZTEazQbXpWb8hvRfgPlpke_NDI5VfofZ10_MVygYPOQ",
+						"user": {
+							"id": 30,
+							"email": "test@gmail.com",
+							"firstname": "minh",
+							"lastname": "vuong",
+							"avatar": null,
+							"language": "vi",
+							"createdAt": "2023-11-13T12:05:46.451Z",
+							"updatedAt": "2023-11-13T12:05:46.451Z"
+						}
+					},
+					"400": {
+						"description": "Login faild failed"
+					}
+				}
+			}
+		},
+
+		"/customer/all": {
+			"get": {
+				"tags": ["Customer"],
+				"summary": "Returns a list of all customers",
+				"responses": {
+					"200": {
+						"description": "A JSON array of customers",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Customer"
+									}
+								},
+								"example": [
+									{
+										"firstname": "Tony",
+										"lastname": "Nguyen",
+										"gender": "Male",
+										"birthday": "23/4/2023",
+										"avatar": "1000001111000111",
+										"score": 0,
+										"address": "Thu Duc City"
+									}
+								]
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request from user"
+					}
+				}
+			}
+		},
+		"/products": {
+			"post": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Product"],
+				"summary": "Create new product",
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Product"
+							},
+							"example":   {
+								"name": "Product 123",
+								"description": "Description 1",
+								"price": 29.99,
+								"thumbnails": "image_url_1.jpg"
+							  }
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Create product successfully"
+					},
+					"400": {
+						"description": "Create product failed"
+					}
+				}
+			}
+		},
+		"/products/all": {
+			"get": {
+				"tags": ["Product"],
+				"summary": "Get all products",
+				"responses": {
+					"200": {
+						"description": "Get all products successfully",
+						"content": {
+						   "application/json": {
+							  "schema": {
+								 "type": "array",
+								 "items": {
+									"$ref": "#/components/schemas/Product"
+								 }
+							  }
+						   }
+						}					
+					},
+					"400": {
+						"description": "Get all products failed"
+					}
+				}
+			}
+		},
+		"/products/{id}": {
+			"get": {
+				"tags": ["Product"],
+				"summary": "Get product by id",
+				"parameters": [
+					{
+					  "in": "path",
+					  "name": "id",
+					  "required": true,
+					  "description": "ID of the product",
+					  "schema": {
+						"type": "integer"
+					  }
+					}
+				  ],
+				"responses": {
+					"200": {
+						"description": "Get product successfully",
+						"content": {
+						   "application/json": {
+							  "schema": {
+								"$ref": "#/components/schemas/Product"
+							  }
+						   }
+						}		
+					},
+					"400": {
+						"description": "Get product failed"
+					}
+				}
+			},
+			"put": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Product"],
+				"summary": "Edit product",
+				"parameters": [
+					{
+					  "in": "path",
+					  "name": "id",
+					  "required": true,
+					  "description": "ID of the product",
+					  "schema": {
+						"type": "integer"
+					  }
+					}
+				  ],
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Product"
+							},
+							"example":   {
+								"name": "Product 11223",
+								"description": "Description 11123",
+								"price": 29.99,
+								"thumbnails": "image_url_1.jpg"
+							  }
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Edit product successfully"
+					},
+					"400": {
+						"description": "Edit product failed"
+					}
+				}
+			},
+			"delete": {
+                "security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Product"],
+				"summary": "Delete a product",
+				"parameters": [
+					{
+					  "in": "path",
+					  "name": "id",
+					  "required": true,
+					  "description": "ID of the product",
+					  "schema": {
+						"type": "integer"
+					  }
+					}
+				  ],
+				"responses": {
+					"200": {
+						"description": "Delete product successfully"
+					},
+					"400": {
+						"description": "Delete product failed"
+					}
+				}
+			}
+		},
+		"/carts": {
+			"get": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Cart"],
+				"summary": "Get cart",
+				"responses": {
+					"200": {
+						"description": "Get cart successfully",
+						"content": {
+						   "application/json": {
+							  "schema": {
+								"$ref": "#/components/schemas/Cart"
+							  }
+						   }
+						}		
+					},
+					"400": {
+						"description": "Get cart failed"
+					}
+				}
+			},
+			"put": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Cart"],
+				"summary": "Edit product in cart",
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"productId": "number",
+								"quantity": "number"
+							},
+							"example":   {
+								"productId": 41,
+								"quantity": 2
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Edit product in cart successfully"
+					},
+					"400": {
+						"description": "Edit product in cart failed"
+					}
+				}
+			},
+			"delete": {
+                "security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Cart"],
+				"summary": "Delete a product in cart",
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"productId": "number"
+							},
+							"example":   {
+								"productId": 41
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Delete product in cart successfully"
+					},
+					"400": {
+						"description": "Delete product in cart failed"
+					}
+				}
+			},
+			"post": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Cart"],
+				"summary": "Add product to cart",
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"productId": "number",
+								"quantity": "number"
+							},
+							"example":   {
+								"productId": 41,
+								"quantity": 2
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Add product to cart successfully"
+					},
+					"400": {
+						"description": "Add product to cart failed"
+					}
+				}
+			}
+		},
+		"/orders/{id}": {
+			"get": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Order"],
+				"summary": "Get order items by id",
+				"parameters": [
+					{
+					  "in": "path",
+					  "name": "id",
+					  "required": true,
+					  "description": "ID of the order",
+					  "schema": {
+						"type": "integer"
+					  }
+					}
+				  ],
+				"responses": {
+					"200": {
+						"description": "Get order items successfully",
+						"content": {
+						   "application/json": {
+							"schema": {
+								"type": "array",
+								"items": {
+								   "$ref": "#/components/schemas/OrderItem"
+								}
+							 }
+						   }
+						}		
+					},
+					"400": {
+						"description": "Get product failed"
+					}
+				}
+			}
+		},
+		"/orders/admin": {
+			"post": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Order"],
+				"summary": "Admin create order",
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Order"
+							},
+							"example":   {
+									"clientId": 62,
+									"status": "Pending",
+									"descriptions": "Order for products",
+									"discountAmount": 10.0,
+									"amount": 100.0,
+									"num_items": 3,
+									"shippingAddress": "123 Main St, City",
+									"paymentMethod": "Credit Card",
+									"products":
+									[
+										{
+										  "productId": 45,
+										  "quantity": 3
+										},
+										{
+										  "productId": 44,
+										  "quantity": 1
+										}
+									]
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Create order successfully"	
+					},
+					"400": {
+						"description": "Create order failed"
+					}
+				}
+			},
+			"put": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Order"],
+				"summary": "Edit order status",
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"orderId": "number",
+								"status": "string"
+							},
+							"example":   {
+								"orderId":7,
+								"status": "Completed"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Edit product in cart successfully"
+					},
+					"400": {
+						"description": "Edit product in cart failed"
+					}
+				}
+			},
+			"delete": {
+                "security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Order"],
+				"summary": "Delete an order",
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"orderId": "number"
+							},
+							"example":   {
+								"orderId": 5
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Delete order successfully"
+					},
+					"400": {
+						"description": "Delete order failed"
+					}
+				}
+			},
+			"get": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Order"],
+				"summary": "Admin get orders",
+				"responses": {
+					"200": {
+						"description": "Get orders successfully",
+						"content": {
+							"application/json": {
+							 "schema": {
+								 "type": "array",
+								 "items": {
+									"$ref": "#/components/schemas/Order"
+								 }
+							  }
+							}
+						 }	
+					},
+					"400": {
+						"description": "Get orders failed"
+					}
+				}
+			}
+		},		
+		"/orders": {
+			"post": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Order"],
+				"summary": "Create order",
+				"requestBody": {
+					"description": "Order object",
+					"required": "True",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Order"
+							},
+							"example":   {
+								"status": "Processing",
+								"descriptions": "Completed order",
+								"discountAmount": 5.0,
+								"shippingAddress": "456 Oak St, Town",
+								"paymentMethod": "PayPal",
+								"createdAt": "2023-01-15T12:30:00Z",
+								"updatedAt": "2023-01-15T12:30:00Z"
+							  }
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Create order successfully"	
+					},
+					"400": {
+						"description": "Create order failed"
+					}
+				}
+			},
+			"get": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Order"],
+				"summary": "Get orders",
+				"responses": {
+					"200": {
+						"description": "Get orders successfully",
+						"content": {
+							"application/json": {
+							 "schema": {
+								 "type": "array",
+								 "items": {
+									"$ref": "#/components/schemas/Order"
+								 }
+							  }
+							}
+						 }	
+					},
+					"400": {
+						"description": "Get orders failed"
+					}
+				}
+			}
+		}
+		,"/carts/item": {
+			"get": {
+				"security": [
+                    {
+                      "JWT": []
+                    }
+                ],
+				"tags": ["Cart"],
+				"summary": "Get cart items",
+				"responses": {
+					"200": {
+						"description": "Get cart items successfully",
+						"content": {
+						   "application/json": {
+							"schema": {
+								"type": "array",
+								"items": {
+								   "$ref": "#/components/schemas/CartItem"
+								}
+							 }
+						   }
+						}		
+					},
+					"400": {
+						"description": "Get cart failed"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"securitySchemes": {
+			"JWT": {
+				"type": "apiKey",
+				"name": "authorization",
+				"in": "header",
+				"description": "",
+				"scheme": "bearer"
+			}
+		},
+
+		"schemas": {
+			"Login": {
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				}
+			},
+			"SignUp": {
+				"type": "object",
+				"properties": {
+					"firstname": {
+						"type": "string"
+					},
+					"lastname": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				}
+			},
+			"Customer": {
+				"type": "object",
+				"properties": {
+					"firstname": {
+						"type": "string"
+					},
+					"lastname": {
+						"type": "string"
+					},
+					"gender": {
+						"type": "string"
+					},
+					"birthday": {
+						"type": "string",
+						"format": "date"
+					},
+					"avatar": {
+						"type": "string"
+					},
+					"score": {
+						"type": "integer"
+					},
+					"address": {
+						"type": "string"
+					}
+				}
+			},
+			"Order": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "string"
+					},
+					"descriptions": {
+						"type": "string"
+					},
+					"pre_discount_ammount": {
+						"type": "number",
+						"format": "double"
+					},
+					"shipping_address": {
+						"type": "string"
+					},
+					"payment_time": {
+						"type": "string",
+						"format": "date"
+					},
+					"payment_method": {
+						"type": "integer"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"num_items": {
+						"type": "integer"
+					},
+					"num_completed": {
+						"type": "integer"
+					}
+				}
+			},
+			"Cart": {
+				"type": "object",
+				"properties": {
+					"total": {
+						"type": "number"
+					},
+					"amount": {
+						"type": "number"
+					}
+				}
+			},
+			"Product":{
+				"type": "object",
+				"properties":{
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"price": {
+						"type": "number"
+					},
+					"thumnails": {
+						"type": "file"
+					}
+				}
+			},
+			"CartItem":{
+				"type": "object",
+				"properties":{
+					"cartId": {
+						"type": "number"
+					},
+					"productId": {
+						"type": "number"
+					},
+					"amount": {
+						"type": "number"
+					},
+					"quantity": {
+						"type": "number"
+					}
+				}
+			},
+			"OrderItem":{
+				"type": "object",
+				"properties":{
+					"orderId": {
+						"type": "number"
+					},
+					"productId": {
+						"type": "number"
+					},
+					"amount": {
+						"type": "number"
+					},
+					"quantity": {
+						"type": "number"
+					}
+				}
+			}
+		}
+	}
+}

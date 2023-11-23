@@ -2,6 +2,9 @@
 const nextConfig = {
     images: {
         domains: ["img.dominos.vn"]
+    },
+    env: {
+        BASE_URL:"http://localhost:3003/api"
     }
 }
 
