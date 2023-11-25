@@ -3,6 +3,9 @@ import Loader from "../Loaders";
 import { Product, Client, OrderItem, Table } from ".";
 import TableOrder from "./TableOrder";
 class Order extends Model {
+    getProducts: any;
+    addProduct: any;
+    addProducts: any;
 	static associate() {
 		Order.belongsTo(Client, {
 			foreignKey: {

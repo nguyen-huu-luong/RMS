@@ -9,7 +9,8 @@ import OrderRouter from "./Order.router";
 import CustomerRouter from "./Client.router";
 import AuthRouter from "./Auth.router";
 import ProductRouter from "./Product.router";
-import CartRouter from "./Cart.router"
+import CartRouter from "./Cart.router";
+import CategoryRouter from "./Category.router";
 import { HttpStatusCode } from "../Constants";
 import { NotFoundError } from "../Errors";
 
@@ -21,6 +22,8 @@ class Routers {
 		const authRouter = new AuthRouter();
 		const productRouter = new ProductRouter();
 		const cartRouter = new CartRouter();
+		const categoryRouter = new CategoryRouter();
+
 		// declare your router here
         
         
@@ -28,6 +31,7 @@ class Routers {
 		customerRouter.initialize(router);
 		productRouter.initialize(router);
 		cartRouter.initialize(router);
+		categoryRouter.initialize(router);
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 
