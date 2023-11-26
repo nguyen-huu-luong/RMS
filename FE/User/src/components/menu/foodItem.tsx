@@ -1,11 +1,15 @@
 import Image from "next/image";
 import { PlusCircleFilled } from "@ant-design/icons";
 import { message } from "antd";
+import { useSession } from "next-auth/react";
+import { addToCart } from "@/app/api/product/cart";
+import { redirect, useRouter } from "next/navigation";
 const FoodItem = ({
     params,
 }: {
     params: {
         food: {
+            id: number;
             name: string;
             thumbnails: string;
             description: string;
@@ -16,6 +20,10 @@ const FoodItem = ({
         openModal: (food: typeof params.food) => void;
     };
 }) => {
+    const { data: session, status } = useSession()
+    if (status ==="unauthenticated") {
+        redirect("/en/signin")
+    }
     return (
         <div
             className={`relative group ${
@@ -38,7 +46,7 @@ const FoodItem = ({
                 </span>{" "}
                 <div className='w-full flex flex-row justify-between text-primary font-bold'>
                     <span className='cursor-pointer'  onClick={() => params.openModal(params.food)}>{params.food.price}Đ</span>
-                    <button onClick={() => message.success('Added food to cart')}>
+                    <button onClick={async () => {await addToCart(session?.user.accessToken, {productId: params.food.id, quantity: 1}) ;message.success('Added food to cart')}}>
                         <PlusCircleFilled />
                     </button>
                 </div>

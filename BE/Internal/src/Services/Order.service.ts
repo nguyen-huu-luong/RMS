@@ -31,22 +31,31 @@ export class OrderService {
         try {
             const status: number = HttpStatusCode.Success;
             let data: any;
+            let response: any;
             if (req.action === "read:own") {
                 const order = await this.orderRepository.getOne(
                     req.userId,
                     parseInt(req.params.id)
                 );
                 data = await order.getProducts();
+                response = {
+                    order: order,
+                    items: data
+                }
             } else {
                 const order = await this.orderRepository.findById(
                     parseInt(req.params.id)
                 );
                 data = await order.getProducts()
+                response = {
+                    order: order,
+                    items: data
+                }
             }
             if (!data) {
                 throw new RecordNotFoundError("Order do not exist");
             }
-            res.status(status).send(data);
+            res.status(status).send(response);
             Message.logMessage(req, status);
         } catch (err) {
             console.log(err);

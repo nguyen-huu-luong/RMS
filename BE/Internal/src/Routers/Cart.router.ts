@@ -12,11 +12,6 @@ class ProductRouter {
 
     public initialize(router: Router) {
         router
-            .route("/carts/item")
-            .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
-                this.cartController.getCartItems(req, res, next)
-            );
-        router
             .route("/carts")
             .get(AuthMiddleware.initialize, Authorization.initialize, 
                 (req: Request, res: Response, next: NextFunction) =>
@@ -28,6 +23,8 @@ class ProductRouter {
             .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.cartController.updateProduct(req, res, next)
             )
+        router
+            .route("/carts/:id")
             .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.cartController.removeProduct(req, res, next)
             )

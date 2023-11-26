@@ -27,12 +27,14 @@ export default function Home() {
     // Modal for food detail
     const [modal, setModal] = useState<boolean>(false);
     const [detail, setDetail] = useState<{
+        id: number;
         name: string;
         thumbnails: string;
         description: string;
         price: number;
         categoryId: string;
     }>({
+        id: 0,
         name: "",
         thumbnails: "",
         description: "",

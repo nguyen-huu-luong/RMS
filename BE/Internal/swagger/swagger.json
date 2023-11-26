@@ -807,35 +807,6 @@
 				}
 			}
 		}
-		,"/carts/item": {
-			"get": {
-				"security": [
-                    {
-                      "JWT": []
-                    }
-                ],
-				"tags": ["Cart"],
-				"summary": "Get cart items",
-				"responses": {
-					"200": {
-						"description": "Get cart items successfully",
-						"content": {
-						   "application/json": {
-							"schema": {
-								"type": "array",
-								"items": {
-								   "$ref": "#/components/schemas/CartItem"
-								}
-							 }
-						   }
-						}		
-					},
-					"400": {
-						"description": "Get cart failed"
-					}
-				}
-			}
-		}
 	},
 	"components": {
 		"securitySchemes": {
