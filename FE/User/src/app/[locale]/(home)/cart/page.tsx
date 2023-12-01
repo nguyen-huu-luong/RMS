@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-import Link from "next/link";
+import Link from "next-intl/link";
 import { useLocale, useTranslations } from "next-intl";
 import Progress from "@/components/order/progressBar";
 import {
@@ -14,17 +14,19 @@ import moneyFormatter from "@/components/function/moneyFormatter";
 import useSWR from "swr";
 import { cartFetcher, editCart, removeProduct } from "@/app/api/product/cart";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next-intl/client";
 
 export default function Cart() {
     const locale = useLocale()
     const { data: session, status } = useSession()
+    const router = useRouter();
     const {
         data: cartItems,
         error: cartItemsError,
         isLoading: cartItemsLoading
     } = useSWR(session ? [`http://localhost:3003/api/carts`, session.user.accessToken] : null,  ([url, token]) => cartFetcher(url, token));
-    if (status === "loading") return <>Loading.....</>
-    if (status === "unauthenticated") return <>Unauthenticated.....</>
+    if (status === "loading") return <>Loading.....</>;
+    if (status === "unauthenticated") router.push('/signin');
     // Order step
     const updateQuantity = async (itemId: number, newQuantity: number) => {
         if (newQuantity === 0) {
@@ -43,8 +45,6 @@ export default function Cart() {
     };
 
     // Check if cart is empty
-    //const isCartEmpty = cart.length === 0;
-
     if (cartItemsError) return <div>Failed to load</div>;
     if (cartItemsLoading) return <div>Loading...</div>;
     console.log(cartItems)

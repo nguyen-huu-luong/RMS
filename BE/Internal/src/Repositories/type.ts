@@ -8,6 +8,7 @@ const TYPES = {
     ICartRepository: Symbol.for("ICartRepository"),
     ITokenRepository: Symbol.for("ITokenRepository"),
     ICategoryRepository: Symbol.for("ICategoryRepository"),
+    IVoucherRepository: Symbol.for("IVoucherRepository")
 };
 
 export { TYPES };

@@ -8,6 +8,8 @@ import {
     EmployeeRepository,
 	IProductRepository,
 	ICartRepository,
+	IVoucherRepository,
+	VoucherRepository,
     ITokenRepository,
     TokenRepository
 } from "../Repositories";
@@ -40,7 +42,7 @@ class InversifyContainer {
 		this.container.bind<ICartRepository>(TYPES.ICartRepository).to(CartRepository);
 		this.container.bind<ITokenRepository>(TYPES.ITokenRepository).to(TokenRepository);
 		this.container.bind<ICategoryRepository>(TYPES.ICategoryRepository).to(CategoryRepository);
-
+		this.container.bind<IVoucherRepository>(TYPES.IVoucherRepository).to(VoucherRepository);
 
 	}
 }

@@ -8,6 +8,7 @@ import Slider from "@/components/home/slider";
 import WelcomeImage from "@/components/home/welcome";
 import { RightCircleFilled } from "@ant-design/icons";
 import { useState } from "react";
+import { Skeleton } from "antd";
 import useSWR from "swr";
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 export default function Home() {

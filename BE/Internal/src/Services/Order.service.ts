@@ -7,6 +7,7 @@ import { IOrderRepository } from "../Repositories/IOrderRepository";
 import {
     ICartRepository,
     IProductRepository,
+    IVoucherRepository,
 } from "../Repositories";
 import { TYPES } from "../Repositories/type";
 import { RecordNotFoundError } from "../Errors";
@@ -20,6 +21,9 @@ export class OrderService {
         ),
         private productRepository = container.get<IProductRepository>(
             TYPES.IProductRepository
+        ),
+        private voucherRepository = container.get<IVoucherRepository>(
+            TYPES.IVoucherRepository
         )
     ) {}
 
@@ -40,17 +44,17 @@ export class OrderService {
                 data = await order.getProducts();
                 response = {
                     order: order,
-                    items: data
-                }
+                    items: data,
+                };
             } else {
                 const order = await this.orderRepository.findById(
                     parseInt(req.params.id)
                 );
-                data = await order.getProducts()
+                data = await order.getProducts();
                 response = {
                     order: order,
-                    items: data
-                }
+                    items: data,
+                };
             }
             if (!data) {
                 throw new RecordNotFoundError("Order do not exist");
@@ -83,11 +87,16 @@ export class OrderService {
     public async createOrder(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
+            const { voucherId, ...orderInfor } = req.body;
             if (req.action === "create:own") {
                 const order = await this.orderRepository.create({
-                    ...req.body,
+                    ...orderInfor,
                     clientId: req.userId,
                 });
+                const voucher = await this.voucherRepository.findById(
+                    voucherId
+                );
+                await order.setVoucher(voucher);
                 const cart = await this.cartRepository.getCart(req.userId);
                 await this.orderRepository.update(order.getDataValue("id"), {
                     num_items: cart?.getDataValue("total"),
@@ -96,24 +105,22 @@ export class OrderService {
                 const cartItems = await cart.getProducts();
                 await Promise.all(
                     cartItems.map(async (item: any) => {
-                        await order.addProduct(item,{
+                        await order.addProduct(item, {
                             through: {
                                 quantity: item.CartItem.quantity,
                                 amount: item.CartItem.amount,
                                 createdAt: new Date(),
                                 updatedAt: new Date(),
                             },
-                        })
+                        });
                     })
                 );
                 await cart.setProducts([]);
-                console.log(await order.getProducts())
                 await this.cartRepository.update(cart?.getDataValue("id"), {
                     total: 0,
                     amount: 0,
                 });
             } else {
-                // await this.orderRepository.adminCreateOrder(req.body);
                 const { products, ...orderData } = req.body;
                 const order = await this.orderRepository.create(orderData);
                 await Promise.all(
@@ -122,27 +129,29 @@ export class OrderService {
                             item.productId
                         );
                         if (!product) {
-                            throw new RecordNotFoundError("Product do not exist");
+                            throw new RecordNotFoundError(
+                                "Product do not exist"
+                            );
                         }
-                        await order.addProduct(product,{
+                        await order.addProduct(product, {
                             through: {
                                 quantity: item.quantity,
-                                amount: item.quantity * product.getDataValue('price'),
+                                amount:
+                                    item.quantity *
+                                    product.getDataValue("price"),
                                 createdAt: new Date(),
                                 updatedAt: new Date(),
                             },
-                        })
+                        });
                     })
                 );
-                const orderItems = await order.getProducts()
+                const orderItems = await order.getProducts();
                 const totalItems = orderItems.reduce(
-                    (total: any, item: any) =>
-                        total + item.OrderItem.quantity,
+                    (total: any, item: any) => total + item.OrderItem.quantity,
                     0
                 );
                 const totalAmount = orderItems.reduce(
-                    (sum: any, item: any) =>
-                        sum + item.OrderItem.amount,
+                    (sum: any, item: any) => sum + item.OrderItem.amount,
                     0
                 );
                 await this.orderRepository.update(order.getDataValue("id"), {

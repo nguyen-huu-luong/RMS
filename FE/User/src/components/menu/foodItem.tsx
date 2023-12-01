@@ -3,11 +3,13 @@ import { PlusCircleFilled } from "@ant-design/icons";
 import { message } from "antd";
 import { useSession } from "next-auth/react";
 import { addToCart } from "@/app/api/product/cart";
-import { redirect, useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { useRouter } from "next-intl/client";
+
 const FoodItem = ({
     params,
 }: {
-    params: {
+    params: { 
         food: {
             id: number;
             name: string;
@@ -20,17 +22,30 @@ const FoodItem = ({
         openModal: (food: typeof params.food) => void;
     };
 }) => {
-    const { data: session, status } = useSession()
-    if (status ==="unauthenticated") {
-        redirect("/en/signin")
-    }
+    const locale = useLocale();
+    const { data: session, status } = useSession();
+    const router = useRouter();
+    const handleAddToCart = async () => {
+        if (status === "unauthenticated") {
+            router.push(`/signin`);
+        } else {
+            await addToCart(session?.user.accessToken, {
+                productId: params.food.id,
+                quantity: 1,
+            });
+            message.success("Added food to cart");
+        }
+    };
     return (
         <div
             className={`relative group ${
                 params.size === "sm" ? "h-52 w-40 p-3" : "h-72 w-60 p-6"
             }   flex flex-col justify-between rounded-xl bg-primary-white z-0`}
         >
-            <div className='w-auto h-auto rounded-lg overflow-hidden cursor-pointer' onClick={() => params.openModal(params.food)}>
+            <div
+                className='w-auto h-auto rounded-lg overflow-hidden cursor-pointer'
+                onClick={() => params.openModal(params.food)}
+            >
                 <Image
                     src={params.food.thumbnails}
                     alt={params.food.name}
@@ -41,12 +56,20 @@ const FoodItem = ({
                 />
             </div>
             <div className='h-auto flex flex-col justify-between items-start gap-3'>
-                <span className='font-bold text-menu cursor-pointer' onClick={() => params.openModal(params.food)}>
+                <span
+                    className='font-bold text-menu cursor-pointer'
+                    onClick={() => params.openModal(params.food)}
+                >
                     {params.food.name}
                 </span>{" "}
                 <div className='w-full flex flex-row justify-between text-primary font-bold'>
-                    <span className='cursor-pointer'  onClick={() => params.openModal(params.food)}>{params.food.price}Đ</span>
-                    <button onClick={async () => {await addToCart(session?.user.accessToken, {productId: params.food.id, quantity: 1}) ;message.success('Added food to cart')}}>
+                    <span
+                        className='cursor-pointer'
+                        onClick={() => params.openModal(params.food)}
+                    >
+                        {params.food.price}Đ
+                    </span>
+                    <button onClick={handleAddToCart}>
                         <PlusCircleFilled />
                     </button>
                 </div>

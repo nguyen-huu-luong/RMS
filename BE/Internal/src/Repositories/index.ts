@@ -4,6 +4,7 @@ export * from './IEmployeeRepository'
 export * from './IOrderRepository'
 export * from './IProductRepository'
 export * from './ICartRepository'
+export * from './IVoucherRepository'
 
 export * from './IPermissionRepository'
 export * from './ITokenRepository'
@@ -14,7 +15,7 @@ export * from './implementation/EmployeeRepository'
 export * from './implementation/OrderRepository'
 export * from './implementation/ProductRepository'
 export * from './implementation/CartRepository'
-
+export * from './implementation/VoucherRepository'
 
 export * from './implementation/PermissionRepository'
 export * from './implementation/TokenRepository'
