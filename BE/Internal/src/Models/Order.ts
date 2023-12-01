@@ -2,10 +2,12 @@ import { Model, DataTypes } from "sequelize";
 import Loader from "../Loaders";
 import { Product, Client, OrderItem, Table } from ".";
 import TableOrder from "./TableOrder";
+import Voucher from "./Voucher";
 class Order extends Model {
     getProducts: any;
     addProduct: any;
     addProducts: any;
+    setVoucher: any;
 	static associate() {
 		Order.belongsTo(Client, {
 			foreignKey: {
@@ -24,6 +26,13 @@ class Order extends Model {
 			foreignKey: "orderId",
 			otherKey: "tableId",
 		});
+
+		Order.belongsTo(Voucher, {
+            foreignKey: {
+                name: "voucherId",
+                allowNull: true,
+            },
+        });
 	}
 }
 

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter, usePathname } from "next-intl/client";
+import { usePathname } from "next-intl/client";
 import Image from "next/image";
 import {
     PlusCircleOutlined,
@@ -9,11 +9,17 @@ import {
 } from "@ant-design/icons";
 import { message } from "antd";
 import styles from "@/app/styles.module.css";
+import { useSession } from "next-auth/react";
+import { addToCart } from "@/app/api/product/cart";
+import { useRouter } from "next-intl/client";
+import { useLocale } from "next-intl";
+
 const FoodDetail = ({
     food,
     closeModal,
 }: {
     food: {
+        id: number;
         name: string;
         thumbnails: string;
         description: string;
@@ -22,6 +28,21 @@ const FoodDetail = ({
     };
     closeModal: () => void;
 }) => {
+    const { data: session, status } = useSession();
+    const router = useRouter();
+    const locale = useLocale();
+    const handleAddToCart = async () => {
+        if (status === "unauthenticated") {
+            router.push(`/signin`);
+        } else {
+            await addToCart(session?.user.accessToken, {
+                productId: food.id,
+                quantity: count,
+            });
+            message.success("Added food to cart");
+            closeModal();
+        }
+    };
     const [count, setCount] = useState<number>(1);
     const increase = () => {
         setCount(count + 1);
@@ -82,8 +103,9 @@ const FoodDetail = ({
                                 </button>
                             </span>
                         </div>
-                        <button className='h-auto rounded-md p-2 bg-primary hover:bg-primary-400 text-item-white transition-all duration-300 ease-in-out'
-                        onClick={() =>{message.success('Added food to cart'), closeModal()}}
+                        <button
+                            className='h-auto rounded-md p-2 bg-primary hover:bg-primary-400 text-item-white transition-all duration-300 ease-in-out'
+                            onClick={handleAddToCart}
                         >
                             ADD TO CART
                         </button>

@@ -25,6 +25,8 @@ import { ACCESS_TOKEN, REFRESH_TOKEN, Role } from "../Constants";
 import jwt from "jsonwebtoken";
 import { TokenUtil } from "../Utils";
 import Person from "./Person";
+import Voucher from "./Voucher";
+import ClientVoucher from "./ClientVoucher";
 
 class Client extends Person {
 	declare getOrders: HasManyGetAssociationsMixin<Order>;
@@ -44,6 +46,7 @@ class Client extends Person {
 	declare email: string;
 	declare isRegistered: boolean;
 	declare hashedPassword: string;
+    getVouchers: any;
 
 	public static associate() {
 		Client.hasMany(Order, {
@@ -94,6 +97,11 @@ class Client extends Person {
 		Client.hasMany(Token, { foreignKey: "tokenableId", constraints: false, scope: {
             tokenableType: 'client'
         } });
+		Client.belongsToMany(Voucher, {
+			through: ClientVoucher,
+			foreignKey: "clientId",
+			otherKey: "voucherId",
+		  });
 	}
 }
 

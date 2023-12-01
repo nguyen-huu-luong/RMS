@@ -20,11 +20,16 @@ export class CartService {
     public async getCart(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data = await this.cartRepository.getCart(req.userId);
-            if (!data) {
+            const cart = await this.cartRepository.getCart(req.userId);
+            if (!cart) {
                 throw new RecordNotFoundError("Cart do not exist");
             }
-            res.status(status).send(data);
+            const cartItems = await cart.getProducts()
+            const response = {
+                cart: cart.toJSON(),
+                items: cartItems.map((item: any) => item.toJSON()),
+            };
+            res.status(status).send(response);
             Message.logMessage(req, status);
         } catch (err) {
             console.log(err);
@@ -48,10 +53,9 @@ export class CartService {
                 await cart.addProduct(product, {
                     through: {
                         quantity:
-                            cartItem[0].CartItem.quantity + req.body.quantity,
+                            req.body.quantity,
                         amount:
-                            product.getDataValue("price") *
-                            (cartItem[0].CartItem.quantity + req.body.quantity),
+                            product.getDataValue("price") * req.body.quantity,
                         createdAt: new Date(),
                         updatedAt: new Date(),
                     },
@@ -84,7 +88,7 @@ export class CartService {
             const status: number = HttpStatusCode.Success;
             const cart = await this.cartRepository.getCart(req.userId);
             const product = await this.productRepository.findById(
-                req.body.productId
+                parseInt(req.params.id)
             );
             if (!product) {
                 throw new RecordNotFoundError("Product do not exist");
@@ -123,17 +127,6 @@ export class CartService {
             }
             await this.updateCartDetail(cart);
             res.status(status).send(statusMess.Success);
-            Message.logMessage(req, status);
-        } catch (err) {
-            console.log(err);
-            next(err);
-        }
-    }
-    public async getCartItems(req: Request, res: Response, next: NextFunction) {
-        try {
-            const status: number = HttpStatusCode.Success;
-            const cart = await this.cartRepository.getCart(req.userId);
-            res.status(status).send(await cart.getProducts());
             Message.logMessage(req, status);
         } catch (err) {
             console.log(err);

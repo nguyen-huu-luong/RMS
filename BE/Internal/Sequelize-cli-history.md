@@ -44,8 +44,8 @@ npx sequelize-cli model:generate --name ChatMessage --attributes
 # EmailCampaign
 npx sequelize-cli model:generate --name EmailCampaign --attributes name:string,status:string,startDate:date,subject:string,sendFrom:string,sendTo:string
 
-# Category
-npx sequelize-cli model:generate --name Category --attributes name:string,description:string,thumnails:blob
+# Voucher
+npx sequelize-cli model:generate --name Voucher --attributes name:string,description:string,promo_code:string,type:string,amount:integer,maximum_reduce:integer,quantity:integer,begin_date:date,end_date:date,created_at:date,updated_at:date
 
 ###### Association
 
@@ -99,6 +99,13 @@ npx sequelize-cli migration:generate --name add-session-id-to-chat-message
 
 # Category has many Product (1:N)
 npx sequelize-cli migration:generate --name add-category-id-to-product
+
+# Order applies voucher
+npx sequelize-cli migration:generate --name add-voucher-id-to-order
+
+# Client and Voucher (M:N)
+npx sequelize-cli migration:generate --name add-client-voucher-association
+
 ### Update:
 # 12/11/2023
 - Delete ClientAccout

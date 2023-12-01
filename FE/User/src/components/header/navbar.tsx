@@ -51,7 +51,7 @@ const NavBar = () => {
     const t = useTranslations("NavBar");
     return (
         <>
-            <nav className='sticky top-0 w-full h-16 shadow-md z-10 bg-primary-white'>
+            <nav className='sticky top-0 w-full h-16 shadow-md z-50 bg-primary-white'>
                 <Container>
                     <div className='w-full h-full flex flex-row font-bold'>
                         {/* Left header */}

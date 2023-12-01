@@ -21,9 +21,6 @@ class CartController {
     public updateProduct(req: Request, res: Response, next: NextFunction) {
         this.cartService.updateProduct(req, res, next);
     }
-    public getCartItems(req: Request, res: Response, next: NextFunction) {
-        this.cartService.getCartItems(req, res, next);
-    }
 
 
 }

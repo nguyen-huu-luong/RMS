@@ -1,59 +1,38 @@
-"use client";
-import { useState } from "react";
-import { useRouter, usePathname } from "next-intl/client";
-import Image from "next/image";
-import { PlusCircleFilled } from "@ant-design/icons";
-import { Steps, theme } from "antd";
 
-const Progress = () => {
-    const next = () => {
-        setCurrent(current + 1);
-      };
-    
-      const prev = () => {
-        setCurrent(current - 1);
-      };
+import {
+    Steps,
+    ConfigProvider
+} from "antd";
+const Progress = ({current}: {current:number}) => {
     const steps = [
         {
-            title: "First",
-            content: "First-content",
+            title: "CART",
         },
         {
-            title: "Second",
-            content: "Second-content",
+            title: "ORDER",
         },
         {
-            title: "Last",
-            content: "Last-content",
+            title: "PAYMENT",
         },
-    ];
-    const { token } = theme.useToken();
-    const [current, setCurrent] = useState(0);
+    ]
     const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
     return (
-        <>
-            <Steps className="" current={current} items={items} />
-            <div>{steps[current].content}</div>
-            <div style={{ marginTop: 24 }}>
-                {current < steps.length - 1 && (
-                    <button onClick={() => next()}>
-                        Next
-                    </button>
-                )}
-                {current === steps.length - 1 && (
-                    <button
-                    >
-                        Done
-                    </button>
-                )}
-                {current > 0 && (
-                    <button style={{ margin: "0 8px" }} onClick={() => prev()}>
-                        Previous
-                    </button>
-                )}
-            </div>
-        </>
+        <div className='w-full h-auto p-10 rounded-3xl bg-primary-white'>
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorPrimary: "#EA6A12",
+                        colorText: "#EA6A12",
+                        colorPrimaryBorder: "rgb(251, 146, 60)",
+                        colorSplit: "rgb(255, 247, 237)",
+                        fontWeightStrong: 600,
+                    },
+                }}
+            >
+                <Steps className='' current={current} items={items} />
+            </ConfigProvider>
+        </div>
     );
 };
 

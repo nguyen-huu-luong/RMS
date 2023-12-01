@@ -11,6 +11,7 @@ import AuthRouter from "./Auth.router";
 import ProductRouter from "./Product.router";
 import CartRouter from "./Cart.router";
 import CategoryRouter from "./Category.router";
+import VoucherRouter from "./Voucher.router";
 import { HttpStatusCode } from "../Constants";
 import { NotFoundError } from "../Errors";
 
@@ -23,7 +24,7 @@ class Routers {
 		const productRouter = new ProductRouter();
 		const cartRouter = new CartRouter();
 		const categoryRouter = new CategoryRouter();
-
+		const voucherRouter = new VoucherRouter();
 		// declare your router here
         
         
@@ -32,6 +33,7 @@ class Routers {
 		productRouter.initialize(router);
 		cartRouter.initialize(router);
 		categoryRouter.initialize(router);
+		voucherRouter.initialize(router)
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 
