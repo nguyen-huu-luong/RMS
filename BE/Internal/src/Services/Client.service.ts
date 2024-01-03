@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import message from '../Utils/Message';
 import {HttpStatusCode} from '../Constants';
 import statusMess from '../Constants/statusMess';
@@ -8,13 +8,25 @@ import { IClientRepository } from '../Repositories/IClientRepository';
 
 export class ClientService {
     constructor(
-        private ClientRepository = container.get<IClientRepository>(TYPES.IClientRepository)
+        private clientRepository = container.get<IClientRepository>(TYPES.IClientRepository)
     ) {}
 
+    public async getAll(req: Request, res: Response, next: NextFunction) {
+
+    }
+
+    public async getByID(req: Request, res: Response, next: NextFunction) {
+
+    }
+
+    public async (req: Request, res: Response, next: NextFunction) {
+
+    }
+    
     public async viewCustomers(req: Request, res: Response) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data = await this.ClientRepository.all();
+            const data = await this.clientRepository.all();
             res.status(status).send(data);
             message.logMessage(req, status);
         }
@@ -29,7 +41,7 @@ export class ClientService {
         try {
             const status: number = HttpStatusCode.Success;
             const data: any = req.body;
-            await this.ClientRepository.create(data);
+            await this.clientRepository.create(data);
             res.status(status).send(statusMess.Success);
             message.logMessage(req, status);
         }
