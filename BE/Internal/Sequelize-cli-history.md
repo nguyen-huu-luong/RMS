@@ -47,6 +47,12 @@ npx sequelize-cli model:generate --name EmailCampaign --attributes name:string,s
 # Voucher
 npx sequelize-cli model:generate --name Voucher --attributes name:string,description:string,promo_code:string,type:string,amount:integer,maximum_reduce:integer,quantity:integer,begin_date:date,end_date:date,created_at:date,updated_at:date
 
+# Channel
+npx sequelize-cli model:generate --name Channel --attributes status:string,last_update:date,created_at:date,updated_at:date
+
+# Message
+npx sequelize-cli model:generate --name Message --attributes content:string,status:string,created_at:date,updated_at:date
+
 ###### Association
 
 # Client has many order
@@ -105,6 +111,18 @@ npx sequelize-cli migration:generate --name add-voucher-id-to-order
 
 # Client and Voucher (M:N)
 npx sequelize-cli migration:generate --name add-client-voucher-association
+
+# Client has a channel (1:1)
+npx sequelize-cli migration:generate --name add-client-channel-association
+
+# Channel has messages (1:N)
+npx sequelize-cli migration:generate --name add-channel-message-association
+
+# Client create messages (1:N)
+npx sequelize-cli migration:generate --name add-client-message-association
+
+# Employee create messages (1:N)
+npx sequelize-cli migration:generate --name add-employee-message-association
 
 ### Update:
 # 12/11/2023

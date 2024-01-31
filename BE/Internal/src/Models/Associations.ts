@@ -15,7 +15,9 @@ import {
 	ChatMessage,
 	ChatSession,
 	Category,
-	Voucher
+	Voucher,
+	Channel,
+	Message
 } from ".";
 import Token from "./Token";
 
@@ -37,6 +39,8 @@ class Association {
             Token.associate() ;
 			Category.associate() ;
 			Voucher.associate();
+			Channel.associate();
+			Message.associate();
 		} catch (err) {
 			console.log("Initialize association failed!");
 			console.log(`Err: ${err}`);

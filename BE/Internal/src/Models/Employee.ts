@@ -5,7 +5,9 @@ import ChatSession from "./ChatSession";
 import Person from "./Person";
 import Loader from "../Loaders";
 import Token from "./Token";
+import Message from "./Message";
 class Employee extends Person {
+    createMessage: any;
 	public static associate() {
 		Employee.hasMany(Client, {
 			foreignKey: {
@@ -33,6 +35,14 @@ class Employee extends Person {
 			scope: {
 				tokenableType: "employee",
 			},
+		});
+		
+		Employee.hasMany(Message, {
+			foreignKey: {
+				name: "employeeId",
+				allowNull: true,
+			},
+			sourceKey: "id",
 		});
 	}
 }

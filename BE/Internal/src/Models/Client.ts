@@ -27,6 +27,8 @@ import { TokenUtil } from "../Utils";
 import Person from "./Person";
 import Voucher from "./Voucher";
 import ClientVoucher from "./ClientVoucher";
+import Channel from "./Channel";
+import Message from "./Message";
 
 class Client extends Person {
 	declare getOrders: HasManyGetAssociationsMixin<Order>;
@@ -47,6 +49,9 @@ class Client extends Person {
 	declare isRegistered: boolean;
 	declare hashedPassword: string;
     getVouchers: any;
+    getChannel: any;
+    createMessage: any;
+	createChannel: any;
 
 	public static associate() {
 		Client.hasMany(Order, {
@@ -102,6 +107,21 @@ class Client extends Person {
 			foreignKey: "clientId",
 			otherKey: "voucherId",
 		  });
+
+		Client.hasOne(Channel, {
+			foreignKey: {
+				name: "clientId",
+				allowNull: false,
+			},
+			sourceKey: "id",
+		});
+		Client.hasMany(Message, {
+			foreignKey: {
+				name: "clientId",
+				allowNull: true,
+			},
+			sourceKey: "id",
+		});
 	}
 }
 

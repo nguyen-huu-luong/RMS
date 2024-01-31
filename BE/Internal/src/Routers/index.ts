@@ -14,6 +14,7 @@ import CategoryRouter from "./Category.router";
 import VoucherRouter from "./Voucher.router";
 import { HttpStatusCode } from "../Constants";
 import { NotFoundError } from "../Errors";
+import ChannelRouter from "./Channel.router";
 
 class Routers {
 	public initialize(app: Application) {
@@ -25,6 +26,7 @@ class Routers {
 		const cartRouter = new CartRouter();
 		const categoryRouter = new CategoryRouter();
 		const voucherRouter = new VoucherRouter();
+		const channelRouter = new ChannelRouter();
 		// declare your router here
         
         
@@ -34,6 +36,7 @@ class Routers {
 		cartRouter.initialize(router);
 		categoryRouter.initialize(router);
 		voucherRouter.initialize(router)
+		channelRouter.initialize(router);
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 

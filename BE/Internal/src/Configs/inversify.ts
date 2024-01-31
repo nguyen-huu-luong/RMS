@@ -11,7 +11,9 @@ import {
 	IVoucherRepository,
 	VoucherRepository,
     ITokenRepository,
-    TokenRepository
+    TokenRepository,
+	ChannelRepository,
+	MessageRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -20,6 +22,8 @@ import { ProductRepository } from "../Repositories";
 import { CartRepository } from "../Repositories";
 import { ICategoryRepository } from "../Repositories/ICategoryRepository";
 import { CategoryRepository } from "../Repositories/implementation/CategoryRepository";
+import { IChannelRepository } from "../Repositories/IChannelRepository";
+import { IMessageRepository } from "../Repositories/IMessageRepository";
 class InversifyContainer {
 	private container;
 
@@ -43,6 +47,8 @@ class InversifyContainer {
 		this.container.bind<ITokenRepository>(TYPES.ITokenRepository).to(TokenRepository);
 		this.container.bind<ICategoryRepository>(TYPES.ICategoryRepository).to(CategoryRepository);
 		this.container.bind<IVoucherRepository>(TYPES.IVoucherRepository).to(VoucherRepository);
+		this.container.bind<IChannelRepository>(TYPES.IChannelRepository).to(ChannelRepository);
+		this.container.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepository);
 
 	}
 }

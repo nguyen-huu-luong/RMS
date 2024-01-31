@@ -29,6 +29,7 @@
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.34.0",
+    "socket.io": "^4.7.4",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
   },
