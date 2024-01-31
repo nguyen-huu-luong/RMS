@@ -11,7 +11,7 @@ import {
 import Image from "next/image";
 import moneyFormatter from "@/components/function/moneyFormatter";
 
-import useSWR from "swr";
+import useSWR from "swr"; 
 import { cartFetcher, editCart, removeProduct } from "@/app/api/product/cart";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";

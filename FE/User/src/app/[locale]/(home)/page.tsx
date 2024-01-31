@@ -9,6 +9,7 @@ import WelcomeImage from "@/components/home/welcome";
 import { RightCircleFilled } from "@ant-design/icons";
 import { useState } from "react";
 import { Skeleton } from "antd";
+import ChatBox from "@/components/chat/chatbox";
 import useSWR from "swr";
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 export default function Home() {
@@ -63,8 +64,9 @@ export default function Home() {
     return (
         <div className='h-auto py-4 flex flex-col justify-center items-center gap-10'>
             {/* Home welcome and carousel banner */}
+            
             <div className='w-80 h-auto flex flex-col sm:flex-row sm:w-full gap-5'>
-                <WelcomeImage params={{ name: "Nguyen Huu A" }} />
+                <WelcomeImage params={{ name: "CUSTOMER" }} />
                 <div className='w-80 h-80 flex-none'>
                     <Slider params={{ images: images }} />
                 </div>

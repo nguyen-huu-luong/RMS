@@ -33,12 +33,14 @@ export default function Menu() {
     // Modal for food detail
     const [modal, setModal] = useState<boolean>(false);
     const [detail, setDetail] = useState<{
+        id: number;
         name: string;
         thumbnails: string;
         description: string;
         price: number;
         categoryId: string;
     }>({
+        id: 0,
         name: "",
         thumbnails: "",
         description: "",
@@ -59,7 +61,7 @@ export default function Menu() {
     if (categoryError) return <div>Failed to load</div>;
     if (foodLoading || categoryLoading) return <div>Loading...</div>;
     return (
-        <div className='w-full h-auto flex flex-col justify-start gap-10'>
+        <div className='w-full h-auto flex flex-col justify-start gap-5'>
             <div className='w-full h-auto rounded-3xl border-2 border-orange-100 bg-primary-white p-2 flex flex-wrap justify-around'>
                 {categories.map((item: any) => {
                     return (
@@ -81,7 +83,7 @@ export default function Menu() {
                 })}
             </div>
             <div className='w-full h-auto flex flex-col justify-center items-center gap-5'>
-                <div className='w-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10'>
+                <div className='w-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
                     {foods
                         .filter((item: any) => category  === categories[parseInt(item.categoryId) - 1]?.name)
                         .slice((currentPage - 1) * 8, currentPage * 8)

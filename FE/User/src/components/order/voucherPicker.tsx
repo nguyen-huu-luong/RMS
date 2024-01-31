@@ -1,6 +1,7 @@
 "use client";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import moment from "moment";
+import moneyFormatter from "../function/moneyFormatter";
 const VoucherPicker = ({
     params,
 }: {
@@ -51,7 +52,7 @@ const VoucherPicker = ({
                                         </div>
                                         <div className='w-auto text-sm font-normal'>
                                             Maximum reduction is{" "}
-                                            {item.maximum_reduce}Đ
+                                            {moneyFormatter(item.maximum_reduce)}
                                         </div>
                                         <div className='w-auto text-xs font-thin'>
                                             {moment(item.end_date).format(
