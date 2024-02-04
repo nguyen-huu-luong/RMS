@@ -9,6 +9,7 @@ export const createOrder = async (token: any, requestBody: any) => {
             'Content-Type': 'application/json',
           },
         });
+        mutate([`http://localhost:3003/api/carts`, token])
         return response.data;
       } catch (error) {
         console.error('Error adding to cart:', error);
