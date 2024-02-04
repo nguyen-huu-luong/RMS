@@ -5,6 +5,7 @@ import Message from "./Message";
 
 class Channel extends Model {
     getMessages: any;
+    getClient: any;
     public static associate() {
         Channel.belongsTo(Client, {
             foreignKey: {
