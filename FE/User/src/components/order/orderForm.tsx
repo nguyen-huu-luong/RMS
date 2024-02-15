@@ -37,21 +37,22 @@ const OrderForm = ({ form }: { form: any }) => {
         form.setFieldsValue({
             address:
                 formValues.deliveryType === "DELIVER"
-                    ? formValues.address +
-                      ", " +
-                      wardList.find(
-                          (ward: any) => ward.value === formValues.ward
-                      )?.label +
-                      ", " +
-                      districtList.find(
-                          (district: any) =>
-                              district.value === formValues.district
-                      )?.label +
-                      ", " +
-                      provinceList.find(
-                          (province: any) =>
-                              province.value === formValues.province
-                      )?.label
+                    ? formValues.address 
+                    // +
+                    //   ", " +
+                    //   wardList.find(
+                    //       (ward: any) => ward.value === formValues.ward
+                    //   )?.label +
+                    //   ", " +
+                    //   districtList.find(
+                    //       (district: any) =>
+                    //           district.value === formValues.district
+                    //   )?.label +
+                    //   ", " +
+                    //   provinceList.find(
+                    //       (province: any) =>
+                    //           province.value === formValues.province
+                    //   )?.label
                     : "",
         });
     };
@@ -96,63 +97,63 @@ const OrderForm = ({ form }: { form: any }) => {
         option?: { label: string; value: string }
     ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
-    //Fetching address
-    useEffect(() => {
-        const fetchProvince = async () => {
-            try {
-                const response = await fetch(
-                    "https://provinces.open-api.vn/api/p/"
-                );
-                const result = await response.json();
-                const options = result.map(
-                    (item: { name: any; code: any }) => ({
-                        value: item.code,
-                        label: item.name,
-                    })
-                );
-                setProvinceList(options);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-        const fetchDistrict = async () => {
-            try {
-                const response = await fetch(
-                    `https://provinces.open-api.vn/api/p/${currentProvince}?depth=2`
-                );
-                const result = await response.json();
-                const options = result.districts.map(
-                    (item: { name: any; code: any }) => ({
-                        value: item.code,
-                        label: item.name,
-                    })
-                );
-                setDistrictList(options);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-        const fetchWard = async () => {
-            try {
-                const response = await fetch(
-                    `https://provinces.open-api.vn/api/d/${currentDistrict}?depth=2`
-                );
-                const result = await response.json();
-                const options = result.wards.map(
-                    (item: { name: any; code: any }) => ({
-                        value: item.code,
-                        label: item.name,
-                    })
-                );
-                setWardList(options);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-        fetchProvince();
-        fetchDistrict();
-        fetchWard();
-    }, [currentProvince, currentDistrict]);
+    // //Fetching address
+    // useEffect(() => {
+    //     const fetchProvince = async () => {
+    //         try {
+    //             const response = await fetch(
+    //                 "https://provinces.open-api.vn/api/p/"
+    //             );
+    //             const result = await response.json();
+    //             const options = result.map(
+    //                 (item: { name: any; code: any }) => ({
+    //                     value: item.code,
+    //                     label: item.name,
+    //                 })
+    //             );
+    //             setProvinceList(options);
+    //         } catch (error) {
+    //             console.error("Error fetching data:", error);
+    //         }
+    //     };
+    //     const fetchDistrict = async () => {
+    //         try {
+    //             const response = await fetch(
+    //                 `https://provinces.open-api.vn/api/p/${currentProvince}?depth=2`
+    //             );
+    //             const result = await response.json();
+    //             const options = result.districts.map(
+    //                 (item: { name: any; code: any }) => ({
+    //                     value: item.code,
+    //                     label: item.name,
+    //                 })
+    //             );
+    //             setDistrictList(options);
+    //         } catch (error) {
+    //             console.error("Error fetching data:", error);
+    //         }
+    //     };
+    //     const fetchWard = async () => {
+    //         try {
+    //             const response = await fetch(
+    //                 `https://provinces.open-api.vn/api/d/${currentDistrict}?depth=2`
+    //             );
+    //             const result = await response.json();
+    //             const options = result.wards.map(
+    //                 (item: { name: any; code: any }) => ({
+    //                     value: item.code,
+    //                     label: item.name,
+    //                 })
+    //             );
+    //             setWardList(options);
+    //         } catch (error) {
+    //             console.error("Error fetching data:", error);
+    //         }
+    //     };
+    //     fetchProvince();
+    //     fetchDistrict();
+    //     fetchWard();
+    // }, [currentProvince, currentDistrict]);
     return (
         <div className='w-full h-auto p-10 rounded-3xl bg-primary-white'>
             <ConfigProvider
@@ -199,7 +200,7 @@ const OrderForm = ({ form }: { form: any }) => {
 
                     {delivery === "DELIVER" ? (
                         <div className='mb-4'>
-                            <Row gutter={8}>
+                            {/* <Row gutter={8}>
                                 <Col
                                     xs={{ span: 24 }}
                                     sm={{ span: 8 }}
@@ -288,7 +289,7 @@ const OrderForm = ({ form }: { form: any }) => {
                                         ></Select>
                                     </Form.Item>
                                 </Col>
-                            </Row>
+                            </Row> */}
                             <Form.Item
                                 name='address'
                                 rules={[

@@ -93,10 +93,13 @@ export class OrderService {
                     ...orderInfor,
                     clientId: req.userId,
                 });
-                const voucher = await this.voucherRepository.findById(
-                    voucherId
-                );
-                await order.setVoucher(voucher);
+                if (voucherId != 0 && voucherId != null) {
+                    const voucher = await this.voucherRepository.findById(
+                        voucherId
+                    );
+                    await order.setVoucher(voucher);
+                }
+
                 const cart = await this.cartRepository.getCart(req.userId);
                 await this.orderRepository.update(order.getDataValue("id"), {
                     num_items: cart?.getDataValue("total"),
