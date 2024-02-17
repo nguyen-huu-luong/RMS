@@ -13,7 +13,6 @@ class Loader {
         try {
             await this.connection.checkDB();
             await this.connection.connect(Loader.sequelize);
-            await Loader.sequelize.authenticate();
             console.log("Load resources successfully!");
         }
         catch (err) {

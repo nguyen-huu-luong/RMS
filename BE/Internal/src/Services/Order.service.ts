@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Message } from "../Utils/";
+import { Message } from "../Utils";
 import { HttpStatusCode } from "../Constants";
 import statusMess from "../Constants/statusMess";
 import { container } from "../Configs";
@@ -9,7 +9,7 @@ import {
     IProductRepository,
     IVoucherRepository,
 } from "../Repositories";
-import { TYPES } from "../Repositories/type";
+import { TYPES } from "../Types/type";
 import { RecordNotFoundError } from "../Errors";
 export class OrderService {
     constructor(

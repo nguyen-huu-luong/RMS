@@ -1,5 +1,5 @@
 export * from './Order.service'
-export * from './Client.service'
+export * from './ClientService'
 export * from './Authorization.service'
 export * from './Product.service'
 export * from './Cart.service'

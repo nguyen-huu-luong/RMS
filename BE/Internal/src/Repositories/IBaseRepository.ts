@@ -1,7 +1,8 @@
 import { Model } from "sequelize";
+import { QueryOptions } from "../Types/type";
 
 interface IBaseRepository<M extends Model> {
-    all(attributes?: string[]): Promise<M[]>;
+    all(options?: QueryOptions): Promise<M[]>;
   
     findById(id: number, attributes?: string[]): Promise<M>;
   

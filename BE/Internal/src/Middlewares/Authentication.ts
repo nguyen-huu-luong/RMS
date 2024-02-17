@@ -3,7 +3,6 @@ import { TokenUtil } from "../Utils";
 import { BaseMiddleware } from "./BaseMiddleware";
 import { BadRequestError, CustomError, UnauthorizedError } from "../Errors";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
-import { HttpStatusCode } from "../Constants";
 
 class AuthMiddleware extends BaseMiddleware {
 	protected static handle(): any {
@@ -21,7 +20,9 @@ class AuthMiddleware extends BaseMiddleware {
 
 	private static async verifyToken(): Promise<any> {
 		try {
-			const authHeader = this.request.header("Authorization");
+			console.log({...this.request.header})
+			const authHeader = this.request.header("Authorization") || this.request.header("authorization");;
+			console.log(authHeader)
 			if (!authHeader?.startsWith("Bearer ")) {
 				throw new UnauthorizedError("You are unauthenticated!");
 			}

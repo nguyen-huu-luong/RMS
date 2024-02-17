@@ -1,7 +1,7 @@
 import { CookieOptions, NextFunction, Request, Response } from "express";
 import { container } from "../Configs";
 import { IClientRepository } from "../Repositories/IClientRepository";
-import { TYPES } from "../Repositories/type";
+import { TYPES } from "../Types/type";
 import { Client, Employee } from "../Models";
 import { Password, TokenUtil } from "../Utils";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
