@@ -2,12 +2,12 @@ import React from "react";
 import { LoginForm } from "@/components/LoginForm";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const SignIn: React.FC = async () => {
     const session = await getServerSession(authOptions) ;
     if (session) {
-        redirect("/profile")
+        redirect(`/en/profile`);
     }
 
     return (

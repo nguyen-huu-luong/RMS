@@ -89,14 +89,19 @@ export class OrderService {
             const status: number = HttpStatusCode.Success;
             const { voucherId, ...orderInfor } = req.body;
             if (req.action === "create:own") {
+                console.log(orderInfor)
                 const order = await this.orderRepository.create({
                     ...orderInfor,
                     clientId: req.userId,
                 });
-                const voucher = await this.voucherRepository.findById(
-                    voucherId
-                );
-                await order.setVoucher(voucher);
+
+                if (voucherId != 0 && voucherId != null) {
+                    const voucher = await this.voucherRepository.findById(
+                        voucherId
+                    );
+                    await order.setVoucher(voucher);
+                }
+
                 const cart = await this.cartRepository.getCart(req.userId);
                 await this.orderRepository.update(order.getDataValue("id"), {
                     num_items: cart?.getDataValue("total"),
@@ -166,6 +171,12 @@ export class OrderService {
             next(err);
         }
     }
+
+    // public async checkResultMomo(resultCode: number, clientId: number){
+    //     if (resultCode == 0){
+
+    //     }
+    // }
 
     public async removeOrder(req: Request, res: Response, next: NextFunction) {
         try {
