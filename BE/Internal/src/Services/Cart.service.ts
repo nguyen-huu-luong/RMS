@@ -29,8 +29,8 @@ export class CartService {
                 cart: cart.toJSON(),
                 items: cartItems.map((item: any) => item.toJSON()),
             };
-            res.status(status).send(response);
             Message.logMessage(req, status);
+            return res.status(status).send(response);
         } catch (err) {
             console.log(err);
             next(err);
