@@ -21,6 +21,8 @@ module.exports = {
             { role: 'user', resource: 'messages', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'channels', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'messages', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
 
             { role: 'employee', resource: 'customers', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'customers', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
@@ -59,6 +61,9 @@ module.exports = {
             { role: 'employee', resource: 'messages', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'channels', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'messages', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
             { role: 'manager', resource: 'customers', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
@@ -112,6 +117,13 @@ module.exports = {
             { role: 'manager', resource: 'vouchers', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'vouchers', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'vouchers', action: 'delele:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'channels', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'messages', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'channels', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'messages', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
             { role: 'chef', resource: 'orders', action: 'update:any', attributes: 'status', createdAt: d, updatedAt: d },

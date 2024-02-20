@@ -10,7 +10,7 @@ const TimeDisplay = (time: any) => {
     return formattedTime;
 };
 function User({
-    params, setChannel
+    params, setChannel, socket
 }: {
     params: {
         channel: any;
@@ -20,10 +20,10 @@ function User({
         userAvatar: any;
     };
     setChannel: any;
+    socket: any;
 }) {
-    console.log(params.channel.id);
     return (
-        <div onClick={()=>setChannel(params.channel.id)} className={`px-2 w-full ${params.latestMessage.status == "Not seen"?"bg-slate-100 hover:bg-slate-200":"hover:bg-slate-50"} h-20 hover:cursor-pointer transition-all duration-300 flex flex-row items-center justify-between gap-2 font-normal`}>
+        <div onClick={()=>{setChannel(params.channel.id); }} className={`px-2 w-full ${params.latestMessage.status == "Not seen"?"bg-slate-100 hover:bg-slate-200":"hover:bg-slate-50"} h-20 hover:cursor-pointer transition-all duration-300 flex flex-row items-center justify-between gap-2 font-normal`}>
             <div className='Avatar flex-none rounded-full border-2 w-16 h-16 border-primary border-opacity-20 overflow-hidden'>
                 <Image
                     src={"/abc"}

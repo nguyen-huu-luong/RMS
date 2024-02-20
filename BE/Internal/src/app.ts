@@ -11,6 +11,7 @@ import Tables from "./Models";
 import { Server as SocketIOServer, Socket } from "socket.io";
 import router from "./Routers";
 import { ErrorHandler } from "./Middlewares";
+import SocketConnection from "./Loaders/socket";
 
 dotenv.config();
 declare global {
@@ -26,11 +27,9 @@ declare global {
 class Server {
     protected app: Application;
     protected server: any;
-    protected io: SocketIOServer;
 
     public constructor() {
         this.app = express();
-        this.io = new SocketIOServer(this.server);
     }
 
     public initial() {
@@ -64,13 +63,9 @@ class Server {
     public getApp() {
         return this.app;
     }
-    public setupSocketIO() {
-        
-        this.io.on("connection", (socket: Socket) => {
-            socket.on("connect", () => {
-                console.log("User disconnected");
-            });
-        });
+
+    public getServer() {
+        return this.server;
     }
 
     public start() {
@@ -85,12 +80,22 @@ class Server {
         const server: Server = new Server();
         const loader: Loader = new Loader();
         const tables: Tables = new Tables();
+        const socket: SocketConnection = new SocketConnection();
 
         await server.initial();
         await loader.load();
         await tables.createTables();
-		server.setupSocketIO();
+
+        const io: SocketIOServer = new SocketIOServer(server.getServer(), {
+            cors: {
+                origin: "*",
+                credentials: true,
+                methods: ["GET", "POST"],
+            },
+        });
+        await socket.init(io);
         server.start();
+
     } catch (err) {
         console.log("Connect to server failed!");
         console.log(`Error: ${err}`);

@@ -24,15 +24,44 @@ class ChannelRouter {
                 Authorization.initialize,
                 (req: Request, res: Response, next: NextFunction) =>
                     this.channelController.sendMessage(req, res, next)
+            )
+            .put(
+                AuthMiddleware.initialize,
+                Authorization.initialize,
+                (req: Request, res: Response, next: NextFunction) =>
+                    this.channelController.viewMessage(req, res, next)
             );
-        router    
+        router
             .route("/channels/messages")
             .get(
                 AuthMiddleware.initialize,
                 Authorization.initialize,
                 (req: Request, res: Response, next: NextFunction) =>
                     this.channelController.getMessages(req, res, next)
+            );
+
+        router
+            .route("/channels/admin")
+            .get(
+                AuthMiddleware.initialize,
+                Authorization.initialize,
+                (req: Request, res: Response, next: NextFunction) =>
+                    this.channelController.getAdminChannel(req, res, next)
             )
+            .post(
+                AuthMiddleware.initialize,
+                Authorization.initialize,
+                (req: Request, res: Response, next: NextFunction) =>
+                    this.channelController.adminSendMessage(req, res, next)
+            );
+        router
+            .route("/channels/messages/admin")
+            .get(
+                AuthMiddleware.initialize,
+                Authorization.initialize,
+                (req: Request, res: Response, next: NextFunction) =>
+                    this.channelController.adminGetMessages(req, res, next)
+            );
     }
 }
 

@@ -5,7 +5,7 @@ import Message from "./Message";
 import Status from "./Status";
 import { useRouter } from "next-intl/client";
 // import useSWR from "swr";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWRInfinite from "swr/infinite";
 import useSWR from "swr";
 import moment from "moment";
@@ -15,29 +15,37 @@ import User from "./User";
 
 const channelFetcher = async (url: string, token: any) => {
     try {
-        const response = await fetch(url, {
+        const response = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
-        return response.json();
+        return response.data;
     } catch (error) {
         console.log(error);
     }
 };
 
-
 const aToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJKYW5pY2tfS3VwaGFsNkB5YWhvby5jb20iLCJyb2xlIjoiZW1wbG95ZWUiLCJpYXQiOjE3MDY4MDQ3MzYsImV4cCI6MTcwNjgxMDczNn0.EYV7Q0S9G4UsUJuS2Qszxv56DuaE8p7h6CXQfiCnk8c";
-const ChatList = ({setChannel}:{setChannel: any}) => {
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJKZWZmZXJleV9Xb2xmODJAZ21haWwuY29tIiwicm9sZSI6ImVtcGxveWVlIiwiaWF0IjoxNzA4MjIxMDEzLCJleHAiOjE3MDgyODEwMTN9.JBFFbfcYdollinXrih75xB0nlRWnbhFcwE64L4gPLGQ";
+const ChatList = ({ setChannel, socket }: { setChannel: any; socket: any }) => {
     const {
         data: channels,
         error: channelsError,
         isLoading: channelsLoading,
-    } = useSWR([`http://localhost:3003/api/channels`, aToken], ([url, token]) =>
+        mutate,
+    } = useSWR([`http://localhost:3003/api/channels/admin`, aToken], ([url, token]) =>
         channelFetcher(url, token)
     );
+    useEffect(() => {
+        socket.on("message:send:fromStaff", (channelId: string, message: string) => {
+            mutate()
+        });
+        socket.on("message:send:fromClient", (channelId: string, message: string) => {
+            mutate()
+        });
+    }, [socket, mutate]);
     if (channelsError) return <div>Failed to load</div>;
     if (channelsLoading) return <div>Loading...</div>;
     return (
@@ -66,7 +74,14 @@ const ChatList = ({setChannel}:{setChannel: any}) => {
             <div className='w-80 h-fit flex flex-col justify-start overflow-y-auto'>
                 {/* <TimeStamp time={"11:11"} /> */}
                 {channels.channel.map((item: any, index: any) => {
-                    return <User key={index} params={item} setChannel={setChannel}/>;
+                    return (
+                        <User
+                            key={index}
+                            params={item}
+                            setChannel={setChannel}
+                            socket={socket}
+                        />
+                    );
                 })}
             </div>
         </>

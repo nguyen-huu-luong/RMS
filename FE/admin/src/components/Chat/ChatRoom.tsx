@@ -3,29 +3,31 @@ import { FullscreenExitOutlined, SendOutlined } from "@ant-design/icons";
 import TimeStamp from "./Timestamp";
 import Message from "./Message";
 import Status from "./Status";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWRInfinite from "swr/infinite";
 import moment from "moment";
 import axios from "axios";
 import { mutate } from "swr";
+import useSWR from "swr";
 
 const messageFetcher = async (url: string, token: any) => {
     try {
-        const response = await fetch(url, {
+        const response = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
-        return response.json();
+        return response.data;
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 const sendMessage = async (token: any, requestBody: object) => {
     try {
-        const response = await axios.post(
-            `http://localhost:3003/api/channels`,
+        await axios.post(
+            `http://localhost:3003/api/channels/admin`,
             requestBody,
             {
                 headers: {
@@ -34,38 +36,63 @@ const sendMessage = async (token: any, requestBody: object) => {
                 },
             }
         );
-        mutate([`http://localhost:3003/api/channels/messages`, token]);
-        mutate([`http://localhost:3003/api/channels`, token]);
-
-        return response.data;
+        await mutate(["http://localhost:3003/api/channels/admin", token]);
     } catch (error) {
-        console.error("Error adding to cart:", error);
+        console.error("Error sending message:", error);
         throw error;
     }
 };
 const aToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJKYW5pY2tfS3VwaGFsNkB5YWhvby5jb20iLCJyb2xlIjoiZW1wbG95ZWUiLCJpYXQiOjE3MDY4MDQ3MzYsImV4cCI6MTcwNjgxMDczNn0.EYV7Q0S9G4UsUJuS2Qszxv56DuaE8p7h6CXQfiCnk8c";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJKZWZmZXJleV9Xb2xmODJAZ21haWwuY29tIiwicm9sZSI6ImVtcGxveWVlIiwiaWF0IjoxNzA4MjIxMDEzLCJleHAiOjE3MDgyODEwMTN9.JBFFbfcYdollinXrih75xB0nlRWnbhFcwE64L4gPLGQ";
 const ChatBox = ({
     channel,
     setChannel,
+    socket,
 }: {
     channel: any;
     setChannel: any;
+    socket: any;
 }) => {
     const [value, setValue] = useState("");
-    const getKey = (pageIndex: number) => {
-        return [
-            `http://localhost:3003/api/channels/messages?size=10&page=${
-                pageIndex + 1
-            }&channelId=${channel}`,
+    // const getKey = (pageIndex: number) => {
+    //     return [
+    //         `http://localhost:3003/api/channels/messages/admin?size=10&page=${
+    //             pageIndex + 1
+    //         }&channelId=${channel}`,
+    //         aToken,
+    //     ];
+    // };
+    // const { data, error, mutate, size, setSize, isValidating } = useSWRInfinite(
+    //     getKey,
+    //     ([url, token]) => messageFetcher(url, token)
+    // );
+    const {
+        data,
+        error: channelsError,
+        isLoading: channelsLoading,
+        mutate,
+    } = useSWR(
+        [
+            `http://localhost:3003/api/channels/messages/admin?channelId=${channel}`,
             aToken,
-        ];
-    };
-    const { data, error, mutate, size, setSize, isValidating } = useSWRInfinite(
-        getKey,
+        ],
         ([url, token]) => messageFetcher(url, token)
     );
-
+    const scrollToBottom = () => {
+        const messageBody = document.getElementById("messageBody");
+        messageBody?.scrollTo(0, messageBody.scrollHeight);
+    };
+    useEffect(() => {
+        socket.on(
+            "message:send:fromClient",
+            (channelId: string, message: string) => {
+                if (channelId == channel) {
+                    mutate();
+                    scrollToBottom();
+                }
+            }
+        );
+    }, [socket, mutate, channel]);
     if (!data) return "loading";
     const send = async (e: any) => {
         e.preventDefault();
@@ -74,18 +101,16 @@ const ChatBox = ({
             channelId: channel,
             status: "Not seen",
         });
-        mutate();
         setValue("");
+        await mutate();
         scrollToBottom();
-    };
-    const scrollToBottom = () => {
-        const messageBody = document.getElementById("messageBody");
-        messageBody?.scrollTo(0, messageBody.scrollHeight);
+        socket.emit("staff:message:send", data.channel, value);
     };
 
-    if (error) return <div>Error loading messages</div>;
-    if (channel == 0) return "Choose customer to chat";
-
+    // if (error) return <div>Error loading messages</div>;
+    if (channel == -1) return "Choose customer to chat";
+    if (channelsError) return <div>Failed to load</div>;
+    if (channelsLoading) return <div>Loading...</div>;
     return (
         <div
             className={` bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full bottom-5 right-5 z-50`}
@@ -97,46 +122,44 @@ const ChatBox = ({
                 id='messageBody'
                 className='body w-full grow font-normal text-sm overflow-auto max-h-full flex flex-col justify-start gap-2 px-2 py-2'
             >
-                <button onClick={() => setSize(size + 1)}>Load More</button>
-                {data[data.length - 1].message.map(
-                    (item: any, index: number) => {
-                        const hasPreviousMessage = index > 0;
-                        const currentTime = moment(item.createdAt);
-                        const previousTime = hasPreviousMessage
-                            ? moment(
-                                  data[data.length - 1].message[index - 1]
-                                      .createdAt
-                              )
-                            : null;
-                        const display =
-                            hasPreviousMessage &&
-                            currentTime.diff(previousTime, "minutes") >= 10;
-                        const lastMessage =
-                            index == data[data.length - 1].message.length - 1 &&
-                            item.employeeId != null;
-                        return (
-                            <>
-                                {(display || index == 0) && (
-                                    <TimeStamp time={item.createdAt} />
-                                )}
-                                <Message
-                                    params={{
-                                        content: item.content,
-                                        employee:
-                                            item.employeeId == null
-                                                ? false
-                                                : true,
-                                        time: item.createdAt,
-                                    }}
-                                />
-                                {lastMessage && (
-                                    <Status read={item.status != "Not seen"} />
-                                )}
-                            </>
-                        );
-                    }
-                )}
-                {isValidating && <div>Sending message...</div>}
+                {/* <button onClick={() => setSize(size + 1)}>Load More</button> */}
+                {/* {data[data.length - 1].message.map( */}
+                {data.message.map((item: any, index: number) => {
+                    const hasPreviousMessage = index > 0;
+                    const currentTime = moment(item.createdAt);
+                    const previousTime = hasPreviousMessage
+                        ? moment(
+                              //   data[data.length - 1].message[index - 1]
+                              data.message[index - 1].createdAt
+                          )
+                        : null;
+                    const display =
+                        hasPreviousMessage &&
+                        currentTime.diff(previousTime, "minutes") >= 10;
+                    const lastMessage =
+                        index == data.message.length - 1 &&
+                        // index == data[data.length - 1].message.length - 1 &&
+                        item.employeeId != null;
+                    return (
+                        <>
+                            {(display || index == 0) && (
+                                <TimeStamp time={item.createdAt} />
+                            )}
+                            <Message
+                                params={{
+                                    content: item.content,
+                                    employee:
+                                        item.employeeId == null ? false : true,
+                                    time: item.createdAt,
+                                }}
+                            />
+                            {lastMessage && (
+                                <Status read={item.status != "Not seen"} />
+                            )}
+                        </>
+                    );
+                })}
+                {/* {isValidating && <div>Sending message...</div>} */}
             </div>
             <div className='footer h-10 w-full bg-primary-100 items-center flex flex-row justify-between p-2 font-medium text-base'>
                 <input
@@ -145,7 +168,9 @@ const ChatBox = ({
                     onChange={(e) => {
                         setValue(e.currentTarget.value);
                     }}
-                    onKeyDown={(e) => (e.key === "Enter" ? send(e) : {})}
+                    onKeyDown={async (e) =>
+                        e.key === "Enter" ? await send(e) : {}
+                    }
                     className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
                     placeholder='Enter text'
                 ></input>
