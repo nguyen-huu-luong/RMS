@@ -34,7 +34,7 @@ type QueryOptions = {
     },
     paginate?: {
         page: number,
-        limit: number
+        pageSize: number
     }
 
 }

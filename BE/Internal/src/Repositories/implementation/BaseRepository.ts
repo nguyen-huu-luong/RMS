@@ -1,7 +1,8 @@
-import { Model, ModelStatic } from "sequelize";
+import { FindOptions, Model, ModelStatic, Sequelize } from "sequelize";
 import { IBaseRepository } from "../IBaseRepository";
 import { injectable, unmanaged } from "inversify";
 import { Filter, QueryOptions } from "../../Types/type";
+import { RecordNotFoundError } from "../../Errors";
 
 @injectable()
 export abstract class BaseRepository<M extends Model> implements IBaseRepository<M> {
@@ -15,16 +16,34 @@ export abstract class BaseRepository<M extends Model> implements IBaseRepository
 		this.attributes = attributes || ["*"] ;
     }
 
-	public async all(options?: QueryOptions): Promise<M[]> {
+	public async all(options?: QueryOptions): Promise<any> {
 
-		if (options) 
+		if (options) {
+			const page = options.paginate?.page || 1
+			const limit = options.paginate?.pageSize || this.DEFAULT_PAGE_SIZE
+			const offset = (page - 1) * limit
+			const findOptions: FindOptions = {
+				// attributes: ['*'],
+				limit,
+				offset,
+				order:  [
+					[options.sort?.by || "id", options.sort?.order.toLocaleUpperCase() || "ASC"]
+				]
+			}
 
-			return this._model.findAll({
-				// attributes: this.attributes[0] && this.attributes[0] == "*" : this.attributes ,
-				limit: options.paginate?.limit || this.DEFAULT_PAGE_SIZE,
-				offset: options.paginate?.page || this.DEFAUTL_OFFSET,
-				order:  [[options.sort?.by || "id", options.sort?.order.toLocaleUpperCase() || "ASC"]]
-			});
+			if (this.attributes[0] != "*") {
+				findOptions.attributes = this.attributes
+			}
+			const { count, rows } = await this._model.findAndCountAll(findOptions);
+
+			return {
+				data: rows,
+				totalCount: count,
+				page: options.paginate?.page,
+				pageSize: options.paginate?.pageSize,
+				sortedBy: options.sort?.by || "id"
+			}
+		}
 		else 
 			return this._model.findAll({ attributes: this.attributes })
 	}
@@ -63,7 +82,7 @@ export abstract class BaseRepository<M extends Model> implements IBaseRepository
 			return true;
 		}
 
-		throw new Error();
+		throw new RecordNotFoundError();
 	}
 
 
