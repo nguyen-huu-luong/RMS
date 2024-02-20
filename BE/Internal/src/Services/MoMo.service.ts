@@ -19,7 +19,8 @@ export class MoMoService {
     public async payWithMethod(req: Request, res: Response, next: NextFunction) {
         const cart = await this.cartRepository.getCart(req.userId);
         const user = await this.clientRepository.findById(req.userId);
-        const data = JSON.stringify(req.body)
+        const uid = {"userId": req.userId}
+        const data = JSON.stringify({...req.body, ...uid})
         const fullname = user.firstname + " " + user.lastname
         var accessKey = 'F8BBA842ECF85';
         var secretKey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
@@ -76,7 +77,7 @@ export class MoMoService {
         const options = {
             hostname: 'test-payment.momo.vn',
             port: 443,
-            path: '/v2/gateway/api/create',
+            path: `/v2/gateway/api/create?ipnUrl=${ipnUrl}`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

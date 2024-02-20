@@ -8,9 +8,9 @@ import {
 } from "@ant-design/icons";
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from "next-intl/client";
-import { useCreateOrder } from "@/app/api/product/order";
+import { useCreateOrder, recordMoMoOrder } from "@/app/api/product/order";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Payment() {
     const locale = useLocale();
@@ -20,21 +20,24 @@ export default function Payment() {
     const payMethod = searchParams.get('method')
     const resultCode = searchParams.get('resultCode')
     const { data: session, status } = useSession()
+    const [orderInfo, setOrderInfo] = useState(searchParams.get('extraData'))
+    const [addOrder, setAddOrder] = useState(0)
     let current: number = 2;
 
-    const updateOrder = async (orderInfo: any) => {
-        await useCreateOrder(session?.user.accessToken, orderInfo, "CASH")
+    const updateOrder = async (orderInfoJS: any) => {
+        await recordMoMoOrder(orderInfoJS)
     }
 
     useEffect(() => {
-        var orderInfo = searchParams.get('extraData')
-        if (session && orderInfo) {
+        let checker = localStorage.getItem("orderInfo")
+        let orderInfo = searchParams.get('extraData')
+        if (resultCode == "0" && checker == "1" && orderInfo) {
+            localStorage.setItem('orderInfo', "0")
             let orderInfoJS = Buffer.from(orderInfo, "base64").toString()
             orderInfoJS = JSON.parse(orderInfoJS)
             updateOrder(orderInfoJS)
-            router.push('/payment?method=MOMO&resultCode=0')
         }
-    }, [session])
+    }, [])
 
     if (payMethod == "MOMO") {
         if (resultCode == "0") {

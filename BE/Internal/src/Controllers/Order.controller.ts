@@ -37,9 +37,8 @@ class OrderController {
         this.orderService.updateStatus(req, res, next);
     }
 
-    public checkResultMomo(req: Request, res: Response) {
-        console.log("Readđyyyyyyyyyy")
-        return res.send("haha").status(204)
+    public recordMoMoOrder(req: Request, res: Response, next: NextFunction) {
+        this.orderService.recordMoMoOrder(req, res, next);
     }
 
 }
