@@ -12,9 +12,9 @@ class OrderRouter {
 
     public initialize(router: Router) {
         router.route('/orders')
-            .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.createOrder(req, res, next))
+            // .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.createOrder(req, res, next))
+            .post(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) => this.orderController.createOrder(req, res, next))
             .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.viewOrders(req, res, next))
-
             
         router.route('/orders/admin')
             .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.viewOrders(req, res, next))
@@ -24,6 +24,10 @@ class OrderRouter {
 
         router.route('/orders/:id')
             .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.viewOrderItems(req, res, next))
+        
+        router.route('/order/momo')
+            .post((req: Request, res: Response)=> this.orderController.checkResultMomo(req, res))
+            .get((req: Request, res: Response)=> this.orderController.checkResultMomo(req, res))
     }
 }
 

@@ -54,4 +54,13 @@ export class OrderRepository
             message.queryError(err);
         }
     }
+
+    public async createOrder(userId: number, data: any) {
+        try{
+            
+        }
+        catch (err){
+            message.queryError(err);
+        }
+    }
 }
