@@ -49,7 +49,7 @@ export default function Order() {
                 router.push('/payment?method=CASH')
             }
             else {
-                // cookieStore.set('orderInfo', dataBody)
+                localStorage.setItem('orderInfo', "1")
                 router.push(data['payUrl'])
             }
         } catch (err) {
