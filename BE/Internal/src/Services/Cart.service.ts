@@ -24,7 +24,9 @@ export class CartService {
             if (!cart) {
                 throw new RecordNotFoundError("Cart do not exist");
             }
-            const cartItems = await cart.getProducts()
+            const cartItems = await cart.getProducts({
+                order: [["updatedAt", "DESC"]],
+            });
             const response = {
                 cart: cart.toJSON(),
                 items: cartItems.map((item: any) => item.toJSON()),
@@ -53,10 +55,13 @@ export class CartService {
                 await cart.addProduct(product, {
                     through: {
                         quantity:
-                            req.body.quantity,
+                            req.body.quantity +
+                            cartItem[0].CartItem.quantity,
                         amount:
-                            product.getDataValue("price") * req.body.quantity,
-                        createdAt: new Date(),
+                            product.getDataValue("price") *
+                            (req.body.quantity +
+                                cartItem[0].CartItem.quantity),
+                        createdAt: cartItem[0].CartItem.createdAt,
                         updatedAt: new Date(),
                     },
                 });
@@ -72,8 +77,8 @@ export class CartService {
                 });
             }
             await this.updateCartDetail(cart);
-            res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
+            return res.status(status).send(statusMess.Success);
         } catch (err) {
             console.log(err);
             next(err);
@@ -90,13 +95,14 @@ export class CartService {
             const product = await this.productRepository.findById(
                 parseInt(req.params.id)
             );
+
             if (!product) {
                 throw new RecordNotFoundError("Product do not exist");
             }
             await cart.removeProduct(product);
             await this.updateCartDetail(cart);
-            res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
+            return res.status(status).send(statusMess.Success);
         } catch (err) {
             console.log(err);
             next(err);
@@ -110,24 +116,32 @@ export class CartService {
         try {
             const status: number = HttpStatusCode.Success;
             const cart = await this.cartRepository.getCart(req.userId);
-            const cartId = cart?.getDataValue("id");
             const product = await this.productRepository.findById(
                 req.body.productId
             );
             if (!product) {
                 throw new RecordNotFoundError("Product do not exist");
             }
+            const cartItem = await cart.getProducts({
+                where: { id: req.body.productId },
+            });
             if (req.body.quantity === 0) {
                 await cart.removeProduct(product);
             } else {
+                console.log("Success")
                 await cart.addProduct(product, {
-                    amount: req.body.quantity * product?.getDataValue("price"),
-                    quantity: req.body.quantity,
+                    through: {
+                        quantity: req.body.quantity,
+                        amount:
+                            product.getDataValue("price") * req.body.quantity,
+                        createdAt: cartItem[0].CartItem.createdAt,
+                        updatedAt: new Date(),
+                    },
                 });
             }
             await this.updateCartDetail(cart);
-            res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
+            return res.status(status).send(statusMess.Success);
         } catch (err) {
             console.log(err);
             next(err);
@@ -137,16 +151,14 @@ export class CartService {
         try {
             const cartItems = await cart.getProducts();
             const totalItems = cartItems.reduce(
-                (total: any, item: any) =>
-                    total + item.CartItem.quantity,
+                (total: any, item: any) => total + item.CartItem.quantity,
                 0
             );
             const totalAmount = cartItems.reduce(
-                (sum: any, item: any) =>
-                    sum + item.CartItem.amount,
+                (sum: any, item: any) => sum + item.CartItem.amount,
                 0
             );
-            await this.cartRepository.update(cart.getDataValue('id'), {
+            await this.cartRepository.update(cart.getDataValue("id"), {
                 total: totalItems,
                 amount: totalAmount,
             });

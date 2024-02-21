@@ -33,7 +33,7 @@ export const addToCart = async (token: any, requestBody: object) => {
 
 export const editCart = async (token: any,requestBody: object) => {
     try {
-      const response = await axios.post(`${process.env.BASE_URL}/carts`, requestBody, {
+      const response = await axios.put(`${process.env.BASE_URL}/carts`, requestBody, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
