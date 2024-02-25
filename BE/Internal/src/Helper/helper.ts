@@ -4,17 +4,17 @@ function parseRequesQueries(query: any): QueryOptions {
     const queryOptions: QueryOptions = {
         filter: {},
         sort: { by: "", order: "asc" },
-        paginate: { page: 1, limit: 10 } // Giá trị mặc định, thay đổi nếu cần
+        paginate: { page: 1, pageSize: 10 } // Giá trị mặc định, thay đổi nếu cần
     };
 
-    const { page, limit, sort, order, ...filterOptions } = query;
+    const { page, pageSize, sort, order, ...filterOptions } = query;
 
     if (sort) {
         queryOptions.sort = { order: order || "asc", by: sort };
     }
 
-    if (page && limit) {
-        queryOptions.paginate = { page, limit };
+    if (page && pageSize) {
+        queryOptions.paginate = { page, pageSize };
     }
 
     console.log(filterOptions)

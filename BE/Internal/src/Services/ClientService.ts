@@ -25,7 +25,10 @@ export class ClientService {
     ) {}
 
     public async getAll(options?: QueryOptions) {
-        return await this.clientRepository.all(options);
+        const result =  await this.clientRepository.all(options);
+        return {
+            ...result
+        }
     }
 
     public async getById(id: number) {
