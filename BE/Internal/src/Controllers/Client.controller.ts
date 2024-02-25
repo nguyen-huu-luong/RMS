@@ -140,7 +140,7 @@ class ClientController {
 	public async updateCustomer(req: Request, res: Response, next: NextFunction) {
 		if (req.action === "update:any") {
 			const id = req.params["id"] ;
-			const customerInfo = req.params["data"]
+			const customerInfo = req.body
 			const data = await this.clientService.update(Number(id), customerInfo);
 			res.send(data);
 		} else {

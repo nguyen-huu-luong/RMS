@@ -55,7 +55,7 @@ export default function LocaleLayout({children, params}: LocaleLayoutProps) {
                         paddingTop: `calc(${variables.headerHeight} + 8px)`
                     }}>
                         <DynamicBreadcrumb />
-                        <div className='flex-1 w-full'>{children}  </div>
+                        <div className='flex-1 w-full' >{children}  </div>
                     </div>
                 </div>
             </NextIntlClientProvider>

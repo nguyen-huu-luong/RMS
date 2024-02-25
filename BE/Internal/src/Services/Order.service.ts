@@ -74,7 +74,13 @@ export class OrderService {
             if (req.action === "read:own") {
                 data = await this.orderRepository.viewOrders(req.userId);
             } else {
-                data = await this.orderRepository.all();
+                let customerId = Number(req.query.customerId)
+                if (customerId){
+                    data = await this.orderRepository.viewOrders(customerId);
+                }
+                else {
+                    data = await this.orderRepository.all();
+                }
             }
             res.status(status).send(data);
             Message.logMessage(req, status);
