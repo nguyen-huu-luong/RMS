@@ -1,7 +1,7 @@
 const TYPES = {
     // IClientController: Symbol.for("IClientController"),
-    // IClientService: Symbol.for("IClientService") ,
-
+    // IClientService: Symbol.for("IClientService"),
+    
     IBaseRepository: Symbol.for("IBaseRepository"),
     IClientRepository: Symbol.for("IClientRepository"),
     IOrderRepository: Symbol.for("IOrderRepository"),
@@ -36,7 +36,6 @@ type QueryOptions = {
         page: number,
         pageSize: number
     }
-
 }
 
 export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter };

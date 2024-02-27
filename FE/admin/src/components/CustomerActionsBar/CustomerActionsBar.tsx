@@ -1,33 +1,135 @@
-import { Button } from "antd";
-import React from "react";
+"use client"
+import { EllipsisOutlined, InfoCircleOutlined, PlusCircleOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Dropdown, Flex, Input, MenuProps, Modal, Space, Tooltip } from "antd";
+import React, { useState } from "react";
+import { AddCustomerForm } from "../AddCustomerForm";
+import { createStyles, useTheme } from 'antd-style';
 
-const ontions = [
+const useStyle = createStyles(({ token }) => ({
+    'my-modal-body': {
+    },
+    'my-modal-mask': {
+      
+    },
+    'my-modal-header': {
+    },
+    'my-modal-footer': {
+    },
+    'my-modal-content': {
+    },
+}));
+
+
+interface CustomerActionBarProps {
+    dataSelected?: Array<any>
+}
+
+const items: MenuProps['items'] = [
     {
-        key: 1,
-        title: 'Source',
-        type: 'select',
-        items: [
-            "Web",
-            "Facebook",
-            "Campaign"
-        ]
+      label: <a href="https://www.antgroup.com">1st menu item</a>,
+      key: '0',
     },
     {
-        key: 2,
-        title: 'Source',
-        type: 'date',
-        items: [
-            "Web",
-            "Facebook",
-            "Campaign"
-        ]
+      label: <a href="https://www.aliyun.com">2nd menu item</a>,
+      key: '1',
     },
+    {
+      type: 'divider',
+    },
+    {
+      label: '3rd menu item',
+      key: '3',
+    },
+  ];
+  
+export const CustomerActionBar: React.FC<CustomerActionBarProps> = (props) => {
+    const [open, setOpen] = useState(false);
+    const { styles } = useStyle();
 
-]
-export const CustomerActionBar: React.FC = () => {
+    const showModal = () => {
+        setOpen(true);
+    };
+
+    const handleOk = () => {
+        setOpen(false);
+    };
+
+    const handleCancel = () => {
+        setOpen(false);
+    };
+
+
+    const classNames = {
+        body: styles['my-modal-body'],
+        mask: styles['my-modal-mask'],
+        header: styles['my-modal-header'],
+        footer: styles['my-modal-footer'],
+        content: styles['my-modal-content'],
+    };
+
+    const modalStyles = {
+        header: {
+            borderRadius: 0,
+            borderBottom: "1px solid #ccc",
+            paddingBottom: 4,
+            marginBottom: 24
+        },
+        body: {
+            borderRadius: 5,
+        },
+        footer: {
+            borderTop: '1px solid #ccc',
+            paddingTop: 16
+        },
+        content: {
+           padding: 20
+        },
+    };
+
     return <main className="bg-white w-full py-2 px-3 rounded-md border">
-        <div className="mb-4 flex space-x-2">
-            abc
-        </div>
-    </main>
+        <Flex>
+            {
+                (props.dataSelected && props.dataSelected?.length > 0) ? 
+                    <Space>
+                        <p>Selected {props.dataSelected?.length} customer</p>
+                        <Button>Send Email</Button>
+                        <Button>Send SMS</Button>
+                        <Button icon={<EllipsisOutlined />} />
+                    </Space> :
+                    <Space>
+                        <Input
+                            placeholder="Enter keywork to search...."
+                            prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
+                            className="flex items-center"
+                        />
+                    </Space>
+            }
+
+            <Space className="ms-auto">
+                <Button icon={<PlusCircleOutlined />} onClick={showModal}>
+                    New
+                </Button>
+                <Dropdown menu={{ items }} trigger={['click']}> 
+                    <Button icon={<EllipsisOutlined />} />
+                
+                </Dropdown>
+            </Space>
+        </Flex>
+
+        <Modal
+            classNames={classNames}
+            styles={modalStyles}
+            title="Add new customer"
+            open={open}
+            onOk={handleOk}
+            okType="primary"
+            okButtonProps={{className: "bg-primary"}}
+            cancelText="Cancel"
+            onCancel={handleCancel}
+            footer={null}
+        >
+        <AddCustomerForm  afterSubmit={handleOk} afterCancel={handleCancel}/>
+    </Modal>
+
+    </main >
 }

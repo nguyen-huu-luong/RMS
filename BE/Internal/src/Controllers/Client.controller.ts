@@ -122,10 +122,10 @@ class ClientController {
 	}
 
 	public async createCustomer(req: Request, res: Response, next: NextFunction) {
-		const errors = validationResult(req);
-		if (!errors.isEmpty()) {
-			throw new ValidationError(errors.array()[0].msg);
-		}
+		// const errors = validationResult(req);
+		// if (!errors.isEmpty()) {
+		// 	throw new ValidationError(errors.array()[0].msg);
+		// }
 		if (req.action === "create:any") {
 			const customerInfo = req.body["data"] ;
 			const data = await this.clientService.create(customerInfo);
