@@ -25,7 +25,9 @@ class ChannelRouter {
                 (req: Request, res: Response, next: NextFunction) =>
                     this.channelController.sendMessage(req, res, next)
             )
-            .put(
+        router
+            .route("/channels/seen")
+            .post(
                 AuthMiddleware.initialize,
                 Authorization.initialize,
                 (req: Request, res: Response, next: NextFunction) =>
@@ -54,6 +56,7 @@ class ChannelRouter {
                 (req: Request, res: Response, next: NextFunction) =>
                     this.channelController.adminSendMessage(req, res, next)
             );
+
         router
             .route("/channels/messages/admin")
             .get(

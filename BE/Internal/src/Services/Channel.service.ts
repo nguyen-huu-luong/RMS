@@ -5,6 +5,8 @@ import { container } from "../Configs";
 import statusMess from "../Constants/statusMess";
 import { IChannelRepository } from "../Repositories/IChannelRepository";
 import { TYPES } from "../Repositories/type";
+import { Op } from "sequelize";
+
 /// <reference path="./types/globle.d.ts" />
 import { IClientRepository, IEmployeeRepository } from "../Repositories";
 import moment from "moment";
@@ -344,30 +346,44 @@ export class ChannelService {
     public async viewMessage(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            let messageToUpdate;
+            let messagesToUpdate;
+
             if (req.role === "user") {
                 const client = await this.clientRepository.findById(req.userId);
                 const channel = await client.getChannel();
-                const messages = await channel.getMessages({
-                    order: [["createdAt", "DESC"]],
-                    limit: 1,
+                messagesToUpdate = await channel.getMessages({
+                    where: {
+                        status: "Not seen",
+                        employeeId: {
+                            [Op.not]: null,
+                        },
+                    },
                 });
-                messageToUpdate = messages[0];
             } else if (req.role === "employee") {
                 const employee = await this.employeeRepository.findById(
                     req.userId
                 );
-                const channel = await this.channelRepository.findById(req.body.id);
-                const messages = await channel.getMessages({
-                    order: [["createdAt", "DESC"]],
-                    limit: 1,
+                const channel = await this.channelRepository.findById(
+                    req.body.id
+                );
+                messagesToUpdate = await channel.getMessages({
+                    where: {
+                        status: "Not seen",
+                        clientId: {
+                            [Op.not]: null,
+                        },
+                    },
                 });
-                messageToUpdate = messages[0];
             } else {
                 return res.status(status).send(statusMess.Success);
             }
-            if (messageToUpdate) {
-                await messageToUpdate.update({ status: "Seen" });
+
+            if (messagesToUpdate.length > 0) {
+                await Promise.all(
+                    messagesToUpdate.map(async (message: any) => {
+                        await message.update({ status: "Seen" });
+                    })
+                );
                 Message.logMessage(req, status);
                 return res.status(status).send(statusMess.Success);
             } else {
