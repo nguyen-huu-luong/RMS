@@ -6,6 +6,8 @@ import {
 	LeftCircleFilled,
 	LeftCircleOutlined,
 	LeftOutlined,
+	SnippetsOutlined
+	
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { Button } from "antd";
@@ -55,7 +57,7 @@ export default function Sidebar() {
 							title: t("sale"),
 							itemId: "/sale",
 							navigateTo: "#",
-							icon: <UserAddOutlined />,
+							icon: <SnippetsOutlined />,
 							subNavs: [
 								{
 									title: t("order"),
