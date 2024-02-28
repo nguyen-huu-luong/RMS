@@ -35,7 +35,7 @@ function User({
             </div>
             <div className={`body text-sm flex flex-col justify-between items-start w-full`}>
                 <div className="w-full font-bold">{params.userName}</div>
-            <div className={`w-40 overflow-ellipsis whitespace-nowrap overflow-hidden ${params.latestMessage.status == "Not seen"?"font-semibold":""}`}> {params.latestMessage.content}</div>
+            <div className={`w-40 overflow-ellipsis whitespace-nowrap overflow-hidden ${params.latestMessage.status == "Not seen"?"font-semibold":""}`}> {params.userName}:{params.latestMessage.content}</div>
                 <div>{" "}</div>
             </div>
             <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'>{TimeDisplay(params.latestMessage.createdAt)}</div>

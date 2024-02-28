@@ -9,18 +9,12 @@ function Chat() {
     useEffect(() => {
         const socketClient = io("http://localhost:3003", {
             auth: {
-                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJKZWZmZXJleV9Xb2xmODJAZ21haWwuY29tIiwicm9sZSI6ImVtcGxveWVlIiwiaWF0IjoxNzA4MjIxMDEzLCJleHAiOjE3MDgyODEwMTN9.JBFFbfcYdollinXrih75xB0nlRWnbhFcwE64L4gPLGQ",
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJBbHRoZWEzN0B5YWhvby5jb20iLCJyb2xlIjoiZW1wbG95ZWUiLCJpYXQiOjE3MDkwNDI0MzMsImV4cCI6MTcwOTEwMjQzM30.RSQ2BNao_cNi8PQxiEt9uL0Wqdbp2g49pudiYxl3dSI",
             },
         });
         socketClient.on("connect", () => {
             setSocket(socketClient);
             console.log("Connected to socket server");
-        });
-        socketClient.on("message:send:fromClient", (channelId, message) => {
-            console.log(channelId + " " + message);
-        });
-        socketClient.on("message:send:fromStaff", (channelId, message) => {
-            console.log(channelId + " " + message);
         });
         socketClient.on("connect_error", (error: any) => {
             console.log(error);

@@ -53,3 +53,23 @@ export const viewMessage = async (token: any) => {
       throw error;
   }
 };
+
+export const seenMessage = async (token: any) => {
+    try {
+        const response = await axios.post(
+            `http://localhost:3003/api/channels/seen`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+export default seenMessage;
