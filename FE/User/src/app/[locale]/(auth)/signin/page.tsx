@@ -3,6 +3,8 @@ import { LoginForm } from "@/components/LoginForm";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
+import {} from 'next-intl/server';
+
 const SignIn: React.FC = async () => {
     const session = await getServerSession(authOptions) ;
     if (session) {
@@ -22,3 +24,4 @@ const SignIn: React.FC = async () => {
 };
 
 export default SignIn;
+

@@ -17,10 +17,9 @@ export const LoginForm: React.FC = () => {
         console.log("Received values of form: ", values);
         let result = await signIn("credentials", {
             ...values,
-            redirect: false,
+            redirect: true,
         });
         setLoading(false);
-        console.log(result);
         if (result && !result.ok) {
             if (result.error) {
                 const error = JSON.parse(result.error);

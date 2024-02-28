@@ -1,15 +1,10 @@
 import React from "react";
-import { LoginForm } from "@/components/LoginForm";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
 import RegistrationForm from "@/components/RegisterForm";
-// import { useLocale } from "next-intl";
-// import { useRouter } from "next/navigation";
 
 const Register: React.FC = async () => {
-    // const router = useRouter()
-    // const locale = useLocale()
     const session = await getServerSession(authOptions) ;
     if (session) {
         redirect(`/${"en"}/profile`);
