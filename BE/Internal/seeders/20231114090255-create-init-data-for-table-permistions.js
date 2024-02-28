@@ -63,6 +63,7 @@ module.exports = {
             { role: 'employee', resource: 'messages', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'channels', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
 
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
