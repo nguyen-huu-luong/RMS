@@ -3,7 +3,7 @@ import React from 'react';
 import { Form, Input, Button, Radio, ConfigProvider } from 'antd';
 import axios from 'axios';
 import { register } from 'module';
-import SignIn from '../[locale]/(auth)/signin/page';
+// import SignIn from '../[locale]/(auth)/signin/page';
 import { signIn } from 'next-auth/react';
 
 const RegistrationForm = () => {
@@ -162,7 +162,7 @@ return (
 
             <Form.Item>
                 <Button type="primary" htmlType="submit" className='bg-primary w-full mt-2'>
-                    Đăng ký
+                    Sign Up
                 </Button>
             </Form.Item>
         </Form>

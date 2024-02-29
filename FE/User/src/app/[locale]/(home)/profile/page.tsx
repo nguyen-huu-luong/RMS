@@ -7,9 +7,8 @@ import React from "react"
 const Profile: React.FC = async () => {
     const session = await getServerSession(authOptions);
     if (!session) {
-        redirect("/signin")
+        redirect(`/${"en"}/signin`);
     }
-    console.log(session)
     return <div>{JSON.stringify(session)}</div>
 }
 

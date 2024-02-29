@@ -298,7 +298,7 @@ const OrderForm = ({ form }: { form: any }) => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Please input your province!",
+                                        message: "Please input your address!",
                                     },
                                 ]}
                             >
