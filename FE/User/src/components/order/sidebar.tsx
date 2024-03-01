@@ -167,13 +167,6 @@ const SideBar = ({
             >
                 Pay and Order
             </button>
-            {/* <Link
-                className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-primary hover:bg-primary-400 text-item-white transition-all duration-300  flex justify-center'
-                href={"/payment"}
-                locale={locale}
-            >
-                Pay & Order
-            </Link> */}
             <Link
                 className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 hover:bg-primary hover:text-item-white transition-all duration-300 flex justify-center'
                 href={"/cart"}

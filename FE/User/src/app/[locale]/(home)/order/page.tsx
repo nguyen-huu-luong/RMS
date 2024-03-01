@@ -34,7 +34,7 @@ export default function Order() {
             const payMethod = formValues.paymentMethod
             const dataBody = {
                 status: "New order",
-                descriptions: formValues.orderNote ? formValues.orderNote : "",
+                descriptions: formValues.orderNotes ? formValues.orderNotes : "",
                 shippingAddress:
                     formValues.deliveryType === "DELIVER"
                         ? formValues.address
