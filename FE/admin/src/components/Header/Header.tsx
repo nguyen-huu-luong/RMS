@@ -11,6 +11,7 @@ import { Button, Dropdown, MenuProps, Tooltip } from "antd";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { LocaleSwitcher } from "../LocaleSwitcher/";
+import variables from "@/app/variables.module.scss";
 
 export default function Header() {
 	const t = useTranslations("Header");
@@ -21,7 +22,7 @@ export default function Header() {
 			icon: <UserOutlined />,
 		},
 		{
-			label: <Link href="/profile">{t("setting")}</Link>,
+			label: <Link href="/settings">{t("setting")}</Link>,
 			key: "3",
 			icon: <SettingOutlined />,
 		},
@@ -37,7 +38,10 @@ export default function Header() {
 		items,
 	};
 	return (
-		<div className="w-full flex items-center bg-white py-2 space-x-2 px-10 shadow-lg">
+		<div
+			className="flex items-center bg-white py-2 px-10 space-x-2 border-b-2 fixed top-0 right-0 h-header"
+			style={{ width: `calc(100% - ${variables.sidebarWidth}` }}
+		>
 			<Tooltip title={t("chat-center")}>
 				<Button
 					className="border-0 ms-auto hover:border"

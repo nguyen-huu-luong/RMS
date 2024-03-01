@@ -33,7 +33,6 @@ export default function Cart() {
             await removeItem(itemId);
             return;
         }
-        console.log(newQuantity)
         await editCart(session?.user.accessToken, {
             productId: itemId,
             quantity: newQuantity
@@ -47,7 +46,6 @@ export default function Cart() {
     // Check if cart is empty
     if (cartItemsError) return <div>Failed to load</div>;
     if (cartItemsLoading) return <div>Loading...</div>;
-    console.log(cartItems)
     return (cartItems.cart.total === 0) ? (
         <div className='w-full h-auto flex flex-col justify-center items-center gap-5 p-20 bg-primary-white rounded-3xl transition-all duration-300'>
             <div className='w-auto h-auto rounded-lg overflow-hidden'>

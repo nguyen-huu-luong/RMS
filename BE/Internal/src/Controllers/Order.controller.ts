@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 
-import {OrderService} from "../Services";
+import {OrderService, MoMoService} from "../Services";
 
 class OrderController {
     protected orderService: OrderService;
+    protected momoService: MoMoService;
 
     constructor() {
         this.orderService = new OrderService();
+        this.momoService = new MoMoService();
     }
 
     public viewOrderItems(req: Request, res: Response, next:NextFunction) {
@@ -18,7 +20,13 @@ class OrderController {
     }
 
     public createOrder(req: Request, res: Response, next:NextFunction) {
-        this.orderService.createOrder(req, res, next);
+        const payMethod = req.query.method
+        if(payMethod == "CASH") {
+            this.orderService.createOrder(req, res, next);
+        }
+        else{
+            this.momoService.payWithMethod(req, res, next);
+        }
     }
 
     public removeOrder(req: Request, res: Response, next:NextFunction) { 
@@ -28,6 +36,11 @@ class OrderController {
     public updateStatus(req: Request, res: Response, next:NextFunction) { 
         this.orderService.updateStatus(req, res, next);
     }
+
+    public recordMoMoOrder(req: Request, res: Response, next: NextFunction) {
+        this.orderService.recordMoMoOrder(req, res, next);
+    }
+
 }
 
 export default OrderController;

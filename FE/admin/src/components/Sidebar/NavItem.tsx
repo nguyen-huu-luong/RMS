@@ -19,6 +19,7 @@ const NavItem: React.FC<INavItemProps> = (item: INavItemProps) => {
 		if (item.subNavs && item.subNavs.length > 0) {
 			setExpandNav(!expandNav);
 		} else {
+            console.log(router)
 			router.push(item.navigateTo);
 		}
 	};

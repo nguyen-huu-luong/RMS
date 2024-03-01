@@ -17,11 +17,24 @@ const config: Config = {
         colors: {
             primary: "#4A58EC",
             bgsecondary: "#E7E9FD"
+        },
+
+        width: {
+            sidebar: "250px",
+        },
+        height: {
+            header: "48px"
+        },
+
+        spacing: {
+            sidebar: '250px',
+            header: '48px'
         }
+        
     
       
     },
   },
-  plugins: [],
+  plugins: [require("daisyui")],
 }
 export default config

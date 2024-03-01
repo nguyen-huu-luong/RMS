@@ -7,6 +7,10 @@ $border-color: #DADAD9 ;
 $default-bg-color: #F8F8F8 ;
 $place-hoder-color: #666666 ;
 $link-color: #2892F4 ;
+
+
+$header-height: 48px ;
+$sidebar-width: 250px ;
  
 :export {
     primaryColor: $primary-color;
@@ -18,4 +22,7 @@ $link-color: #2892F4 ;
     defaultBackgroundColor: $default-bg-color;
     placehoderColor: $place-hoder-color ;
     linkColor:  $link-color;
+
+    headerHeight: $header-height;
+    sidebarWidth: $sidebar-width;
 }

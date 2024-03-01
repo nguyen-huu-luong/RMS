@@ -14,10 +14,13 @@ import {
 import { Avatar, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next-intl/client";
 
 const NavBar = () => {
     const locale = useLocale();
-
+    const { data: session, status } = useSession();
+    const router = useRouter();
     const [click, setClick] = useState(false);
     const [search, setSearch] = useState(true);
     const MENU_LISTS = [
@@ -27,21 +30,52 @@ const NavBar = () => {
         { name: "About", href: `about` },
     ];
 
-    const items: MenuProps["items"] = [
-        {
-            key: "profile",
-            label: (
-                <Link key={"profile"} href={`/account`} locale={locale}>
-                    Profile
-                </Link>
-            ),
-        },
-        {
-            key: "logout",
-            label: "Log out",
-            onClick: () => signOut()
-        },
-    ];
+    const items: MenuProps["items"] =
+        status == "authenticated"
+            ? [
+                  {
+                      key: "profile",
+                      label: (
+                          <Link
+                              key={"profile"}
+                              href={`/profile`}
+                              locale={locale}
+                          >
+                              Profile
+                          </Link>
+                      ),
+                  },
+                  {
+                      key: "logout",
+                      label: "Log out",
+                      onClick: () => {
+                          signOut();
+                      },
+                  },
+              ]
+            : [
+                  {
+                      key: "signin",
+                      label: (
+                          <Link key={"signin"} href={`/signin`} locale={locale}>
+                              Sign In
+                          </Link>
+                      ),
+                  },
+                  {
+                      key: "register",
+                      label: (
+                          <Link
+                              key={"register"}
+                              href={`/register`}
+                              locale={locale}
+                          >
+                              Register
+                          </Link>
+                      ),
+                  },
+              ];
+
     const toggleNav = () => {
         setClick(!click);
     };
@@ -163,15 +197,19 @@ const NavBar = () => {
                             {search ? (
                                 <>
                                     <LanguageChanger />
-                                    <Link
-                                        href={"/cart"}
-                                        locale={locale}
-                                        className='hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'
-                                    >
-                                        <ShoppingCartOutlined
-                                            style={{ fontSize: "1.6rem" }}
-                                        />
-                                    </Link>
+                                    {status == "authenticated" ? (
+                                        <Link
+                                            href={"/cart"}
+                                            locale={locale}
+                                            className='hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'
+                                        >
+                                            <ShoppingCartOutlined
+                                                style={{ fontSize: "1.6rem" }}
+                                            />
+                                        </Link>
+                                    ) : (
+                                        <></>
+                                    )}
                                     <Dropdown
                                         menu={{ items }}
                                         placement='bottom'

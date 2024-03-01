@@ -42,7 +42,6 @@ export default async function RootLayout({
                 >
                    <Provider>
                         <div className='flex flex-col min-h-screen'>
-                            <NavBar/>
                             <main className='flex-grow overflow-hidden'>
                                 <Container>
                                     <div className='w-full h-full py-4'>
