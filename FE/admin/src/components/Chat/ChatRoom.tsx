@@ -197,8 +197,7 @@ import { useState, useEffect, useCallback } from "react";
 import moment from "moment";
 import axios from "axios";
 import { mutate } from "swr";
-const aToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJBbHRoZWEzN0B5YWhvby5jb20iLCJyb2xlIjoiZW1wbG95ZWUiLCJpYXQiOjE3MDkwNDI0MzMsImV4cCI6MTcwOTEwMjQzM30.RSQ2BNao_cNi8PQxiEt9uL0Wqdbp2g49pudiYxl3dSI";
+
 const messageFetcher = async (url: string, token: any) => {
     try {
         const response = await axios.get(url, {
@@ -210,7 +209,26 @@ const messageFetcher = async (url: string, token: any) => {
         return response.data;
     } catch (error) {
         console.log(error);
-        // throw error;
+        throw error;
+    }
+};
+
+export const seenMessage = async (token: any, id: string) => {
+    try {
+        const response = await axios.put(
+            `http://localhost:3003/api/channels`,
+            {id: id},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
     }
 };
 
@@ -228,7 +246,7 @@ const sendMessage = async (token: any, requestBody: object) => {
         );
     } catch (error) {
         console.error("Error sending message:", error);
-        // throw error;
+        throw error;
     }
 };
 
@@ -236,41 +254,85 @@ const ChatBox = ({
     channel,
     setChannel,
     socket,
+    token,
 }: {
     channel: any;
     setChannel: any;
     socket: any;
+    token: any;
 }) => {
     const [value, setValue] = useState("");
     const [data, setData] = useState<any>(null);
+    const [inputFocused, setInputFocused] = useState(false);
     const fetchData = useCallback(async () => {
         try {
             const fetchedData = await messageFetcher(
                 `http://localhost:3003/api/channels/messages/admin?channelId=${channel}`,
-                aToken
+                token
             );
             setData(fetchedData);
         } catch (error) {
             console.error("Error fetching messages:", error);
         }
-    }, [channel]);
+    }, [channel, token]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-
     useEffect(() => {
-        socket.on(
-            "message:send:fromClient",
-            (channelId: string, message: string) => {
-                if (channelId == channel) {
-                    fetchData();
-                    scrollToBottom();
+        const handleNewMessage = (
+            channelId: any,
+            message: string,
+            clientId: string
+        ) => {
+            console.log("SEEN nè")
+            if (channelId == channel) {
+                setData((prevData: any) => ({
+                    ...prevData,
+                    message: [
+                        ...prevData.message,
+                        {
+                            content: message,
+                            createdAt: new Date(),
+                            employeeId: null,
+                            clientId: clientId,
+                            status: "Not seen",
+                        },
+                    ],
+                }));
+                scrollToBottom();
+            }
+        };
+        const handleSeenMessage = (channelId: any) => {
+            if (channelId == channel) {
+                if (!data || !data.message || data.message.length === 0) {
+                    return;
+                }
+                const newData = { ...data };
+                const lastMessage = newData.message[newData.message.length - 1];
+                if (lastMessage.status === "Not seen") {
+                    lastMessage.status = "Seen";
+                    setData(newData);
                 }
             }
-        );
-    }, [socket, channel, fetchData]);
+        };
+        socket.on("message:send:fromClient", handleNewMessage);
+        socket.on("message:read:fromClient", handleSeenMessage);
+        return () => {
+            socket.off("message:send:fromClient", handleNewMessage);
+            socket.off("message:read:fromClient", handleSeenMessage);
+        };
+    }, [socket, channel, data]);
+
+    const handleFocus = () => {
+        viewMessage()
+        setInputFocused(true);
+    };
+
+    const handleBlur = () => {
+        setInputFocused(false);
+    };
 
     const scrollToBottom = () => {
         const messageBody = document.getElementById("messageBody");
@@ -280,18 +342,36 @@ const ChatBox = ({
     const send = async (e: any) => {
         e.preventDefault();
         try {
-            await sendMessage(aToken, {
+            await sendMessage(token, {
                 content: value,
                 channelId: channel,
                 status: "Not seen",
             });
             setValue("");
-            await fetchData();
+            setData((prevData: any) => ({
+                ...prevData,
+                message: [
+                    ...prevData.message,
+                    {
+                        content: value,
+                        createdAt: new Date(),
+                        employeeId: "1",
+                        status: "Not seen",
+                    },
+                ],
+            }));
+            socket.emit("staff:message:send", data.channel, value, "1");
             scrollToBottom();
-            socket.emit("staff:message:send", data.channel, value);
         } catch (error) {
             console.error("Error sending message:", error);
         }
+    };
+
+    const viewMessage = async () => {
+        await seenMessage(token, channel);
+        socket.emit("staff:message:read", data.channel);
+        setValue("");
+        scrollToBottom();
     };
 
     if (channel === -1) return "Choose customer to chat";
@@ -345,6 +425,8 @@ const ChatBox = ({
                     id='message'
                     value={value}
                     onChange={(e) => setValue(e.currentTarget.value)}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
                     onKeyDown={async (e) =>
                         e.key === "Enter" ? await send(e) : {}
                     }

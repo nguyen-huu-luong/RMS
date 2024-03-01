@@ -35,29 +35,11 @@ export const sendMessage = async (token: any, requestBody: object) => {
     }
 };
 
-export const viewMessage = async (token: any) => {
-  try {
-      const response = await axios.put(
-          `${process.env.BASE_URL}/channels`,
-          // { channelId }, 
-          {
-              headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-              },
-          }
-      );
-      return response.data;
-  } catch (error) {
-      console.error("Error updating message status:", error);
-      throw error;
-  }
-};
-
 export const seenMessage = async (token: any) => {
     try {
-        const response = await axios.post(
-            `http://localhost:3003/api/channels/seen`,
+        const response = await axios.put(
+            `http://localhost:3003/api/channels`,
+            {},
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

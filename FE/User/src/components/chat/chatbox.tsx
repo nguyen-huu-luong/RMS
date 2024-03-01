@@ -230,6 +230,7 @@ import useSWR from "swr";
 let socket: any;
 const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
     const [socket, setSocket] = useState<any>(null);
+    const [inputFocused, setInputFocused] = useState(false);
     const [data, setData] = useState<any>(null);
     const locale = useLocale();
     const { data: session, status } = useSession();
@@ -252,6 +253,7 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
         const messageBody = document.getElementById("messageBody");
         messageBody?.scrollTo(0, messageBody.scrollHeight);
     };
+    scrollToBottom();
     useEffect(() => {
         if (status === "loading" && params.show) return;
         if (status === "unauthenticated" && params.show) router.push("/signin");
@@ -271,26 +273,40 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
             setSocket(socketClient);
             console.log("Connected to socket server");
         });
-        const handleNewMessage = (channelId: any, message: string) => {
+        const handleNewMessage = (
+            channelId: any,
+            message: string,
+            employeeId: string
+        ) => {
             setData((prevData: any) => ({
                 ...prevData,
                 message: [
                     ...prevData.message,
-                    { content: message, createdAt: new Date(), clientId: null },
+                    {
+                        content: message,
+                        createdAt: new Date(),
+                        clientId: null,
+                        employeeId: employeeId,
+                    },
                 ],
             }));
             scrollToBottom();
         };
 
+        const handleSeenMessage = (channelId: any) => {
+            if (!data || !data.message || data.message.length === 0) {
+                return;
+            }
+            const newData = { ...data };
+            const lastMessage = newData.message[newData.message.length - 1];
+            if (lastMessage.status === "Not seen") {
+                lastMessage.status = "Seen";
+                setData(newData);
+            }
+        };
+
         socketClient.on("message:send:fromStaff", handleNewMessage);
-        // socketClient.on(
-        //     "message:read:fromStaff",
-        //     (channelId: any) => {
-        //         console.log("Staff read your message")
-        //         viewMessage(session?.user.accessToken);
-        //         mutate()
-        //     }
-        // );
+        socketClient.on("message:read:fromStaff", handleSeenMessage);
         socketClient.on("connect_error", (error: any) => {
             console.log(error);
         });
@@ -298,9 +314,21 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
             console.log("Disconnected from socket server");
         });
         return () => {
+            socketClient.off("message:send:fromStaff", handleNewMessage);
+            socketClient.off("message:read:fromStaff", handleSeenMessage);
             socketClient.disconnect();
         };
-    }, [session?.user.accessToken]);
+    }, [session?.user.accessToken, data]);
+
+    const handleFocus = () => {
+        viewMessage();
+        setInputFocused(true);
+    };
+
+    const handleBlur = () => {
+        setInputFocused(false);
+    };
+
     const send = async (e: any) => {
         e.preventDefault();
         await sendMessage(session?.user.accessToken, {
@@ -312,16 +340,25 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
             ...prevData,
             message: [
                 ...prevData.message,
-                { content: value, createdAt: new Date(), clientId: session?.user.id, status: "Not seen" },
+                {
+                    content: value,
+                    createdAt: new Date(),
+                    clientId: session?.user.id,
+                    status: "Not seen",
+                },
             ],
         }));
         scrollToBottom();
-        socket.emit("client:message:send", data.channel, value);
+        socket.emit(
+            "client:message:send",
+            data.channel,
+            value,
+            session?.user.id
+        );
     };
-    const view = async () => {
-        console.log(session?.user.accessToken);
+    const viewMessage = async () => {
         await seenMessage(session?.user.accessToken);
-        socket.emit("client:message:seen", data.channel);
+        socket.emit("client:message:read", data.channel);
         setValue("");
         scrollToBottom();
     };
@@ -388,7 +425,8 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
                             setValue(e.currentTarget.value);
                         }}
                         onKeyDown={(e) => (e.key === "Enter" ? send(e) : {})}
-                        // onFocus={()=>view()}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
                         className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
                         placeholder='Enter text'
                     ></input>

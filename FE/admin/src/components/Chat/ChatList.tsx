@@ -95,7 +95,7 @@ import TimeStamp from "./Timestamp";
 import Message from "./Message";
 import Status from "./Status";
 import { useRouter } from "next-intl/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import moment from "moment";
 import axios from "axios";
 import User from "./User";
@@ -110,46 +110,38 @@ const channelFetcher = async (url: string, token: any) => {
         });
         return response.data;
     } catch (error) {
-        console.log(error);
-        // throw error;
+        throw error;
     }
 };
 
-const aToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJBbHRoZWEzN0B5YWhvby5jb20iLCJyb2xlIjoiZW1wbG95ZWUiLCJpYXQiOjE3MDkwNDI0MzMsImV4cCI6MTcwOTEwMjQzM30.RSQ2BNao_cNi8PQxiEt9uL0Wqdbp2g49pudiYxl3dSI";
-const ChatList = ({ setChannel, socket }: { setChannel: any; socket: any }) => {
+
+
+const ChatList = ({
+    setChannel,
+    socket,
+    token,
+}: {
+    setChannel: any;
+    socket: any;
+    token: any;
+}) => {
     const [channels, setChannels] = useState<any>(null);
-    const fetchChannels = async () => {
+    const fetchChannels = useCallback(async () => {
         try {
             const fetchedData = await channelFetcher(
                 `http://localhost:3003/api/channels/admin`,
-                aToken
+                token
             );
             setChannels(fetchedData);
         } catch (error) {
             console.log(error);
         }
-    };
+    }, [setChannels, token]);
 
     useEffect(() => {
         fetchChannels();
-    }, []);
+    }, [fetchChannels]);
 
-    useEffect(() => {
-        socket.on(
-            "message:send:fromStaff",
-            (channelId: string, message: string) => {
-                fetchChannels();
-            }
-        );
-        socket.on(
-            "message:send:fromClient",
-            (channelId: string, message: string) => {
-                console.log("user:", message);
-                fetchChannels();
-            }
-        );
-    }, [socket]);
     if (!channels) return "Loading...";
     return (
         <>
@@ -175,17 +167,25 @@ const ChatList = ({ setChannel, socket }: { setChannel: any; socket: any }) => {
                 />{" "}
             </div>
             <div className='w-80 h-fit flex flex-col justify-start overflow-y-auto'>
-                {channels.channel.map((item: any, index: any) => {
-                    return (
-                        <User
-                            key={index}
-                            params={item}
-                            setChannel={setChannel}
-                            socket={socket}
-
-                        />
-                    );
-                })}
+                {channels.channel
+                    .sort((a: any, b: any) => {
+                        return (
+                            new Date(b.updateTime).getTime() -
+                            new Date(a.updateTime).getTime()
+                        );
+                    })
+                    .map((item: any, index: any) => {
+                        return (
+                            <User
+                                key={index}
+                                params={item}
+                                setChannel={setChannel}
+                                socket={socket}
+                                setChannels={setChannels}
+                                token={token}
+                            />
+                        );
+                    })}
             </div>
         </>
     );

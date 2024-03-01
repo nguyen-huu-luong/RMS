@@ -347,7 +347,6 @@ export class ChannelService {
         try {
             const status: number = HttpStatusCode.Success;
             let messagesToUpdate;
-
             if (req.role === "user") {
                 const client = await this.clientRepository.findById(req.userId);
                 const channel = await client.getChannel();
@@ -359,7 +358,7 @@ export class ChannelService {
                         },
                     },
                 });
-            } else if (req.role === "employee") {
+            } else if (req.role === "employee" || req.role == "manager") {
                 const employee = await this.employeeRepository.findById(
                     req.userId
                 );

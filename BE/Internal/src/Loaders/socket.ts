@@ -20,6 +20,7 @@ class SocketConnection {
                     channels.forEach((channel: any) => {
                         socket.join("Channel_" + channel.dataValues.id);
                     });
+                    console.log(socket.rooms)
                 }
                 next();
             } catch (error) {
@@ -30,26 +31,27 @@ class SocketConnection {
         io.on("connection", (socket: any) => {
             socket.on(
                 "client:message:send",
-                (channelId: string, message: string) => {
-                    socket
+                (channelId: string, message: string, clientId: string) => {
+                    io
                         .to("Channel_" + channelId)
-                        .emit("message:send:fromClient", channelId, message);
+                        .emit("message:send:fromClient", channelId, message, clientId);
                 }
             );
             socket.on(
                 "staff:message:send",
-                (channelId: string, message: string) => {
-                    socket
+                (channelId: string, message: string, employeeId: string) => {
+                    io
                         .to("Channel_" + channelId)
-                        .emit("message:send:fromStaff", channelId, message);
+                        .emit("message:send:fromStaff", channelId, message, employeeId);
                 }
             );
             socket.on("client:message:read", (channelId: string) => {
-                console.log("Channel id" + channelId);
+                io
+                    .to("Channel_" + channelId)
+                    .emit("message:read:fromClient", channelId);
             });
             socket.on("staff:message:read", (channelId: string) => {
-                console.log("Staff read from channel ", channelId);
-                socket
+                io
                     .to("Channel_" + channelId)
                     .emit("message:read:fromStaff", channelId);
             });

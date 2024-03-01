@@ -3,13 +3,16 @@ import ChatList from "@/components/Chat/ChatList";
 import ChatBox from "@/components/Chat/ChatRoom";
 import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
+
+const aToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiWmVsbWFfUG93bG93c2tpMzhAaG90bWFpbC5jb20iLCJyb2xlIjoibWFuYWdlciIsImlhdCI6MTcwOTE5OTAzNSwiZXhwIjoxNzA5MjU5MDM1fQ.AcUhaqj-lVe8fhhcRzm1i3IMOn8132bTmHED0GYokyE';
+
 function Chat() {
     const [channel, setChannel] = useState(-1);
     const [socket, setSocket] = useState<any>(null);
     useEffect(() => {
         const socketClient = io("http://localhost:3003", {
             auth: {
-                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJBbHRoZWEzN0B5YWhvby5jb20iLCJyb2xlIjoiZW1wbG95ZWUiLCJpYXQiOjE3MDkwNDI0MzMsImV4cCI6MTcwOTEwMjQzM30.RSQ2BNao_cNi8PQxiEt9uL0Wqdbp2g49pudiYxl3dSI",
+                token: aToken,
             },
         });
         socketClient.on("connect", () => {
@@ -34,6 +37,7 @@ function Chat() {
                         <ChatList
                             socket={socket}
                             setChannel={setChannel}
+                            token={aToken}
                         ></ChatList>
                     </div>
                     <div className='basis-3/4 bg-white rounded-2xl'>
@@ -42,9 +46,10 @@ function Chat() {
                                 socket={socket}
                                 channel={channel}
                                 setChannel={setChannel}
+                                token={aToken}
                             />
                         ) : (
-                            ""
+                        ""
                         )}
                     </div>
                 </div>
