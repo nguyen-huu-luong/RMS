@@ -45,9 +45,7 @@ export default function Page({ params }: { params: { id: string } }) {
             title: "Price",
             dataIndex: "price",
             key: "price",
-            render: (record: any) => (
-                <span>{moneyFormatter(record)}</span>
-            ),
+            render: (record: any) => <span>{moneyFormatter(record)}</span>,
         },
         {
             title: "Amount",
@@ -90,7 +88,9 @@ export default function Page({ params }: { params: { id: string } }) {
                 </Descriptions>
                 <Descriptions title='Detail'>
                     <Descriptions.Item label='Shipping Address'>
-                        {order.order.shippingAddress?order.order.shippingAddress:"Take away"}
+                        {order.order.shippingAddress
+                            ? order.order.shippingAddress
+                            : "Take away"}
                     </Descriptions.Item>
                     <Descriptions.Item label='Payment Method'>
                         {order.order.paymentMethod}

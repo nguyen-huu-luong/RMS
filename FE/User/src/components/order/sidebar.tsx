@@ -13,27 +13,29 @@ const SideBar = ({
     currentCart,
     setAmount,
     setVoucherId,
+    fee
 }: {
     onPayOrder: () => void;
     currentCart: any;
     setAmount: any;
     setVoucherId: any;
+    fee: any;
 }) => {
     const locale = useLocale();
     const { data: session, status } = useSession();
-    const {
-        data: vouchers,
-        error: vouchersError,
-        isLoading: vouchersLoading,
-    } = useSWR(
-        session
-            ? [
-                  `http://localhost:3003/api/vouchers/all`,
-                  session.user.accessToken,
-              ]
-            : null,
-        ([url, token]) => voucherFetcher(url, token)
-    );
+    // const {
+    //     data: vouchers,
+    //     error: vouchersError,
+    //     isLoading: vouchersLoading,
+    // } = useSWR(
+    //     session
+    //         ? [
+    //               `http://localhost:3003/api/vouchers/all`,
+    //               session.user.accessToken,
+    //           ]
+    //         : null,
+    //     ([url, token]) => voucherFetcher(url, token)
+    // );
     if (status === "loading") return <>Loading.....</>;
     if (status === "unauthenticated") return <>Unauthenticated.....</>;
     const [modal, setModal] = useState<boolean>(false);
@@ -45,8 +47,8 @@ const SideBar = ({
     };
     const [voucher, setVoucher] = useState<any>(null);
 
-    if (vouchersError) return <div>Failed to load</div>;
-    if (vouchersLoading) return <Loading />;
+    // if (vouchersError) return <div>Failed to load</div>;
+    // if (vouchersLoading) return <Loading />;
     return (
         <div className='w-auto h-auto p-10 rounded-3xl bg-primary-white flex flex-col gap-5 justify-start items-center font-extrabold'>
             <div className='w-full flex flex-row justify-between gap-10'>
@@ -58,7 +60,7 @@ const SideBar = ({
                     >
                         Choose Code
                     </span>
-                    {modal && (
+                    {/* {modal && (
                         <VoucherPicker
                             params={{
                                 vouchers: vouchers,
@@ -67,7 +69,7 @@ const SideBar = ({
                                 setVoucher: setVoucher,
                             }}
                         />
-                    )}
+                    )} */}
                 </span>
             </div>
             {!voucher && (
@@ -114,7 +116,7 @@ const SideBar = ({
                         Shipping cost
                     </span>
                     <span className='relative w-auto whitespace-nowrap '>
-                        <span className='w-full cursor-pointer'>0</span>
+                        <span className='w-full cursor-pointer'>{fee}</span>
                     </span>
                 </div>
             </div>
@@ -136,11 +138,10 @@ const SideBar = ({
                                     : (voucher.amount *
                                           currentCart.cart.amount) /
                                       100
-                                : 0)}
+                                : 0) + fee}
                     </span>
                 </span>
             </div>
-            {/* <button onClick={onPayOrder}>TEST</button> */}
             <button
                 onClick={() => {
                     setAmount(
@@ -158,7 +159,7 @@ const SideBar = ({
                                     : (voucher.amount *
                                           currentCart.cart.amount) /
                                       100
-                                : 0)
+                                : 0) + fee
                     );
                     setVoucherId(voucher ? voucher.id : null);
                     onPayOrder();

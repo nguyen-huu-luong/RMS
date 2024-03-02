@@ -105,7 +105,7 @@ export class OrderService {
                 const cart = await this.cartRepository.getCart(req.userId);
                 await this.orderRepository.update(order.getDataValue("id"), {
                     num_items: cart?.getDataValue("total"),
-                    amount: cart?.getDataValue("amount"),
+                    amount: parseInt(cart?.getDataValue("amount")) + parseInt(order.getDataValue("shippingCost")),
                 });
                 const cartItems = await cart.getProducts();
                 await Promise.all(
