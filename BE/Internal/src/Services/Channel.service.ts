@@ -198,21 +198,24 @@ export class ChannelService {
             let message: any;
             const client = await this.clientRepository.findById(req.userId);
             const channel = await client.getChannel();
-            message = await channel.getMessages();
-            const size = req.query.size
-                ? parseInt(req.query.size as string, 10)
-                : 10;
-            const page = req.query.page
-                ? parseInt(req.query.page as string, 10)
+            message = await channel.getMessages({
+                order: [
+                    ['createdAt', 'DESC'],
+                ],
+            });
+            const size = 10;
+            const index = req.query.index
+                ? parseInt(req.query.index as string, 10)
                 : 1;
+            const startIndex = (index - 1) * size;
+            const endIndex = startIndex + size;
             response = {
                 channel: channel.getDataValue("id"),
-                message: message.slice(-(size * page)),
+                message: message.slice(startIndex, endIndex).reverse(),
             };
             Message.logMessage(req, status);
             if (res.headersSent) return;
-            res.status(status).send(response);
-            return;
+            return res.status(status).send(response);
         } catch (err) {
             console.log(err);
             next(err);
@@ -302,17 +305,20 @@ export class ChannelService {
                 ? parseInt(req.query.channelId as string, 10)
                 : 0;
             const channel = await this.channelRepository.findById(channelId);
-            message = await channel.getMessages();
-            // const size = req.query.size
-            //     ? parseInt(req.query.size as string, 10)
-            //     : 10;
-            // const page = req.query.page
-            //     ? parseInt(req.query.page as string, 10)
-            //     : 1;
+            message = await channel.getMessages({
+                order: [
+                    ['createdAt', 'DESC'],
+                ],
+            });
+            const size = 15;
+            const index = req.query.index
+                ? parseInt(req.query.index as string, 10)
+                : 1;
+            const startIndex = (index - 1) * size;
+            const endIndex = startIndex + size;
             response = {
                 channel: channel.getDataValue("id"),
-                // message: message.slice(-(size * page)),
-                message: message,
+                message: message.slice(startIndex, endIndex).reverse(),
             };
             Message.logMessage(req, status);
             if (res.headersSent) return;

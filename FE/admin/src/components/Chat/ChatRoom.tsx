@@ -198,12 +198,15 @@ import moment from "moment";
 import axios from "axios";
 import { mutate } from "swr";
 
-const messageFetcher = async (url: string, token: any) => {
+const messageFetcher = async (url: string, token: any, index: any) => {
     try {
         const response = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
+            },
+            params: {
+                index: !index ? 1 : index,
             },
         });
         return response.data;
@@ -217,7 +220,7 @@ export const seenMessage = async (token: any, id: string) => {
     try {
         const response = await axios.put(
             `http://localhost:3003/api/channels`,
-            {id: id},
+            { id: id },
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -255,11 +258,15 @@ const ChatBox = ({
     setChannel,
     socket,
     token,
+    setIndex,
+    index,
 }: {
     channel: any;
     setChannel: any;
     socket: any;
     token: any;
+    setIndex: any;
+    index: any;
 }) => {
     const [value, setValue] = useState("");
     const [data, setData] = useState<any>(null);
@@ -268,13 +275,23 @@ const ChatBox = ({
         try {
             const fetchedData = await messageFetcher(
                 `http://localhost:3003/api/channels/messages/admin?channelId=${channel}`,
-                token
+                token,
+                !index ? 1 : index
             );
-            setData(fetchedData);
+            if (index == 1) {
+                setData(fetchedData);
+            } else {
+                setData((prevData: any) => ({
+                    ...prevData,
+                    message: [...fetchedData.message, ...prevData.message],
+                }));
+                scrollToTop();
+            }
+            scrollToTop();
         } catch (error) {
             console.error("Error fetching messages:", error);
         }
-    }, [channel, token]);
+    }, [channel, token, index]);
 
     useEffect(() => {
         fetchData();
@@ -286,7 +303,6 @@ const ChatBox = ({
             message: string,
             clientId: string
         ) => {
-            console.log("SEEN nè")
             if (channelId == channel) {
                 setData((prevData: any) => ({
                     ...prevData,
@@ -326,7 +342,7 @@ const ChatBox = ({
     }, [socket, channel, data]);
 
     const handleFocus = () => {
-        viewMessage()
+        viewMessage();
         setInputFocused(true);
     };
 
@@ -337,6 +353,11 @@ const ChatBox = ({
     const scrollToBottom = () => {
         const messageBody = document.getElementById("messageBody");
         messageBody?.scrollTo(0, messageBody.scrollHeight);
+    };
+
+    const scrollToTop = () => {
+        const messageBody = document.getElementById("messageBody");
+        messageBody?.scrollTo({ top: 20, behavior: "smooth" });
     };
 
     const send = async (e: any) => {
@@ -373,6 +394,7 @@ const ChatBox = ({
         setValue("");
         scrollToBottom();
     };
+    scrollToBottom();
 
     if (channel === -1) return "Choose customer to chat";
     if (!data) return "loading";
@@ -388,6 +410,9 @@ const ChatBox = ({
                 id='messageBody'
                 className='body w-full grow font-normal text-sm overflow-auto max-h-full flex flex-col justify-start gap-2 px-2 py-2'
             >
+                <button
+                    onClick={() => setIndex((index: any) => index + 1)}
+                > Load more </button>
                 {data.message.map((item: any, index: number) => {
                     const hasPreviousMessage = index > 0;
                     const currentTime = moment(item.createdAt);

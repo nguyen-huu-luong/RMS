@@ -1,12 +1,15 @@
 "use client";
 import axios from "axios";
 import { mutate } from "swr";
-export const messageFetcher = async (url: string, token: any) => {
+export const messageFetcher = async (url: string, token: any, index: any) => {
     try {
         const response = await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
+            },
+            params: {
+                index: !index ? 1 : index,
             },
         });
         return response.data;

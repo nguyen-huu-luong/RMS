@@ -115,15 +115,17 @@ const channelFetcher = async (url: string, token: any) => {
 };
 
 
-
+ 
 const ChatList = ({
     setChannel,
     socket,
     token,
+    setIndex
 }: {
     setChannel: any;
     socket: any;
     token: any;
+    setIndex: any;
 }) => {
     const [channels, setChannels] = useState<any>(null);
     const fetchChannels = useCallback(async () => {
@@ -183,6 +185,7 @@ const ChatList = ({
                                 socket={socket}
                                 setChannels={setChannels}
                                 token={token}
+                                setIndex={setIndex}
                             />
                         );
                     })}

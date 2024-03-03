@@ -38,6 +38,7 @@ function User({
     socket,
     setChannels,
     token,
+    setIndex
 }: {
     params: {
         channel: any;
@@ -50,6 +51,7 @@ function User({
     socket: any;
     setChannels: any;
     token: any;
+    setIndex: any;
 }) {
     useEffect(() => {
         const handleClientMessage = (
@@ -170,6 +172,7 @@ function User({
             onClick={() => {
                 setChannel(params.channel.id);
                 viewMessage();
+                setIndex(1);
             }}
             className={`px-2 w-full ${
                 params.latestMessage.status == "Not seen" &&

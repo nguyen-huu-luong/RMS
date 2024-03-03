@@ -232,6 +232,7 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
     const [socket, setSocket] = useState<any>(null);
     const [inputFocused, setInputFocused] = useState(false);
     const [data, setData] = useState<any>(null);
+    const [index, setIndex] = useState<number>(1);
     const locale = useLocale();
     const { data: session, status } = useSession();
     const [value, setValue] = useState("");
@@ -241,9 +242,19 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
             if (session?.user.accessToken) {
                 const fetchedData = await messageFetcher(
                     `http://localhost:3003/api/channels/messages`,
-                    session?.user.accessToken
+                    session?.user.accessToken,
+                    !index ? 1 : index
                 );
-                setData(fetchedData);
+                // setIsLoading(false);
+                if (index == 1) {
+                    setData(fetchedData);
+                } else {
+                    setData((prevData: any) => ({
+                        ...prevData,
+                        message: [...fetchedData.message, ...prevData.message],
+                    }));
+                    scrollToTop();
+                }
             }
         } catch (error) {
             console.error("Failed to fetch data:", error);
@@ -251,14 +262,59 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
     };
     const scrollToBottom = () => {
         const messageBody = document.getElementById("messageBody");
-        messageBody?.scrollTo(0, messageBody.scrollHeight);
+        messageBody?.scrollTo({
+            top: messageBody.scrollHeight + 10,
+            behavior: "smooth",
+        });
     };
-    scrollToBottom();
+    const [isLoading, setIsLoading] = useState(false);
+
+    // const handleScroll = () => {
+    //     const messageBody = document.getElementById("messageBody");
+    //     if (!messageBody) return;
+    //     const { scrollTop } = messageBody;
+    //     if (scrollTop < 5) {
+    //         setIsLoading(true);
+    //         setIndex((index) => index + 1);
+    //     } else return;
+    // };
+
+    // const debounce = (func: Function, delay: number) => {
+    //     let timeout: NodeJS.Timeout;
+    //     return function (this: any, ...args: any[]) {
+    //         const context = this;
+    //         clearTimeout(timeout);
+    //         timeout = setTimeout(() => func.apply(context, args), delay);
+    //     };
+    // };
+
+    // useEffect(() => {
+    //     const messageBody = document.getElementById("messageBody");
+    //     if (!messageBody) return;
+    //     const debounceScroll = debounce(handleScroll, 10000);
+    //     messageBody.addEventListener("scroll", handleScroll);
+    //     return () => messageBody.removeEventListener("scroll", handleScroll);
+    // }, [isLoading, params.show]);
+
+    // useEffect(() => {
+    //     if (isLoading) {
+    //         fetchData();
+    //     }
+    // }, [isLoading]);
+
+    const scrollToTop = () => {
+        const messageBody = document.getElementById("messageBody");
+        messageBody?.scrollTo({ top: 20, behavior: "smooth" });
+    };
+    useEffect(() => {
+        scrollToBottom();
+    }, [params.show]);
+    useEffect(() => {}, []);
     useEffect(() => {
         if (status === "loading" && params.show) return;
         if (status === "unauthenticated" && params.show) router.push("/signin");
         fetchData();
-    }, [status, params.show]);
+    }, [status, params.show, index]);
 
     useEffect(() => {
         if (!session?.user.accessToken) {
@@ -348,13 +404,13 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
                 },
             ],
         }));
-        scrollToBottom();
         socket.emit(
             "client:message:send",
             data.channel,
             value,
             session?.user.id
         );
+        scrollToBottom();
     };
     const viewMessage = async () => {
         await seenMessage(session?.user.accessToken);
@@ -383,6 +439,9 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
                     id='messageBody'
                     className='body w-full grow font-normal text-sm overflow-auto max-h-full flex flex-col justify-start gap-2 px-2 py-2'
                 >
+                    <button
+                        onClick={() => setIndex((index) => index + 1)}
+                    > Load more </button>
                     {data.message.map((item: any, index: number) => {
                         const hasPreviousMessage = index > 0;
                         const currentTime = moment(item.createdAt);
