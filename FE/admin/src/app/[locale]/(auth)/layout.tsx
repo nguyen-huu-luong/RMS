@@ -50,7 +50,7 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
                             }}
                         >
                             <div
-                                className='min-h-screen  ps-sidebar mx-4 flex flex-col items-center w-full space-y-2'
+                                className='min-h-screen mx-4 flex flex-col items-center w-full space-y-2'
                                 style={{
                                     paddingTop: `calc(${variables.headerHeight} + 8px)`,
                                 }}

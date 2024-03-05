@@ -418,6 +418,7 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
         setValue("");
         scrollToBottom();
     };
+    if (!data) return <div>Loading...</div>
     return (
         params.show && (
             <div

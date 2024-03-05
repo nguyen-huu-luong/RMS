@@ -8,6 +8,7 @@ import { useRouter } from "next-intl/client";
 import { useState } from "react";
 import { useLocale } from "next-intl";
 import { signOut } from "next-auth/react";
+import variables from "@/app/variables.module.scss";
 
 export const LoginForm: React.FC = () => {
     const [messageApi, contextHolder] = message.useMessage();
@@ -49,9 +50,9 @@ export const LoginForm: React.FC = () => {
             <ConfigProvider
                 theme={{
                     token: {
-                        colorPrimary: "#EA6A12",
+                        colorPrimary: `${variables.primaryColor}`,
                         colorTextSecondary: "rgb(255, 247, 237)",
-                        colorLinkHover: "#EA6A12",
+                        colorLinkHover: `${variables.primaryColor}`,
                     },
                     components: {
                         Input: {
@@ -170,7 +171,6 @@ export const LoginForm: React.FC = () => {
                     </div> */}
                 </Form>
             </ConfigProvider>
-            <button onClick={()=>signOut()}>signout</button>
         </>
     );
 };

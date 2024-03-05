@@ -13,7 +13,7 @@ const SignIn: React.FC = async () => {
     }
 
     return (
-        <main className="flex items-center justify-center w-full space-x-6">
+        <main className="flex items-center justify-center w-full">
             <div className="h-[600px] rounded-lg w-full md:w-2/5 flex items-center justify-center">
               <LoginForm />
             </div>
