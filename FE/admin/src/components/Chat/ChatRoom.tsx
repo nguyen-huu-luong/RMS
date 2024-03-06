@@ -360,7 +360,7 @@ const ChatBox = ({
         messageBody?.scrollTo({ top: 20, behavior: "smooth" });
     };
 
-    const send = async (e: any) => {
+    const send = async (e: any) => { 
         e.preventDefault();
         try {
             await sendMessage(token, {
@@ -394,17 +394,15 @@ const ChatBox = ({
         setValue("");
         scrollToBottom();
     };
-    scrollToBottom();
-
     if (channel === -1) return "Choose customer to chat";
     if (!data) return "loading";
-
+    scrollToBottom();
     return (
         <div
             className={` bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full bottom-5 right-5 z-50`}
         >
             <div className='header h-10 w-full text-white bg-primary items-center flex flex-row justify-between p-2 font-bold border-b-white border-b-2'>
-                <span>Live chat</span>
+                <span>Chat</span>
             </div>
             <div
                 id='messageBody'

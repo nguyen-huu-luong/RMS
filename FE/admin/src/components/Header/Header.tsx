@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import {
 	BellOutlined,
@@ -12,6 +13,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { LocaleSwitcher } from "../LocaleSwitcher/";
 import variables from "@/app/variables.module.scss";
+import { signOut } from "next-auth/react";
 
 export default function Header() {
 	const t = useTranslations("Header");
@@ -31,6 +33,9 @@ export default function Header() {
 			key: "2",
 			icon: <LogoutOutlined />,
 			danger: true,
+			onClick: () => {
+				signOut();
+			},
 		},
 	];
 

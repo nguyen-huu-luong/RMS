@@ -54,14 +54,15 @@ export const authOptions: AuthOptions = {
                     return p;
                 }
             }, {});
-            if (token && session.user) session.user.role = token.role;
+
             return { ...session, user: sanitizedToken };
         },
         async jwt({ token, user }) {
-            // if (typeof user !== "undefined") {
-            //   return user as unknown as JWT;
-            // }
-            if (user) token.role = user.role;
+            if (typeof user !== "undefined") {
+                // user has just signed in so the user object is populated
+                return user as unknown as JWT;
+            }
+
             return token;
         },
     },

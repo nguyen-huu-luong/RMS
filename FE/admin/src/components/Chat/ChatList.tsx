@@ -120,14 +120,17 @@ const ChatList = ({
     setChannel,
     socket,
     token,
-    setIndex
+    setIndex,
+    staffId
 }: {
     setChannel: any;
     socket: any;
     token: any;
     setIndex: any;
+    staffId: any;
 }) => {
     const [channels, setChannels] = useState<any>(null);
+    const [channelStatus, setChannelStatus] = useState<any>({});
     const fetchChannels = useCallback(async () => {
         try {
             const fetchedData = await channelFetcher(
@@ -143,7 +146,15 @@ const ChatList = ({
     useEffect(() => {
         fetchChannels();
     }, [fetchChannels]);
-
+    useEffect(() => {
+        socket.on("initial:channels", (initialChannels: any) => {
+            setChannelStatus(initialChannels);
+        });
+        socket.on("channel:status:update", (updatedChannels: any) => {
+            setChannelStatus(updatedChannels);
+            console.log(updatedChannels)
+        });
+    }, [socket]);
     if (!channels) return "Loading...";
     return (
         <>
@@ -166,7 +177,7 @@ const ChatList = ({
                                         focus:cursor-text focus:border-primary outline-none focus:pr-2
                                         transition-all duration-500 transform w-full
                                         '
-                />{" "}
+                />{" "} 
             </div>
             <div className='w-80 h-fit flex flex-col justify-start overflow-y-auto'>
                 {channels.channel
@@ -186,6 +197,8 @@ const ChatList = ({
                                 setChannels={setChannels}
                                 token={token}
                                 setIndex={setIndex}
+                                staffId={staffId}
+                                channelStatus={channelStatus}
                             />
                         );
                     })}

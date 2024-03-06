@@ -4,7 +4,8 @@ import moment from "moment";
 import Image from "next/image";
 import { useEffect, useCallback } from "react";
 import axios from "axios";
-
+import { message } from "antd";
+import { Tag } from "antd";
 export const seenMessage = async (token: any, id: string) => {
     try {
         const response = await axios.put(
@@ -38,7 +39,9 @@ function User({
     socket,
     setChannels,
     token,
-    setIndex
+    setIndex,
+    staffId,
+    channelStatus,
 }: {
     params: {
         channel: any;
@@ -52,6 +55,8 @@ function User({
     setChannels: any;
     token: any;
     setIndex: any;
+    staffId: any;
+    channelStatus: any;
 }) {
     useEffect(() => {
         const handleClientMessage = (
@@ -167,12 +172,32 @@ function User({
             return { ...prevChannels, channel: updatedChannels };
         });
     };
-    return (
-        <div
-            onClick={() => {
+
+    const handleJoinRoom = async () => {
+        try {
+            const response = await socket
+                .timeout(5000)
+                .emitWithAck("staff:channel:join", params.channel.id, staffId);
+            if (response.status == "0") {
+                message.warning(
+                    `There is other staff in ${params.userName}'s channel!`
+                );
+            } else {
                 setChannel(params.channel.id);
                 viewMessage();
                 setIndex(1);
+                message.success(
+                    `Join ${params.userName}'s channel successfully!`
+                );
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+    return (
+        <div
+            onClick={() => {
+                handleJoinRoom();
             }}
             className={`px-2 w-full ${
                 params.latestMessage.status == "Not seen" &&
@@ -208,9 +233,13 @@ function User({
                 </div>
                 <div> </div>
             </div>
-            <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'>
-                {TimeDisplay(params.latestMessage.createdAt)}
-            </div>
+            {params.channel.id in channelStatus ? (
+                <Tag color="#87d068">Active</Tag>
+            ) : (
+                <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'>
+                    {TimeDisplay(params.latestMessage.createdAt)}
+                </div>
+            )}
         </div>
     );
 }
