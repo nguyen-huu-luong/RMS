@@ -39,7 +39,7 @@ export default function Order() {
             const formValues = form.getFieldsValue();
             const payMethod = formValues.paymentMethod;
             const dataBody = {
-                status: "New order",
+                status: "Pending",
                 descriptions: formValues.orderNotes
                     ? formValues.orderNotes
                     : "",

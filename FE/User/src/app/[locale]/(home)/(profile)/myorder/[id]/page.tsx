@@ -29,6 +29,7 @@ export default function Page({ params }: { params: { id: string } }) {
             : null,
         ([url, token]) => orderFetcher(url, token)
     );
+    console.log(session?.user);
     const columns = [
         {
             title: "Name",
@@ -77,6 +78,9 @@ export default function Page({ params }: { params: { id: string } }) {
                     <Descriptions.Item label='Status'>
                         {order.order.status}
                     </Descriptions.Item>
+                    <Descriptions.Item label='Shipping cost'>
+                        {order.order.shippingCost}
+                    </Descriptions.Item>
                     <Descriptions.Item label='Amount'>
                         {order.order.amount}
                     </Descriptions.Item>
@@ -96,10 +100,10 @@ export default function Page({ params }: { params: { id: string } }) {
                         {order.order.paymentMethod}
                     </Descriptions.Item>
                     <Descriptions.Item label='Receiver'>
-                        {order.order.status}
+                        {session?.user.firstname + " " + session?.user.lastname}
                     </Descriptions.Item>
                     <Descriptions.Item label='Phone Number'>
-                        {order.order.amount}
+                        {session?.user.phone}
                     </Descriptions.Item>
                     <Descriptions.Item label='Note'>
                         {order.order.descriptions}

@@ -12,6 +12,7 @@ import { Space, Table, DatePicker } from "antd";
 import moment, { Moment } from "moment";
 import { FileSearchOutlined, CloseSquareOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
+import { cancelOrder } from "@/app/api/product/order";
 const { RangePicker } = DatePicker;
 
 export default function MyOrder() {
@@ -23,6 +24,7 @@ export default function MyOrder() {
     };
     const { data: session, status } = useSession();
     const router = useRouter();
+
     const columns = [
         {
             title: "Id",
@@ -53,11 +55,11 @@ export default function MyOrder() {
                         />
                     </Link>
                     {record.status == "Pending" ? (
-                        <a>
+                        <div className="cursor-pointer" onClick={() => handleDeleteOrder(record)}>
                             <CloseSquareOutlined
                                 style={{ fontSize: "24px", color: "#08c" }}
                             />
-                        </a>
+                        </div>
                     ) : (
                         ""
                     )}
@@ -75,6 +77,9 @@ export default function MyOrder() {
             : null,
         ([url, token]) => ordersFetcher(url, token)
     );
+    const handleDeleteOrder = (record: any) => {
+        cancelOrder(session?.user.accessToken, {orderId: record.id, status: "Cancel"})
+    }
     useEffect(() => {
         if (!orders) return;
         setFilteredOrders(orders);
@@ -82,11 +87,9 @@ export default function MyOrder() {
         console.log(dateRange);
         const filteredOrders = orders.filter((order: any) => {
             const orderDate = moment(order.createdAt);
-
-            console.log(moment(dateRange[1]._d));
             return orderDate.isBetween(
-                dateRange[0],
-                dateRange[1],
+                moment(dateRange[0].$d).toDate(),
+                moment(dateRange[1].$d).toDate(),
                 "days",
                 "[]"
             );

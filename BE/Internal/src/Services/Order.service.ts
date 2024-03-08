@@ -10,7 +10,7 @@ import {
     IVoucherRepository,
 } from "../Repositories";
 import { TYPES } from "../Repositories/type";
-import { RecordNotFoundError } from "../Errors";
+import { RecordNotFoundError, UnauthorizedError } from "../Errors";
 export class OrderService {
     constructor(
         private orderRepository = container.get<IOrderRepository>(
@@ -196,7 +196,11 @@ export class OrderService {
         try {
             const status: number = HttpStatusCode.Success;
             const data: any = req.body;
-            await this.orderRepository.updateStatus(data);
+            if (req.action === "update:own") {
+                await this.orderRepository.updateStatus(data);
+            } else if (req.action === "update:any"){
+                await this.orderRepository.updateStatus(data);
+            } else throw UnauthorizedError
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         } catch (err) {
