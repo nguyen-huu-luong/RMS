@@ -43,7 +43,7 @@ function Chat() {
     return (
         <>
             {socket != null ? (
-                <div className='flex flex-row w-full p-5 gap-5 h-[300px]'>
+                <div className='flex flex-row w-full p-5 gap-5 h-[350px]'>
                     <div className='basis-1/4 w-full h-full bg-white rounded-2xl flex flex-col justify-start gap-1'>
                         <ChatList
                             socket={socket}

@@ -165,7 +165,7 @@ const ChatList = ({
                 <p>All customers</p>
             </div>
             <div
-                className='search h-14 items-center align-middle w-full text-base font-medium flex flex-row 
+                className='z-0 search h-14 items-center align-middle w-full text-base font-medium flex flex-row 
             justify-center p-4'
             >
                 <input
@@ -175,7 +175,7 @@ const ChatList = ({
                     className='rounded-full border-gray-100 font-normal
                                         border-2 text-placeholder pl-2 p-1 focus:bg-primary-white
                                         focus:cursor-text focus:border-primary outline-none focus:pr-2
-                                        transition-all duration-500 transform w-full
+                                        transition-all duration-500 transform w-full z-0
                                         '
                 />{" "} 
             </div>

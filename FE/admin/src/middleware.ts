@@ -20,7 +20,7 @@ import { withAuth } from "next-auth/middleware";
 import createIntlMiddleware from "next-intl/middleware";
 import { locales } from "./config";
 import { NextResponse, NextRequest } from "next/server";
-const publicPages = ["/", "/signin"];
+const publicPages = ["/signin"];
 
 function protectCustomersRoute(req: any) {
     if (
