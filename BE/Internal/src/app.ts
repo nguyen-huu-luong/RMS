@@ -8,47 +8,48 @@ import cors from "cors";
 import http from "http";
 import Loader from "./Loaders";
 import Tables from "./Models";
-
+import { Server as SocketIOServer, Socket } from "socket.io";
 import router from "./Routers";
 import { ErrorHandler } from "./Middlewares";
 import bodyParser from "body-parser";
+import SocketConnection from "./Loaders/socket";
 
 dotenv.config();
 declare global {
-	namespace Express {
-		interface Request {
-			userId: number;
-			token: string;
-			role: string;
-			action: string;
-		}
-	}
+    namespace Express {
+        interface Request {
+            userId: number;
+            token: string;
+            role: string;
+            action: string;
+        }
+    }
 }
 class Server {
-	protected app: Application;
-	protected server: any;
+    protected app: Application;
+    protected server: any;
 
-	public constructor() {
-		this.app = express();
-	}
+    public constructor() {
+        this.app = express();
+    }
 
-	public initial() {
-		this.app.use(express.json());
+    public initial() {
+        this.app.use(express.json());
 		this.app.use(express.urlencoded({ extended: true }));
-		this.app.use(
-			cors({
-				origin: "*",
-				credentials: true,
-			})
-		);
-		this.app.use(cookieParser());
+        this.app.use(
+            cors({
+                origin: "*",
+                credentials: true,
+            })
+        );
+        this.app.use(cookieParser());
 
-		// router to api documentation
-		this.app.use(
-			"/api-docs",
-			swaggerUI.serve,
-			swaggerUI.setup(swaggerDocument)
-		);
+        // router to api documentation
+        this.app.use(
+            "/api-docs",
+            swaggerUI.serve,
+            swaggerUI.setup(swaggerDocument)
+        );
 
 		// this.app.use("", (req, res) => res.sendFile("index.html", {root: __dirname}))
 		// set app router
@@ -62,31 +63,44 @@ class Server {
 		this.server = new http.Server(this.app);
 	}
 
-	public getApp() {
-		return this.app;
-	}
+    public getApp() {
+        return this.app;
+    }
 
-	public start() {
-		this.server.listen(process.env.PORT || 3003, () => {
-			console.log("Server is listening on port", process.env.PORT);
-		});
-	}
+    public getServer() {
+        return this.server;
+    }
+
+    public start() {
+        this.server.listen(process.env.PORT || 3003, () => {
+            console.log("Server is listening on port", process.env.PORT);
+        });
+    }
 }
 
 (async () => {
-	try {
-		const server: Server = new Server();
-		const loader: Loader = new Loader();
-		const tables: Tables = new Tables();
+    try {
+        const server: Server = new Server();
+        const loader: Loader = new Loader();
+        const tables: Tables = new Tables();
+        const socket: SocketConnection = new SocketConnection();
 
-		await loader.load();
-		
-		await tables.createTables();
-		
-		server.initial();
-		server.start();
-	} catch (err) {
-		console.log("Connect to server failed!");
-		console.log(`Error: ${err}`);
-	}
+        await server.initial();
+        await loader.load();
+        await tables.createTables();
+
+        const io: SocketIOServer = new SocketIOServer(server.getServer(), {
+            cors: {
+                origin: "*",
+                credentials: true,
+                methods: ["GET", "POST"],
+            },
+        });
+        await socket.init(io);
+        server.start();
+
+    } catch (err) {
+        console.log("Connect to server failed!");
+        console.log(`Error: ${err}`);
+    }
 })();

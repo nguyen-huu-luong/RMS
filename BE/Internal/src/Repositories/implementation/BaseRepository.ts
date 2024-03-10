@@ -17,7 +17,6 @@ export abstract class BaseRepository<M extends Model> implements IBaseRepository
     }
 
 	public async all(options?: QueryOptions): Promise<any> {
-
 		if (options) {
 			const page = options.paginate?.page || 1
 			const limit = options.paginate?.pageSize || this.DEFAULT_PAGE_SIZE
@@ -44,8 +43,12 @@ export abstract class BaseRepository<M extends Model> implements IBaseRepository
 				sortedBy: options.sort?.by || "id"
 			}
 		}
-		else 
-			return this._model.findAll({ attributes: this.attributes })
+		else {
+			if (this.attributes[0] === "*") {
+				return this._model.findAll()
+			} 
+			return this._model.findAll({attributes: this.attributes})
+		}
 	}
 
 	public async findById(id: number, attributes?: string[]): Promise<M> {

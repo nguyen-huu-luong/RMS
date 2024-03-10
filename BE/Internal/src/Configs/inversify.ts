@@ -12,7 +12,9 @@ import {
     ITokenRepository,
     TokenRepository,
 	MessageTemplateRepository,
-	IMessageTemplateRepository
+	IMessageTemplateRepository,
+	ChannelRepository,
+	MessageRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -23,6 +25,8 @@ import { ICategoryRepository } from "../Repositories/ICategoryRepository";
 import { CategoryRepository } from "../Repositories/implementation/CategoryRepository";
 // import { IClientService } from "../Services";
 import { TYPES } from "../Types/type";
+import { IChannelRepository } from "../Repositories/IChannelRepository";
+import { IMessageRepository } from "../Repositories/IMessageRepository";
 class InversifyContainer {
 	private container;
 	static instance: InversifyContainer ;
@@ -60,6 +64,8 @@ class InversifyContainer {
 		// this.container.bind<IClientService>(TYPES.IClientService).to(ClientService);
 
 		// this.container.bind<IClientController>(TYPES.IClientController).to(ClientController)
+		this.container.bind<IChannelRepository>(TYPES.IChannelRepository).to(ChannelRepository);
+		this.container.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepository);
 
 	}
 }

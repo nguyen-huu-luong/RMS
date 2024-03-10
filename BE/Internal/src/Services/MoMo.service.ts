@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import * as dotenv from 'dotenv';
 import { ICartRepository, IClientRepository } from "../Repositories";
 import { container } from "../Configs";
-import { TYPES } from "../Repositories/type";
+import { TYPES } from "../Types/type";
 
 dotenv.config();
 

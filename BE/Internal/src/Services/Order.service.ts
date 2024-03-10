@@ -10,7 +10,7 @@ import {
     IVoucherRepository,
 } from "../Repositories";
 import { TYPES } from "../Types/type";
-import { RecordNotFoundError } from "../Errors";
+import { RecordNotFoundError, UnauthorizedError } from "../Errors";
 export class OrderService {
     constructor(
         private orderRepository = container.get<IOrderRepository>(
@@ -111,7 +111,7 @@ export class OrderService {
                 const cart = await this.cartRepository.getCart(req.userId);
                 await this.orderRepository.update(order.getDataValue("id"), {
                     num_items: cart?.getDataValue("total"),
-                    amount: cart?.getDataValue("amount"),
+                    amount: parseInt(cart?.getDataValue("amount")) + parseInt(order.getDataValue("shippingCost")),
                 });
                 const cartItems = await cart.getProducts();
                 await Promise.all(
@@ -202,7 +202,11 @@ export class OrderService {
         try {
             const status: number = HttpStatusCode.Success;
             const data: any = req.body;
-            await this.orderRepository.updateStatus(data);
+            if (req.action === "update:own") {
+                await this.orderRepository.updateStatus(data);
+            } else if (req.action === "update:any"){
+                await this.orderRepository.updateStatus(data);
+            } else throw new UnauthorizedError()
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         } catch (err) {

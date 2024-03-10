@@ -34,8 +34,8 @@ export class VoucherService {
             } else {
                 data = await this.voucherRepository.all();
             }
-            res.status(status).send(data);
             Message.logMessage(req, status);
+            return res.status(status).send(data);
         }
         catch (err) {
             console.log(err)
@@ -49,8 +49,8 @@ export class VoucherService {
             if (!data) {
 				throw new RecordNotFoundError("Voucher do not exist");
 			}
-            res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
+            return res.status(status).send(statusMess.Success);
         }
         catch (err) {
             console.log(err)
@@ -64,8 +64,9 @@ export class VoucherService {
             if (!data) {
 				throw new RecordNotFoundError("Voucher do not exist");
 			}
-            res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
+            return res.status(status).send(statusMess.Success);
+
         }
         catch (err) {
             console.log(err)
@@ -79,8 +80,8 @@ export class VoucherService {
             if (!data) {
 				throw new RecordNotFoundError("Voucher do not exist");
 			}
-            res.status(status).send(statusMess.Success);
             Message.logMessage(req, status)
+            return res.status(status).send(statusMess.Success);
         }
         catch (err) {
             console.log(err)
@@ -95,8 +96,8 @@ export class VoucherService {
             if (!data) {
 				throw new RecordNotFoundError("Voucher do not exist");
 			}
-            res.status(status).send(data);
             Message.logMessage(req, status);
+            return res.status(status).send(data);
         }
         catch (err) {
             console.log(err)
@@ -137,8 +138,8 @@ export class VoucherService {
                     },
                 });
             }
-            res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
+            return res.status(status).send(statusMess.Success);
         }
         catch (err) {
             console.log(err)
@@ -166,8 +167,8 @@ export class VoucherService {
                     quantity: req.body.quantity,
                 });
             }
-            res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
+            return res.status(status).send(statusMess.Success);
         }
         catch (err) {
             console.log(err)

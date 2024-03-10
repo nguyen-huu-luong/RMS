@@ -44,6 +44,7 @@ Order.init(
 		amount: DataTypes.FLOAT,
 		num_items: DataTypes.INTEGER,
 		shippingAddress: DataTypes.STRING,
+		shippingCost: DataTypes.FLOAT,
 		paymentMethod: DataTypes.STRING,
 	},
 	{ sequelize: Loader.sequelize }

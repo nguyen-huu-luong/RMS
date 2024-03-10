@@ -12,7 +12,11 @@ const TYPES = {
     ITokenRepository: Symbol.for("ITokenRepository"),
     ICategoryRepository: Symbol.for("ICategoryRepository"),
     IVoucherRepository: Symbol.for("IVoucherRepository"),
-    IMessageTemplateRepository: Symbol.for("IMessageTemplateRepository")
+    IMessageTemplateRepository: Symbol.for("IMessageTemplateRepository"),
+
+    IMessageRepository: Symbol.for("IMessageRepository"),
+    IChannelRepository: Symbol.for("IChannelRepository")
+
 };
 
 type FilterCondition = {
