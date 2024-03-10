@@ -92,7 +92,7 @@ export default function Payment() {
                             ORDER SUCCESSFULLY
                         </span>
                         <Link
-                            href={"/#"}
+                            href={"/myorder"}
                             locale={locale}
                             className='p-2 px-10 w-auto h-auto rounded-lg font-extrabold text-lg border-orange-500 border-2 hover:bg-primary-400 bg-primary text-item-white transition-all duration-300 flex justify-center'
                         >

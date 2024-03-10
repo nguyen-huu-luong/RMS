@@ -28,3 +28,19 @@ export const recordMoMoOrder = async (requestBody: any) => {
         throw error;
     }
 }
+
+export const cancelOrder = async (token: any, requestBody: any) => {
+    try {
+        const response = await axios.put(`${process.env.BASE_URL}/orders`, requestBody, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        mutate([`http://localhost:3003/api/orders`, token])
+        return response.data;
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        throw error;
+    }
+};

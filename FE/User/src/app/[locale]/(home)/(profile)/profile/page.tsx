@@ -9,7 +9,7 @@ const Profile: React.FC = async () => {
     if (!session) {
         redirect(`/${"en"}/signin`);
     }
-    return <div>{JSON.stringify(session)}</div>
+    return <div className="break-words w-96">{JSON.stringify(session)}</div>
 }
 
 export default Profile
