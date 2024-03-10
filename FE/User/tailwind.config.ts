@@ -27,6 +27,9 @@ const config: Config = {
         'placeholder': '#DDD8D8',
         'menu': '#07143B',
         '':''
+      },
+      borderColor: {
+        'primary': '#EA6A12',
       }
     },
   },

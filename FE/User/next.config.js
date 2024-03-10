@@ -5,7 +5,7 @@ const nextConfig = {
     },
     env: {
         BASE_URL:"http://localhost:3003/api"
-    }
+    },
 }
 
 module.exports = nextConfig

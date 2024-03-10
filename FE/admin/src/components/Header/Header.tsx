@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import {
 	BellOutlined,
@@ -13,6 +14,7 @@ import { useTranslations } from "next-intl";
 import { LocaleSwitcher } from "../LocaleSwitcher/";
 import variables from "@/app/variables.module.scss";
 import { DynamicBreadcrumb } from "..";
+import { signOut } from "next-auth/react";
 
 export default function Header() {
 	const t = useTranslations("Header");
@@ -32,6 +34,9 @@ export default function Header() {
 			key: "2",
 			icon: <LogoutOutlined />,
 			danger: true,
+			onClick: () => {
+				signOut();
+			},
 		},
 	];
 
@@ -44,7 +49,6 @@ export default function Header() {
 			style={{ width: `calc(100% - ${variables.sidebarWidth}` }}
 		>
             <DynamicBreadcrumb />
-
 			<div className="flex items-center">
 				<Tooltip title={t("chat-center")}>
 					<Button

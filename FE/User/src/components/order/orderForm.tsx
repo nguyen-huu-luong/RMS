@@ -3,33 +3,10 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { ConfigProvider, Radio, Form, Input, Select, Row, Col } from "antd";
-import axios from "axios";
-
-// const apiKey = '';
-// const origin = '123 Main St, City1, Country1'; // Địa chỉ xuất phát
-// const destination = '456 Market St, City2, Country2'; // Địa chỉ đích
-// const googleMapsApiUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json';
-// const getDistance = async () => {
-//   try {
-//     const response = await axios.get(googleMapsApiUrl, {
-//       params: {
-//         origins: origin,
-//         destinations: destination,
-//         key: apiKey,
-//       },
-//     });
-//     const distance = response.data.rows[0].elements[0].distance.text;
-//     console.log('Distance:', distance);
-//   } catch (error) {
-//     console.error('Error fetching distance:', error);
-//   }
-// };
+import Map from "@/components/map/map";
 
 import { useState, useEffect, useRef, Dispatch } from "react";
-const OrderForm = ({ form }: { form: any }) => {
-
-    
-
+const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
     const { data: session, status } = useSession();
     if (status === "unauthenticated") {
         redirect("/en/signin");
@@ -39,24 +16,7 @@ const OrderForm = ({ form }: { form: any }) => {
         const formValues = form.getFieldsValue();
         form.setFieldsValue({
             address:
-                formValues.deliveryType === "DELIVER"
-                    ? formValues.address 
-                    // +
-                    //   ", " +
-                    //   wardList.find(
-                    //       (ward: any) => ward.value === formValues.ward
-                    //   )?.label +
-                    //   ", " +
-                    //   districtList.find(
-                    //       (district: any) =>
-                    //           district.value === formValues.district
-                    //   )?.label +
-                    //   ", " +
-                    //   provinceList.find(
-                    //       (province: any) =>
-                    //           province.value === formValues.province
-                    //   )?.label
-                    : "",
+                formValues.deliveryType === "DELIVER" ? formValues.address : "",
         });
     };
     const [delivery, setDelivery] = useState("DELIVER");
@@ -99,64 +59,6 @@ const OrderForm = ({ form }: { form: any }) => {
         input: string,
         option?: { label: string; value: string }
     ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
-
-    // //Fetching address
-    // useEffect(() => {
-    //     const fetchProvince = async () => {
-    //         try {
-    //             const response = await fetch(
-    //                 "https://provinces.open-api.vn/api/p/"
-    //             );
-    //             const result = await response.json();
-    //             const options = result.map(
-    //                 (item: { name: any; code: any }) => ({
-    //                     value: item.code,
-    //                     label: item.name,
-    //                 })
-    //             );
-    //             setProvinceList(options);
-    //         } catch (error) {
-    //             console.error("Error fetching data:", error);
-    //         }
-    //     };
-    //     const fetchDistrict = async () => {
-    //         try {
-    //             const response = await fetch(
-    //                 `https://provinces.open-api.vn/api/p/${currentProvince}?depth=2`
-    //             );
-    //             const result = await response.json();
-    //             const options = result.districts.map(
-    //                 (item: { name: any; code: any }) => ({
-    //                     value: item.code,
-    //                     label: item.name,
-    //                 })
-    //             );
-    //             setDistrictList(options);
-    //         } catch (error) {
-    //             console.error("Error fetching data:", error);
-    //         }
-    //     };
-    //     const fetchWard = async () => {
-    //         try {
-    //             const response = await fetch(
-    //                 `https://provinces.open-api.vn/api/d/${currentDistrict}?depth=2`
-    //             );
-    //             const result = await response.json();
-    //             const options = result.wards.map(
-    //                 (item: { name: any; code: any }) => ({
-    //                     value: item.code,
-    //                     label: item.name,
-    //                 })
-    //             );
-    //             setWardList(options);
-    //         } catch (error) {
-    //             console.error("Error fetching data:", error);
-    //         }
-    //     };
-    //     fetchProvince();
-    //     fetchDistrict();
-    //     fetchWard();
-    // }, [currentProvince, currentDistrict]);
     return (
         <div className='w-full h-auto p-10 rounded-3xl bg-primary-white'>
             <ConfigProvider
@@ -202,112 +104,31 @@ const OrderForm = ({ form }: { form: any }) => {
                     </Form.Item>
 
                     {delivery === "DELIVER" ? (
-                        <div className='mb-4'>
-                            {/* <Row gutter={8}>
-                                <Col
-                                    xs={{ span: 24 }}
-                                    sm={{ span: 8 }}
-                                    style={{ marginTop: 8 }}
+                        <>
+                            <div className='mb-4'>
+                                <Form.Item
+                                    name='address'
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Please input your address!",
+                                        },
+                                    ]}
                                 >
-                                    <Form.Item
-                                        name='province'
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message:
-                                                    "Please input your province!",
-                                            },
-                                        ]}
-                                    >
-                                        <Select
-                                            showSearch
-                                            placeholder='Province'
-                                            style={{ width: "100%" }}
-                                            options={provinceList}
-                                            optionFilterProp='children'
-                                            onChange={(e: any) => {
-                                                onProvinceChange(e);
-                                                form.setFieldsValue({
-                                                    district: undefined,
-                                                    ward: undefined,
-                                                });
-                                            }}
-                                            filterOption={filterOption}
-                                        ></Select>
-                                    </Form.Item>
-                                </Col>
-                                <Col
-                                    xs={{ span: 24 }}
-                                    sm={{ span: 8 }}
-                                    style={{ marginTop: 8 }}
-                                >
-                                    <Form.Item
-                                        name='district'
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message:
-                                                    "Please input your district!",
-                                            },
-                                        ]}
-                                    >
-                                        <Select
-                                            showSearch
-                                            placeholder='District'
-                                            style={{ width: "100%" }}
-                                            options={districtList}
-                                            optionFilterProp='children'
-                                            onChange={(e: any) => {
-                                                onDistrictChange(e);
-                                                form.setFieldsValue({
-                                                    ward: undefined,
-                                                });
-                                            }}
-                                            filterOption={filterOption}
-                                        ></Select>
-                                    </Form.Item>
-                                </Col>
-                                <Col
-                                    xs={{ span: 24 }}
-                                    sm={{ span: 8 }}
-                                    style={{ marginTop: 8 }}
-                                >
-                                    <Form.Item
-                                        name='ward'
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message:
-                                                    "Please input your ward!",
-                                            },
-                                        ]}
-                                    >
-                                        <Select
-                                            placeholder='Ward'
-                                            style={{ width: "100%" }}
-                                            options={wardList}
-                                            optionFilterProp='children'
-                                            onChange={onWardChange}
-                                            filterOption={filterOption}
-                                        ></Select>
-                                    </Form.Item>
-                                </Col>
-                            </Row> */}
-                            <Form.Item
-                                name='address'
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please input your province!",
-                                    },
-                                ]}
-                            >
-                                <Input
-                                    placeholder='Detail Address'
-                                    style={{ marginTop: 8 }}
-                                />
-                            </Form.Item>
-                        </div>
+                                    <Input
+                                        placeholder='Detail Address'
+                                        style={{ marginTop: 8 }}
+                                    />
+                                </Form.Item>
+                                <Form.Item hidden name='shippingCost'>
+                                    <Input />
+                                </Form.Item>
+                            </div>
+                            <div className='w-full h-auto rounded-xl overflow-hidden'>
+                                <Map form={form} setFee={setFee}></Map>
+                            </div>
+                        </>
                     ) : (
                         // </Form.Item>
                         <div className='pb-6 font-normal text-lg'>

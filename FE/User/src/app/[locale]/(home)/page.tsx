@@ -9,6 +9,7 @@ import WelcomeImage from "@/components/home/welcome";
 import { RightCircleFilled } from "@ant-design/icons";
 import { useState } from "react";
 import { Skeleton } from "antd";
+import ChatBox from "@/components/chat/chatbox";
 import useSWR from "swr";
 // import {createOrder} from "../../api/product/order"
 // import { useRouter } from 'next/navigation';
@@ -86,8 +87,9 @@ export default function Home() {
                 Pay
             </button> */}
             {/* Home welcome and carousel banner */}
+            
             <div className='w-80 h-auto flex flex-col sm:flex-row sm:w-full gap-5'>
-                <WelcomeImage params={{ name: "Nguyen Huu A" }} />
+                <WelcomeImage params={{ name: "CUSTOMER" }} />
                 <div className='w-80 h-80 flex-none'>
                     <Slider params={{ images: images }} />
                 </div>

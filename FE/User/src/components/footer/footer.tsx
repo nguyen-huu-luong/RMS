@@ -12,7 +12,7 @@ const Footer = () => {
     const locale = useLocale();
     const t = useTranslations("Footer");
     return (
-        <div className='bg-primary h-auto text-item-white pt-10 z-40'>
+        <div className='bg-primary h-auto text-item-white pt-10 z-30'>
             <Container> 
                 <div className='w-auto'>
                     <div className='h-auto w-auto flex flex-col md:flex-row gap-4 justify-around items-center md:items-start'>

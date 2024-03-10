@@ -11,7 +11,7 @@ import {
 import Image from "next/image";
 import moneyFormatter from "@/components/function/moneyFormatter";
 
-import useSWR from "swr";
+import useSWR from "swr"; 
 import { cartFetcher, editCart, removeProduct } from "@/app/api/product/cart";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
@@ -46,6 +46,8 @@ export default function Cart() {
     // Check if cart is empty
     if (cartItemsError) return <div>Failed to load</div>;
     if (cartItemsLoading) return <div>Loading...</div>;
+    console.log(cartItems)
+    if (!cartItems) return <div>Loading...</div>;
     return (cartItems.cart.total === 0) ? (
         <div className='w-full h-auto flex flex-col justify-center items-center gap-5 p-20 bg-primary-white rounded-3xl transition-all duration-300'>
             <div className='w-auto h-auto rounded-lg overflow-hidden'>
