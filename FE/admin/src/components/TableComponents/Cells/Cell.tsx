@@ -12,6 +12,7 @@ enum CellType {
     Money = 'money',
     Checkbox = 'checkbox',
 }
+
 export interface ICellProps {
     type: CellType | string | "text",
     leftIcon?: React.FC,
@@ -23,9 +24,7 @@ export interface ICellProps {
     actions?: string[],
     date?: Date | string,
     tags?: React.FC[],
-
 }
-
 
 export default function Cell({children, ...props} : ICellProps) {
     return (props.type === CellType.Action && <div>Action cell</div>) ||

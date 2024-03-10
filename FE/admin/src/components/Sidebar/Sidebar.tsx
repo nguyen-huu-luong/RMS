@@ -3,8 +3,6 @@ import Navigation from "./Navigation";
 import {
 	UserAddOutlined,
 	AccountBookOutlined,
-	LeftCircleFilled,
-	LeftCircleOutlined,
 	LeftOutlined,
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";

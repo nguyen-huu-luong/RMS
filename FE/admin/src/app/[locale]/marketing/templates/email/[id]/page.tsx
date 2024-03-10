@@ -1,48 +1,24 @@
-import { UnderlineOutlined } from "@ant-design/icons";
-import { Card } from "antd";
-import React, { ReactElement } from "react";
+"use client"
+import DropContainer from "@/components/EmailTemplateComponents/DropContainer";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import RightSisebar from "@/components/EmailTemplateComponents/RightSidebar";
+import LeftSidebar from "@/components/EmailTemplateComponents/LeftSidebar";
 
-type ItemType = {
-    icon: ReactElement,
-    text: string
-}
-const items: ItemType[] = [
-    {
-        icon: <UnderlineOutlined />,
-        text: 'title'
-    },
-    {
-        icon: <UnderlineOutlined />,
-        text: 'title'
-    },
-    {
-        icon: <UnderlineOutlined />,
-        text: 'title'
-    },
-    {
-        icon: <UnderlineOutlined />,
-        text: 'title'
-    },
-    {
-        icon: <UnderlineOutlined />,
-        text: 'title'
-    }
-]
-
-function Home() {
-    return (<main>
-        <div>
-            <h6>Item</h6>
-            <div className="flex">
-                {items.map((item: ItemType) => (<Card className="flex flex-row">
-                    {item.icon}
-                    <p>{item.text}</p>
-                </Card>))}
-            </div>
+const EmailTemplateEditor: React.FC = () => {
+  
+  return (
+    <div className="w-full bg-white" >
+      <DndProvider backend={HTML5Backend}>
+        <div className="flex justify-end max-h-screen h-screen overflow-auto relative">
+          <LeftSidebar />
+          <DropContainer />
+          <RightSisebar />
         </div>
+      </DndProvider>
+      {/* <ConfigElement /> */}
+    </div>
+  );
+};
 
-
-    </main>);
-}
-
-export default Home;
+export default EmailTemplateEditor;

@@ -6,6 +6,9 @@ const nextConfig = {
     sassOptions: {
         includePaths: [path.join(__dirname, 'styles')],
     },
+    experimental: {
+        serverComponentsExternalPackages: ["mjml"],
+      },
 }
 
 const withNextIntl = require("next-intl/plugin")(

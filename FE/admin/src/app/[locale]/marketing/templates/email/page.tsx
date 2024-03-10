@@ -1,186 +1,213 @@
 "use client";
-import React, { useRef, useState } from "react";
-import { Button, ConfigProvider, Divider, InputRef, Radio, Table, Input, Space } from "antd";
-import type { ColumnType, ColumnsType } from 'antd/es/table';
+import React, { useEffect, useRef, useState } from "react";
+import {
+	ConfigProvider,
+	Table,
+} from "antd";
+import type { TableProps, GetProp } from "antd";
 import { variables } from "@/app";
-import { render } from "react-dom";
-import { FieldTimeOutlined, InfoCircleFilled, InfoOutlined, MailFilled, MailOutlined, UserOutlined } from "@ant-design/icons";
+import type {
+	Key,
+	SortOrder,
+} from "antd/es/table/interface";
+import { CustomerActionBar, CustomerFilterBar } from "@/components";
 import Link from "next/link";
-import { SearchOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
-import type { FilterConfirmProps } from 'antd/es/table/interface';
+
+type ColumnsType<T> = TableProps<T>["columns"];
+type TablePaginationConfig = Exclude<
+	GetProp<TableProps, "pagination">,
+	boolean
+>;
 
 interface DataType {
 	key: React.Key;
+	id: number;
 	name: string;
-	age: number;
-	address: string;
+	type: string;
+	createdAt: string;
+	updatedAt: Date;
 }
 
-const data: DataType[] = [
-	{
-		key: "1",
-		name: "John Brown",
-		age: 32,
-		address: "New York No. 1 Lake Park",
-	},
-	{
-		key: "2",
-		name: "Jim Green",
-		age: 42,
-		address: "London No. 1 Lake Park",
-	},
-	{
-		key: "3",
-		name: "Joe Black",
-		age: 32,
-		address: "Sydney No. 1 Lake Park",
-	},
-	{
-		key: "4",
-		name: "Disabled User",
-		age: 99,
-		address: "Sydney No. 1 Lake Park",
-	},
-];
-
-// rowSelection object indicates the need for row selection
-const rowSelection = {
-	onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-		console.log(
-			`selectedRowKeys: ${selectedRowKeys}`,
-			"selectedRows: ",
-			selectedRows
-		);
-	},
-	getCheckboxProps: (record: DataType) => ({
-		disabled: record.name === "Disabled User", // Column configuration not to be checked
-		name: record.name,
-	}),
+type ErrorType = {
+	isError: boolean;
+	title: string;
+	message: string;
 };
-type DataIndex = keyof DataType;
+
+type SorterParams = {
+	field?: Key | readonly Key[];
+	order?: SortOrder;
+};
+
+interface TableParams {
+	pagination?: TablePaginationConfig;
+	sorter?: SorterParams;
+	filters?: Parameters<GetProp<TableProps, "onChange">>[1];
+}
 
 const EmailTemplate: React.FC = () => {
-	const [searchText, setSearchText] = useState('');
-	const [searchedColumn, setSearchedColumn] = useState('');
-	const searchInput = useRef<InputRef>(null);
-	const handleSearch = (
-		selectedKeys: string[],
-		confirm: (param?: FilterConfirmProps) => void,
-		dataIndex: DataIndex,
-	) => {
-		confirm();
-		setSearchText(selectedKeys[0]);
-		setSearchedColumn(dataIndex);
-	};
-
-	const handleReset = (clearFilters: () => void) => {
-		clearFilters();
-		setSearchText('');
-	};
-	const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<DataType> => ({
-		filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-			<div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-				<Input
-					ref={searchInput}
-					placeholder={`Search ${dataIndex}`}
-					value={selectedKeys[0]}
-					onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-					onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-					style={{ marginBottom: 8, display: 'block' }}
-				/>
-				<Space>
-					<Button
-						type="primary"
-						onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-						icon={<SearchOutlined />}
-						size="small"
-						style={{ width: 90 }}
-					>
-						Search
-					</Button>
-					<Button
-						onClick={() => clearFilters && handleReset(clearFilters)}
-						size="small"
-						style={{ width: 90 }}
-					>
-						Reset
-					</Button>
-					<Button
-						type="link"
-						size="small"
-						onClick={() => {
-							confirm({ closeDropdown: false });
-							setSearchText((selectedKeys as string[])[0]);
-							setSearchedColumn(dataIndex);
-						}}
-					>
-						Filter
-					</Button>
-					<Button
-						type="link"
-						size="small"
-						onClick={() => {
-							close();
-						}}
-					>
-						close
-					</Button>
-				</Space>
-			</div>
-		),
-		filterIcon: (filtered: boolean) => (
-			<SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
-		),
-		onFilter: (value, record) =>
-			record[dataIndex]
-				.toString()
-				.toLowerCase()
-				.includes((value as string).toLowerCase()),
-		onFilterDropdownOpenChange: (visible) => {
-			if (visible) {
-				setTimeout(() => searchInput.current?.select(), 100);
-			}
+	const [data, setData] = useState<DataType[]>();
+	const [loading, setLoading] = useState(false);
+	const [selectedCustomers, setSelectedCustomers] = useState<DataType[]>();
+	const [tableParams, setTableParams] = useState<TableParams>({
+		pagination: {
+			current: 1,
+			pageSize: 10,
+			total: 0,
 		},
-		render: (text) =>
-			searchedColumn === dataIndex ? (
-				<Highlighter
-					highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-					searchWords={[searchText]}
-					autoEscape
-					textToHighlight={text ? text.toString() : ''}
-				/>
-			) : (
-				text
-			),
+		filters: {},
+		sorter: {
+			field: "id",
+			order: "ascend",
+		},
+	});
+	const [error, setError] = useState<ErrorType>({
+		isError: false,
+		message: "",
+		title: "",
 	});
 
+	// rowSelection object indicates the need for row selection
+	const rowSelection = {
+		onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+			console.log(
+				`selectedRowKeys: ${selectedRowKeys}`,
+				"selectedRows: ",
+				selectedRows
+			);
+			setSelectedCustomers(selectedRows)
+
+			console.log(selectedCustomers)
+		},
+	};
 	const columns: ColumnsType<DataType> = [
 		{
-			title: 'Name',
-			dataIndex: 'name',
-			key: 'name',
-			width: '30%',
-			...getColumnSearchProps('name'),
+			title: "ID",
+			dataIndex: "id",
+			key: "id",
 		},
 		{
-			title: 'Age',
-			dataIndex: 'age',
-			key: 'age',
-			width: '20%',
-			...getColumnSearchProps('age'),
-			sorter: (a, b) => a.age - b.age,
+			title: "Name",
+			dataIndex: "name",
+			key: "name",
 		},
 		{
-			title: 'Address',
-			dataIndex: 'address',
-			key: 'address',
-			...getColumnSearchProps('address'),
-			sorter: (a, b) => a.address.length - b.address.length,
-			sortDirections: ['descend', 'ascend'],
+			title: "type",
+			dataIndex: "type",
+			key: "type",
+		},
+		{
+			title: "CreatedAt",
+			dataIndex: "createdAt",
+			key: "createdAt",
+		},
+
+		{
+			title: "UpdatedAt",
+			dataIndex: "updatedAt",
+			key: "updatedAt",
 		},
 	];
 
+	const fetchData = () => {
+		setLoading(true);
+		try {
+			let filterQueriesStr = "";
+			for (const key in tableParams.filters) {
+				filterQueriesStr = `${filterQueriesStr}&${key}=${tableParams.filters[key]}`;
+			}
+			let sortQueries =
+				tableParams.sorter?.field && tableParams.sorter?.order
+					? `&sort=${tableParams.sorter?.field}&order=${tableParams.sorter?.order === "ascend" ? "asc" : "desc"
+					}`
+					: "";
+			fetch(
+				`http://localhost:3003/api/message-templates/all?page=${tableParams.pagination?.current}
+							&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
+				{
+					headers: {
+						Authorization:
+							"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiTWFyaW9fS29zc0B5YWhvby5jb20iLCJyb2xlIjoibWFuYWdlciIsImlhdCI6MTcwODM1NjUwNCwiZXhwIjoxNzE0MzU2NTA0fQ.naMCtTR_QKTwTMkqjIL6QaMNnbZdOk7wzuojI_H5RNc",
+					},
+				}
+			)
+				.then((res) => res.json())
+				.then((results) => {
+					const data = results.data.map((item: any) => ({
+						...item,
+						key: item.id,
+						fullname: `${item.firstname} ${item.lastname}`,
+					}));
+					setData(data);
+					setLoading(false);
+					setTableParams({
+						...tableParams,
+						pagination: {
+							...tableParams.pagination,
+							pageSize: results.pageSize,
+							current: results.page,
+							total: results.totalCount,
+						},
+					});
+				})
+				.catch((error) => {
+					console.log(error);
+					setError({
+						isError: true,
+						title: error?.name || "Something went wrong!",
+						message: error?.message || "Unknown error",
+					});
+				});
+		} catch (error: any) {
+			console.log(error);
+			setError({
+				isError: true,
+				title: error?.name || "Something went wrong!",
+				message: error?.message || "Unknown error",
+			});
+		}
+	};
+
+	useEffect(() => {
+		fetchData();
+	}, [JSON.stringify(tableParams)]);
+
+	const handleTableChange: TableProps["onChange"] = (
+		pagination,
+		filters,
+		sorter,
+		extra
+	) => {
+		console.log(pagination, filters, sorter, extra);
+		if (Array.isArray(sorter)) {
+			const firstSorter = sorter[0];
+			console.log("Sorter is array");
+			setTableParams(prev => ({
+				...prev,
+				pagination,
+				filters,
+				sorter: {
+					field: firstSorter?.field || prev.sorter?.field,
+					order: firstSorter?.order || prev.sorter?.order,
+				},
+			}));
+		} else {
+			console.log("Sorter is not an array");
+
+			setTableParams(prev => ({
+				pagination,
+				filters,
+				sorter: {
+					field: sorter?.field || prev.sorter?.field,
+					order: sorter?.order || prev.sorter?.order,
+				},
+			}));
+		}
+	};
+	const handleCloseError = () => {
+		console.log(error);
+		setError({ isError: false, title: "", message: "" });
+	};
 
 	return (
 		<ConfigProvider
@@ -200,12 +227,16 @@ const EmailTemplate: React.FC = () => {
 				columns={columns}
 				pagination={{
 					className: "bg-white rounded px-4 py-2",
-					showTotal: (total) => `Total ${total} items`,
+					showTotal: (total: number) => `Total ${total} items`,
 					position: ["bottomCenter", "bottomRight"],
 					showSizeChanger: true,
-					// showQuickJumper: true
+					showQuickJumper: true,
+					total: tableParams.pagination?.total,
+					pageSize: tableParams.pagination?.pageSize,
 				}}
+				loading={loading}
 				dataSource={data}
+				onChange={handleTableChange}
 			/>
 		</ConfigProvider>
 	);
