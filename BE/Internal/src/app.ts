@@ -11,6 +11,7 @@ import Tables from "./Models";
 
 import router from "./Routers";
 import { ErrorHandler } from "./Middlewares";
+import bodyParser from "body-parser";
 
 dotenv.config();
 declare global {
@@ -32,7 +33,8 @@ class Server {
 	}
 
 	public initial() {
-		this.app.use(bodyParse());
+		this.app.use(express.json());
+		this.app.use(express.urlencoded({ extended: true }));
 		this.app.use(
 			cors({
 				origin: "*",
@@ -48,6 +50,7 @@ class Server {
 			swaggerUI.setup(swaggerDocument)
 		);
 
+		// this.app.use("", (req, res) => res.sendFile("index.html", {root: __dirname}))
 		// set app router
 		router.initialize(this.app);
 
@@ -55,6 +58,7 @@ class Server {
 		this.app.use((err: any, req: Request, res: Response, next: NextFunction) =>
 			ErrorHandler.initializeErrorHandler(err, req, res, next)
 		);
+
 		this.server = new http.Server(this.app);
 	}
 
@@ -75,10 +79,11 @@ class Server {
 		const loader: Loader = new Loader();
 		const tables: Tables = new Tables();
 
-		await server.initial();
 		await loader.load();
+		
 		await tables.createTables();
-
+		
+		server.initial();
 		server.start();
 	} catch (err) {
 		console.log("Connect to server failed!");

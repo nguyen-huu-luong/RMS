@@ -39,7 +39,7 @@ export default function Header() {
 	};
 	return (
 		<div
-			className="flex items-center bg-white py-2 px-10 space-x-2 border-b-2 fixed top-0 right-0 h-header"
+			className="flex items-center bg-white py-2 px-10 space-x-2 border-b-2 fixed z-50 top-0 right-0 h-header"
 			style={{ width: `calc(100% - ${variables.sidebarWidth}` }}
 		>
 			<Tooltip title={t("chat-center")}>

@@ -1,9 +1,10 @@
 import { Model, DataTypes } from 'sequelize';
-import Loader from '../Loaders';
+import { sequelize } from '../Configs';
 import Reservation from './Reservation';
 import TableOrder from './TableOrder';
 import TableReservation from './TableReservation';
 import Order from './Order';
+import Loader from '../Loaders';
 class Table extends Model {
   static associate() {
     Table.belongsToMany(Reservation, {

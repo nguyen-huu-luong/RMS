@@ -4,7 +4,7 @@ import {HttpStatusCode} from '../Constants';
 import { container } from '../Configs';
 import statusMess from '../Constants/statusMess';
 import { IVoucherRepository } from '../Repositories/IVoucherRepository';
-import { TYPES } from '../Repositories/type';
+import { TYPES } from "../Types/type";
 import { validationResult } from "express-validator";
 /// <reference path="./types/globle.d.ts" />
 import {

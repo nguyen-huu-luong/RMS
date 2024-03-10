@@ -48,14 +48,14 @@ export default function LocaleLayout({children, params}: LocaleLayoutProps) {
         <html lang={locale} >
             <body className={inter.className}>
             <NextIntlClientProvider locale={locale} messages={messages}>
-               <div className="flex relative justify-center h-screen" style={{backgroundColor: Colors.defaultBackgroundColor }}>
+               <div className="flex relative justify-center min-h-screen" style={{backgroundColor: Colors.defaultBackgroundColor }}>
                     <Sidebar />
                     <Header />
                     <div className="min-h-screen  ps-sidebar mx-4 flex flex-col items-center w-full space-y-2" style={{
                         paddingTop: `calc(${variables.headerHeight} + 8px)`
                     }}>
                         <DynamicBreadcrumb />
-                        <div className='flex-1 w-full'>{children}  </div>
+                        <div className='flex-1 w-full' >{children}  </div>
                     </div>
                 </div>
             </NextIntlClientProvider>

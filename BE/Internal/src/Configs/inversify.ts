@@ -1,6 +1,5 @@
 import { Container } from "inversify";
 import {OrderRepository} from "../Repositories/implementation/OrderRepository";
-import { TYPES } from "../Repositories/type";
 import {
 	IOrderRepository,
 	IClientRepository,
@@ -20,16 +19,28 @@ import { ProductRepository } from "../Repositories";
 import { CartRepository } from "../Repositories";
 import { ICategoryRepository } from "../Repositories/ICategoryRepository";
 import { CategoryRepository } from "../Repositories/implementation/CategoryRepository";
+// import { IClientService } from "../Services";
+import { ClientService } from "../Services";
+import { TYPES } from "../Types/type";
 class InversifyContainer {
 	private container;
+	static instance: InversifyContainer ;
 
 	constructor() {
+		if (InversifyContainer.instance) {
+			throw new Error("Using InversifyContainer.getInstance() instead")
+		}
 		this.container = new Container();
 	}
 
 	public getContainer(): Container {
 		this.register();
 		return this.container;
+	}
+
+	static getInstance() {
+		InversifyContainer.instance = InversifyContainer.instance || new InversifyContainer() ;
+		return InversifyContainer.instance ;
 	}
 
 	public register() {
@@ -43,9 +54,13 @@ class InversifyContainer {
 		this.container.bind<ITokenRepository>(TYPES.ITokenRepository).to(TokenRepository);
 		this.container.bind<ICategoryRepository>(TYPES.ICategoryRepository).to(CategoryRepository);
 		this.container.bind<IVoucherRepository>(TYPES.IVoucherRepository).to(VoucherRepository);
+		
+		// this.container.bind<IClientService>(TYPES.IClientService).to(ClientService);
+
+		// this.container.bind<IClientController>(TYPES.IClientController).to(ClientController)
 
 	}
 }
 
-const containerObj = new InversifyContainer();
-export default containerObj.getContainer();;
+const containerObj = InversifyContainer.getInstance()
+export default containerObj.getContainer();

@@ -1,7 +1,7 @@
 import { container } from "../Configs";
 import { Permission } from "../Models";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
-import { TYPES } from "../Repositories/type";
+import { TYPES } from "../Types/type";
 
 export class AuthorizationService {
     constructor(

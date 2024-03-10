@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Message } from "../Utils/";
+import { Message } from "../Utils";
 import { HttpStatusCode } from "../Constants";
 import statusMess from "../Constants/statusMess";
 import { container } from "../Configs";
@@ -9,7 +9,7 @@ import {
     IProductRepository,
     IVoucherRepository,
 } from "../Repositories";
-import { TYPES } from "../Repositories/type";
+import { TYPES } from "../Types/type";
 import { RecordNotFoundError } from "../Errors";
 export class OrderService {
     constructor(
@@ -74,7 +74,13 @@ export class OrderService {
             if (req.action === "read:own") {
                 data = await this.orderRepository.viewOrders(req.userId);
             } else {
-                data = await this.orderRepository.all();
+                let customerId = Number(req.query.customerId)
+                if (customerId){
+                    data = await this.orderRepository.viewOrders(customerId);
+                }
+                else {
+                    data = await this.orderRepository.all();
+                }
             }
             res.status(status).send(data);
             Message.logMessage(req, status);
