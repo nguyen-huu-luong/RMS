@@ -11,7 +11,8 @@ const TYPES = {
     ICartRepository: Symbol.for("ICartRepository"),
     ITokenRepository: Symbol.for("ITokenRepository"),
     ICategoryRepository: Symbol.for("ICategoryRepository"),
-    IVoucherRepository: Symbol.for("IVoucherRepository")
+    IVoucherRepository: Symbol.for("IVoucherRepository"),
+    IMessageTemplateRepository: Symbol.for("IMessageTemplateRepository")
 };
 
 type FilterCondition = {

@@ -14,6 +14,7 @@ import { HttpStatusCode } from "../Constants";
 import { NotFoundError } from "../Errors";
 import OrderRouter from "./Order.router";
 import ClientRouter from "./Client.router";
+import MarketingRouter from "./marketing.router";
 
 process.on("unhandledRejection", (reason, promise) => {
 	console.error("Unhandled Rejection at:", promise, "reason:", reason);
@@ -27,6 +28,7 @@ class Routers {
 		const voucherRouter = new VoucherRouter();
 		const clientRouter = new ClientRouter();
 		const authRouter = new AuthRouter();
+		const marketingRouter = new MarketingRouter();
 		// declare your router here
 		const router = Router();
         
@@ -37,13 +39,14 @@ class Routers {
 		categoryRouter.initialize(router);
 		voucherRouter.initialize(router)
 		clientRouter.initialize(router)
+		marketingRouter.initialize(router)
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 
 		app._router.all(
 			"*",
 			(request: Request, response: Response, next: NextFunction) => {
-				let err = new NotFoundError("Không có api");
+				let err = new NotFoundError("API NOT FOUND");
 				response.status(HttpStatusCode.NotFound).send(err.toPlainObject());
 			}
 		);

@@ -10,7 +10,9 @@ import {
 	IVoucherRepository,
 	VoucherRepository,
     ITokenRepository,
-    TokenRepository
+    TokenRepository,
+	MessageTemplateRepository,
+	IMessageTemplateRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -20,7 +22,6 @@ import { CartRepository } from "../Repositories";
 import { ICategoryRepository } from "../Repositories/ICategoryRepository";
 import { CategoryRepository } from "../Repositories/implementation/CategoryRepository";
 // import { IClientService } from "../Services";
-import { ClientService } from "../Services";
 import { TYPES } from "../Types/type";
 class InversifyContainer {
 	private container;
@@ -54,6 +55,7 @@ class InversifyContainer {
 		this.container.bind<ITokenRepository>(TYPES.ITokenRepository).to(TokenRepository);
 		this.container.bind<ICategoryRepository>(TYPES.ICategoryRepository).to(CategoryRepository);
 		this.container.bind<IVoucherRepository>(TYPES.IVoucherRepository).to(VoucherRepository);
+		this.container.bind<IMessageTemplateRepository>(TYPES.IMessageTemplateRepository).to(MessageTemplateRepository);
 		
 		// this.container.bind<IClientService>(TYPES.IClientService).to(ClientService);
 

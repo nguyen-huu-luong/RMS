@@ -19,3 +19,6 @@ export * from './implementation/VoucherRepository'
 
 export * from './implementation/PermissionRepository'
 export * from './implementation/TokenRepository'
+
+export * from "./IMessaggeTemplateRepository"
+export * from "./implementation/MessageTemplateRepository"
