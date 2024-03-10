@@ -26,7 +26,9 @@ class Authorization extends BaseMiddleware {
 			TYPES.IPermissionRepository
 		);
 
-		const resource = this.request.originalUrl.split("/")[2];
+		let resource = this.request.originalUrl.split("/")[2];
+		resource = resource.split("?")[0]
+		console.log(resource)
 		const allPermissions = await permissionRepository.findAllByRole(this.request.role);
 		const resquestAction = this.getAction();
 		let actions = allPermissions

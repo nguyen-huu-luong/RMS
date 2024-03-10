@@ -10,8 +10,28 @@ import { RightCircleFilled } from "@ant-design/icons";
 import { useState } from "react";
 import { Skeleton } from "antd";
 import useSWR from "swr";
+// import {createOrder} from "../../api/product/order"
+// import { useRouter } from 'next/navigation';
+
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 export default function Home() {
+    // const router = useRouter();
+    // const createOrder = async () => {
+    //     console.log("haha")
+    //     try {
+    //       const response = await fetch("http://localhost:3003/api/orders", {
+    //         method: 'POST'
+    //     })
+    //     const data = await response.json()
+    //     router.push(data['payUrl']);
+    //       } catch (error) {
+    //         console.error('Error adding to cart:', error);
+    //         throw error;
+    //       }
+    //   };
+      
+
+
     const locale = useLocale();
     const t = useTranslations("Home");
     const [currentCategory, setCurrentCategory] = useState<string>("Pizza");
@@ -62,6 +82,9 @@ export default function Home() {
     if (foodLoading || categoryLoading) return <div>Loading...</div>;
     return (
         <div className='h-auto py-4 flex flex-col justify-center items-center gap-10'>
+                   {/* <button onClick={createOrder}>
+                Pay
+            </button> */}
             {/* Home welcome and carousel banner */}
             <div className='w-80 h-auto flex flex-col sm:flex-row sm:w-full gap-5'>
                 <WelcomeImage params={{ name: "Nguyen Huu A" }} />
