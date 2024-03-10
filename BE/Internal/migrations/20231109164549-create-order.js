@@ -26,6 +26,9 @@ module.exports = {
       shippingAddress: {
         type: Sequelize.STRING
       },
+      shippingCost: {
+        type: Sequelize.STRING
+      },
       paymentMethod: {
         type: Sequelize.STRING
       },
