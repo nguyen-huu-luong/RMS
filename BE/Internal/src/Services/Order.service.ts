@@ -9,8 +9,9 @@ import {
     IProductRepository,
     IVoucherRepository,
 } from "../Repositories";
-import { TYPES } from "../Types/type";
+import { QueryOptions, TYPES } from "../Types/type";
 import { RecordNotFoundError, UnauthorizedError } from "../Errors";
+import { parseRequesQueries } from "../Helper/helper";
 export class OrderService {
     constructor(
         private orderRepository = container.get<IOrderRepository>(
@@ -71,6 +72,8 @@ export class OrderService {
         try {
             const status: number = HttpStatusCode.Success;
             let data: any;
+            const queries = { ...req.body, ...req.query };
+            const options: QueryOptions = parseRequesQueries(queries);
             if (req.action === "read:own") {
                 data = await this.orderRepository.viewOrders(req.userId);
             } else {
@@ -79,7 +82,12 @@ export class OrderService {
                     data = await this.orderRepository.viewOrders(customerId);
                 }
                 else {
-                    data = await this.orderRepository.all();
+                    data = await this.orderRepository.all(options);
+                    const orders =  await Promise.all(data.data.map(async (order: any) => {
+                        const client = await order.getClient();
+                        return { order: order, client: client };
+                    }));
+                    data.data = orders;
                 }
             }
             res.status(status).send(data);
@@ -120,6 +128,7 @@ export class OrderService {
                             through: {
                                 quantity: item.CartItem.quantity,
                                 amount: item.CartItem.amount,
+                                status: "Preparing",
                                 createdAt: new Date(),
                                 updatedAt: new Date(),
                             },
@@ -206,6 +215,22 @@ export class OrderService {
                 await this.orderRepository.updateStatus(data);
             } else if (req.action === "update:any"){
                 await this.orderRepository.updateStatus(data);
+            } else throw new UnauthorizedError()
+            res.status(status).send(statusMess.Success);
+            Message.logMessage(req, status);
+        } catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+
+    public async updateItemStatus(req: Request, res: Response, next: NextFunction) {
+        try {
+            const status: number = HttpStatusCode.Success;
+            const {orderId, itemId, stt}: any = req.body;
+            if (req.action === "update:any"){
+                // await this.orderRepository.updateStatus(data);
+                
             } else throw new UnauthorizedError()
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
