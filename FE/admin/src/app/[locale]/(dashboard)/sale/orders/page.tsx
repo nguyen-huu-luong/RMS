@@ -10,6 +10,7 @@ import {
     Select,
     Alert,
     Descriptions,
+    Tag
 } from "antd";
 import type { TableProps, GetProp, TableColumnType } from "antd";
 import { variables } from "@/app";
@@ -422,6 +423,7 @@ const Order: React.FC = () => {
             name: record.fullname,
         }),
     };
+
     const columns: ColumnsType<DataType> = [
         {
             title: "ID",
@@ -456,7 +458,25 @@ const Order: React.FC = () => {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            render: (text) => <a>{text}</a>,
+            render: (text) => (
+                <>
+                    {text == "Cancel" ? (
+                        <Tag color='red' >{text}</Tag>
+                    ) : text == "Pending" ? (
+                        <Tag color='blue'>{text}</Tag>
+                    ) : text == "Preparing" ? (
+                        <Tag color='green'>{text}</Tag>
+                    ) : text == "Ready" ? (
+                        <Tag color='orange'>{text}</Tag>
+                    ) : text == "Delivering" ? (
+                        <Tag color='yellow'>{text}</Tag>
+                    ) : text == "Done" ? (
+                        <Tag color='purple'>{text}</Tag>
+                    ) : (
+                        ""
+                    )}
+                </>
+            ),
             ...getColumnSearchProps("status"),
         },
         {

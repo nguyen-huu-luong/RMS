@@ -8,6 +8,8 @@ class Order extends Model {
     addProduct: any;
     addProducts: any;
     setVoucher: any;
+    setProducts: any;
+    setProduct: any;
 	static associate() {
 		Order.belongsTo(Client, {
 			foreignKey: {

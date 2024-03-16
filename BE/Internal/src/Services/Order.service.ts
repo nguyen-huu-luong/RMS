@@ -77,16 +77,17 @@ export class OrderService {
             if (req.action === "read:own") {
                 data = await this.orderRepository.viewOrders(req.userId);
             } else {
-                let customerId = Number(req.query.customerId)
-                if (customerId){
+                let customerId = Number(req.query.customerId);
+                if (customerId) {
                     data = await this.orderRepository.viewOrders(customerId);
-                }
-                else {
+                } else {
                     data = await this.orderRepository.all(options);
-                    const orders =  await Promise.all(data.data.map(async (order: any) => {
-                        const client = await order.getClient();
-                        return { order: order, client: client };
-                    }));
+                    const orders = await Promise.all(
+                        data.data.map(async (order: any) => {
+                            const client = await order.getClient();
+                            return { order: order, client: client };
+                        })
+                    );
                     data.data = orders;
                 }
             }
@@ -103,7 +104,7 @@ export class OrderService {
             const status: number = HttpStatusCode.Success;
             const { voucherId, ...orderInfor } = req.body;
             if (req.action === "create:own") {
-                console.log(req.userId)
+                console.log(req.userId);
                 const order = await this.orderRepository.create({
                     ...orderInfor,
                     clientId: req.userId,
@@ -119,7 +120,9 @@ export class OrderService {
                 const cart = await this.cartRepository.getCart(req.userId);
                 await this.orderRepository.update(order.getDataValue("id"), {
                     num_items: cart?.getDataValue("total"),
-                    amount: parseInt(cart?.getDataValue("amount")) + parseInt(order.getDataValue("shippingCost")),
+                    amount:
+                        parseInt(cart?.getDataValue("amount")) +
+                        parseInt(order.getDataValue("shippingCost")),
                 });
                 const cartItems = await cart.getProducts();
                 await Promise.all(
@@ -187,12 +190,16 @@ export class OrderService {
         }
     }
 
-    public async recordMoMoOrder(req: Request, res: Response, next: NextFunction){
+    public async recordMoMoOrder(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
         const { userId, ...orderInfor } = req.body;
-        req.body = orderInfor
-        req.userId = userId
-        req.action = "create:own"
-        this.createOrder(req, res, next)
+        req.body = orderInfor;
+        req.userId = userId;
+        req.action = "create:own";
+        this.createOrder(req, res, next);
     }
 
     public async removeOrder(req: Request, res: Response, next: NextFunction) {
@@ -213,9 +220,9 @@ export class OrderService {
             const data: any = req.body;
             if (req.action === "update:own") {
                 await this.orderRepository.updateStatus(data);
-            } else if (req.action === "update:any"){
+            } else if (req.action === "update:any") {
                 await this.orderRepository.updateStatus(data);
-            } else throw new UnauthorizedError()
+            } else throw new UnauthorizedError();
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         } catch (err) {
@@ -224,15 +231,69 @@ export class OrderService {
         }
     }
 
-    public async updateItemStatus(req: Request, res: Response, next: NextFunction) {
+    public async updateItemStatus(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
         try {
             const status: number = HttpStatusCode.Success;
-            const {orderId, itemId, stt}: any = req.body;
-            if (req.action === "update:any"){
+            const { orderId, itemId, stt }: any = req.body;
+            if (req.action === "update:any") {
                 // await this.orderRepository.updateStatus(data);
-                
-            } else throw new UnauthorizedError()
+            } else throw new UnauthorizedError();
             res.status(status).send(statusMess.Success);
+            Message.logMessage(req, status);
+        } catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+
+    public async updateItems(req: Request, res: Response, next: NextFunction) {
+        try {
+            const status: number = HttpStatusCode.Success;
+            const data: any = req.body;
+            if (req.action === "update:own") {
+                await this.orderRepository.updateStatus(data);
+            } else if (req.action === "update:any") {
+                await this.orderRepository.updateStatus(data);
+            } else throw new UnauthorizedError();
+            res.status(status).send(statusMess.Success);
+            Message.logMessage(req, status);
+        } catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+
+    public async viewItems(req: Request, res: Response, next: NextFunction) {
+        try {
+            const status: number = HttpStatusCode.Success;
+            const { orderId, itemId, stt }: any = req.body;
+            if (req.action === "read:any") {
+                const orders = await this.orderRepository.all();
+                const order = await this.orderRepository.findById(2);
+                const product = await this.productRepository.findById(45);
+                await order.setProducts([45], {
+                    through:{
+                        status: "Cooking"
+                    }
+                })
+                // console.log(await order.getProducts())
+                const ordersWithItems = await Promise.all(
+                    orders.map(async (order) => {
+                        const orderItems = await order.getProducts();
+                        return {
+                            ...order.toJSON(),
+                            orderItems: orderItems.map((item: any) =>
+                                item.toJSON()
+                            ),
+                        };
+                    })
+                );
+                res.status(status).send(ordersWithItems);
+            } else throw new UnauthorizedError();
             Message.logMessage(req, status);
         } catch (err) {
             console.log(err);
