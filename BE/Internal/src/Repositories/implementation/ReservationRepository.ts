@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import "reflect-metadata";
 import { IReservationRepository } from "../IReservationRepository";
 import { BaseRepository } from "./BaseRepository";
-import { Reservation } from "../../Models";
+import { Reservation, Table } from "../../Models";
 import message from "../../Utils/Message";
 
 @injectable()
@@ -34,13 +34,14 @@ export class ReservationRepository
 				attributes: ['id', 'customerCount', 'customerName', 'status', 'dateTo', 'timeTo', 'description'],
 				where: {
 					dateTo: date_
-				}
+				},
+				include: Table 
 			});
-			console.log(allRes)
 			return allRes;
 		} catch (err) {
 			message.queryError(err);
 		}
 	}
+
 
 }

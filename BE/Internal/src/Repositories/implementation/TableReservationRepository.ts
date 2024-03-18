@@ -4,6 +4,7 @@ import { ITableReservationRepository } from "../ITableReservationRepository";
 import { BaseRepository } from "./BaseRepository";
 import { TableReservation } from "../../Models";
 import message from "../../Utils/Message";
+import { table } from "console";
 
 @injectable()
 export class TableReservationRepository
@@ -13,5 +14,4 @@ export class TableReservationRepository
 	constructor() {
 		super(TableReservation);
 	}
-
 }
