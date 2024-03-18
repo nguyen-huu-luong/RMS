@@ -11,11 +11,20 @@ module.exports = {
       customerCount: {
         type: Sequelize.INTEGER
       },
+      customerName: {
+        type: Sequelize.STRING
+      },
+      customerPhone: {
+        type: Sequelize.STRING
+      },
       status: {
         type: Sequelize.STRING
       },
       dateTo: {
-        type: Sequelize.DATE
+        type: Sequelize.DATEONLY
+      },
+      timeTo: {
+        type: Sequelize.STRING
       },
       description: {
         type: Sequelize.STRING
