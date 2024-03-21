@@ -13,6 +13,9 @@ class ReservationController {
         this.reservationService.viewAllReservationsPage(req, res, next)
     }
 
+    public filterReservation(req: Request, res: Response, next: NextFunction) {
+        this.reservationService.filterReservation(req, res, next)
+    }
 
 }
 

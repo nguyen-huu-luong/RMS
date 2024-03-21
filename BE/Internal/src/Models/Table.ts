@@ -1,4 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, type BelongsToCreateAssociationMixin } from 'sequelize';
 import { sequelize } from '../Configs';
 import Reservation from './Reservation';
 import TableOrder from './TableOrder';
@@ -7,6 +7,7 @@ import Order from './Order';
 import Floor from './Floor';
 import Loader from '../Loaders';
 class Table extends Model {
+  declare createFloor: BelongsToCreateAssociationMixin<Floor>;
   static associate() {
     Table.belongsToMany(Reservation, {
       through: TableReservation,

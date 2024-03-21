@@ -26,6 +26,9 @@ module.exports = {
       timeTo: {
         type: Sequelize.STRING
       },
+      timeEnd: {
+        type: Sequelize.STRING
+      },
       description: {
         type: Sequelize.STRING
       },

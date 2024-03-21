@@ -11,7 +11,7 @@ module.exports = {
 					key: "id",
 				},
 				allowNull: false,
-				onDelete: "CASCADE",
+				onDelete: "SET NULL",
 			},
 			reservationId: {
 				type: Sequelize.INTEGER,

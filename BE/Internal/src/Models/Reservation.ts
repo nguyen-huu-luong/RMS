@@ -68,6 +68,10 @@ Reservation.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    timeEnd: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     description: {
       type: DataTypes.STRING,
     },

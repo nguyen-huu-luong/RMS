@@ -11,8 +11,11 @@ class ReservationRouter {
     }
 
     public initialize(router: Router) {
-        router.route('/reservations')
+        router.route('/reservations/all')
             .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.reservationController.viewAllReservationsPage(req, res, next))
+
+        router.route('/reservations')
+        .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.reservationController.filterReservation(req, res, next))
     }
 }
 
