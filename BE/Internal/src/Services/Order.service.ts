@@ -253,14 +253,36 @@ export class OrderService {
     public async updateItems(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const data: any = req.body;
-            if (req.action === "update:own") {
-                await this.orderRepository.updateStatus(data);
-            } else if (req.action === "update:any") {
-                await this.orderRepository.updateStatus(data);
+            const {orderId, productId, dish_status} = req.body;
+            console.log(req.body)
+            if (req.action === "update:any") {
+                const order = await this.orderRepository.findById(orderId);
+                const product = await this.productRepository.findById(productId);
+                let orderItems = await order.getProducts();
+                const targetOrderItem = orderItems.map((item: any) => {
+                    if (item.OrderItem.getDataValue("productId") == productId)
+                        return item.OrderItem;
+                }).filter((order: any) => order !== undefined);
+                await order.addProduct(product, {
+                    through: {
+                        quantity: targetOrderItem[0].quantity,
+                        amount:
+                            targetOrderItem[0].quantity *
+                            product.getDataValue("price"),
+                        status: dish_status,
+                        createdAt: targetOrderItem[0].createdAt,
+                        updatedAt: new Date(),
+                    },
+                });
+                orderItems = await order.getProducts();
+                const check = orderItems.every((item: any) => item.OrderItem.status === 'Ready');
+                if (check) {
+                    await order.update({ status: dish_status });
+                    return res.status(status).send("Update Order");
+                } 
             } else throw new UnauthorizedError();
-            res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
+            return res.status(status).send(statusMess.Success);
         } catch (err) {
             console.log(err);
             next(err);
@@ -273,25 +295,17 @@ export class OrderService {
             const { orderId, itemId, stt }: any = req.body;
             if (req.action === "read:any") {
                 const orders = await this.orderRepository.all();
-                const order = await this.orderRepository.findById(2);
-                const product = await this.productRepository.findById(45);
-                await order.setProducts([45], {
-                    through:{
-                        status: "Cooking"
-                    }
-                })
-                // console.log(await order.getProducts())
-                const ordersWithItems = await Promise.all(
-                    orders.map(async (order) => {
-                        const orderItems = await order.getProducts();
-                        return {
-                            ...order.toJSON(),
-                            orderItems: orderItems.map((item: any) =>
-                                item.toJSON()
-                            ),
-                        };
+                const ordersWithItems = (await Promise.all(
+                    orders.map(async (order: any) => {
+                        if (order.status === 'Preparing' || order.status === 'Ready') {
+                            const orderItems = await order.getProducts();
+                            return {
+                                ...order.toJSON(),
+                                orderItems: orderItems.map((item: any) => item.toJSON()),
+                            };
+                        } else return null;
                     })
-                );
+                )).filter((order: any) => order !== null)
                 res.status(status).send(ordersWithItems);
             } else throw new UnauthorizedError();
             Message.logMessage(req, status);

@@ -10,7 +10,7 @@ import {
     Select,
     Alert,
     Descriptions,
-    Tag
+    Tag,
 } from "antd";
 import type { TableProps, GetProp, TableColumnType } from "antd";
 import { variables } from "@/app";
@@ -30,6 +30,7 @@ import { Switch, Modal } from "antd";
 import { useRouter } from "next-intl/client";
 import { createStyles, useTheme } from "antd-style";
 import { useSession } from "next-auth/react";
+import moment from "moment";
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
     "my-modal-mask": {},
@@ -37,7 +38,7 @@ const useStyle = createStyles(({ token }) => ({
     "my-modal-footer": {},
     "my-modal-content": {},
 }));
-
+const { confirm } = Modal;
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
     GetProp<TableProps, "pagination">,
@@ -90,6 +91,24 @@ const updateOrder = async (requestBody: any, token: any) => {
         throw error;
     }
 };
+
+function showConfirm() {
+    confirm({
+        title: "Do you want to delete these items?",
+        content:
+            "When clicked the OK button, this dialog will be closed after 1 second",
+        async onOk() {
+            try {
+                return new Promise((resolve, reject) => {
+                    setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
+                });
+            } catch (e) {
+                return console.log("Oops errors!");
+            }
+        },
+        onCancel() {},
+    });
+}
 
 const orderFetcher = async (url: any, token: any) => {
     try {
@@ -160,7 +179,6 @@ const Order: React.FC = () => {
         },
     ];
 
-    const [checked, setChecked] = useState(true);
     const router = useRouter();
     const [modalData, setModalData] = useState<any>({
         id: "",
@@ -248,7 +266,7 @@ const Order: React.FC = () => {
             // Gọi fetchData khi authenticated là true
             fetchData();
         }
-    }, [authenticated]);
+    }, [authenticated, JSON.stringify(tableParams)]);
 
     const showModal = async (id: any) => {
         const res = await axios.get(`http://localhost:3003/api/orders/${id}`, {
@@ -458,25 +476,36 @@ const Order: React.FC = () => {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            render: (text) => (
-                <>
-                    {text == "Cancel" ? (
-                        <Tag color='red' >{text}</Tag>
-                    ) : text == "Pending" ? (
-                        <Tag color='blue'>{text}</Tag>
-                    ) : text == "Preparing" ? (
-                        <Tag color='green'>{text}</Tag>
-                    ) : text == "Ready" ? (
-                        <Tag color='orange'>{text}</Tag>
-                    ) : text == "Delivering" ? (
-                        <Tag color='yellow'>{text}</Tag>
-                    ) : text == "Done" ? (
-                        <Tag color='purple'>{text}</Tag>
-                    ) : (
-                        ""
-                    )}
-                </>
-            ),
+            render: (_, record) => {
+                let color = "";
+                switch (record.status) {
+                    case "Cancel":
+                        color = "red";
+                        break;
+                    case "Pending":
+                        color = "blue";
+                        break;
+                    case "Preparing":
+                        color = "green";
+                        break;
+                    case "Ready":
+                        color = "orange";
+                        break;
+                    case "Delivering":
+                        color = "yellow";
+                        break;
+                    case "Done":
+                        color = "purple";
+                        break;
+                    default:
+                        break;
+                }
+                return (
+                    <Space size='small'>
+                        <Tag color={color}>{record.status.toUpperCase()}</Tag>;
+                    </Space>
+                );
+            },
             ...getColumnSearchProps("status"),
         },
         {
@@ -486,9 +515,12 @@ const Order: React.FC = () => {
             ...getColumnSearchProps("amount"),
         },
         {
-            title: "CreatedAt",
+            title: "Created At",
             dataIndex: "createdAt",
             key: "createdAt",
+            render: (text, record) => {
+                return <>{moment(text).format("MMMM Do YYYY, h:mm:ss a")}</>;
+            },
             ...getColumnSearchProps("createdAt"),
         },
         {
@@ -499,13 +531,52 @@ const Order: React.FC = () => {
                     {record.status == "Pending" ? (
                         <>
                             <a
-                                onClick={() => handleAcceptOrder(record.id)}
+                                onClick={() => {
+                                    Modal.confirm({
+                                        title: "Accept this order",
+                                        autoFocusButton: null,
+                                        okButtonProps: {
+                                            style: {
+                                                backgroundColor: "#2b60ff",
+                                            },
+                                        },
+                                        okText: "Accept",
+                                        onOk: () => {
+                                            handleAcceptOrder(record.id);
+                                        },
+                                        footer: (_, { OkBtn, CancelBtn }) => (
+                                            <>
+                                                <CancelBtn />
+                                                <OkBtn />
+                                            </>
+                                        ),
+                                    });
+                                }}
                                 className='text-green-700 hover:text-green-600'
                             >
                                 Accept
                             </a>
                             <a
-                                onClick={() => handleRejectOrder(record.id)}
+                                onClick={() => {
+                                    Modal.confirm({
+                                        title: "Reject this order",
+                                        autoFocusButton: null,
+                                        okButtonProps: {
+                                            style: {
+                                                backgroundColor: "#f7454e",
+                                            },
+                                        },
+                                        okText: "Reject",
+                                        onOk: () =>
+                                            handleRejectOrder(record.id),
+                                        footer: (_, { OkBtn, CancelBtn }) => (
+                                            <>
+                                                <CancelBtn />
+                                                <OkBtn />
+                                            </>
+                                        ),
+                                    });
+                                }}
                                 className='text-red-700 hover:text-red-600'
                             >
                                 Reject
@@ -514,12 +585,57 @@ const Order: React.FC = () => {
                     ) : (
                         ""
                     )}
-                    {record.status == "ready" ? (
+                    {record.status == "Ready" ? (
                         <a
-                            onClick={() => handleDeliverOrder(record.id)}
+                            // onClick={() => handleDeliverOrder(record.id)}
+                            onClick={() => {
+                                Modal.confirm({
+                                    title: "Deliver this order",
+                                    autoFocusButton: null,
+                                    okButtonProps: {
+                                        style: {
+                                            backgroundColor: "#2b60ff",
+                                        },
+                                    },
+                                    okText: "Deliver",
+                                    onOk: () => handleDeliverOrder(record.id),
+                                    footer: (_, { OkBtn, CancelBtn }) => (
+                                        <>
+                                            <CancelBtn />
+                                            <OkBtn />
+                                        </>
+                                    ),
+                                });
+                            }}
                             className='text-blue-700 hover:text-blue-600'
                         >
                             Deliver
+                        </a>
+                    ) : record.status == "Delivering" ? (
+                        <a
+                            // onClick={() => handleDoneOrder(record.id)}
+                            onClick={() => {
+                                Modal.confirm({
+                                    title: "Finish delivering this order",
+                                    autoFocusButton: null,
+                                    okButtonProps: {
+                                        style: {
+                                            backgroundColor: "#2b60ff",
+                                        },
+                                    },
+                                    okText: "Finish",
+                                    onOk: () => handleDoneOrder(record.id),
+                                    footer: (_, { OkBtn, CancelBtn }) => (
+                                        <>
+                                            <CancelBtn />
+                                            <OkBtn />
+                                        </>
+                                    ),
+                                });
+                            }}
+                            className='text-blue-700 hover:text-blue-600'
+                        >
+                            Done
                         </a>
                     ) : (
                         ""
@@ -595,7 +711,15 @@ const Order: React.FC = () => {
 
     const handleDeliverOrder = async (orderId: number) => {
         await updateOrder(
-            { orderId: orderId, status: "Deliver" },
+            { orderId: orderId, status: "Delivering" },
+            session?.user.accessToken
+        );
+        fetchData();
+    };
+
+    const handleDoneOrder = async (orderId: number) => {
+        await updateOrder(
+            { orderId: orderId, status: "Done" },
             session?.user.accessToken
         );
         fetchData();
@@ -621,7 +745,7 @@ const Order: React.FC = () => {
                     },
                 }}
             >
-                <Space direction='vertical'>
+                <div className='w-full flex flex-col justify-start gap-5'>
                     {/* <CustomerFilterBar /> */}
                     {error.isError && (
                         <Alert
@@ -665,24 +789,15 @@ const Order: React.FC = () => {
                                     )
                                 }
                             />
-                        </div>
-                        <Space>
                             <Button onClick={handleClearFilter}>
                                 Clear filters
                             </Button>
                             <Button onClick={handleClearAll}>
                                 Clear filters and sorters
                             </Button>
-                            <Switch
-                                checkedChildren='Table'
-                                unCheckedChildren='Kanban'
-                                checked={checked}
-                                onChange={setChecked}
-                            />
-                        </Space>
+                        </div>
                     </div>
-
-                    {checked ? (
+                    <div className='w-full h-auto'>
                         <Table
                             rowSelection={{
                                 ...rowSelection,
@@ -702,10 +817,8 @@ const Order: React.FC = () => {
                             dataSource={data}
                             onChange={handleTableChange}
                         />
-                    ) : (
-                        <div className='w-full rounded-sm bg-white p-3'></div>
-                    )}
-                </Space>
+                    </div>
+                </div>
             </ConfigProvider>
             <Modal
                 classNames={classNames}

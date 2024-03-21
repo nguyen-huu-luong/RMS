@@ -25,7 +25,7 @@ export default function Cart() {
         error: cartItemsError,
         isLoading: cartItemsLoading
     } = useSWR(session ? [`http://localhost:3003/api/carts`, session.user.accessToken] : null,  ([url, token]) => cartFetcher(url, token));
-    if (status === "loading") return <>Loading.....</>;
+    if (status === "loading") return <div>Loading.....</div>;
     if (status === "unauthenticated") router.push('/signin');
     // Order step
     const updateQuantity = async (itemId: number, newQuantity: number) => {
@@ -43,10 +43,8 @@ export default function Cart() {
         await removeProduct(session?.user.accessToken, itemId)
     };
 
-    // Check if cart is empty
     if (cartItemsError) return <div>Failed to load</div>;
     if (cartItemsLoading) return <div>Loading...</div>;
-    console.log(cartItems)
     if (!cartItems) return <div>Loading...</div>;
     return (cartItems.cart.total === 0) ? (
         <div className='w-full h-auto flex flex-col justify-center items-center gap-5 p-20 bg-primary-white rounded-3xl transition-all duration-300'>
