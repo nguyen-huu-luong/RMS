@@ -7,7 +7,11 @@
         "discount": "Get MORE discount on every weekend.",
         "menu": "Menu Category",
         "all": "View all",
-        "trend": "Trending Orders"
+        "trend": "Trending Orders",
+        "Food_des": "Descriptions",
+        "Price": "Price",
+        "Add": "ADD TO CART",
+        "Success": "Add to cart successfully!"
     },
     "NavBar":{
         "Home": "Home",
@@ -76,7 +80,9 @@
         "Shipping":"Shipping cost",
         "Pay":"Pay and Order",
         "Total":"Total amount",
-        "Back":"Back to cart"
+        "Back":"Back to cart",
+        "Success": "ORDER SUCCESSFULLY",
+        "View": "View Order"
     },
     "Profile":{
         "Profile": "Profile",

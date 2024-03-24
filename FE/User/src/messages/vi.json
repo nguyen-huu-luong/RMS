@@ -7,7 +7,12 @@
         "discount": "Nhận thêm NHIỀU ưu đãi vào cuối tuần.",
         "menu": "Danh mục món ăn",
         "all": "Xem tất cả",
-        "trend": "Món ăn bán chạy"
+        "trend": "Món ăn bán chạy",
+        "Food_des": "Mô tả",
+        "Price": "Giá",
+        "Add": "THÊM VÀO GIỎ",
+        "Success": "Thêm vào giỏ hàng thành công!"
+
     },    
     "NavBar":{
         "Home": "Trang chủ",
@@ -76,7 +81,9 @@
         "Shipping":"Phí ship",
         "Pay":"Thanh toán và đặt hàng",
         "Total":"Thành tiền",
-        "Back":"Về giỏ hàng"
+        "Back":"Về giỏ hàng",
+        "Success": "ĐẶT HÀNG THÀNH CÔNG",
+        "View": "Xem đơn hàng"
     },
     "Profile":{
         "Profile": "Thông tin người dùng",

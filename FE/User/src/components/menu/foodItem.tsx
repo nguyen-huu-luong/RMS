@@ -3,7 +3,7 @@ import { PlusCircleFilled } from "@ant-design/icons";
 import { message } from "antd";
 import { useSession } from "next-auth/react";
 import { addToCart } from "@/app/api/product/cart";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next-intl/client";
 
 const FoodItem = ({
@@ -23,6 +23,7 @@ const FoodItem = ({
     };
 }) => {
     const locale = useLocale();
+    const t = useTranslations('Home')
     const { data: session, status } = useSession();
     const router = useRouter();
     const handleAddToCart = async () => {
@@ -33,7 +34,7 @@ const FoodItem = ({
                 productId: params.food.id,
                 quantity: 1,
             });
-            message.success("Added food to cart");
+            message.success(t('Success'));
         }
     };
     return (

@@ -123,7 +123,7 @@ const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
                         rules={[
                             {
                                 required: true,
-                                message: "Please choose your payment method!",
+                                message: t('Method_warn'),
                             },
                         ]}
                     >
