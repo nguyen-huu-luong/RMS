@@ -47,7 +47,7 @@ const FoodItem = ({
                 onClick={() => params.openModal(params.food)}
             >
                 <Image
-                    src={params.food.thumbnails}
+                    src={'/'}
                     alt={params.food.name}
                     width={200}
                     height={200}

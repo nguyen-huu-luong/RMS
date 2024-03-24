@@ -1,5 +1,5 @@
-'use client'
-import { useState } from "react";
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next-intl/link";
 import { useLocale, useTranslations } from "next-intl";
 import Progress from "@/components/order/progressBar";
@@ -11,22 +11,36 @@ import {
 import Image from "next/image";
 import moneyFormatter from "@/components/function/moneyFormatter";
 
-import useSWR from "swr"; 
+import useSWR from "swr";
 import { cartFetcher, editCart, removeProduct } from "@/app/api/product/cart";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
+import Loading from "@/components/loading";
 
 export default function Cart() {
-    const locale = useLocale()
-    const { data: session, status } = useSession()
+    const locale = useLocale();
+    const t = useTranslations('Cart');
+    const { data: session, status } = useSession();
     const router = useRouter();
+    useEffect(() => {
+        if (status === "loading") return;
+        if (status === "unauthenticated") {
+            router.push("/signin");
+        }
+    }, [status, router]);
     const {
         data: cartItems,
         error: cartItemsError,
-        isLoading: cartItemsLoading
-    } = useSWR(session ? [`http://localhost:3003/api/carts`, session.user.accessToken] : null,  ([url, token]) => cartFetcher(url, token));
-    if (status === "loading") return <>Loading.....</>;
-    if (status === "unauthenticated") router.push('/signin');
+        isLoading: cartItemsLoading,
+    } = useSWR(
+        session
+            ? [`http://localhost:3003/api/carts`, session.user.accessToken]
+            : null,
+        ([url, token]) => cartFetcher(url, token)
+    );
+    if (status === "loading") return <Loading />;
+    if (status === "unauthenticated") router.push("/signin");
+
     // Order step
     const updateQuantity = async (itemId: number, newQuantity: number) => {
         if (newQuantity === 0) {
@@ -35,20 +49,18 @@ export default function Cart() {
         }
         await editCart(session?.user.accessToken, {
             productId: itemId,
-            quantity: newQuantity
-        })
+            quantity: newQuantity,
+        });
     };
-
     const removeItem = async (itemId: number) => {
-        await removeProduct(session?.user.accessToken, itemId)
+        await removeProduct(session?.user.accessToken, itemId);
     };
 
     // Check if cart is empty
     if (cartItemsError) return <div>Failed to load</div>;
-    if (cartItemsLoading) return <div>Loading...</div>;
-    console.log(cartItems)
-    if (!cartItems) return <div>Loading...</div>;
-    return (cartItems.cart.total === 0) ? (
+    if (cartItemsLoading) return <Loading />;
+    if (!cartItems) return <Loading />;
+    return cartItems.cart.total === 0 ? (
         <div className='w-full h-auto flex flex-col justify-center items-center gap-5 p-20 bg-primary-white rounded-3xl transition-all duration-300'>
             <div className='w-auto h-auto rounded-lg overflow-hidden'>
                 <Image
@@ -59,40 +71,36 @@ export default function Cart() {
                     unoptimized
                 />
             </div>
-            <span className='font-bold'>
-                There is no product in your cart now.
-            </span>
+            <span className='font-bold'>{t("No")}</span>
             <Link
                 href={"/menu"}
                 locale={locale}
                 className='p-3 w-auto h-auto rounded-lg font-extrabold text-lg border-orange-500 border-2 hover:bg-primary-400 bg-primary text-item-white transition-all duration-300 flex justify-center'
             >
-                CONTINUE BUYING
+                {t("Continue")}
             </Link>
         </div>
     ) : (
         <div className='flex flex-col lg:flex-row justify-between gap-5 p-10'>
             <div className='flex flex-col justify-between gap-5 w-full'>
-                <Progress current={0}/>
+                <Progress current={0} />
                 <div className='w-full h-auto p-10 rounded-3xl bg-primary-white overflow-x-auto'>
                     <table className='table-auto min-w-full'>
                         <thead>
                             <tr>
                                 <th className='text-left p-2 font-extrabold text-lg'>
-                                    DISH NAME
+                                    {t("Dish")}
                                 </th>
                                 <th className='text-left p-2 font-extrabold text-lg'>
-                                    QUANTITY
+                                    {t("Quantity")}
                                 </th>
                                 <th className='text-left p-2 font-extrabold text-lg'>
-                                    PRICE
+                                    {t("Price")}
                                 </th>
                                 <th className='text-left p-2 font-extrabold text-lg'>
-                                    TOTAL
+                                    {t("Total")}
                                 </th>
-                                <th className='text-left p-2 font-extrabold text-lg text-white'>
-                                    A
-                                </th>
+                                <th className='text-left p-2 font-extrabold text-lg text-white'></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -104,12 +112,12 @@ export default function Cart() {
                                     <td className='text-left p-2 font-medium text-xl flex flex-row justify-between w-24'>
                                         <button
                                             className='w-auto h-auto text-primary'
-                                            onClick={() => 
-                                                {updateQuantity(
+                                            onClick={() => {
+                                                updateQuantity(
                                                     item.id,
                                                     item.CartItem.quantity - 1
-                                                );}
-                                            }
+                                                );
+                                            }}
                                         >
                                             <MinusCircleOutlined
                                                 style={{
@@ -140,9 +148,7 @@ export default function Cart() {
                                         {moneyFormatter(item.price)}
                                     </td>
                                     <td className='text-left p-2 font-medium text-xl '>
-                                        {moneyFormatter(
-                                            item.CartItem.amount
-                                        )}
+                                        {moneyFormatter(item.CartItem.amount)}
                                     </td>
                                     <td className='text-left p-2 font-medium text-xl '>
                                         <button
@@ -167,7 +173,7 @@ export default function Cart() {
             <div className='w-auto h-auto p-10 rounded-3xl bg-primary-white flex flex-col gap-5 justify-start items-center font-extrabold'>
                 <div className='w-full flex flex-row justify-between gap-14 text-lg'>
                     <span className='w-auto whitespace-nowrap'>
-                        Provisional Amount
+                        {t("Amount")}
                     </span>
                     <span className='w-auto whitespace-nowrap text-primary'>
                         {moneyFormatter(cartItems.cart.amount)}
@@ -178,14 +184,14 @@ export default function Cart() {
                     locale={locale}
                     className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 hover:bg-primary hover:text-item-white transition-all duration-300 flex justify-center'
                 >
-                    Order more dish
+                    {t("More")}
                 </Link>
                 <Link
                     href={"/order"}
                     locale={locale}
                     className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-primary hover:bg-primary-400 text-item-white transition-all duration-300  flex justify-center'
                 >
-                    Continue
+                    {t("Continue_2")}
                 </Link>
             </div>
         </div>

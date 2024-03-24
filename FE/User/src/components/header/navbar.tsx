@@ -23,6 +23,7 @@ const NavBar = () => {
     const router = useRouter();
     const [click, setClick] = useState(false);
     const [search, setSearch] = useState(true);
+    const t = useTranslations("NavBar");
     const MENU_LISTS = [
         { name: "Home", href: `` },
         { name: "Menu", href: `menu` },
@@ -41,13 +42,13 @@ const NavBar = () => {
                               href={`/profile`}
                               locale={locale}
                           >
-                              Profile
+                              {t("Profile")}
                           </Link>
                       ),
                   },
                   {
                       key: "logout",
-                      label: "Log out",
+                      label: t("LogOut"),
                       onClick: () => {
                           signOut();
                       },
@@ -58,7 +59,7 @@ const NavBar = () => {
                       key: "signin",
                       label: (
                           <Link key={"signin"} href={`/signin`} locale={locale}>
-                              Sign In
+                              {t("SingIn")}{" "}
                           </Link>
                       ),
                   },
@@ -70,7 +71,7 @@ const NavBar = () => {
                               href={`/register`}
                               locale={locale}
                           >
-                              Register
+                              {t("Register")}{" "}
                           </Link>
                       ),
                   },
@@ -82,7 +83,6 @@ const NavBar = () => {
     const toggleSearch = () => {
         setSearch(!search);
     };
-    const t = useTranslations("NavBar");
     return (
         <>
             <nav className='sticky top-0 w-full h-16 shadow-md z-50 bg-primary-white'>

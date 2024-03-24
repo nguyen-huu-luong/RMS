@@ -7,12 +7,18 @@ import {
     useMap,
     useMapEvents,
 } from "react-leaflet";
-import { Button } from "antd";
 import React, { useState, useEffect } from "react";
 import { LatLngTuple } from "leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
+import MapMarkerIcon from "../../../public/marker.png";
+
+const customIcon = new L.Icon({
+  iconUrl: MapMarkerIcon.src,
+  iconSize: [35, 35],
+});
+
 const default_lat = 10.772148767808112;
 const default_lon = 106.65794471088427;
 
@@ -147,27 +153,25 @@ const Map = ({ form, setFee }: { form: any; setFee: any }) => {
         }
     };
     return (
-        <>
-            <Button type='text' onClick={handleSearch}>
-                Get your location
-            </Button>
+        <div className="z-0">
             <MapContainer
                 style={{
                     height: "250px",
                     width: "100%",
+                    zIndex: 0,
                 }}
                 center={coord}
                 zoom={20}
                 scrollWheelZoom={true}
             >
                 <TileLayer url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' />
-                <Marker position={markerPosition}>
+                <Marker position={markerPosition} icon={customIcon}>
                     <Popup>Your location!</Popup>
                 </Marker>
                 <UseMapEventsWrapper handleMapClick={handleMapClick} />
                 <MyComponent />
             </MapContainer>
-        </>
+        </div>
     );
 };
 

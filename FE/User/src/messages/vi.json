@@ -1,7 +1,13 @@
 {
     "Home":{
         "name": "Home Cuisine",
-        "description":"Chào mừng đến với Home Cuisine!"
+        "description":"Chào mừng đến với Home Cuisine!",
+        "hello": "Xin chào khách hàng!",
+        "deal": "Ưu đãi cuối tuần",
+        "discount": "Nhận thêm NHIỀU ưu đãi vào cuối tuần.",
+        "menu": "Danh mục món ăn",
+        "all": "Xem tất cả",
+        "trend": "Món ăn bán chạy"
     },    
     "NavBar":{
         "Home": "Trang chủ",
@@ -9,7 +15,11 @@
         "News": "Tin tức",
         "Deals": "Khuyến mãi",
         "About": "Về chúng tôi",
-        "Search-placeholder": "Tìm kiếm"
+        "Search-placeholder": "Tìm kiếm",
+        "Profile": "Thông tin",
+        "LogOut": "Đăng xuất",
+        "SignIn": "Đăng nhập",
+        "Register": "Đăng ký"
     },
     "Footer":{
         "About": "Về chúng tôi",
@@ -31,6 +41,65 @@
         "Name-plh": "Nhập tên của bạn",
         "Phone-plh": "Nhập số điện thoại của bạn",
         "Email-plh":"Nhập email của bạn"
+    },
+    "Cart":{
+        "No": "Không có sản phẩm nào trong giỏ hàng của bạn.",
+        "Continue": "TIẾP TỤC MUA",
+        "Dish": "TÊN MÓN ĂN",
+        "Quantity": "SỐ LƯỢNG",
+        "Price": "ĐƠN GIÁ",
+        "Total": "THÀNH TIỀN",
+        "Amount": "Tổng hóa đơn",
+        "More": "Đặt thêm món",
+        "Continue_2": "Tiếp tục"
+    },
+    "Order":{
+        "Cart": "GIỎ HÀNG",
+        "Order": "ĐẶT HÀNG",
+        "Payment": "THANH TOÁN",
+        "Ship": "ĐỊA CHỈ NHẬN HÀNG",
+        "Deliver": "Gửi tới địa chỉ",
+        "Receive": "Nhận tại nhà hàng",
+        "Address": "Đại học bách khoa TP HCM",
+        "Address_plh": "Địa chỉ cụ thể",
+        "Address_warn": "Quý khách vui lòng nhập địa chỉ!",
+        "Note": "GHI CHÚ",
+        "Method": "PHƯƠNG THỨC THANH TOÁN",
+        "Method_warn": "Quý khách vui lòng chọn phương thức thanh toán!",
+        "Cash": "TIỀN MẶT",
+        "Momo": "MOMO",
+        "Discount": "Mã giảm giá",
+        "Choose": "Chọn mã",
+        "No_discount":"Bạn chưa chọn mã giảm giá nào.",
+        "Pre_discount":"Giá ban đầu",
+        "Discount_amount":"Giá sau khi giảm",
+        "Shipping":"Phí ship",
+        "Pay":"Thanh toán và đặt hàng",
+        "Total":"Thành tiền",
+        "Back":"Về giỏ hàng"
+    },
+    "Profile":{
+        "Profile": "Thông tin người dùng",
+        "Date": "Ngày",
+        "Status": "Trạng thái",
+        "Action": "Hành động",
+        "Manage": "Quản lý đơn hàng",
+        "No": "Bạn chưa có đơn hàng nào.",
+        "Name": "Tên",
+        "Quantity": "Số lượng",
+        "Price": "Đơn giá",
+        "Amount": "Thành tiền",
+        "Order":"Đơn",
+        "Ship": "Phí vận chuyển",
+        "Remain":"Còn lại",
+        "Detail":"Chi tiết",
+        "Address":"Địa chỉ nhận hàng",
+        "Take": "Lấy tại quầy",
+        "Pay":"Phương thức thanh toán",
+        "Receiver": "Người nhận",
+        "Phone": "Số điện thoại",
+        "Note":"Ghi chú",
+        "Item": "Danh sách món ăn"
     },
     "404":{
         "Lang": "Tiếng việt"

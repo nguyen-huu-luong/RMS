@@ -39,7 +39,6 @@ export const editCart = async (token: any,requestBody: object) => {
           'Content-Type': 'application/json',
         },
       });
-      console.log(requestBody)
       mutate([`http://localhost:3003/api/carts`, token])
       return response.data;
     } catch (error) {

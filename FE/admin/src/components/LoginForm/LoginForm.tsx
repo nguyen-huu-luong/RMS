@@ -30,14 +30,10 @@ export const LoginForm: React.FC = () => {
                 console.log(error);
             }
         } else {
-            router.push("/profile");
+            router.push("/");
         }
     };
-    const signInGoogle = () => {
-        signIn("google", {
-            redirect: true,
-        });
-    };
+
     const showError = (message?: string) => {
         messageApi.open({
             type: "error",
@@ -144,31 +140,6 @@ export const LoginForm: React.FC = () => {
                         {/* <span>Or</span>
                         <div className='h-[1px] w-full bg-primary line'></div> */}
                     </div>
-                    {/* <div className='flex gap-4'>
-                        <Button
-                            className='w-full flex items-center justify-center'
-                            onClick={signInGoogle}
-                        >
-                            <Image
-                                src={"/google-icon.webp"}
-                                width={24}
-                                height={24}
-                                alt=''
-                                className='me-2'
-                            />
-                            <span>Google</span>
-                        </Button>
-                        <Button className='w-full flex items-center justify-center'>
-                            <img
-                                src={"/Facebook.png"}
-                                width={24}
-                                height={24}
-                                alt=''
-                                className='me-2'
-                            />
-                            <span>Facebook</span>
-                        </Button>
-                    </div> */}
                 </Form>
             </ConfigProvider>
         </>

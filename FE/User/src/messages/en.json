@@ -1,7 +1,13 @@
 {
     "Home":{
         "name": "Home Cuisine",
-        "description":"Welcome to Home Cuisine!"
+        "description":"Welcome to Home Cuisine!",
+        "hello": "Hello, CUSTOMER!",
+        "deal": "Deal of the weekend",
+        "discount": "Get MORE discount on every weekend.",
+        "menu": "Menu Category",
+        "all": "View all",
+        "trend": "Trending Orders"
     },
     "NavBar":{
         "Home": "Home",
@@ -9,7 +15,11 @@
         "News": "News",
         "Deals": "Deals",
         "About": "About us",
-        "Search-placeholder": "Search"
+        "Search-placeholder": "Search",
+        "Profile": "Profile",
+        "LogOut": "Log Out",
+        "SignIn": "Sign In",
+        "Register": "Register"
     },
     "Footer":{
         "About": "About us",
@@ -31,6 +41,65 @@
         "Name-plh": "Input your name here",
         "Phone-plh": "Input your phone here",
         "Email-plh":"Input your email here"
+    },
+    "Cart":{
+        "No": "There is no product in your cart now.",
+        "Continue": "CONTINUE BUYING",
+        "Dish": "DISH NAME",
+        "Quantity": "QUANTITY",
+        "Price": "PRICE",
+        "Total": "TOTAL",
+        "Amount": "Provisional Amount",
+        "More": "Order more dish",
+        "Continue_2": "Continue"
+    },
+    "Order":{
+        "Cart": "CART",
+        "Order": "ORDER",
+        "Payment": "PAYMENT",
+        "Ship": "SHIPPING ADDRESS",
+        "Deliver": "Deliver to address",
+        "Receive": "Receive at restaurant",
+        "Address": "Ground Floor, TOPS Au Co Shopping Center, No. 685 Au Co, Tan Thanh Ward, Tan Phu District, Ho Chi Minh City",
+        "Address_plh": "Detail Address",
+        "Address_warn": "Please input your address!",
+        "Note": "ORDER NOTE",
+        "Method": "PAYMENT METHOD",
+        "Method_warn": "Please choose your payment method!",
+        "Cash": "CASH",
+        "Momo": "MOMO",
+        "Discount": "Discount Code",
+        "Choose": "Choose Code",
+        "No_discount":"You haven't added any discount codes.",
+        "Pre_discount":"Pre-discount amount",
+        "Discount_amount":"Discount amount",
+        "Shipping":"Shipping cost",
+        "Pay":"Pay and Order",
+        "Total":"Total amount",
+        "Back":"Back to cart"
+    },
+    "Profile":{
+        "Profile": "Profile",
+        "Date": "Date",
+        "Status": "Status",
+        "Action": "Action",
+        "Manage": "Manage Order",
+        "No": "You haven't placed any orders yet.",
+        "Name": "Name",
+        "Quantity": "Quantity",
+        "Price": "Price",
+        "Amount": "Amount",
+        "Order":"Order",
+        "Ship": "Shipping Cost",
+        "Remain":"Remaining",
+        "Detail":"Detail",
+        "Address":"Shipping Address",
+        "Take": "Take away",
+        "Pay":"Payment Method",
+        "Receiver": "Receiver",
+        "Phone": "Phone Number",
+        "Note":"Note",
+        "Item": "Items"
     },
     "404":{
         "Lang": "Tiếng anh"

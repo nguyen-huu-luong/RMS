@@ -32,7 +32,7 @@ export class CartService {
                 items: cartItems.map((item: any) => item.toJSON()),
             };
             Message.logMessage(req, status);
-            return res.status(status).send(response);
+            res.status(status).send(response);
         } catch (err) {
             console.log(err);
             next(err);
