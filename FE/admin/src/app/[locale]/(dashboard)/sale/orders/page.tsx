@@ -12,6 +12,7 @@ import {
     Descriptions,
     Tag,
 } from "antd";
+import { io } from "socket.io-client";
 import type { TableProps, GetProp, TableColumnType } from "antd";
 import { variables } from "@/app";
 import {
@@ -31,6 +32,8 @@ import { useRouter } from "next-intl/client";
 import { createStyles, useTheme } from "antd-style";
 import { useSession } from "next-auth/react";
 import moment from "moment";
+import {message} from 'antd';
+
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
     "my-modal-mask": {},
@@ -131,6 +134,7 @@ const Order: React.FC = () => {
     const searchInput = useRef<InputRef>(null);
     const [data, setData] = useState<DataType[]>();
     const [loading, setLoading] = useState(false);
+    const [socket, setSocket] = useState<any>(null);
     const [selectedOrders, setSelectedOrders] = useState<DataType[]>();
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState<any>([]);
@@ -192,6 +196,7 @@ const Order: React.FC = () => {
     });
     const { styles } = useStyle();
     const { data: session, status } = useSession();
+
     const fetchData = () => {
         setLoading(true);
         try {
@@ -258,8 +263,30 @@ const Order: React.FC = () => {
             setAuthenticated(true);
         } else if (status === "unauthenticated") {
             router.push("/signin");
-        }
-    }, [status, router]);
+        } else return;
+        const socketClient = io("http://localhost:3003", {
+            auth: {
+                token: session?.user.accessToken,
+            },
+        });
+        socketClient.on("connect", () => {
+            setSocket(socketClient);
+            console.log("Connected to socket server");
+        });
+        socketClient.on("connect_error", (error: any) => {
+            console.log(error);
+        });
+        socketClient.on("order:finish:fromChef", (orderId: any) => {
+            message.success(`Finish order #${orderId}! Ready to deliver!`);
+            fetchData()
+        });
+        socketClient.on("disconnect", () => {
+            console.log("Disconnected from socket server");
+        });
+        return () => {
+            socketClient.disconnect();
+        };
+    }, [status, router, session?.user.accessToken]);
 
     useEffect(() => {
         if (authenticated) {
@@ -267,7 +294,11 @@ const Order: React.FC = () => {
             fetchData();
         }
     }, [authenticated, JSON.stringify(tableParams)]);
-
+    // useEffect(() => {
+    //     socket.on("order:finish:fromChef", (orderId: any) => {
+    //         console.log(orderId)
+    //     });
+    // }, [socket]);
     const showModal = async (id: any) => {
         const res = await axios.get(`http://localhost:3003/api/orders/${id}`, {
             headers: {
@@ -706,6 +737,7 @@ const Order: React.FC = () => {
             { orderId: orderId, status: "Preparing" },
             session?.user.accessToken
         );
+        socket.emit("staff:order:prepare", orderId);
         fetchData();
     };
 

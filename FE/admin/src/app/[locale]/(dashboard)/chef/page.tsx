@@ -6,6 +6,8 @@ import { useRouter } from "next-intl/client";
 import useSWR from "swr";
 import { orderItemsFetcher } from "@/app/api/product/order";
 import Column from "@/components/Chef/column";
+import {message} from 'antd';
+
 function Chef() {
     const router = useRouter();
     const [orders, setOrders] = useState<any>(null);
@@ -14,6 +16,39 @@ function Chef() {
     const [doneItems, setDoneItems] = useState<any>(null);
     const [refetch, setRefetch] = useState<any>(null);
     const { data: session, status } = useSession();
+    const [socket, setSocket] = useState<any>(null);
+    const [authenticated, setAuthenticated] = useState(false);
+
+    useEffect(() => {
+        if (status === "authenticated") {
+            setAuthenticated(true);
+        } else if (status === "unauthenticated") {
+            router.push("/signin");
+        } else return;
+        const socketClient = io("http://localhost:3003", {
+            auth: {
+                token: session?.user.accessToken,
+            },
+        });
+        socketClient.on("connect", () => {
+            setSocket(socketClient);
+            console.log("Connected to socket server");
+        });
+        socketClient.on("connect_error", (error: any) => {
+            console.log(error);
+        });
+        socketClient.on("order:prepare:fromStaff", (orderId: any) => {
+            message.info(`New order #${orderId}`);
+            refetch(`New order #${orderId}`);
+
+        })
+        socketClient.on("disconnect", () => {
+            console.log("Disconnected from socket server");
+        });
+        return () => {
+            socketClient.disconnect();
+        };
+    }, [status, router, session?.user.accessToken]);
     useEffect(() => {
         const fetchOrders = async () => {
             if (status === "loading") return;
@@ -71,6 +106,7 @@ function Chef() {
                 doneItems={doneItems}
                 cookingItems={cookingItems}
                 preparingItems={preparingItems}
+                socket={socket}
             />
             <Column
                 name={"Processing"}
@@ -81,6 +117,7 @@ function Chef() {
                 doneItems={doneItems}
                 cookingItems={cookingItems}
                 preparingItems={preparingItems}
+                socket={socket}
             />
             <Column
                 name={"Done"}
@@ -91,6 +128,7 @@ function Chef() {
                 doneItems={doneItems}
                 cookingItems={cookingItems}
                 preparingItems={preparingItems}
+                socket={socket}
             />
         </div>
     );

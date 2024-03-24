@@ -23,6 +23,7 @@ function Column({
     doneItems,
     preparingItems,
     cookingItems,
+    socket,
 }: {
     name: string;
     items: any;
@@ -32,6 +33,7 @@ function Column({
     doneItems: any;
     preparingItems: any;
     cookingItems: any;
+    socket: any;
 }) {
     return (
         <div className='flex flex-col gap-2 justify-start w-full'>
@@ -55,6 +57,7 @@ function Column({
                         doneItems={doneItems}
                         cookingItems={cookingItems}
                         preparingItems={preparingItems}
+                        socket={socket}
                     />
                 ))}
             </div>

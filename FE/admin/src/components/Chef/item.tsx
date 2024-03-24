@@ -21,7 +21,8 @@ function Item({
     orders,
     doneItems,
     preparingItems,
-    cookingItems
+    cookingItems,
+    socket,
 }: {
     item: any;
     color: any;
@@ -31,6 +32,7 @@ function Item({
     doneItems: any;
     preparingItems: any;
     cookingItems: any;
+    socket: any;
 }) {
     const { styles } = useStyle();
     const classNames = {
@@ -59,9 +61,10 @@ function Item({
             padding: 20,
         },
     };
-    const order = orders.find((order: any) => order.orderId === item.OrderItem.orderId);
+    const order = orders.find(
+        (order: any) => order.orderId === item.OrderItem.orderId
+    );
     const updateStatus = async () => {
-
         const res = await updateItemsStatus(
             "http://localhost:3003/api/orders/chef",
             {
@@ -78,10 +81,9 @@ function Item({
                 item.OrderItem.productId +
                 (item.OrderItem.status === "Preparing" ? "Cooking" : "Ready")
         );
-        if (res == "Update Order"){
-            message.success(
-                `Finish order #${item.OrderItem.orderId}`
-            );
+        if (res == "Update Order") {
+            message.success(`Finish order #${item.OrderItem.orderId}`);
+            socket.emit("chef:order:finish", item.OrderItem.orderId);
         }
     };
 
@@ -142,10 +144,16 @@ function Item({
                 footer={null}
                 width={800}
             >
-                <Descriptions layout="vertical">
-                    <Descriptions.Item label='Date order'>{moment(order.createdAt).format('DD-MM-YYYY')}</Descriptions.Item>
-                    <Descriptions.Item label='Time order'>{moment(order.createdAt).format('hh:mm')}</Descriptions.Item>
-                    <Descriptions.Item label='Note'>{order.descriptions}</Descriptions.Item>
+                <Descriptions layout='vertical'>
+                    <Descriptions.Item label='Date order'>
+                        {moment(order.createdAt).format("DD-MM-YYYY")}
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Time order'>
+                        {moment(order.createdAt).format("hh:mm")}
+                    </Descriptions.Item>
+                    <Descriptions.Item label='Note'>
+                        {order.descriptions}
+                    </Descriptions.Item>
                 </Descriptions>
             </Modal>
         </div>
