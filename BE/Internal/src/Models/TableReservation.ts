@@ -12,8 +12,9 @@ TableReservation.init(
 				model: "Tables",
 				key: "id",
 			},
-			allowNull: false,
-			onDelete: "CASCADE",
+			defaultValue: 1,
+			allowNull: true,
+			onDelete: "SET DEFAULT",
 		},
 		reservationId: {
 			type: DataTypes.INTEGER,

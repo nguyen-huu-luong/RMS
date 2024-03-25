@@ -136,10 +136,42 @@ export class TableService {
 
     public async deleteTable(req: Request, res: Response, next: NextFunction) {
         try {
-            if (req.action = "create:any") {
+            if (req.action = "delete:any") {
                 const table_names = req.body.request_body.table_names;
                 const result = await this.tableRepository.deleteTable(table_names)
                 await this.viewAllReservationsPage(req, res, next)
+
+            }
+            else throw new UnauthorizedError()
+        }
+        catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+
+    public async getTable(req: Request, res: Response, next: NextFunction) {
+        try {
+            if (req.action = "read:any") {
+                const table_id = Number(req.query.id);
+                const table = await this.tableRepository.findById(table_id)
+                res.send(table)
+
+            }
+            else throw new UnauthorizedError()
+        }
+        catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+
+    public async updateTable(req: Request, res: Response, next: NextFunction) {
+        try {
+            if (req.action = "update:any") {
+                const table_id = Number(req.query.id);
+                const table = await this.tableRepository.update(table_id, req.body)
+                res.send(table)
 
             }
             else throw new UnauthorizedError()

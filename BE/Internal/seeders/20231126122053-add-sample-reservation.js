@@ -19,6 +19,13 @@ module.exports = {
 
         const tables = [
             {
+                name: "N/A",
+                status: "Free",
+                numRes: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
                 name: "T1",
                 status: "Free",
                 numRes: 1,
@@ -186,31 +193,31 @@ module.exports = {
 
         const table_reservations = [
             {
-                tableId: 1,
+                tableId: 2,
                 reservationId: 1
             },
             {
-                tableId: 2,
+                tableId: 3,
                 reservationId: 2
             },
             {
-                tableId: 3,
+                tableId: 4,
                 reservationId: 3
             },
             {
-                tableId: 5,
+                tableId: 6,
                 reservationId: 4
             },
             {
-                tableId: 9,
+                tableId: 10,
                 reservationId: 4
             },
             {
-                tableId: 5,
+                tableId: 6,
                 reservationId: 5
             },
             {
-                tableId: 9,
+                tableId: 10,
                 reservationId: 5
             },
         ]

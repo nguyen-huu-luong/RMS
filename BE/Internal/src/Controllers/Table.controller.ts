@@ -16,6 +16,14 @@ class TableController {
     public deleteTable(req: Request, res: Response, next: NextFunction) {
         this.tableService.deleteTable(req, res, next)
     }
+
+    public getTable(req: Request, res: Response, next: NextFunction) {
+        this.tableService.getTable(req, res, next)
+    }
+
+    public updateTable(req: Request, res: Response, next: NextFunction) {
+        this.tableService.updateTable(req, res, next)
+    }
 }
 
 export default TableController;

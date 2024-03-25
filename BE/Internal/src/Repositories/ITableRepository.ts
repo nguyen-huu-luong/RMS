@@ -6,5 +6,6 @@ export interface ITableRepository extends IBaseRepository<Table> {
     createTable(table_name: any, floor: any): Promise<any>;
     findTable(table_name: any): Promise<any>;
     deleteTable(table_names: any): Promise<any>;
+    updateNumRes(num: number, table_ids: any): Promise<any>;
 }
 

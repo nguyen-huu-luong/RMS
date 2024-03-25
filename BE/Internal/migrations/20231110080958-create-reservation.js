@@ -24,10 +24,10 @@ module.exports = {
         type: Sequelize.DATEONLY
       },
       timeTo: {
-        type: Sequelize.STRING
+        type: Sequelize.TIME
       },
       timeEnd: {
-        type: Sequelize.STRING
+        type: Sequelize.TIME
       },
       description: {
         type: Sequelize.STRING

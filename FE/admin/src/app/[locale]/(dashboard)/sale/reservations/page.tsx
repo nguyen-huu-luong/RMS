@@ -4,11 +4,14 @@ import axios from 'axios';
 import { mutate } from 'swr';
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
-import { resFetcher, filterReservation, createTable, createFloor, deleteItem } from '@/app/api/reservation';
+import { resFetcher, filterReservation, createTable, createFloor, deleteItem, updateReservationStatus, deleteReservation, createReservation, updateReservationDetail } from '@/app/api/reservation';
 import { useState, useEffect } from 'react';
 import { UsergroupAddOutlined, TableOutlined, CloseSquareOutlined, CheckSquareOutlined, FileSearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { Button, Modal, Form, Input, type FormProps, notification, Select, DatePicker, TimePicker, InputNumber, } from 'antd';
+import moment from "moment";
+import dayjs from 'dayjs';
+
 const Context = React.createContext({ name: 'Default' });
 
 function Home() {
@@ -16,13 +19,15 @@ function Home() {
     const { data: session, status } = useSession();
     const [api, contextHolder] = notification.useNotification();
     const [deleteOption, setDeleteOption] = useState([])
-
+    const dateFormat = "YYYY-MM-DD";
+    const timeFormat = 'HH:mm';
     interface Dictionary {
         [Key: string]: string;
     }
     const [form_table] = Form.useForm();
     const [form_delete] = Form.useForm();
     const [form_floor] = Form.useForm();
+    const [form_reservation_detail] = Form.useForm();
     const [checker, setChecker] = useState(true)
     const [messError, setMessError] = useState("")
 
@@ -93,7 +98,6 @@ function Home() {
         setMessError("")
         let data = await createTable(session?.user.accessToken, table_name_?.trim(), floor_name_?.trim())
         if (data.status) {
-            console.log(data.floors)
             resInfo.floors = data.floors
             resInfo.tables = data.tables
             setIsModalTableOpen(false);
@@ -105,6 +109,13 @@ function Home() {
 
     }
 
+    const handleUpdateReservationStatus = async (status: any, id: any) => {
+        const data = await updateReservationStatus({"status": status },id, session?.user.accessToken)
+        resInfo.floors = data.floors
+        resInfo.tables = data.tables
+        resInfo.reservarions = data.reservarions
+        setChecker((current_value) => !current_value)
+    }
     const [isModalTableOpen, setIsModalTableOpen] = useState(false);
 
     const showModalTable = (floor_name: any) => {
@@ -135,13 +146,12 @@ function Home() {
     const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
     const handleDeleteItem = async (values: any) => {
         let item_names = values.item_name
-        let item_type =  values.item_type
+        let item_type = values.item_type
         let data = await deleteItem(session?.user.accessToken, item_type, item_names)
         resInfo.floors = data.floors
         resInfo.reservarions = data.reservarions
         resInfo.tables = data.tables
         resInfo.table_reservations = data.table_reservations
-        console.log(data)
         setChecker((current_value) => !current_value)
         setIsModalDeleteOpen(false);
     }
@@ -162,14 +172,16 @@ function Home() {
     };
 
 
-    const [isModalReservationFloor, setIsModalReservationOpen] = useState(false);
+    const [isModalReservation, setIsModalReservationOpen] = useState(false);
 
     const showModalReservation = () => {
+        form_reservation_detail.resetFields()
         setIsModalReservationOpen(true);
     };
 
 
     const handleCanceModalReservation = () => {
+        setMessError("")
         setIsModalReservationOpen(false);
     };
 
@@ -186,8 +198,114 @@ function Home() {
         setDeleteOption(arr)
     }
 
-    const handleCreateReservation = () => {
+    const handleCreateReservation = async (values: any) => {
+        const start_time: any = values.start_time.format("HH:mm")
+        const end_time: any = values.end_time.format("HH:mm")
 
+        if (start_time > end_time) {
+            setMessError("Start time must be less than end time")
+        }
+        else {
+            const request_body: any = {
+                "customerCount": values.quantity,
+                "customerName": values.customer_name,
+                "customerPhone": values.phone_number,
+                "status": "Waiting",
+                "dateTo": values.date_reserve.format("YYYY-MM-DD"),
+                "timeTo": values.start_time.format("HH:mm"),
+                "timeEnd": values.end_time.format("HH:mm"),
+                "table_ids": values.table_reservation,
+                "description": values.note,
+            }
+            const data = await createReservation(session?.user.accessToken, request_body)
+
+            if(data.hasOwnProperty("message")) {
+                setMessError(data["message"])
+            }
+            else {
+                resInfo.floors = data.floors
+                resInfo.reservarions = data.reservarions
+                resInfo.tables = data.tables
+                resInfo.table_reservations = data.table_reservations
+                setChecker((current_value) => !current_value)
+                setIsModalReservationOpen(false);
+            }
+        }
+       
+    }
+
+
+    const [isModalReservationDetail, setIsModalReservationDetailOpen] = useState(false);
+
+    const showModalReservationDetail = async (item: any) => {
+        if (item.Tables) {
+            let tables: Array<Number> = []
+            await item.Tables.map((table: any) => tables.push(table.id))
+            form_reservation_detail.setFieldsValue({customer_name: item.customerName})
+            form_reservation_detail.setFieldsValue({phone_number: item.customerPhone})
+            form_reservation_detail.setFieldsValue({quantity: item.customerCount})
+            form_reservation_detail.setFieldsValue({table_reservation: tables})
+            form_reservation_detail.setFieldsValue({date_reserve: moment(item.dateTo)})
+            form_reservation_detail.setFieldsValue({start_time: dayjs(item.timeTo, timeFormat)})
+            form_reservation_detail.setFieldsValue({end_time: dayjs(item.timeEnd, timeFormat)})
+            form_reservation_detail.setFieldsValue({note: item.description})
+            form_reservation_detail.setFieldsValue({status: item.status})
+            form_reservation_detail.setFieldsValue({res_id: item.id})
+            setIsModalReservationDetailOpen(true);
+        }
+    };
+
+
+    const handleCanceModalReservationDetail = () => {
+        setMessError("")
+        setIsModalReservationDetailOpen(false);
+    };
+
+    const handleReservationDetail = async (values: any) => {
+        const start_time: any = values.start_time.format("HH:mm")
+        const end_time: any = values.end_time.format("HH:mm")
+
+        if (start_time > end_time) {
+            setMessError("Start time must be less than end time")
+        }
+        else {
+            const request_body: any = {
+                "res_id": values.res_id,
+                "customerCount": values.quantity,
+                "customerName": values.customer_name,
+                "customerPhone": values.phone_number,
+                "status": values.status,
+                "dateTo": values.date_reserve.format("YYYY-MM-DD"),
+                "timeTo": values.start_time.format("HH:mm"),
+                "timeEnd": values.end_time.format("HH:mm"),
+                "table_ids": values.table_reservation,
+                "description": values.note,
+            }
+            const data = await updateReservationDetail(session?.user.accessToken, request_body)
+
+            if(data.hasOwnProperty("message")) {
+                setMessError(data["message"])
+            }
+            else {
+                resInfo.floors = data.floors
+                resInfo.reservarions = data.reservarions
+                resInfo.tables = data.tables
+                resInfo.table_reservations = data.table_reservations
+                setChecker((current_value) => !current_value)
+                setIsModalReservationDetailOpen(false);
+            }
+        }
+    }
+
+    const handelDeleteReservation = async () => {
+        let res_id = form_reservation_detail.getFieldValue("res_id")
+        let data = await deleteReservation(session?.user.accessToken, res_id)
+        resInfo.floors = data.floors
+        resInfo.reservarions = data.reservarions
+        resInfo.tables = data.tables
+        resInfo.table_reservations = data.table_reservations
+        setChecker((current_value) => !current_value)
+        setIsModalReservationDetailOpen(false);
     }
 
     type FieldType = {
@@ -195,15 +313,17 @@ function Home() {
         table_name?: string;
         floor_name_temp?: string;
         customer_name?: string;
-        phone_number? :string;
-        quantity? : number;
+        phone_number?: string;
+        quantity?: number;
         note?: number,
         date_reserve?: any,
+        status?: any,
         start_time?: any,
         end_time?: any,
         table_reservation?: any,
         item_type?: any,
-        item_name?: any
+        item_name?: any,
+        res_id?: any
     };
 
     return (
@@ -244,6 +364,125 @@ function Home() {
                                         <hr></hr>
                                     </div>
                                     <div className='mt-3' style={{ maxHeight: "500px", overflowY: "auto" }}>
+                                        <Modal title="Reservation information detail" open={isModalReservationDetail} onCancel={handleCanceModalReservationDetail} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
+                                            <Form form={form_reservation_detail} name="basic" onFinish={handleReservationDetail}>
+                                                <div className='relative'>
+                                                    <div className='flex justify-between'>
+                                                        <div style={{ width: "48%" }}>
+                                                            <p>
+                                                                Customer name
+                                                            </p>
+                                                            <Form.Item<FieldType>
+                                                                name="customer_name"
+                                                                rules={[{ required: true, message: 'Please input the customer name !' }]}>
+                                                                <Input />
+                                                            </Form.Item>
+                                                        </div>
+                                                        <div style={{ width: "48%" }}>
+                                                            <p>
+                                                                Phone number
+                                                            </p>
+                                                            <Form.Item<FieldType>
+                                                                name="phone_number"
+                                                                rules={[{ required: true, message: 'Please input phone number !' }]}>
+                                                                <Input />
+                                                            </Form.Item>
+                                                        </div>
+                                                    </div>
+                                                    <div className='flex justify-between'>
+                                                        <div>
+                                                            <p>
+                                                                Date
+                                                            </p>
+                                                            <Form.Item name="date_reserve"
+                                                                rules={[{ required: true, message: 'Please choose date !' }]}>
+                                                                <DatePicker format={dateFormat}/>
+                                                            </Form.Item>
+                                                        </div>
+                                                        <div>
+                                                            <p>
+                                                                Start time
+                                                            </p>
+                                                            <Form.Item name="start_time" rules={[{ required: true, message: 'Please choose start time !' }]}>
+                                                                <TimePicker format={timeFormat}/>
+                                                            </Form.Item>
+                                                        </div>
+                                                        <div>
+                                                            <p>
+                                                                End time
+                                                            </p>
+                                                            <Form.Item name="end_time" rules={[{ required: true, message: 'Please choose end time !' }]}>
+                                                                <TimePicker format={timeFormat}/>
+                                                            </Form.Item>
+                                                        </div>
+                                                    </div>
+                                                    <div className='flex justify-between'>
+                                                        <div style={{width: "48%"}}>
+                                                            <p>
+                                                                Quantity
+                                                            </p>
+                                                            <Form.Item name="quantity" rules={[{ required: true, message: 'Please input the quantity !' }]}>
+                                                                <InputNumber min={1} style={{ width: "100%" }} />
+                                                            </Form.Item>
+                                                        </div>
+
+                                                        <div style={{width: "48%"}}>
+                                                            <p>
+                                                                Status
+                                                            </p>
+                                                            <Form.Item name="status" rules={[{ required: true, message: 'Please choose reserved tables !' }]}>
+                                                                <Select  allowClear>
+                                                                <Select.Option value="Done">Done</Select.Option>
+                                                                <Select.Option value="Waiting">Waiting</Select.Option>
+                                                                <Select.Option value="Canceled">Canceled</Select.Option>
+                                                                </Select>
+                                                            </Form.Item>
+                                                        </div>
+                                                    </div>
+                                                    <div >
+                                                            <p>
+                                                                Table
+                                                            </p>
+                                                            <Form.Item name="table_reservation" rules={[{ required: true, message: 'Please choose reserved tables !' }]}>
+                                                                <Select mode="multiple" allowClear>
+                                                                    {
+                                                                        resInfo.tables.map((item: any) => <Select.Option value={item.id}>{item.name}</Select.Option>)
+                                                                    }
+                                                                </Select>
+                                                            </Form.Item>
+                                                        </div>
+                                                    <div>
+                                                        <p>
+                                                            Note
+                                                        </p>
+                                                        <Form.Item<FieldType>
+                                                            name="note">
+                                                            <Input />
+                                                        </Form.Item>
+                                                    </div>
+                                                    <div style={{display: "none"}}>
+                                                    
+                                                        <Form.Item<FieldType>
+                                                            name="res_id">
+                                                            <Input />
+                                                        </Form.Item>
+                                                    </div>
+                                                    <p className='mt-0 text-center absolute' style={{ color: "#ff4d4f", bottom: "-22px", left: "50%", transform: "translateX(-50%)"  }}>{messError}</p>
+                                                </div>
+                                                <div >
+                                                    <Form.Item >
+                                                        <div className='flex justify-end' style={{ width: "100%" }}>
+                                                            <div className='pr-3'>
+                                                                <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType='submit'>CHANGE</Button>
+                                                            </div>
+                                                            <div>
+                                                                <Button onClick={handelDeleteReservation} style={{ backgroundColor: "#DB3A34", color: "white" }} htmlType="button">DELETE</Button>
+                                                            </div>
+                                                        </div>
+                                                    </Form.Item>
+                                                </div>
+                                            </Form>
+                                        </Modal>
                                         {
                                             Object.keys(resInfo.reservarions).length == 0 ? <p className='text-center text-gray-400'>No data</p>
                                                 : <>
@@ -261,9 +500,9 @@ function Home() {
                                                                                         <div className='flex justify-around' style={{ width: "100%" }}>
                                                                                             <div className='relative' >
                                                                                                 <div className='inline-block absolute' style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
-                                                                                                    <p className='text-center'>{item.timeTo}</p>
-                                                                                                    <p className='text-center font-bold p-0 m-0' style={{fontSize: "10px"}}>to</p>
-                                                                                                    <p className='text-center'>{item.timeEnd}</p>
+                                                                                                    <p className='text-center'>{item.timeTo.slice(0, 5)}</p>
+                                                                                                    <p className='text-center font-bold p-0 m-0' style={{ fontSize: "10px" }}>to</p>
+                                                                                                    <p className='text-center'>{item.timeEnd.slice(0, 5)}</p>
                                                                                                 </div>
                                                                                             </div>
                                                                                             <div className='flex' style={{ width: "185px" }}>
@@ -281,11 +520,11 @@ function Home() {
 
                                                                                         </div>
                                                                                         <div className=' pr-1 pt-1'>
-                                                                                            <div><button><FileSearchOutlined style={{ color: "#4A58EC" }} /></button></div>
+                                                                                            <div><button onClick={()  => showModalReservationDetail(item)}><FileSearchOutlined style={{ color: "#4A58EC" }} /></button></div>
                                                                                             {
                                                                                                 item.status == "Waiting" && <>
-                                                                                                    <div><button><CheckSquareOutlined style={{ color: "#54B435" }} /></button></div>
-                                                                                                    <div><button><CloseSquareOutlined style={{ color: "#DB3A34" }} /></button></div>
+                                                                                                    <div><button onClick={() => handleUpdateReservationStatus("Done", item.id)}><CheckSquareOutlined style={{ color: "#54B435" }} /></button></div>
+                                                                                                    <div><button onClick={() => handleUpdateReservationStatus("Canceled", item.id)}><CloseSquareOutlined style={{ color: "#DB3A34" }} /></button></div>
                                                                                                 </>
 
                                                                                             }
@@ -316,79 +555,79 @@ function Home() {
                             <div className='flex justify-between' style={{ width: "60%" }} >
                                 <div>
                                     <button type="button" className="p-1 px-2 text-sm rounded border-0" style={{ color: "white", backgroundColor: "#4A58EC" }} onClick={showModalReservation}>Reserve</button>
-                                    <Modal title="Reservation information form" open={isModalReservationFloor} onCancel={handleCanceModalReservation} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
-                                        <Form form={form_floor} name="basic" onFinish={handleCreateReservation}>
-                                            <div >
+                                    <Modal title="Reservation information form" open={isModalReservation} onCancel={handleCanceModalReservation} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
+                                        <Form form={form_reservation_detail} name="basic" onFinish={handleCreateReservation}>
+                                            <div className='relative'>
                                                 <div className='flex justify-between'>
-                                                <div style={{width: "48%"}}>
-                                                    <p>
-                                                        Customer name
-                                                    </p>
-                                                    <Form.Item<FieldType>
-                                                        name="customer_name"
-                                                        rules={[{ required: true, message: 'Please input the customer name !' }]}>
-                                                        <Input />
-                                                    </Form.Item>
-                                                </div>
-                                                <div style={{width: "48%"}}>
-                                                    <p>
-                                                        Phone number
-                                                    </p>
-                                                    <Form.Item<FieldType>
-                                                        name="phone_number"
-                                                        rules={[{ required: true, message: 'Please input phone number !' }]}>
-                                                        <Input />
-                                                    </Form.Item>
-                                                </div>
-                                                </div>
-                                                <div className='flex justify-between'>
-                                                <div>
-                                                    <p>
-                                                        Date
-                                                    </p>
-                                                    <Form.Item name="date_reserve"
-                                                        rules={[{ required: true, message: 'Please choose date !' }]}>
-                                                        <DatePicker />
-                                                    </Form.Item>
-                                                </div>
-                                                <div>
-                                                    <p>
-                                                        Start time
-                                                    </p>
-                                                    <Form.Item name="start_time"  rules={[{ required: true, message: 'Please choose start time !' }]}>
-                                                        <TimePicker />
-                                                    </Form.Item>
-                                                </div>
-                                                <div>
-                                                    <p>
-                                                        End time
-                                                    </p>
-                                                    <Form.Item name="end_time"  rules={[{ required: true, message: 'Please choose end time !' }]}>
-                                                        <TimePicker />
-                                                    </Form.Item>
-                                                </div>
+                                                    <div style={{ width: "48%" }}>
+                                                        <p>
+                                                            Customer name
+                                                        </p>
+                                                        <Form.Item<FieldType>
+                                                            name="customer_name"
+                                                            rules={[{ required: true, message: 'Please input the customer name !' }]}>
+                                                            <Input />
+                                                        </Form.Item>
+                                                    </div>
+                                                    <div style={{ width: "48%" }}>
+                                                        <p>
+                                                            Phone number
+                                                        </p>
+                                                        <Form.Item<FieldType>
+                                                            name="phone_number"
+                                                            rules={[{ required: true, message: 'Please input phone number !' }]}>
+                                                            <Input />
+                                                        </Form.Item>
+                                                    </div>
                                                 </div>
                                                 <div className='flex justify-between'>
-                                                <div style={{width: "48%"}}>
-                                                    <p>
-                                                        Quantity
-                                                    </p>
-                                                    <Form.Item  name="quantity"  rules={[{ required: true, message: 'Please input the quantity !' }]}>
-                                                        <InputNumber min={1} style={{width: "100%"}}/>
-                                                    </Form.Item>
+                                                    <div>
+                                                        <p>
+                                                            Date
+                                                        </p>
+                                                        <Form.Item name="date_reserve"
+                                                            rules={[{ required: true, message: 'Please choose date !' }]}>
+                                                            <DatePicker format={dateFormat}/>
+                                                        </Form.Item>
+                                                    </div>
+                                                    <div>
+                                                        <p>
+                                                            Start time
+                                                        </p>
+                                                        <Form.Item name="start_time" rules={[{ required: true, message: 'Please choose start time !' }]}>
+                                                            <TimePicker format={timeFormat}/>
+                                                        </Form.Item>
+                                                    </div>
+                                                    <div>
+                                                        <p>
+                                                            End time
+                                                        </p>
+                                                        <Form.Item name="end_time" rules={[{ required: true, message: 'Please choose end time !' }]}>
+                                                            <TimePicker format={timeFormat}/>
+                                                        </Form.Item>
+                                                    </div>
                                                 </div>
-                                                <div style={{width: "48%"}}>
-                                                    <p>
-                                                        Table
-                                                    </p>
-                                                    <Form.Item name="table_reservation"  rules={[{ required: true, message: 'Please choose reserved tables !' }]}>
-                                                        <Select mode="multiple" allowClear>
-                                                            {
-                                                                resInfo.tables.map((item: any) => <Select.Option value={item.name}>{item.name}</Select.Option>)
-                                                            }
-                                                        </Select>
-                                                    </Form.Item>
-                                                </div>
+                                                <div className='flex justify-between'>
+                                                    <div style={{ width: "48%" }}>
+                                                        <p>
+                                                            Quantity
+                                                        </p>
+                                                        <Form.Item name="quantity" rules={[{ required: true, message: 'Please input the quantity !' }]}>
+                                                            <InputNumber min={1} style={{ width: "100%" }} />
+                                                        </Form.Item>
+                                                    </div>
+                                                    <div style={{ width: "48%" }}>
+                                                        <p>
+                                                            Table
+                                                        </p>
+                                                        <Form.Item name="table_reservation" rules={[{ required: true, message: 'Please choose reserved tables !' }]}>
+                                                            <Select mode="multiple" allowClear>
+                                                                {
+                                                                    resInfo.tables.map((item: any) => <Select.Option value={item.id}>{item.name}</Select.Option>)
+                                                                }
+                                                            </Select>
+                                                        </Form.Item>
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <p>
@@ -399,19 +638,20 @@ function Home() {
                                                         <Input />
                                                     </Form.Item>
                                                 </div>
+                                                <p className='mt-0 text-center absolute' style={{ color: "#ff4d4f", bottom: "-22px", left: "50%", transform: "translateX(-50%)"  }}>{messError}</p>
                                             </div>
                                             <div >
-                                                    <Form.Item >
-                                                        <div className='flex justify-end' style={{ width: "100%" }}>
-                                                            <div className='pr-3'>
-                                                                <Button style={{ backgroundColor: "#989898", color: "white" }} onClick={handleCanceModalReservation}>CANCEL</Button>
-                                                            </div>
-                                                            <div>
-                                                                <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">CONFIRM</Button>
-                                                            </div>
+                                                <Form.Item >
+                                                    <div className='flex justify-end mt-3' style={{ width: "100%" }}>
+                                                        <div className='pr-3'>
+                                                            <Button style={{ backgroundColor: "#989898", color: "white" }} onClick={handleCanceModalReservation}>CANCEL</Button>
                                                         </div>
-                                                    </Form.Item>
-                                                </div>
+                                                        <div>
+                                                            <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">CONFIRM</Button>
+                                                        </div>
+                                                    </div>
+                                                </Form.Item>
+                                            </div>
                                         </Form>
                                     </Modal>
                                 </div>
@@ -520,13 +760,13 @@ function Home() {
                                                         <Form.Item<FieldType>
                                                             name="table_name"
                                                             rules={[{ required: true, message: 'Please input table name !' }]}>
-                                                            <Input style={{ width: "100%" }}  onFocus={() => setMessError("")}/>
+                                                            <Input style={{ width: "100%" }} onFocus={() => setMessError("")} />
                                                         </Form.Item>
                                                     </div>
                                                     <div style={{ width: "90%", display: "none" }}>
                                                         <Form.Item<FieldType>
                                                             name="floor_name_temp">
-                                                            <Input style={{ width: "100%" }}  />
+                                                            <Input style={{ width: "100%" }} />
                                                         </Form.Item>
                                                     </div>
                                                     <p className='mt-0 absolute' style={{ top: "46%", color: "#ff4d4f", left: "22%" }}>{messError}</p>

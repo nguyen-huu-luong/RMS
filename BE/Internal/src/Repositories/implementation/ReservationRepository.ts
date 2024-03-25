@@ -22,10 +22,11 @@ export class ReservationRepository
 	public async viewRes(date_: any) {
 		try {
 			const allRes = await this._model.findAll({
-				attributes: ['id', 'customerCount', 'customerName', 'status', 'dateTo', 'timeTo', 'timeEnd', 'description'],
+				attributes: ['id', 'customerCount', 'customerName', 'customerPhone','status', 'dateTo', 'timeTo', 'timeEnd', 'description'],
 				where: {
 					dateTo: date_
 				},
+				order: [['timeTo', 'ASC']],
 				include: Table
 			});
 			return allRes;
@@ -86,7 +87,7 @@ export class ReservationRepository
 		if (status_ != "") {
 
 			let allRes = await this._model.findAll({
-				attributes: ['id', 'customerCount', 'customerName', 'status', 'dateTo', 'timeTo', 'description'],
+				attributes: ['id', 'customerCount', 'customerName', 'customerPhone','status', 'dateTo', 'timeTo', 'timeEnd', 'description'],
 				where: {
 					id: {
 						[Op.in]: res_ids
@@ -99,7 +100,7 @@ export class ReservationRepository
 		}
 
 		let allRes = await this._model.findAll({
-			attributes: ['id', 'customerCount', 'customerName', 'status', 'dateTo', 'timeTo', 'description'],
+			attributes: ['id', 'customerCount', 'customerName', 'customerPhone', 'status', 'dateTo', 'timeTo', 'timeEnd', 'description'],
 			where: {
 				id: {
 					[Op.in]: res_ids
@@ -111,4 +112,33 @@ export class ReservationRepository
 		return allRes;
 	}
 
+	public async getConflictReservation(date_to: any, time_to: any, time_end: any, res_ids: any) {
+		let conflict_res = await this._model.findAll({
+			attributes: ['id'],
+			where: {
+				id: {
+					[Op.in]: res_ids,
+				},
+				dateTo: date_to,
+				status: "Waiting",
+				[Op.not]: {
+					[Op.or] : [
+						{
+							timeTo: {
+								[Op.gte]: time_end
+							}
+						},
+						{
+							timeEnd: {
+								[Op.lte]: time_to
+							}
+						}
+					]
+				}
+
+			}
+		})
+
+		return conflict_res
+	}
 }

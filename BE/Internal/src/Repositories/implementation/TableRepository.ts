@@ -18,7 +18,10 @@ export class TableRepository
 			const allTables = await this._model.findAll({
 				where: {
 					floorId: floor
-				}
+				},
+				order:  [
+					["id", "ASC"]
+				]
 			});
 			return allTables;
 		} catch (err) {
@@ -70,6 +73,24 @@ export class TableRepository
 					}
 				}
 			})
+
+			return true
+		}
+		catch (err) {
+			return false
+		}
+	}
+
+	public async updateNumRes(num: number, table_ids: any) {
+		try {
+
+			await this._model.increment('numRes', {by: num, where: {
+				id: {
+					[Op.in]: table_ids
+				}
+			}})
+
+			return true
 		}
 		catch (err) {
 			return false

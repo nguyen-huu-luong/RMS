@@ -65,11 +65,11 @@ Reservation.init(
       },
     },
     timeTo: {
-      type: DataTypes.STRING,
+      type: DataTypes.TIME,
       allowNull: false,
     },
     timeEnd: {
-      type: DataTypes.STRING,
+      type: DataTypes.TIME,
       allowNull: false,
     },
     description: {

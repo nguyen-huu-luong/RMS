@@ -131,4 +131,62 @@ export const deleteItem = async (token: any, type_: any, data: any) => {
     } catch (error) {
         console.log(error)
     }
+
+}
+export const updateReservationStatus = async (requestBody: any, id: string,token: any) => {
+    try {
+        const response = await axios.put(`${process.env.BASE_URL}/reservations?id=${id}`, requestBody, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const deleteReservation = async (token: any, res_id: any) => {
+    try {
+        let url = `${process.env.BASE_URL}/reservations?id=${res_id}`
+        const response = await axios.delete(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        })
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const createReservation = async (token: any, request_body: any) => {
+    try {
+        let url = `${process.env.BASE_URL}/reservations`
+        const response = await axios.post(url, request_body, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const updateReservationDetail = async (token: any, request_body: any) => {
+    try {
+        const response = await axios.put(`${process.env.BASE_URL}/reservations/all`, request_body, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
 }

@@ -50,7 +50,7 @@ export class FloorRepository
 	}
 
 	public async findAllFloor() {
-		let floors = this._model.findAll({
+		let floors = await this._model.findAll({
 			order: [
 				['id', 'ASC']
 			]

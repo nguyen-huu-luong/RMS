@@ -6,4 +6,5 @@ export interface IReservationRepository extends IBaseRepository<Reservation > {
     viewRes(date_: any): Promise<any>;
     getDatesLimit(start_date ?: any, end_date ?: any): Promise<any>;
     getFilterReservation(res_ids: any, date_: any, status_: any): Promise<any>
+    getConflictReservation(date_to: any, time_to: any, time_end: any, res_ids: any): Promise<any>
 }

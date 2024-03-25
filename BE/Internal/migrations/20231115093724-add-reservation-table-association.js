@@ -3,19 +3,24 @@
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
 		await queryInterface.createTable("TableReservations", {
+			id: {
+				allowNull: false,
+				autoIncrement: true,
+				primaryKey: true,
+				type: Sequelize.INTEGER
+			  },
 			tableId: {
 				type: Sequelize.INTEGER,
-				primaryKey: true,
 				references: {
 					model: "Tables",
 					key: "id",
 				},
-				allowNull: false,
-				onDelete: "SET NULL",
+				defaultValue: 1,
+				allowNull: true,
+				onDelete: "SET DEFAULT",
 			},
 			reservationId: {
 				type: Sequelize.INTEGER,
-				primaryKey: true,
 				references: {
 					model: "Reservations",
 					key: "id",
