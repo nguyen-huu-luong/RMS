@@ -36,11 +36,6 @@ const ChatIcon = () => {
             ) : (
                 <></>
             )}
-            {/* {(unreadMessages > 0 && popup == false)  && (
-                <div className='z-50 fixed bottom-4 right-4 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center'>
-                    {unreadMessages}
-                </div>
-            )} */}
             <button
                 onClick={() => showPopup(true)}
                 className='shadow-xl z-40 fixed bottom-5 right-5 inline-flex items-center w-12 h-12 justify-center overflow-hidden transition-all bg-primary-white rounded-full hover:bg-primary-white group'

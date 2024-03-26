@@ -31,12 +31,19 @@ export default function Cart() {
     const {
         data: cartItems,
         error: cartItemsError,
-        isLoading: cartItemsLoading,
+        isLoading: cartItemsLoading,   
+        mutate     
     } = useSWR(
         session
             ? [`http://localhost:3003/api/carts`, session.user.accessToken]
             : null,
-        ([url, token]) => cartFetcher(url, token)
+        ([url, token]) => cartFetcher(url, token), {
+            keepPreviousData: true,
+            onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+                if (retryCount >= 10) return
+                setTimeout(() => revalidate({ retryCount }), 2000)
+              }
+        }
     );
     if (status === "loading") return <Loading />;
     if (status === "unauthenticated") router.push("/signin");
@@ -60,6 +67,9 @@ export default function Cart() {
     if (cartItemsError) return <div>Failed to load</div>;
     if (cartItemsLoading) return <Loading />;
     if (!cartItems) return <Loading />;
+    if (cartItems && cartItems.code){
+        return setTimeout(() => mutate(), 1000);
+    }
     return cartItems.cart.total === 0 ? (
         <div className='w-full h-auto flex flex-col justify-center items-center gap-5 p-20 bg-primary-white rounded-3xl transition-all duration-300'>
             <div className='w-auto h-auto rounded-lg overflow-hidden'>

@@ -59,7 +59,7 @@ const NavBar = () => {
                       key: "signin",
                       label: (
                           <Link key={"signin"} href={`/signin`} locale={locale}>
-                              {t("SingIn")}{" "}
+                              {t("SignIn")}{" "}
                           </Link>
                       ),
                   },
