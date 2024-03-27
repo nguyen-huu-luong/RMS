@@ -1,0 +1,724 @@
+[33mcommit b1546963007b7aff1fe6ce791dc7d55e146a9dc5[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/RMS-29[m[33m)[m
+Merge: aae240a 4a33b23
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Mar 10 10:23:17 2024 +0700
+
+    Merge branch 'feature/RMS-30' of https://github.com/nguyen-huu-luong/RMS into feature/RMS-29
+
+[33mcommit aae240a0b7b9691aa0f2b1c324ced9276048eb51[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Mar 10 10:23:10 2024 +0700
+
+    Temp commit
+
+[33mcommit 3a08ff82cfd66ec2cfcf3fa5021d7a9c2d9b1771[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Mar 10 10:19:24 2024 +0700
+
+    Temp commit
+
+[33mcommit 6b8973c3725443df97b00a122171e047524a594a[m[33m ([m[1;31morigin/feature/RMS-29[m[33m)[m
+Merge: 9a4301a 04a8956
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Mar 10 09:53:53 2024 +0700
+
+    Temp commit
+
+[33mcommit 4a33b23f4ee91beffe671c647598bdf9ee5962f2[m[33m ([m[1;31morigin/feature/RMS-30[m[33m)[m
+Author: Vuong <vuonglht@gmail.com>
+Date:   Sun Mar 10 09:42:55 2024 +0700
+
+    feat: add UI for edit email template
+
+[33mcommit 6ffd636ed0238cc42b301d15fbfedcbe122970c8[m
+Author: Vuong <vuonglht@gmail.com>
+Date:   Sun Mar 10 09:38:35 2024 +0700
+
+    feat:add backend for email template
+
+[33mcommit 9a4301a227922665ef6c57e9f56354516106b631[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Tue Mar 5 21:47:16 2024 +0700
+
+    [RMS-29][ADD] Implementing the customer segmentation API
+
+[33mcommit 04a8956ab1d9446ed2d4d7d78a65e153486f5bf6[m[33m ([m[1;31morigin/feature/RMS-24[m[33m)[m
+Author: Vuong <vuonglht@gmail.com>
+Date:   Tue Feb 27 20:48:31 2024 +0700
+
+    [ADD] Implement feature customer management
+
+[33mcommit 621e4083341a68376d6dbf7514acc263f0c87955[m
+Merge: 41f9bdb d226316
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Feb 25 23:32:33 2024 +0700
+
+    Merge branch 'feature/RMS-24' of https://github.com/nguyen-huu-luong/RMS into feature/RMS-24
+
+[33mcommit 41f9bdbafdac3d81b330b15eb3a134aed2c454bc[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Feb 25 23:32:10 2024 +0700
+
+    [RMS-24][ADD] Implement customer profile detail page
+
+[33mcommit d9453f29383cedcc6cbe63b1f091845dc3f9d6e2[m[33m ([m[1;31morigin/feature/RMS-13[m[33m, [m[1;32mfeature/RMS-13[m[33m)[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Tue Feb 20 21:16:42 2024 +0700
+
+    [RMS-13][FIX] Fixing async promise in MoMo service
+
+[33mcommit d226316419f6ea48b4fe9f28242ecd3293c8c855[m
+Author: vuongdz <vuongdz@gmail.com>
+Date:   Tue Feb 20 17:36:24 2024 +0700
+
+    finish pagination and sorter
+
+[33mcommit 9a076ce338cd4f3aa05a3aeacf8aa6c33fff98f3[m
+Merge: e7e9fe4 3f1f1e1
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Feb 18 10:30:15 2024 +0700
+
+    Resolve conflict
+
+[33mcommit e7e9fe4d69043845cb8a855fed35b3a41705c7e4[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Feb 18 10:18:13 2024 +0700
+
+    [RMS-13][ADD] Integrating MOMO  service
+
+[33mcommit 6d42f1f7101283459234f54b1c6fa5bd956bba17[m
+Author: Vuong <vuonglht@gmail.com>
+Date:   Sat Feb 17 16:29:34 2024 +0700
+
+    add customer api logic
+
+[33mcommit 3f1f1e1cad111098d03ed3a23bdcec3c7baa85ad[m
+Merge: e183f9f 5cd8af3
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Thu Feb 15 22:44:04 2024 +0700
+
+    Merge pull request #26 from nguyen-huu-luong/feature/RMS-23
+    
+    [RMS-23] Fix order step
+
+[33mcommit 5cd8af3882fa0d1ee9c25823a9e5cbb46287865e[m[33m ([m[1;31morigin/feature/RMS-23[m[33m)[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sun Feb 4 15:03:42 2024 +0700
+
+    [RMS-19] Fix order step
+
+[33mcommit fc673efab5f4640cdc7ce798b180fcb5a51319e4[m[33m ([m[1;31morigin/temp[m[33m)[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Wed Jan 3 14:37:03 2024 +0700
+
+    save works
+
+[33mcommit e183f9ffa6f41de077cee5aafb3abe913c5c7f67[m
+Merge: f16a22e 804389c
+Author: Minh Vương <83860155+vuong2404@users.noreply.github.com>
+Date:   Fri Dec 1 15:29:45 2023 +0700
+
+    Merge pull request #25 from nguyen-huu-luong/feature/RMS-14
+    
+    Feature/rms 14
+
+[33mcommit f16a22eb0db298fed68eb7f88c965cc2063d729d[m
+Merge: 41ceaa8 840747f
+Author: Minh Vương <83860155+vuong2404@users.noreply.github.com>
+Date:   Fri Dec 1 15:25:56 2023 +0700
+
+    Merge pull request #24 from nguyen-huu-luong/feature/RMS-23
+    
+    Feature/RMS-23
+
+[33mcommit 840747f9ce11848589656a9d5eacc75549bde650[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Fri Dec 1 15:07:29 2023 +0700
+
+    [ADD] Voucher page
+
+[33mcommit 878a02903b6fa71823166cb16d4faa612ed64738[m
+Merge: 8ca8285 41ceaa8
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sun Nov 26 15:43:51 2023 +0700
+
+    Merge branch 'master' of github.com:nguyen-huu-luong/RMS into feature/RMS-10
+
+[33mcommit 8ca82857a24ec2b821e702da47368d30d16cf571[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sun Nov 26 15:43:36 2023 +0700
+
+    [UPDATE] Update to order step
+
+[33mcommit 41ceaa889aa2da3fa7edddeca4d55c06a345d9aa[m
+Merge: 199baa9 aa434aa
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Sat Nov 25 14:33:47 2023 +0700
+
+    Merge pull request #23 from nguyen-huu-luong/feature/RMS-10
+    
+    Feature/RMS-10
+
+[33mcommit aa434aae7fbbb61e2a17e2fbcbfdb7bc860327d5[m[33m ([m[1;31morigin/feature/RMS-10[m[33m)[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Thu Nov 23 15:58:00 2023 +0700
+
+    [UPDATE] Update structure in client side UI
+
+[33mcommit 555b69cfc1da3b5d1e7e8b41b1485603a6d4e4a6[m
+Merge: d824918 3265a66
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Thu Nov 23 14:15:09 2023 +0700
+
+    Merge branch 'feature/RMS-10' of github.com:nguyen-huu-luong/RMS into feature/RMS-10
+
+[33mcommit d8249187e73ef8b0a0dcdf36e4430f3dcdad98ce[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Thu Nov 23 14:13:58 2023 +0700
+
+    add login/register page, config next-auth
+
+[33mcommit 3265a66402265f75f1262d342711189a5ffecd4f[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Thu Nov 23 14:09:02 2023 +0700
+
+    [Update] Food Item
+
+[33mcommit ab9b66bb94aab500968a8373b2cb74a2e7b9d028[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Thu Nov 23 14:08:35 2023 +0700
+
+    [UPDATE] Add category
+
+[33mcommit 7ea2c20f2ccd05a2a31b89ebbfd21fac97823d36[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Mon Nov 20 19:55:45 2023 +0700
+
+    [UPDATE] Use sequelize built-in methods
+
+[33mcommit 212bd84d282ea7a7dd8a0b7aab8240218e203d9c[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Mon Nov 20 15:32:50 2023 +0700
+
+    [REMOVE] Revert false commit
+
+[33mcommit 6405b82bf858171a8e40be12710c7a477903aac4[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Mon Nov 20 15:27:00 2023 +0700
+
+    [UPDATE] Architecture for Order, Product and Cart
+
+[33mcommit 5e053deae3b525eb769752c6cef3333226d22395[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sun Nov 19 16:55:30 2023 +0700
+
+    [ADD] Example for redux in nextJs
+
+[33mcommit 199baa91253b9bb444ebe2a73040ee0c873412bf[m
+Merge: cf2c174 8c0ac73
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Sun Nov 19 13:52:17 2023 +0700
+
+    Merge pull request #19 from nguyen-huu-luong/feature/RMS-9
+    
+    feature/RMS-9
+
+[33mcommit 8c0ac736844b5338527ae57aa7d65fa9644e1a6d[m[33m ([m[1;31morigin/feature/RMS-9[m[33m)[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sat Nov 18 23:47:41 2023 +0700
+
+    [ADD] Swagger for Product, Cart and Order
+
+[33mcommit 072161ebfb9a4ed584d086d5212c4b0ea0fa1fd2[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sat Nov 18 18:55:54 2023 +0700
+
+    [UPDATE] Add authorization to cart, order
+
+[33mcommit 9212e828bd32fc1e15db74eec11db942ec8df0f8[m
+Merge: 64047ee cf2c174
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sat Nov 18 10:53:26 2023 +0700
+
+    Merge branch 'master' of github.com:nguyen-huu-luong/RMS into feature/RMS-9
+
+[33mcommit 64047eeb54e7e0c2909caff7b73f9a37871823f3[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sat Nov 18 10:49:00 2023 +0700
+
+    [UPDATE] Implement API for Product, Cart and Order
+
+[33mcommit cf2c1748c0a5089bbfae2aa66d6356ed354ce983[m
+Merge: ff5e83b 417e18e
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Sat Nov 18 07:34:31 2023 +0700
+
+    Merge pull request #18 from nguyen-huu-luong/feature/RMS-7
+    
+    [RMS-7][MODIFY][ADD] modify auth logic and add logic for admin login
+
+[33mcommit 417e18e6e7c28dab8f2c4b3df7cf1fe0fbb7188d[m[33m ([m[1;31morigin/feature/RMS-7[m[33m)[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Fri Nov 17 18:28:15 2023 +0700
+
+    [RMS-7][MODIFY][ADD] modify auth logic and add logic for admin login
+
+[33mcommit 804389c1def8c520845d859a214d3afbd0818d0c[m[33m ([m[1;31morigin/feature/RMS-14[m[33m)[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Fri Nov 17 13:00:40 2023 +0700
+
+    [RMS-14][ADD] add dynamic breadcrumb
+
+[33mcommit eeb783630a0c6b0203ce67a47e53eee9b08f22dd[m
+Merge: dd923e5 ff5e83b
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Thu Nov 16 14:31:47 2023 +0700
+
+    Merge branch 'master' of github.com:nguyen-huu-luong/RMS into feature/RMS-14
+
+[33mcommit ff5e83bb6a5e303459910ca043722e1b241382b4[m
+Merge: 3253f3d ba73e1b
+Author: Minh Vương <83860155+vuong2404@users.noreply.github.com>
+Date:   Thu Nov 16 14:31:25 2023 +0700
+
+    Merge pull request #17 from nguyen-huu-luong/feature/RMS-7
+    
+    Feature/RMS-7[UPDATE]
+
+[33mcommit dd923e594e016ea96153d33c791bca5ee2b30273[m
+Merge: 00a6e47 ba73e1b
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Thu Nov 16 14:19:53 2023 +0700
+
+    Merge branch 'feature/RMS-7' of github.com:nguyen-huu-luong/RMS into feature/RMS-14
+
+[33mcommit ba73e1bd17d3516585ffc5d6f23ea81d13fb3215[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Thu Nov 16 13:00:29 2023 +0700
+
+    [UPDATE] Fix typo and update chat session association
+
+[33mcommit e48fbcd10384843cb21f04bbb2c760af79c100e6[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Thu Nov 16 11:52:50 2023 +0700
+
+    [UPDATE] Update migration
+
+[33mcommit 47608f65a734e0fe3b87b9df23b92326b1e01cc2[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Wed Nov 15 23:57:36 2023 +0700
+
+    [Update] Resolve conflict - 2
+
+[33mcommit 7d265dfda09302f29bcaa62622a866d982614cef[m
+Merge: ca15fac 3253f3d
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Wed Nov 15 23:46:59 2023 +0700
+
+    [Update] Resolve conflict with master branch
+
+[33mcommit ca15fac3da3611b5904c2a55b10212eaf43cb8df[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Wed Nov 15 23:33:08 2023 +0700
+
+    [ADD] Update association for Chat, Reservation and Table
+
+[33mcommit 00a6e474936769a25468df9942973d08e03ff0da[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Wed Nov 15 13:38:40 2023 +0700
+
+    [RMS-14][ADD] add dynamic breadcrumb componets
+
+[33mcommit a0983edaa7f7b01a18f692e3aea83ae696287f4b[m
+Merge: 36b32d4 3253f3d
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Wed Nov 15 08:19:58 2023 +0700
+
+    Merge branch 'master' of github.com:nguyen-huu-luong/RMS into feature/RMS-8
+
+[33mcommit 3253f3dc6f03dc2dafc5e258a004c4332d847292[m
+Merge: 3e98cfe 02f7259
+Author: Nguyễn Hùng <80147640+nguyenhung220102@users.noreply.github.com>
+Date:   Tue Nov 14 23:21:38 2023 +0700
+
+    Merge pull request #15 from nguyen-huu-luong/feature/RMS-10
+    
+    [RMS-10][ADD] Implement UI for order page
+
+[33mcommit 3e98cfe80120147cf93f454c04feb9f5517364b6[m
+Merge: 9bdce25 2f8c389
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Tue Nov 14 22:38:58 2023 +0700
+
+    Merge pull request #12 from nguyen-huu-luong/feature/RMS-8
+    
+    [ADD] finished feature authorization
+
+[33mcommit 9bdce254fe9d91fd0311f9f5a7352cdf531eaead[m
+Merge: d020e57 c5ca0c8
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Tue Nov 14 22:38:40 2023 +0700
+
+    Merge pull request #14 from nguyen-huu-luong/feature/RMS-9
+    
+    [RMS-9][ADD]
+
+[33mcommit c5ca0c8a3d361d3ad8b8c0fc59f72c53399b8376[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Tue Nov 14 21:49:16 2023 +0700
+
+    Revert "[RMS-9][UPDATE] Package-lock.json file"
+    
+    This reverts commit 7ca94b0d884bdff0d1add9fb3455f00c0e1ced89. desc.
+
+[33mcommit 21ee303d68024e4e3421979e9945c0efd3ce2d43[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Tue Nov 14 21:48:48 2023 +0700
+
+    Revert "[RMS-9][Update package-lock.json"
+    
+    This reverts commit 14b99b33ad1781ade7c7a44c315d8bbbf8481b8c. desc.
+
+[33mcommit 6f01da8735ca9eaffd0d829dd140f6398b36fba9[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Tue Nov 14 21:47:13 2023 +0700
+
+    Revert "[RMS-9][Update] Resolve conflicts"
+    
+    This reverts commit f9dcf5b6c0db705f6c11e53452dfbc7a710fbc79. desc.
+     Please enter the commit message for your changes. Lines starting
+
+[33mcommit f9dcf5b6c0db705f6c11e53452dfbc7a710fbc79[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Tue Nov 14 21:44:09 2023 +0700
+
+    [RMS-9][Update] Resolve conflicts
+
+[33mcommit 14b99b33ad1781ade7c7a44c315d8bbbf8481b8c[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Tue Nov 14 21:42:33 2023 +0700
+
+    [RMS-9][Update package-lock.json
+
+[33mcommit 02f7259a6bb345c8a1c62708d3b070d2d2d2fc7f[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Tue Nov 14 20:50:41 2023 +0700
+
+    [RMS-10][ADD] Implement UI for order page
+
+[33mcommit 36b32d40eb7ca9ca341f4c389117d861fc4c05e7[m
+Merge: 2f8c389 d020e57
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Tue Nov 14 20:31:52 2023 +0700
+
+    Merge branch 'master' of github.com:nguyen-huu-luong/RMS into feature/RMS-8
+
+[33mcommit 2f8c389255207ff88f2cf3f1f0bce3a5e4051b0a[m[33m ([m[1;31morigin/feature/RMS-8[m[33m)[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Tue Nov 14 20:24:24 2023 +0700
+
+    [ADD] finished feature authorization
+
+[33mcommit d020e577510a18d27d85ad4532964c37628e0606[m
+Merge: 7edd7e5 e93d5ea
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Tue Nov 14 09:18:47 2023 +0700
+
+    Merge pull request #11 from nguyen-huu-luong/feature/RMS-8
+    
+    Feature/rms 8
+
+[33mcommit e93d5eabbb66e6f65e81b992ff245a7818843ba5[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Mon Nov 13 22:50:29 2023 +0700
+
+    finished authentication API
+
+[33mcommit c34fa3685046df502fa1915595a05ef82d5a97fd[m
+Merge: 479daea 7edd7e5
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Mon Nov 13 19:00:03 2023 +0700
+
+    Merge branch 'master' of github.com:nguyen-huu-luong/RMS into feature/RMS-8
+
+[33mcommit 479daeaf3588142f89ce78cead5af2f96cc1076f[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Mon Nov 13 18:59:36 2023 +0700
+
+    [ADD] Add common errors and config Error handler
+
+[33mcommit 7edd7e5a458310c4bf4a676fc93dab8db25f1816[m
+Merge: d150d31 a87702f
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Mon Nov 13 14:58:56 2023 +0700
+
+    Merge pull request #10 from nguyen-huu-luong/feature/RMS-7
+    
+    Feature/rms 7
+
+[33mcommit a87702f520e6206fa7b92b99baaa755e68679397[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Sun Nov 12 23:32:26 2023 +0700
+
+    [MODIFY] modify foloder structure
+
+[33mcommit a120650abb40a16344bf022ca7a056b1d713f0ca[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Sun Nov 12 19:50:51 2023 +0700
+
+    [ADD] create class  base repisitory
+
+[33mcommit 7ca94b0d884bdff0d1add9fb3455f00c0e1ced89[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sun Nov 12 16:01:38 2023 +0700
+
+    [RMS-9][UPDATE] Package-lock.json file
+
+[33mcommit d2d1c8cdbb70ee125a03577be13bcb77e355e776[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sun Nov 12 15:56:45 2023 +0700
+
+    [RMS-9][ADD] Implement home and product page on client side
+
+[33mcommit 4e4953f536d212513c9430e3421bde541e855106[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sun Nov 12 15:53:52 2023 +0700
+
+    [RMS-9][Update] Update layout for Client Side UI
+
+[33mcommit ccb76b536fe9c813ccdfe6a43050b90f9271c900[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Sun Nov 12 15:40:26 2023 +0700
+
+    [ADD] add association to  some tables
+
+[33mcommit 8166580210b15dbc715274c9f65fd71ab31df431[m
+Merge: 602eae1 a611975
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Fri Nov 10 16:34:37 2023 +0700
+
+    Merge branch 'feature/RMS-7' of github.com:nguyen-huu-luong/RMS into feature/RMS-7
+
+[33mcommit 602eae1c7296cc8f6304d06d44c0e36e45111d9a[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Fri Nov 10 16:33:42 2023 +0700
+
+    Update some models
+
+[33mcommit a611975160c4cd1924b7e05afd2b3fbbab806903[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Fri Nov 10 16:33:31 2023 +0700
+
+    update some models
+
+[33mcommit d150d310bf6e66d7d1ae69d73d4290191f3fca78[m
+Merge: ce07f6e 9d59f4c
+Author: Minh Vương <83860155+vuong2404@users.noreply.github.com>
+Date:   Fri Nov 10 16:03:21 2023 +0700
+
+    Merge pull request #9 from nguyen-huu-luong/feature/RMS-7
+    
+    Feature/rms 7
+
+[33mcommit 9d59f4c3eef8e8b5acbfa69b090013b9e8d15b10[m
+Merge: 907833d ce07f6e
+Author: Minh Vương <83860155+vuong2404@users.noreply.github.com>
+Date:   Fri Nov 10 16:03:08 2023 +0700
+
+    Merge branch 'master' into feature/RMS-7
+
+[33mcommit 907833d7214449f1b2e9b999b8c6966f95d62b75[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Fri Nov 10 15:54:41 2023 +0700
+
+    resolve confict
+
+[33mcommit 839673bb3f595d2fb99c6a6b0d4c5dc59eea9bad[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Fri Nov 10 15:41:12 2023 +0700
+
+    Update BE
+
+[33mcommit c74964f88378562b45628848ab2b45fb68c11db1[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Fri Nov 10 15:15:20 2023 +0700
+
+    add some nescessary tables
+
+[33mcommit ab355ab6a1b3f6addc1c5ae558e090f8204a1726[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Fri Nov 10 15:05:19 2023 +0700
+
+    [ADD] add config sequelize-cli
+
+[33mcommit ce07f6e837e3cd3ab8d85d9deba041928b647935[m
+Merge: eb7ed08 e722f5e
+Author: Minh Vương <83860155+vuong2404@users.noreply.github.com>
+Date:   Thu Nov 9 22:38:47 2023 +0700
+
+    Merge pull request #8 from nguyen-huu-luong/feature/RMS-16
+    
+    [RMS-16][ADD] Add configuration of swagger
+
+[33mcommit e722f5ed656dd81eb9abe92f49cbb8dbc62f1f08[m[33m ([m[1;31morigin/feature/RMS-16[m[33m)[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Thu Nov 9 20:48:04 2023 +0700
+
+    [RMS-16][ADD] Add configuration of swagger
+
+[33mcommit 5dc2f4fc87dde7734c4df4fc8cb5acb42234d7fd[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Thu Nov 9 15:26:21 2023 +0700
+
+    [ADD] add  DI for repository, [MODIFY] modify env variable name
+
+[33mcommit 6ad0c85a5312ad391a97d3ac263a26107ea4fbb9[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Wed Nov 8 15:24:46 2023 +0700
+
+    Fix async of DB
+
+[33mcommit f74653f9f223d5168650b216c46ef54f8cc90c1d[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Wed Nov 8 15:22:47 2023 +0700
+
+    Fix async of DB
+
+[33mcommit eb7ed08618c2a5133465d540cb05461f748f73e4[m
+Merge: d0160f3 53b6409
+Author: Nguyễn Hùng <80147640+nguyenhung220102@users.noreply.github.com>
+Date:   Tue Nov 7 16:40:35 2023 +0700
+
+    [RMS-6][Update] Update client side UI
+    
+    Feature/RMS-6
+
+[33mcommit 53b6409aca19ea79a71811e6c16a52679346dab3[m[33m ([m[1;31morigin/feature/RMS-6[m[33m)[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Tue Nov 7 16:33:42 2023 +0700
+
+    [RMS-6][Modify] Update footer.
+
+[33mcommit 2c7a2849cf1c3999fc8e9262b39e8957e060d916[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Tue Nov 7 15:58:35 2023 +0700
+
+    [RMS-6][Modify] Add global CSS variables in taiwind.config.ts
+
+[33mcommit d0160f3b5b410622cb8524f80fb66896ea151ba6[m[33m ([m[1;32mmaster[m[33m)[m
+Merge: d567500 0acf942
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Mon Nov 6 08:16:03 2023 +0700
+
+    Merge pull request #5 from nguyen-huu-luong/feature/RMS-4
+    
+    [RMS-16][ADD] Add more detail about type and add pre-path of api
+
+[33mcommit 0acf9425ce05a7d0a038ebbf567bb691f2da6d9a[m[33m ([m[1;31morigin/feature/RMS-4[m[33m, [m[1;32mfeature/RMS-4[m[33m)[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Mon Nov 6 08:14:53 2023 +0700
+
+    [RMS-16][ADD] Add more detail about type and add pre-path of api
+
+[33mcommit d5675005cf1dca83fa561871bf7b5c56ef868f76[m
+Merge: aab0891 eaa2144
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Sun Nov 5 16:09:36 2023 +0700
+
+    Merge pull request #4 from nguyen-huu-luong/feature/RMS-4
+    
+    [RMS-4][ADD] Set up back-end
+
+[33mcommit eaa214429e67fd8c9f0e691fbb5d12eb8d8a0edf[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Nov 5 16:06:42 2023 +0700
+
+    [RMS-4][ADD] Set up back-end
+
+[33mcommit 62ab393517283491218d2f60d07abc2b8ce1276d[m[33m ([m[1;31morigin/feature/RMS-1[m[33m, [m[1;32mfeature/RMS-1[m[33m)[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Nov 5 15:42:00 2023 +0700
+
+    Implement layer architecture
+
+[33mcommit bc77178256f3dc133fb30dd75b67318914a50815[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sun Nov 5 09:18:30 2023 +0700
+
+    Set up express
+
+[33mcommit aab0891b410b29a4224a34be916e910c00904f01[m
+Merge: b48dc3f 08a5423
+Author: Nguyễn Hùng <80147640+nguyenhung220102@users.noreply.github.com>
+Date:   Sun Nov 5 00:27:23 2023 +0700
+
+    Merge pull request #3 from nguyen-huu-luong/Feature/RMS-6
+    
+    Set up client side UI
+
+[33mcommit 08a5423066e4df2343311badb61ee56131efb8fb[m
+Author: NguyenHung <nguyenhung.220102@gmail.com>
+Date:   Sun Nov 5 00:22:53 2023 +0700
+
+    Set up client side UI
+
+[33mcommit b48dc3fde329d989cfa151c1d51ccde7e552db70[m
+Merge: 9776c12 49ad4eb
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Thu Nov 2 14:06:49 2023 +0700
+
+    Merge branch 'feature/RMS-5'
+
+[33mcommit 9776c120f2ea12b3c3b56f449cbfcba1b88567e0[m
+Merge: 0d6400c 6a91c1b
+Author: Minh Vương <83860155+vuong2404@users.noreply.github.com>
+Date:   Thu Nov 2 20:23:58 2023 +0700
+
+    Merge pull request #2 from nguyen-huu-luong/feature/RMS-5
+    
+    setup initial admin side UI
+
+[33mcommit 6a91c1b5c17202afa104880cee9130283770b528[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Thu Nov 2 18:48:52 2023 +0700
+
+    setup initial admin side UI
+
+[33mcommit 49ad4eb6914d5439789278d94ff1e4717698be1e[m[33m ([m[1;31morigin/feature/RMS-5[m[33m)[m
+Author: vuong2404 <minhvuonglht@gmail.com>
+Date:   Thu Nov 2 14:03:03 2023 +0700
+
+    fig Error: Unable to find next-intl locale,...
+
+[33mcommit 0d6400c112212211552ec5588eeefcc5303c06b3[m
+Merge: 98303c1 edf68ab
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Sat Oct 21 22:59:10 2023 +0700
+
+    Merge pull request #1 from nguyen-huu-luong/feature/RMS-1
+    
+    Demo work flow
+
+[33mcommit edf68ab5cdee5b584ca7fa17d00db2ea2376e292[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Sat Oct 21 20:20:00 2023 +0700
+
+    Demo work flow
+
+[33mcommit 98303c1d6927f8331195cdd23e807b80cca4bfaa[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Fri Oct 20 22:17:59 2023 +0700
+
+    [RMS-1][ADD] Initial project
+
+[33mcommit 1ddddb9c9b4395e1df15146280457861cb62a4da[m
+Author: nguyen-huu-luong <nguyenhuuluong1204@gmail.com>
+Date:   Fri Oct 20 22:15:25 2023 +0700
+
+    [RMS-1][ADD] Initial project
+
+[33mcommit b5aa08239bd13fa22891d540ce5785431762050b[m
+Author: Luong Nguyen <80337518+nguyen-huu-luong@users.noreply.github.com>
+Date:   Fri Oct 20 22:02:15 2023 +0700
+
+    Initial commit
