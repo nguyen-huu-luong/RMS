@@ -10,8 +10,6 @@ class Token extends Model {
     declare tokenableId: number ;
     declare tokenableType: string ;
 
-	
-
 	public static associate(): void {
 		Token.belongsTo(Client, { foreignKey: "tokenableId", constraints: false });
 		Token.belongsTo(Employee, {

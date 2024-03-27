@@ -4,7 +4,7 @@ import { HttpStatusCode } from "../Constants";
 import { container } from "../Configs";
 import { ICartRepository } from "../Repositories/ICartRepository";
 import { IProductRepository } from "../Repositories";
-import { TYPES } from "../Repositories/type";
+import { TYPES } from "../Types/type";
 import statusMess from "../Constants/statusMess";
 import { RecordNotFoundError } from "../Errors";
 export class CartService {
@@ -32,7 +32,9 @@ export class CartService {
                 items: cartItems.map((item: any) => item.toJSON()),
             };
             Message.logMessage(req, status);
-            return res.status(status).send(response);
+            if (res.headersSent !== true) {
+                res.status(status).send(response);
+            }
         } catch (err) {
             console.log(err);
             next(err);
@@ -55,12 +57,10 @@ export class CartService {
                 await cart.addProduct(product, {
                     through: {
                         quantity:
-                            req.body.quantity +
-                            cartItem[0].CartItem.quantity,
+                            req.body.quantity + cartItem[0].CartItem.quantity,
                         amount:
                             product.getDataValue("price") *
-                            (req.body.quantity +
-                                cartItem[0].CartItem.quantity),
+                            (req.body.quantity + cartItem[0].CartItem.quantity),
                         createdAt: cartItem[0].CartItem.createdAt,
                         updatedAt: new Date(),
                     },
@@ -128,7 +128,7 @@ export class CartService {
             if (req.body.quantity === 0) {
                 await cart.removeProduct(product);
             } else {
-                console.log("Success")
+                console.log("Success");
                 await cart.addProduct(product, {
                     through: {
                         quantity: req.body.quantity,

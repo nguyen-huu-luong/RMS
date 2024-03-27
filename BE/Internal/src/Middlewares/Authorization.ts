@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { BaseMiddleware } from "./BaseMiddleware";
 import { AuthorizationService } from "../Services";
 import { container } from "../Configs";
-import { TYPES } from "../Repositories/type";
+import { TYPES } from "../Types/type";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
 import { Permission } from "../Models";
 import { ForbiddenError } from "../Errors";

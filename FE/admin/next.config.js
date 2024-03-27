@@ -6,6 +6,12 @@ const nextConfig = {
     sassOptions: {
         includePaths: [path.join(__dirname, 'styles')],
     },
+    experimental: {
+        serverComponentsExternalPackages: ["mjml"],
+      },
+      env: {
+        BASE_URL:"http://localhost:3003/api"
+    },
 }
 
 const withNextIntl = require("next-intl/plugin")(

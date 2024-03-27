@@ -43,7 +43,7 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt"},
   callbacks: {
     async session({ session, token }) {
       const sanitizedToken = Object.keys(token).reduce((p, c) => {

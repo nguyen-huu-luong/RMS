@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import * as dotenv from 'dotenv';
 import { ICartRepository, IClientRepository } from "../Repositories";
 import { container } from "../Configs";
-import { TYPES } from "../Repositories/type";
+import { TYPES } from "../Types/type";
 
 dotenv.config();
 
@@ -30,7 +30,7 @@ export class MoMoService {
         var redirectUrl = 'http://localhost:3000/en/payment?method=MOMO';
         var ipnUrl = 'http://localhost:3003/api/order/momo';
         var requestType = "payWithMethod";
-        var amount = cart.amount;
+        var amount = cart.amount + req.body["shippingCost"] - req.body["discountAmount"];
         var orderId = partnerCode + req.userId  + new Date().getTime();
         var requestId = orderId;
         var extraData = Buffer.from(data).toString('base64');
@@ -39,19 +39,11 @@ export class MoMoService {
         var lang = 'vi';
         var userInfo = {"name": fullname}
     
-        //before sign HMAC SHA256 with format
-        //accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
         var rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode +  "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" + requestType;
-        //puts raw signature
-        // console.log("--------------------RAW SIGNATURE----------------")
-        // console.log(rawSignature)
-        //signature
         const crypto = require('crypto');
         var signature = crypto.createHmac('sha256', secretKey)
             .update(rawSignature)
             .digest('hex');
-        // console.log("--------------------SIGNATURE----------------")
-        // console.log(signature)
     
         //json object send to MoMo endpoint
         const requestBody = JSON.stringify({
@@ -86,14 +78,8 @@ export class MoMoService {
         }
         //Send the request and get the response
         const req_payment = https.request(options, (res_payment:any) => {
-            // console.log(`Status: ${res_payment.statusCode}`);
-            // console.log(`Headers: ${JSON.stringify(res_payment.headers)}`);
             res_payment.setEncoding('utf8');
             res_payment.on('data', (body:any) => {
-                // console.log('Body: ');
-                // console.log(body);
-                // console.log('resultCode: ');
-                // console.log(JSON.parse(body).resultCode);
                 res.send(body)
             });
             res_payment.on('end', () => {
@@ -105,7 +91,6 @@ export class MoMoService {
             console.log(`problem with request: ${e.message}`);
         });
         // write data to request body
-        // console.log("Sending....")
         req_payment.write(requestBody);
         req_payment.end();
     }

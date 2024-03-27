@@ -2,6 +2,9 @@
     transform-origin: center;
     animation: fade-in ease-in-out 0.5s;
 }
+.chat{
+    animation: chat ease-in-out 0.5s;
+}
 @keyframes foodDetail {
     from{
         opacity: 0;
@@ -23,5 +26,16 @@
     }
     to {
         opacity: 1;
+    }
+}
+
+@keyframes chat {
+    from{
+        opacity: 0;
+        transform: scale(0);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
 }
