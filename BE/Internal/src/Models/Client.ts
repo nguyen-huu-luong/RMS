@@ -160,7 +160,7 @@ Client.init(
 			type: DataTypes.DATE,
 		},
 		avatar: {
-			type: DataTypes.BLOB,
+			type: DataTypes.STRING,
 		},
 		score: {
 			type: DataTypes.INTEGER,
@@ -192,6 +192,9 @@ Client.init(
 			type: DataTypes.STRING,
 			allowNull: false,
 			defaultValue: "vi",
+		},
+		profit: {
+			type: DataTypes.INTEGER,
 		},
 	},
 	{ sequelize: Loader.sequelize }
