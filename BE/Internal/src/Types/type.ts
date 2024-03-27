@@ -15,7 +15,11 @@ const TYPES = {
     IMessageTemplateRepository: Symbol.for("IMessageTemplateRepository"),
 
     IMessageRepository: Symbol.for("IMessageRepository"),
-    IChannelRepository: Symbol.for("IChannelRepository")
+    IChannelRepository: Symbol.for("IChannelRepository"),
+    ITableRepository: Symbol.for("ITableRepository"),
+    IFloorRepository: Symbol.for("IFloorRepository"),
+    IReservationRepository: Symbol.for("IReservationRepository"),
+    ITableReservationRepository: Symbol.for("ITableReservationRepository"),
 
 };
 

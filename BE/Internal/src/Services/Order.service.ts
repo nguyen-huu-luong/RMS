@@ -143,9 +143,10 @@ export class OrderService {
                     total: 0,
                     amount: 0,
                 });
-            } else {
+            } else if (req.action == "create:any") {
                 const { products, ...orderData } = req.body;
                 const order = await this.orderRepository.create(orderData);
+                console.log(products, orderData)
                 await Promise.all(
                     products.map(async (item: any) => {
                         let product = await this.productRepository.findById(
@@ -181,7 +182,7 @@ export class OrderService {
                     num_items: totalItems,
                     amount: totalAmount,
                 });
-            }
+            } else throw new UnauthorizedError()
             res.status(status).send(statusMess.Success);
             Message.logMessage(req, status);
         } catch (err) {

@@ -83,13 +83,13 @@ class Client extends Person {
 			otherKey: "targetListId",
 		});
 
-		Client.hasMany(Reservation, {
-			foreignKey: {
-				name: "clientId",
-				allowNull: false,
-			},
-			sourceKey: "id",
-		});
+		// Client.hasMany(Reservation, {
+		// 	foreignKey: {
+		// 		name: "clientId",
+		// 		allowNull: false,
+		// 	},
+		// 	sourceKey: "id",
+		// });
 
 		Client.hasMany(ChatSession, {
 			foreignKey: {
