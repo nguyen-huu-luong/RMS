@@ -6,6 +6,7 @@ import TableReservation from './TableReservation';
 import Order from './Order';
 import Floor from './Floor';
 import Loader from '../Loaders';
+import Cart from './Cart';
 class Table extends Model {
   declare createFloor: BelongsToCreateAssociationMixin<Floor>;
   static associate() {
@@ -21,11 +22,21 @@ class Table extends Model {
 				allowNull: true,
 			},
 		});
-    // Table.belongsToMany(Order, {
-    //   through: TableOrder,
-    //   foreignKey: "tableId",
-    //   otherKey: "orderId",
-    // });
+
+    Table.hasOne(Cart, {
+			foreignKey: {
+				name: "tableId",
+				allowNull: true,
+			},
+			sourceKey: "id",
+		})
+    Table.hasMany(Order, {
+      foreignKey: {
+        name: "tableId",
+        allowNull: false,
+      },
+      sourceKey: "id",
+    });
 
   }
 }

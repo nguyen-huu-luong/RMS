@@ -29,6 +29,7 @@ function Home() {
     const router = useRouter();
 
     const showModal = () => {
+        console.log(items)
         setOpen(true);
     };
 

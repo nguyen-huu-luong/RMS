@@ -13,14 +13,22 @@ import Loader from "../Loaders";
 import Client from "./Client";
 import Product from "./Product";
 import CartItem from "./CartItem";
+import Table from "./Table";
 class Cart extends Model {
 	public static associate() {
 		Cart.belongsTo(Client, {
 			foreignKey: {
 				name: "clientId",
-                allowNull: false
+                allowNull: true
 			},
 		});
+
+		Cart.belongsTo(Table, {
+			foreignKey: {
+				name: "tableId",
+                allowNull: true
+			},
+		})
 
         Cart.belongsToMany(Product, {through: CartItem, foreignKey: "cartId", otherKey: 'productId'})
 	}
