@@ -304,7 +304,7 @@ const ChatBox = ({
             clientId: string
         ) => {
             if (channelId == channel) {
-                // socket.emit("staff:message:read", channelId);
+
                 setData((prevData: any) => ({
                     ...prevData,
                     message: [

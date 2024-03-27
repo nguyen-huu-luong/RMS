@@ -2,12 +2,9 @@
 import { LockOutlined, MailOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Button, Checkbox, ConfigProvider, Form, Input, message } from "antd";
 import { signIn } from "next-auth/react";
-import Image from "next/image";
-import Link from "next-intl/link";
 import { useRouter } from "next-intl/client";
 import { useState } from "react";
 import { useLocale } from "next-intl";
-import { signOut } from "next-auth/react";
 import variables from "@/app/variables.module.scss";
 
 export const LoginForm: React.FC = () => {
@@ -17,10 +14,9 @@ export const LoginForm: React.FC = () => {
     const locale = useLocale();
     const onFinish = async (values: any) => {
         setLoading(true);
-        console.log("Received values of form: ", values);
         let result = await signIn("credentials", {
             ...values,
-            redirect: true,
+            redirect: false,
         });
         setLoading(false);
         if (result && !result.ok) {
@@ -30,6 +26,7 @@ export const LoginForm: React.FC = () => {
                 console.log(error);
             }
         } else {
+            router.push("/");
             router.push("/");
         }
     };
@@ -137,8 +134,6 @@ export const LoginForm: React.FC = () => {
                     </Form.Item>
                     <div className='flex flex-row items-center space-x-4 my-2'>
                         <div className='h-[1px] w-full bg-primary line'></div>
-                        {/* <span>Or</span>
-                        <div className='h-[1px] w-full bg-primary line'></div> */}
                     </div>
                 </Form>
             </ConfigProvider>

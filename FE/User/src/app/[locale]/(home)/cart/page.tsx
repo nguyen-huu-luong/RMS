@@ -63,7 +63,6 @@ export default function Cart() {
         await removeProduct(session?.user.accessToken, itemId);
     };
 
-    // Check if cart is empty
     if (cartItemsError) return <div>Failed to load</div>;
     if (cartItemsLoading) return <Loading />;
     if (!cartItems) return <Loading />;

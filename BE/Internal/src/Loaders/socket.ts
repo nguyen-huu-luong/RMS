@@ -1,8 +1,6 @@
 import { NextFunction } from "express";
-import DBConnect from "./db";
 import { Channel } from "../Models";
 import { TokenUtil } from "../Utils";
-import { UnauthorizedError } from "../Errors";
 class SocketConnection {
     private channels: { [channelId: string]: string } = {};
 
@@ -22,7 +20,7 @@ class SocketConnection {
                     channels.forEach((channel: any) => {
                         socket.join("Channel_" + channel.dataValues.id);
                     });
-                    console.log(socket.rooms);
+                    socket.join("Kitchen");
                 }
                 next();
             } catch (error) {
@@ -32,6 +30,8 @@ class SocketConnection {
         });
         io.on("connection", (socket: any) => {
             socket.emit("initial:channels", this.channels);
+
+            //Chat
             socket.on(
                 "client:message:send",
                 (channelId: string, message: string, clientId: string) => {
@@ -66,11 +66,22 @@ class SocketConnection {
                     channelId
                 );
             });
+
+            //Kitchen
+            socket.on("chef:order:finish", (orderId: string) => {
+                io.to("Kitchen").emit("order:finish:fromChef", orderId);
+            });
+            socket.on("staff:order:prepare", (orderId: string) => {
+                io.to("Kitchen").emit("order:prepare:fromStaff", orderId);
+            });
             socket.on(
                 "staff:channel:join",
                 (channelId: string, staffId: string, callback: any) => {
-                    console.log(this.channels)
-                    if (this.channels[channelId] && this.channels[channelId] != socket.id) {
+                    console.log(this.channels);
+                    if (
+                        this.channels[channelId] &&
+                        this.channels[channelId] != socket.id
+                    ) {
                         callback({
                             status: "0",
                         });
@@ -112,11 +123,9 @@ class SocketConnection {
                     if (this.channels[channelId] === socket.id) {
                         delete this.channels[channelId];
                         io.emit("channel:status:update", this.channels);
-                        // io.to(channelId).emit("room:update", { type: "disconnect", staffId: socket.id });
                     }
                 });
             });
-
         });
     }
 }
