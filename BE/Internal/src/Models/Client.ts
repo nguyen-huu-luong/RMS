@@ -193,6 +193,9 @@ Client.init(
 			allowNull: false,
 			defaultValue: "vi",
 		},
+		profit: {
+			type: DataTypes.INTEGER,
+		},
 	},
 	{ sequelize: Loader.sequelize }
 );
