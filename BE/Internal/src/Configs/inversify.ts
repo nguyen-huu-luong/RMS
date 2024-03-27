@@ -14,7 +14,11 @@ import {
 	MessageTemplateRepository,
 	IMessageTemplateRepository,
 	ChannelRepository,
-	MessageRepository
+	MessageRepository,
+	IFloorRepository,
+	ITableRepository,
+	ITableReservationRepository,
+	IReservationRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -23,6 +27,7 @@ import { ProductRepository } from "../Repositories";
 import { CartRepository } from "../Repositories";
 import { ICategoryRepository } from "../Repositories/ICategoryRepository";
 import { CategoryRepository } from "../Repositories/implementation/CategoryRepository";
+import { FloorRepository, TableRepository, TableReservationRepository, ReservationRepository } from "../Repositories";
 // import { IClientService } from "../Services";
 import { TYPES } from "../Types/type";
 import { IChannelRepository } from "../Repositories/IChannelRepository";
@@ -60,7 +65,10 @@ class InversifyContainer {
 		this.container.bind<ICategoryRepository>(TYPES.ICategoryRepository).to(CategoryRepository);
 		this.container.bind<IVoucherRepository>(TYPES.IVoucherRepository).to(VoucherRepository);
 		this.container.bind<IMessageTemplateRepository>(TYPES.IMessageTemplateRepository).to(MessageTemplateRepository);
-		
+		this.container.bind<IFloorRepository>(TYPES.IFloorRepository).to(FloorRepository);
+		this.container.bind<ITableRepository>(TYPES.ITableRepository).to(TableRepository);
+		this.container.bind<ITableReservationRepository>(TYPES.ITableReservationRepository).to(TableReservationRepository);
+		this.container.bind<IReservationRepository>(TYPES.IReservationRepository).to(ReservationRepository);
 		// this.container.bind<IClientService>(TYPES.IClientService).to(ClientService);
 
 		// this.container.bind<IClientController>(TYPES.IClientController).to(ClientController)

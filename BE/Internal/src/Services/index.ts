@@ -9,3 +9,7 @@ export * from './Category.service'
 export * from './Voucher.service'
 export * from './MoMo.service'
 export * from './Channel.service'
+export * from './Table.service'
+export * from './Reservation.service'
+export * from './Floor.service'
+

@@ -16,6 +16,9 @@ import OrderRouter from "./Order.router";
 import ClientRouter from "./Client.router";
 import MarketingRouter from "./marketing.router";
 import ChannelRouter from "./Channel.router";
+import ReservationRouter from "./Reservation.router";
+import TableRouter from "./Table.router";
+import FloorRouter from "./Floor.router";
 
 process.on("unhandledRejection", (reason, promise) => {
 	console.error("Unhandled Rejection at:", promise, "reason:", reason);
@@ -31,6 +34,9 @@ class Routers {
 		const authRouter = new AuthRouter();
 		const marketingRouter = new MarketingRouter();
 		const channelRouter = new ChannelRouter();
+		const reservationRouter = new ReservationRouter()
+		const tableRouter = new TableRouter()
+		const floorRouter = new FloorRouter()
 		// declare your router here
 		const router = Router();
         
@@ -43,6 +49,9 @@ class Routers {
 		clientRouter.initialize(router)
 		marketingRouter.initialize(router)
 		channelRouter.initialize(router);
+		reservationRouter.initialize(router)
+		tableRouter.initialize(router)
+		floorRouter.initialize(router)
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 

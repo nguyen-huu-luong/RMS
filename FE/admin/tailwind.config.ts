@@ -16,7 +16,8 @@ const config: Config = {
     
         colors: {
             primary: "#4A58EC",
-            bgsecondary: "#E7E9FD"
+            bgsecondary: "#E7E9FD",
+            menu: "#EA6A12"
         },
 
         width: {

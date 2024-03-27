@@ -21,15 +21,22 @@ class Order extends Model {
 			otherKey: "productId",
 		});
 
-		Order.belongsToMany(Table, {
-			through: TableOrder,
-			foreignKey: "orderId",
-			otherKey: "tableId",
-		});
+		// Order.belongsToMany(Table, {
+		// 	through: TableOrder,
+		// 	foreignKey: "orderId",
+		// 	otherKey: "tableId",
+		// });
 
 		Order.belongsTo(Voucher, {
             foreignKey: {
                 name: "voucherId",
+                allowNull: true,
+            },
+        });
+
+		Order.belongsTo(Table, {
+            foreignKey: {
+                name: "tableId",
                 allowNull: true,
             },
         });
