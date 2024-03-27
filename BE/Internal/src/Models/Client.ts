@@ -160,7 +160,7 @@ Client.init(
 			type: DataTypes.DATE,
 		},
 		avatar: {
-			type: DataTypes.BLOB,
+			type: DataTypes.STRING,
 		},
 		score: {
 			type: DataTypes.INTEGER,

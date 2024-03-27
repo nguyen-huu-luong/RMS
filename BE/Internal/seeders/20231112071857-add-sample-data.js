@@ -1,28 +1,93 @@
 "use strict";
 const bcrypt = require('bcrypt')
 const faker = require("faker");
+const avatar = [
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711532192/Client/photo-1711292471935-33f01af44bca_mwhryd.jpg",
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711532164/Client/photo-1711263618908-d419b874c8f3_y19nq5.jpg",
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711532125/Client/photo-1711318741098-368efe99fe3f_yga6x4.jpg",
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711532088/Client/photo-1711367465791-5c369c862593_fkrlg5.jpg",
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711532058/Client/photo-1711210430750-66ae0698c356_qtf6sb.jpg",
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711532040/Client/photo-1711221024071-c0c934920ff0_edpopy.jpg",
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711532012/Client/photo-1711298205592-535995310152_rhl8ja.jpg",
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711531983/Client/photo-1711402905522-b90c0bc15afa_wwu4fe.jpg",
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711531946/Client/photo-1711403174834-d33851ffc786_qw9apa.jpg",
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711531879/Client/photo-1711370865063-12f626e0f7d1_sv29ts.jpg"
+]
+
+const veggies = [
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534514/Product/Veggie/photo-1625944230945-1b7dd3b949ab_qxe715.jpg
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534454/Product/Veggie/photo-1518779578993-ec3579fee39f_kddc81.jpg
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534399/Product/Veggie/photo-1648437595604-f1794490053c_bj4u87.jpg
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534333/Product/Veggie/photo-1558736119-77819403c711_ljddvi.jpg
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534308/Product/Veggie/photo-1609690963718-0b55905aef78_lsokze.jpg
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534254/Product/Veggie/photo-1677653805080-59c57727c84e_ujkdeh.jpg
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534224/Product/Veggie/photo-1518779578993-ec3579fee39f_kc1caw.jpg
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534192/Product/Veggie/photo-1629145400374-e99188d4443b_hhodrf.jpg
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534134/Product/Veggie/photo-1533606117812-0783e8e690f1_hoafsh.jpg
+    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534119/Product/Veggie/photo-1627279001674-4c7dbd9edb88_xuj7rs.jpg
+]
+
+const sources = [
+    "Facebook", "Tiktok", "At Restaurant"
+]
+
+const types = [
+    "Lead", "Customer"
+]
+
+const newData = [
+    [ 'Tô', 'Như', 'Phương', '2000-01-26', '59/6/12 Nguyễn Đình Chiểu, Phường 4, Quận 3, Thành phố Hồ Chí Minh', 'TmThin.Tng5@yahoo.com'],
+    [ 'Hà', 'Gia', 'Hùng', '2001-01-08', '142/19 Nguyen Thi Thap, Phường Binh Thuan, Quận 7, Thành phố Hồ Chí Minh', 'DiuHnh93@yahoo.com'],
+    [ 'Trần', 'Nhân', 'Từ', '2000-09-13', '18 Luy Ban Bich Street Tan Thoi Hoa Phường, Thành phố Hồ Chí Minh', 'TunHi.Phng48@gmail.com'],
+    [ 'Hà', 'Lam', 'Tuyền', '2000-05-05', '98 Nguyễn Đình Chiểu, Quận 1, Thành phố Hồ Chí Minh', 'nhChiu.Trng74@yahoo.com'],
+    [ 'Vương', 'Phương', 'Nghi', '1999-01-16', '298 Nguyen Trong Tuyen, Phường 1, Thành phố Hồ Chí Minh', 'ThyVn.Tng@gmail.com'],
+    [ 'Đỗ', 'Bảo', 'Khánh', '2000-05-30', '18 Luy Ban Bich Street Tan Thoi Hoa Phường, Thành phố Hồ Chí Minh', 'MinhL_Lm@yahoo.com'],
+    [ 'Phùng', 'Trung', 'Lực', '1998-09-21', '298 Nguyen Trong Tuyen, Phường 1, Thành phố Hồ Chí Minh', 'PhngLoan.Mai28@yahoo.com'],
+    [ 'Phạm', 'Thu', 'Hằng', '2000-01-19', '142/19 Nguyen Thi Thap, Phường Binh Thuan, Quận 7, Thành phố Hồ Chí Minh', 'YnTrm.on@hotmail.com'],
+    [ 'Mai', 'Quốc', 'Việt', '2000-02-27', '410 Su Van Hanh, Phường 9, Quận 10, Thành phố Hồ Chí Minh', 'HngThu83@gmail.com'],
+    [ 'Lê', 'Sơn', 'Dương', '1999-01-19', '98 Nguyễn Đình Chiểu Dist1, Thành phố Hồ Chí Minh', 'ThinLng_Ng@gmail.com'],
+];
+
+const phone = [
+    "0822 740 644",
+    "092 150 49 74",
+    "0794 494 321",
+    "0584 944 008",
+    "0393 959 772",
+    "091 029 69 04",
+    "0594 657 887",
+    "0833 421 294",
+    "0582 568 184",
+    "0838 060 168"
+]
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         const clientPassword = await bcrypt.hash("client", 10) ;
-        const clients = Array.from({ length: 20 }, () => ({
-            email: faker.internet.email(),
-            phone: faker.phone.phoneNumber(),
-            firstname: faker.name.firstName(),
-            lastname: faker.name.lastName(),
-            gender: faker.random.boolean(),
-            birthday: faker.date.past(),
-            avatar: faker.image.avatar(),
-            score: faker.random.number(),
-            address: faker.address.streetAddress(),
-            source: faker.random.word(),
-            type: faker.random.word(),
-            hashedPassword: clientPassword,
-            isRegistered: faker.random.boolean(),
-            isActive: faker.random.boolean(),
-            language: "vi", // Assuming a default language
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        }));
+        const clients = [];
+        for (let i = 0; i < newData.length; i++) {
+            const [firstName, middleName, lastName, birthday, address, email] = newData[i];
+            const client = {
+                email: email,
+                phone: phone[i],
+                firstname: firstName,
+                lastname: lastName,
+                gender: faker.random.boolean(),
+                birthday: new Date(birthday),
+                avatar: avatar[i],
+                score: 0,
+                address: address,
+                source: sources[Math.floor(Math.random() * sources.length)],
+                type: types[Math.floor(Math.random() * types.length)],
+                hashedPassword: clientPassword,
+                isRegistered: true,
+                isActive: true,
+                language: "vi",
+                profit: faker.random.number({ min: 200000, max: 500000,  precision: 10000  }),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+            clients.push(client);
+        }
         const admins = [
             {
                 username: "manager",

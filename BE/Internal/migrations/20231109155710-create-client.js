@@ -27,7 +27,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       avatar: {
-        type: Sequelize.BLOB
+        type: Sequelize.STRING
       },
       score: {
         type: Sequelize.INTEGER
