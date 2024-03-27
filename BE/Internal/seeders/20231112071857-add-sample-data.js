@@ -14,18 +14,6 @@ const avatar = [
     "https://res.cloudinary.com/djdpobmlv/image/upload/v1711531879/Client/photo-1711370865063-12f626e0f7d1_sv29ts.jpg"
 ]
 
-const veggies = [
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534514/Product/Veggie/photo-1625944230945-1b7dd3b949ab_qxe715.jpg
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534454/Product/Veggie/photo-1518779578993-ec3579fee39f_kddc81.jpg
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534399/Product/Veggie/photo-1648437595604-f1794490053c_bj4u87.jpg
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534333/Product/Veggie/photo-1558736119-77819403c711_ljddvi.jpg
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534308/Product/Veggie/photo-1609690963718-0b55905aef78_lsokze.jpg
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534254/Product/Veggie/photo-1677653805080-59c57727c84e_ujkdeh.jpg
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534224/Product/Veggie/photo-1518779578993-ec3579fee39f_kc1caw.jpg
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534192/Product/Veggie/photo-1629145400374-e99188d4443b_hhodrf.jpg
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534134/Product/Veggie/photo-1533606117812-0783e8e690f1_hoafsh.jpg
-    https://res.cloudinary.com/djdpobmlv/image/upload/v1711534119/Product/Veggie/photo-1627279001674-4c7dbd9edb88_xuj7rs.jpg
-]
 
 const sources = [
     "Facebook", "Tiktok", "At Restaurant"
