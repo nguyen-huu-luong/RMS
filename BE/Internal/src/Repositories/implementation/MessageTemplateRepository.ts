@@ -11,7 +11,7 @@ export class MessageTemplateRepository
 	implements IMessageTemplateRepository
 {
 	constructor() {
-		super(Messagetemplate, ["id","name" ,"type", "createdAt", "updatedAt"]);
+		super(Messagetemplate, ["id","name" ,"type","content","description", "createdAt", "updatedAt"]);
 	}
 
 	

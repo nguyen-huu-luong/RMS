@@ -16,6 +16,7 @@ import OrderRouter from "./Order.router";
 import ClientRouter from "./Client.router";
 import MarketingRouter from "./marketing.router";
 import ChannelRouter from "./Channel.router";
+import EmployeeRouter from "./employee.router";
 
 process.on("unhandledRejection", (reason, promise) => {
 	console.error("Unhandled Rejection at:", promise, "reason:", reason);
@@ -31,6 +32,7 @@ class Routers {
 		const authRouter = new AuthRouter();
 		const marketingRouter = new MarketingRouter();
 		const channelRouter = new ChannelRouter();
+		const employeeRouter = new EmployeeRouter();
 		// declare your router here
 		const router = Router();
         
@@ -43,6 +45,7 @@ class Routers {
 		clientRouter.initialize(router)
 		marketingRouter.initialize(router)
 		channelRouter.initialize(router);
+		employeeRouter.initialize(router);
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 
