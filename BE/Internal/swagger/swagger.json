@@ -608,6 +608,17 @@
                 ],
 				"tags": ["Order"],
 				"summary": "Admin create order",
+				"parameters": [
+					{
+					  "in": "path",
+					  "name": "method",
+					  "required": true,
+					  "description": "Method of the order",
+					  "schema": {
+						"type": "string"
+					  }
+					}
+				  ],
 				"requestBody": {
 					"description": "Order object",
 					"required": "True",

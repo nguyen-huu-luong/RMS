@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import {
 	Button,
 	ConfigProvider,
@@ -25,6 +26,8 @@ import type {
 } from "antd/es/table/interface";
 import { CustomerActionBar } from "@/components";
 import fetchClient from "@/lib/fetch-client";
+import Link from "next/link";
+import { customersFetcher } from "@/app/api/client";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -68,6 +71,7 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const EmailTemplate: React.FC = () => {
+	const [checker, setChecker] = useState(true);
 	const [searchText, setSearchText] = useState("");
 	const [searchedColumn, setSearchedColumn] = useState("");
 	const searchInput = useRef<InputRef>(null);
@@ -223,8 +227,8 @@ const EmailTemplate: React.FC = () => {
 			title: "Fullname",
 			dataIndex: "fullname",
 			key: "fullname",
-			render: (text) => <a>{text}</a>,
-			...getColumnSearchProps("fullname"),
+			render: (text, row) => <a style={{ color: "#4A58EC" }} href={`./customers/${row.id}`}>{text}</a>,
+			// ...getColumnSearchProps("fullname"),
 		},
 		{
 			title: "Phone number",
@@ -316,8 +320,6 @@ const EmailTemplate: React.FC = () => {
 					pageSize: results.pageSize,
 					current: results.page,
 					total: results.totalCount,
-					// 200 is mock data, you should read it from server
-					// total: data.totalCount,
 				},
 			});
 				
@@ -335,7 +337,7 @@ const EmailTemplate: React.FC = () => {
 
 	useEffect(() => {
 		fetchData();
-	}, [JSON.stringify(tableParams)]);
+	}, []);
 
 	const handleTableChange: TableProps["onChange"] = (
 		pagination,
@@ -368,6 +370,8 @@ const EmailTemplate: React.FC = () => {
 				},
 			}));
 		}
+
+		setChecker(prevState => !prevState)
 	};
 
 	const handleSortFieldChange = (key: string) => {
@@ -376,6 +380,7 @@ const EmailTemplate: React.FC = () => {
 			...prev,
 			sorter: { ...prev.sorter, field: key },
 		}));
+		setChecker(prevState => !prevState)
 		console.log(tableParams);
 	};
 
@@ -387,6 +392,7 @@ const EmailTemplate: React.FC = () => {
 				order: prev.sorter?.order === "ascend" ? "descend" : "ascend",
 			},
 		}));
+		setChecker(prevState => !prevState)
 	};
 
 	const handleClearFilter = () => { };

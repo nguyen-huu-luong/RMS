@@ -45,9 +45,13 @@ export abstract class BaseRepository<M extends Model> implements IBaseRepository
 		}
 		else {
 			if (this.attributes[0] === "*") {
-				return this._model.findAll()
+				return this._model.findAll({order:  [
+					["id", "ASC"]
+				]})
 			} 
-			return this._model.findAll({attributes: this.attributes})
+			return this._model.findAll({attributes: this.attributes, order:  [
+				["id", "ASC"]
+			]})
 		}
 	}
 
