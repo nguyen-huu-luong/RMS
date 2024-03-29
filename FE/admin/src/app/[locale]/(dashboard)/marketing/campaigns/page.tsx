@@ -4,34 +4,20 @@ import { useSession } from "next-auth/react";
 import {
     Button,
     ConfigProvider,
-    InputRef,
-    Radio,
     Table,
     Input,
     Space,
-    Checkbox,
     Select,
-    Row,
-    Alert,
+    Flex, Modal, Form, DatePicker, InputNumber
 } from "antd";
-import type { TableProps, GetProp, TableColumnType } from "antd";
+import type { TableProps, GetProp } from "antd";
 import { variables } from "@/app";
-import {
-    SearchOutlined,
-    SortAscendingOutlined,
-    SortDescendingOutlined,
-} from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import type {
-    FilterConfirmProps,
-    FilterValue,
     Key,
     SortOrder,
-    SorterResult,
 } from "antd/es/table/interface";
-import { CustomerActionBar, CustomerFilterBar } from "@/components";
 import Link from "next/link";
-import { customersFetcher } from "@/app/api/client";
+import { EllipsisOutlined, PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -50,12 +36,6 @@ interface DataType {
 
 }
 
-type ErrorType = {
-    isError: boolean;
-    title: string;
-    message: string;
-};
-
 type SorterParams = {
     field?: Key | readonly Key[];
     order?: SortOrder;
@@ -67,11 +47,20 @@ interface TableParams {
     filters?: Parameters<GetProp<TableProps, "onChange">>[1];
 }
 
-type DataIndex = keyof DataType;
-
 const Campaign: React.FC = () => {
-    const temp_data: DataType[] = [{ id: 1, name: "Introduce new dish", type: "Type", status: "Planning", start_date: "2024-02-04", end_date: "2024-05-04" }]
-    const { data: session, status } = useSession();
+    const temp_data: DataType[] = [
+        { id: 1, name: "Introduce new dish", type: "Newsletter", status: "Planning", start_date: "2024-02-04", end_date: "2024-05-04" },
+        { id: 2, name: "Promote campaign 2023", type: "Newsletter", status: "Active", start_date: "2024-02-04", end_date: "2024-05-04" },
+        { id: 3, name: "Reactivation Campaign", type: "Email", status: "Planning", start_date: "2024-02-04", end_date: "2024-05-04" },
+    ]
+    const target_list: any[] = [
+        {id: 1, name: "Lead"},
+        {id: 2, name: "Customer"},
+        {id: 3, name: "Subscriber"}
+    ]
+
+    const [form_campaign] = Form.useForm();
+
     const [checker, setChecker] = useState(true);
     const [data, setData] = useState<DataType[]>(temp_data);
     const [loading, setLoading] = useState(false);
@@ -88,12 +77,6 @@ const Campaign: React.FC = () => {
             order: "ascend",
         },
     });
-    const [error, setError] = useState<ErrorType>({
-        isError: false,
-        message: "",
-        title: "",
-    });
-
 
     // rowSelection object indicates the need for row selection
     const rowSelection = {
@@ -180,11 +163,23 @@ const Campaign: React.FC = () => {
         setChecker(prevState => !prevState)
     };
 
+    const handleCreateCampaign = (values: any) => {
+        console.log(values)
+        handleCancel()
+    } 
 
-    const handleCloseError = () => {
-        console.log(error);
-        setError({ isError: false, title: "", message: "" });
+    const [open, setOpen] = useState(false);
+
+    const showModal = () => {
+        form_campaign.resetFields()
+        setOpen(true);
     };
+
+    const handleCancel = () => {
+        setOpen(false);
+    };
+
+
 
     return (
         <ConfigProvider
@@ -194,24 +189,136 @@ const Campaign: React.FC = () => {
                         headerBg: variables.backgroundSecondaryColor,
                         footerBg: "#fff",
                     },
+                    Form: {
+                        itemMarginBottom: 16,
+                    },
+                    Input: {
+                        addonBg: "#F6FAFD",
+                        colorFillTertiary: "#F6FAFD",
+                    },
+                    InputNumber: {
+                        addonBg: "#F6FAFD",
+                        colorFillTertiary: "#F6FAFD",
+                    },
+                    DatePicker: {
+                        colorFillTertiary: "#F6FAFD",
+                    },
+
+                    Select: {
+                        colorFillTertiary: "#F6FAFD",
+                    },
                 },
             }}
         >
-            
+
             <div className="w-full h-auto flex-col gap-3">
-            
-                {/* <CustomerFilterBar /> */}
-                <CustomerActionBar dataSelected={selectedCustomers} />
-                {error.isError && (
-                    <Alert
-                        message={error.title}
-                        description={error.message}
-                        type="error"
-                        showIcon
-                        onClose={handleCloseError}
-                        closeIcon
-                    />
-                )}
+                <div className="bg-white w-full py-2 px-3 rounded-md border">
+                    <Flex>
+                        {
+                            <Space>
+                                <Input
+                                    placeholder="Enter keywork to search...."
+                                    prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
+                                    className="flex items-center"
+                                />
+                            </Space>
+                        }
+
+                        <Space className="ms-auto">
+                            <Button icon={<PlusCircleOutlined />} onClick={showModal}>
+                                New
+                            </Button>
+                            <Button icon={<EllipsisOutlined />} />
+
+                        </Space>
+                    </Flex>
+
+                    <Modal title="Add new campaign" footer={null} open={open} onCancel={handleCancel}>
+                        <Form form={form_campaign} name="form_item_path" variant="filled" layout="vertical" style={{ maxWidth: 1000 }} onFinish={handleCreateCampaign}>
+
+                            <div className="flex space-x-2">
+                                <div className='w-full'>
+                                    <Form.Item label="Name" name="name" required rules={[{ required: true, message: 'Please input the campaign name !' }]}>
+                                        <Input placeholder='Campaign name' />
+                                    </Form.Item>
+                                </div>
+                                <div className='w-full'>
+                                    <Form.Item label="Status" name="status" required rules={[{ required: true, message: 'Please select the  campaign status !' }]}>
+                                        <Select>
+                                            <Select.Option value="planning">Planning</Select.Option>
+                                            <Select.Option value="active">Active</Select.Option>
+                                            <Select.Option value="inactive">Inactive</Select.Option>
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                            </div>
+
+                            <div className="flex space-x-2">
+                                <div className='w-full'>
+                                    <Form.Item label="Type" name="type" required rules={[{ required: true, message: 'Please input the campaign type !' }]}>
+                                        <Select>
+                                            <Select.Option value="newsletter">Newsletter</Select.Option>
+                                            <Select.Option value="email">Email</Select.Option>
+                                            <Select.Option value="welcome">Welcome</Select.Option>
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                                <div className='w-full'>
+                                    <Form.Item label="Start date" name="start_date" required rules={[{ required: true, message: 'Please input the start date !' }]}>
+                                        <DatePicker className='w-full' />
+                                    </Form.Item>
+                                </div>
+                            </div>
+
+                            <div className="flex space-x-2">
+                                <div className='w-full'>
+                                    <Form.Item label="Budget" name="budget" >
+                                       <InputNumber min={10000} className='w-full' />
+                                    </Form.Item>
+                                </div>
+                                <div className='w-full'>
+                                    <Form.Item label="End date" name="end_date" required rules={[{ required: true, message: 'Please input the end date !' }]}>
+                                        <DatePicker className='w-full' />
+                                    </Form.Item>
+                                </div>
+                            </div>
+
+
+                            <div className="flex space-x-2">
+                                <div className='w-full'>
+                                    <Form.Item label="Target lists" name="target_list" rules={[{ required: true, message: 'Please choose the target item !' }]}>
+                                        <Select mode="multiple" allowClear>
+                                            {
+                                                target_list.map((item) => <Select.Option value={item.id}>{item.name}</Select.Option>)
+                                            }
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+
+                                <div className='w-full'>
+                                    <Form.Item label="Frequently" name="frequently" rules={[{ required: true, message: 'Please choose the frequently !' }]}>
+                                    <Select>
+                                            <Select.Option value="every_day">Every day</Select.Option>
+                                            <Select.Option value="every_week">Every week</Select.Option>
+                                            <Select.Option value="every_month">Every month</Select.Option>
+                                        </Select>
+                                    </Form.Item>
+                                </div>
+                            </div>
+
+                            <Form.Item>
+                                <div className='flex justify-end space-x-2'>
+                                    <Button type="default" htmlType="reset" onClick={handleCancel}>
+                                        Cancel
+                                    </Button>
+                                    <Button type="primary" htmlType="submit" style={{ backgroundColor: "#4A58EC", color: "white" }}>
+                                        Save
+                                    </Button>
+                                </div>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+                </div>
 
                 <div className="mt-2">
                     <Table
@@ -232,8 +339,7 @@ const Campaign: React.FC = () => {
                         dataSource={data}
                         onChange={handleTableChange}
                     />
-               
-</div>
+                </div>
             </div>
         </ConfigProvider>
     );
