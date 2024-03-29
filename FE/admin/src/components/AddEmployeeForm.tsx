@@ -3,39 +3,46 @@ import {
     Button,
     ConfigProvider,
     Form,
+    Input,
     Select,
     Upload,
     message
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import RMSInput from './inputs/RMSInput';
-import RMSDatePicker from './inputs/RMSDatePicker';
 import axios from 'axios';
 
-interface AddCustomerFormProps {
+// const BoldLabelForm = styled(Form)`
+//   .ant-form-item-label {
+//     label {
+//       font-weight: bold;
+//     }
+//   }
+// `; 
+
+interface AddEmployeeFormProps {
     afterSubmit: () => void
     afterCancel: () => void
 }
 
-export const AddCustomerForm: React.FC<AddCustomerFormProps> = (props) => {
+export const AddEmployeeForm: React.FC<AddEmployeeFormProps> = (props) => {
 
     const [form] = Form.useForm();
 
     const onFinish = async (values: any) => {
         try {
-            const response = await axios.post('http://localhost:3003/api/customers', { data: values }, {
+            const response = await axios.post('http://localhost:3003/api/employees', { data: values }, {
                 headers: {
-                    Authorization:
-                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiTWFyaW9fS29zc0B5YWhvby5jb20iLCJyb2xlIjoibWFuYWdlciIsImlhdCI6MTcwODM1NjUwNCwiZXhwIjoxNzE0MzU2NTA0fQ.naMCtTR_QKTwTMkqjIL6QaMNnbZdOk7wzuojI_H5RNc",
+                    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiTW9ydG9uLk1vcmFyQHlhaG9vLmNvbSIsInJvbGUiOiJtYW5hZ2VyIiwiaWF0IjoxNzEwNjgyMjY5LCJleHAiOjE3MTA2ODI4Njl9.jPycRT81xcOXMtJIePOafNQKy1T9oo3cm4jrTETRA4Q"
                 }
             });
-            console.log('New customer added:', response.data);
-            message.success('Customer added successfully');
+            console.log('New employee added:', response.data);
+            message.success('Employee added successfully');
             form.resetFields();
             props.afterSubmit();
         } catch (error) {
-            console.error('Error adding customer:', error);
-            message.error('Failed to add customer');
+            console.error('Error adding employee:', error);
+            message.error('Failed to add employee');
         }
     };
 
@@ -72,7 +79,7 @@ export const AddCustomerForm: React.FC<AddCustomerFormProps> = (props) => {
         }}
     >
         <Form name="form_item_path" variant="filled" layout="vertical" style={{ maxWidth: 1000 }} onFinish={onFinish} onReset={props.afterCancel}>
-            <Form.Item
+            {/* <Form.Item
                 name="upload-avatar"
                 label="Avatar"
                 valuePropName="fileList"
@@ -81,7 +88,7 @@ export const AddCustomerForm: React.FC<AddCustomerFormProps> = (props) => {
                 <Upload name="avatar" action="/upload.do" listType="picture">
                     <Button icon={<UploadOutlined />} />
                 </Upload>
-            </Form.Item>
+            </Form.Item> */}
 
             <div className="flex space-x-2">
                 <div className='w-full'>
@@ -111,42 +118,14 @@ export const AddCustomerForm: React.FC<AddCustomerFormProps> = (props) => {
 
             <div className="flex space-x-2">
                 <div className='w-full'>
-                    <Form.Item label="Birthday">
-                        <RMSDatePicker className='w-full' />
-                    </Form.Item>
-                </div>
-                <div className='w-full'>
-                    <Form.Item label="Source">
-                        <Select>
-                            <Select.Option value="demo">Demo</Select.Option>
-                        </Select>
-                    </Form.Item>
-                </div>
-            </div>
-
-
-            <div className="flex space-x-2">
-                <div className='w-full'>
-                    <Form.Item label="Source">
-                        <Select>
-                            <Select.Option value="demo">Demo</Select.Option>
-                        </Select>
+                    <Form.Item label="Username" name="username" required>
+                        <RMSInput placeholder='Username' />
                     </Form.Item>
                 </div>
 
-                <div className='w-full'>
-                    <Form.Item label="Source">
-                        <Select>
-                            <Select.Option value="demo">Demo</Select.Option>
-                        </Select>
-                    </Form.Item>
-                </div>
-
-                <div className='w-full'>
-                    <Form.Item label="Source">
-                        <Select>
-                            <Select.Option value="demo">Demo</Select.Option>
-                        </Select>
+                <div className='w-full' >
+                    <Form.Item label="Password" name="password" required>
+                        <RMSInput placeholder='Password' />
                     </Form.Item>
                 </div>
             </div>

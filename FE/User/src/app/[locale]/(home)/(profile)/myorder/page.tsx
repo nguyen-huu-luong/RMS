@@ -78,7 +78,7 @@ export default function MyOrder() {
         ([url, token]) => ordersFetcher(url, token)
     );
     const handleDeleteOrder = (record: any) => {
-        cancelOrder(session?.user.accessToken, {orderId: record.id, status: "Cancel"})
+        cancelOrder(session?.user.accessToken, { orderId: record.id, status: "Cancel" })
     }
     useEffect(() => {
         if (!orders) return;

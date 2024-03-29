@@ -55,18 +55,13 @@ const TextPreview = ({ section, index, textIndex, path }: ITextPreview) => {
     return { ...defaultStyle, ...objectCss, ...hoverStyle } as CSSProperties;
   };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    e.preventDefault
-    console.log(e.target.value)
-    setTextValue(e.target.value)
-  }
 
   return (
     <div
-      style={{ ...getStyle() }}
       onMouseEnter={() => setIsHovered(false)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
+      style={{ ...getStyle() }} 
     >
       {/* <textarea style={{width: "100%"}} value={textValue} onChange={handleTextChange} /> */}
       <div dangerouslySetInnerHTML={{ __html: section.content }} />

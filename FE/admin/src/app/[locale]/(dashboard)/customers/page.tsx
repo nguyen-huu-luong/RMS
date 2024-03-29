@@ -4,13 +4,10 @@ import {
 	Button,
 	ConfigProvider,
 	InputRef,
-	Radio,
 	Table,
 	Input,
 	Space,
-	Checkbox,
 	Select,
-	Row,
 	Alert,
 } from "antd";
 import type { TableProps, GetProp, TableColumnType } from "antd";
@@ -23,13 +20,11 @@ import {
 import Highlighter from "react-highlight-words";
 import type {
 	FilterConfirmProps,
-	FilterValue,
 	Key,
 	SortOrder,
-	SorterResult,
 } from "antd/es/table/interface";
-import { CustomerActionBar, CustomerFilterBar } from "@/components";
-import Link from "next/link";
+import { CustomerActionBar } from "@/components";
+import fetchClient from "@/lib/fetch-client";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -288,7 +283,7 @@ const EmailTemplate: React.FC = () => {
 		// }
 	];
 
-	const fetchData = () => {
+	const fetchData = async () => {
 		setLoading(true);
 		try {
 			let filterQueriesStr = "";
@@ -300,46 +295,35 @@ const EmailTemplate: React.FC = () => {
 					? `&sort=${tableParams.sorter?.field}&order=${tableParams.sorter?.order === "ascend" ? "asc" : "desc"
 					}`
 					: "";
-			fetch(
-				`http://localhost:3003/api/customers/all?page=${tableParams.pagination?.current}
-							&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
-				{
-					headers: {
-						Authorization:
-							"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiTWFyaW9fS29zc0B5YWhvby5jb20iLCJyb2xlIjoibWFuYWdlciIsImlhdCI6MTcwODM1NjUwNCwiZXhwIjoxNzE0MzU2NTA0fQ.naMCtTR_QKTwTMkqjIL6QaMNnbZdOk7wzuojI_H5RNc",
-					},
-				}
-			)
-				.then((res) => res.json())
-				.then((results) => {
-					const data = results.data.map((item: any) => ({
-						...item,
-						key: item.id,
-						fullname: `${item.firstname} ${item.lastname}`,
-					}));
-					setData(data);
-					setLoading(false);
-					setTableParams({
-						...tableParams,
-						pagination: {
-							...tableParams.pagination,
-							pageSize: results.pageSize,
-							current: results.page,
-							total: results.totalCount,
-							// 200 is mock data, you should read it from server
-							// total: data.totalCount,
-						},
-					});
-				})
-				.catch((error) => {
-					console.log(error);
-					setError({
-						isError: true,
-						title: error?.name || "Something went wrong!",
-						message: error?.message || "Unknown error",
-					});
-				});
+			const respone = await fetchClient({
+				url: `/customers/all?page=${tableParams.pagination?.current}
+				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`
+			})
+
+			console.log(respone)
+			const results = respone.data
+			const data = results.data.map((item: any) => ({
+				...item,
+				key: item.id,
+				fullname: `${item.firstname} ${item.lastname}`,
+			}));
+			setData(data);
+			setLoading(false);
+			setTableParams({
+				...tableParams,
+				pagination: {
+					...tableParams.pagination,
+					pageSize: results.pageSize,
+					current: results.page,
+					total: results.totalCount,
+					// 200 is mock data, you should read it from server
+					// total: data.totalCount,
+				},
+			});
+				
+				
 		} catch (error: any) {
+			setLoading(false)
 			console.log(error);
 			setError({
 				isError: true,
@@ -425,7 +409,7 @@ const EmailTemplate: React.FC = () => {
 				},
 			}}
 		>
-			<Space direction="vertical">
+			<Space direction="vertical" className="w-full">
 				{/* <CustomerFilterBar /> */}
 				<CustomerActionBar dataSelected={selectedCustomers}/>
 				{error.isError && (

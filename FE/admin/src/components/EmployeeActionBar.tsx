@@ -2,10 +2,11 @@
 import { EllipsisOutlined, InfoCircleOutlined, PlusCircleOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Dropdown, Flex, Input, MenuProps, Modal, Space, Tooltip } from "antd";
 import React, { useState } from "react";
-import { AddCustomerForm } from "../AddCustomerForm";
 import { createStyles, useTheme } from 'antd-style';
-import { SendEmailModal } from "../Modals/SendEmailModal";
-import { SendSMSModal } from "../Modals/SendSMSModal";
+import { AddEmployeeForm } from "./AddEmployeeForm";
+import { SendEmailModal } from "./Modals/SendEmailModal";
+import { SendSMSModal } from "./Modals/SendSMSModal";
+import { FaTrash } from "react-icons/fa";
 
 const useStyle = createStyles(({ token }) => ({
     'my-modal-body': {
@@ -22,7 +23,7 @@ const useStyle = createStyles(({ token }) => ({
 }));
 
 
-interface CustomerActionBarProps {
+interface IEmployeeActionBarProps {
     dataSelected?: Array<any>
 }
 
@@ -44,7 +45,7 @@ const items: MenuProps['items'] = [
     },
 ];
 
-export const CustomerActionBar: React.FC<CustomerActionBarProps> = (props) => {
+export const EmployeeActionBar: React.FC<IEmployeeActionBarProps> = (props) => {
     const [open, setOpen] = useState(false);
     const { styles } = useStyle();
 
@@ -93,10 +94,8 @@ export const CustomerActionBar: React.FC<CustomerActionBarProps> = (props) => {
             {
                 (props.dataSelected && props.dataSelected?.length > 0) ?
                     <Space>
-                        <p>Selected {props.dataSelected?.length} customer</p>
-                        <SendEmailModal emailLists={props.dataSelected.map((item) => item.email)}/>
-                        <SendSMSModal />
-                        <Button icon={<EllipsisOutlined />} />
+                        <p>Selected {props.dataSelected?.length} employee</p>
+                        <Button icon={<FaTrash />} danger>Delete</Button>
                     </Space> :
                     <Space>
                         <Input
@@ -121,7 +120,7 @@ export const CustomerActionBar: React.FC<CustomerActionBarProps> = (props) => {
         <Modal
             classNames={classNames}
             styles={modalStyles}
-            title="Add new customer"
+            title="Add new employee"
             open={open}
             onOk={handleOk}
             okType="primary"
@@ -130,7 +129,7 @@ export const CustomerActionBar: React.FC<CustomerActionBarProps> = (props) => {
             onCancel={handleCancel}
             footer={null}
         >
-            <AddCustomerForm afterSubmit={handleOk} afterCancel={handleCancel} />
+            <AddEmployeeForm afterSubmit={handleOk} afterCancel={handleCancel} />
         </Modal>
 
     </main >

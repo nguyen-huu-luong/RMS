@@ -1,10 +1,9 @@
 import useEmailDataStore from "@/store/email";
 import { Button, Col, Flex, Row, Space } from "antd";
-import { MdOutlineMargin } from "react-icons/md";
-import InputNumber from "./InputNumber";
+import InputNumber from "../ButtonAttributes/InputNumber";
 
 const Alignment = () => {
-    const { activeNode, updateAttributes, updateContent } = useEmailDataStore();
+    const { activeNode, updateAttributes} = useEmailDataStore();
     const { section } = activeNode;
     const attributes = section.attributes;
 
