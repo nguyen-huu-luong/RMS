@@ -127,6 +127,10 @@ function Home() {
         return total;
     };
 
+    const handleOrder = () => {
+        console.log(items)
+    }
+
     if (foodError) return <div>Failed to load</div>;
     if (categoryError) return <div>Failed to load</div>;
     if (foodLoading || categoryLoading) return <div>Loading...</div>;
@@ -263,7 +267,7 @@ function Home() {
                         <>
                             {items.length != 0 ? (
                                 <>
-                                    <div className='flex flex-col gap-3 overflow-y-auto'>
+                                    <div className='gap-3 overflow-y-auto' style={{height: "45%"}}>
                                         {items.map((item: any) => {
                                             return (
                                                 <div
@@ -276,6 +280,9 @@ function Home() {
                                                 </div>
                                             );
                                         })}
+                                    </div>
+                                    <div className="text-center" onClick={handleOrder}>
+                                        <button className="bg-menu px-1 py-1 border-t-menu rounded  text-white">Order</button>
                                     </div>
                                     <div className='h-auto flex flex-col gap-2 justify-between'>
                                         <div className='font-bold text-md py-2 border-t-menu border-t-2'>

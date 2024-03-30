@@ -16,6 +16,10 @@ class TableRouter {
         .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.createTable(req, res, next))
         .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.deleteTable(req, res, next))
         .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.updateTable(req, res, next))
+
+        router.route('/tables/cart/:id')
+        .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.addtoCart(req, res, next))
+        .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.updateCart(req, res, next))
     }
 }
 

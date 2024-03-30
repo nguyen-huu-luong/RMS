@@ -24,6 +24,14 @@ class TableController {
     public updateTable(req: Request, res: Response, next: NextFunction) {
         this.tableService.updateTable(req, res, next)
     }
+
+    public addtoCart(req: Request, res: Response, next: NextFunction){
+        this.tableService.addToCart(req, res, next)
+    }
+
+    public updateCart(req: Request, res: Response, next: NextFunction){
+        this.tableService.updateCart(req, res, next)
+    }
 }
 
 export default TableController;

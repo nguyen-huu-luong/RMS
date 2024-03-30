@@ -43,6 +43,15 @@ class OrderController {
     public recordMoMoOrder(req: Request, res: Response, next: NextFunction) {
         this.orderService.recordMoMoOrder(req, res, next);
     }
+
+    public updateItems(req: Request, res: Response, next:NextFunction) { 
+        this.orderService.updateItems(req, res, next);
+    }
+
+    public viewItems(req: Request, res: Response, next: NextFunction) {
+        this.orderService.viewItems(req, res, next);
+    }
+
 }
 
 export default OrderController;

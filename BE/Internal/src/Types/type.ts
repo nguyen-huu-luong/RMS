@@ -20,6 +20,7 @@ const TYPES = {
     IFloorRepository: Symbol.for("IFloorRepository"),
     IReservationRepository: Symbol.for("IReservationRepository"),
     ITableReservationRepository: Symbol.for("ITableReservationRepository"),
+    ICartItemRepository: Symbol.for("ICartItemRepository"),
 
 };
 

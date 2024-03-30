@@ -1,22 +1,20 @@
-// migrations/20231110123456-add-client-id-to-orders.js
-
 'use strict';
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('Orders', 'clientId', {
+    await queryInterface.addColumn('Carts', 'tableId', {
       type: Sequelize.INTEGER,
       references: {
-        model: 'Clients',
+        model: 'Tables',
         key: 'id',
       },
       allowNull: true,
       onUpdate: 'CASCADE',
-      onDelete: 'SET NULL',
+      onDelete: 'CASCADE',
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn('Orders', 'clientId');
+    await queryInterface.removeColumn('Carts', 'tableId');
   },
 };

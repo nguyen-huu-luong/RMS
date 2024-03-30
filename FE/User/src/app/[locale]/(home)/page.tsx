@@ -8,31 +8,10 @@ import Slider from "@/components/home/slider";
 import WelcomeImage from "@/components/home/welcome";
 import { RightCircleFilled } from "@ant-design/icons";
 import { useState } from "react";
-import { Skeleton } from "antd";
-import ChatBox from "@/components/chat/chatbox";
+import Loading from "@/components/loading";
 import useSWR from "swr";
-// import {createOrder} from "../../api/product/order"
-// import { useRouter } from 'next/navigation';
-
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 export default function Home() {
-    // const router = useRouter();
-    // const createOrder = async () => {
-    //     console.log("haha")
-    //     try {
-    //       const response = await fetch("http://localhost:3003/api/orders", {
-    //         method: 'POST'
-    //     })
-    //     const data = await response.json()
-    //     router.push(data['payUrl']);
-    //       } catch (error) {
-    //         console.error('Error adding to cart:', error);
-    //         throw error;
-    //       }
-    //   };
-      
-
-
     const locale = useLocale();
     const t = useTranslations("Home");
     const [currentCategory, setCurrentCategory] = useState<string>("Pizza");
@@ -80,14 +59,10 @@ export default function Home() {
     ];
     if (foodError) return <div>Failed to load</div>;
     if (categoryError) return <div>Failed to load</div>;
-    if (foodLoading || categoryLoading) return <div>Loading...</div>;
+    if (foodLoading || categoryLoading) return <Loading></Loading>;
     return (
         <div className='h-auto py-4 flex flex-col justify-center items-center gap-10'>
-                   {/* <button onClick={createOrder}>
-                Pay
-            </button> */}
             {/* Home welcome and carousel banner */}
-            
             <div className='w-80 h-auto flex flex-col sm:flex-row sm:w-full gap-5'>
                 <WelcomeImage params={{ name: "CUSTOMER" }} />
                 <div className='w-80 h-80 flex-none'>
@@ -99,7 +74,7 @@ export default function Home() {
             <div className='flex flex-col justify-start w-full h-auto gap-10'>
                 <div className='flex flex-row justify-between text-menu items-center '>
                     <div className='font-extrabold text-2xl font-serif'>
-                        Menu Category
+                        {t("menu")}
                     </div>
 
                     <Link
@@ -109,7 +84,7 @@ export default function Home() {
                         locale={locale}
                         className='flex gap-2 w-auto items-center cursor-pointer'
                     >
-                        <span className='text-md'>View all</span>
+                        <span className='text-md'>{t('all')}</span>
                         <span className='text-primary'>
                             <RightCircleFilled />
                         </span>
@@ -141,7 +116,12 @@ export default function Home() {
                 <div className='w-full h-auto flex flex-col justify-center items-center'>
                     <div className='w-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 lg:gap-10 items-center'>
                         {food
-                            .filter((item: any) => currentCategory  === category[parseInt(item.categoryId) - 1]?.name)
+                            .filter(
+                                (item: any) =>
+                                    currentCategory ===
+                                    category[parseInt(item.categoryId) - 1]
+                                        ?.name
+                            )
                             .slice(0, 6)
                             .map((item: any) => {
                                 return (
@@ -167,30 +147,28 @@ export default function Home() {
             <div className='flex flex-col justify-start w-full h-auto gap-10'>
                 <div className='flex flex-row justify-between text-menu items-center'>
                     <div className='font-extrabold text-2xl font-serif'>
-                        Trending Orders
+                        {t('trend')}
                     </div>
                 </div>
                 <div className='w-full h-auto flex flex-col justify-center items-center'>
                     <div className='w-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 lg:gap-10 items-center'>
-                        {food
-                            .slice(0, 6)
-                            .map((item: any) => {
-                                return (
-                                    <div
-                                        key={`Food ${item.categoryId} ${item.id}`}
-                                        className='duration-300 transition-all ease-in-out'
-                                        onClick={() => setDetail(item)}
-                                    >
-                                        <FoodItem
-                                            params={{
-                                                food: item,
-                                                size: "sm",
-                                                openModal: openModal,
-                                            }}
-                                        />
-                                    </div>
-                                );
-                            })}
+                        {food.slice(0, 6).map((item: any) => {
+                            return (
+                                <div
+                                    key={`Food ${item.categoryId} ${item.id}`}
+                                    className='duration-300 transition-all ease-in-out'
+                                    onClick={() => setDetail(item)}
+                                >
+                                    <FoodItem
+                                        params={{
+                                            food: item,
+                                            size: "sm",
+                                            openModal: openModal,
+                                        }}
+                                    />
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

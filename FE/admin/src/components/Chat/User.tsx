@@ -234,7 +234,7 @@ function User({
                 <div> </div>
             </div>
             {params.channel.id in channelStatus ? (
-                <Tag color="#87d068">Active</Tag>
+                <Tag color='#87d068'>Active</Tag>
             ) : (
                 <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'>
                     {TimeDisplay(params.latestMessage.createdAt)}

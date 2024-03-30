@@ -57,7 +57,7 @@ class Client extends Person {
 		Client.hasMany(Order, {
 			foreignKey: {
 				name: "clientId",
-				allowNull: false,
+				allowNull: true,
 			},
 			sourceKey: "id",
 		});
@@ -65,7 +65,7 @@ class Client extends Person {
 		Client.hasOne(Cart, {
 			foreignKey: {
 				name: "clientId",
-				allowNull: false,
+				allowNull: true,
 			},
 			sourceKey: "id",
 		});

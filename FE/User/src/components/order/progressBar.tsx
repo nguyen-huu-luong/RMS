@@ -3,16 +3,18 @@ import {
     Steps,
     ConfigProvider
 } from "antd";
+import { useTranslations } from "next-intl";
 const Progress = ({current}: {current:number}) => {
+    const t = useTranslations('Order');
     const steps = [
         {
-            title: "CART",
+            title: t('Cart'),
         },
         {
-            title: "ORDER",
+            title:  t('Order'),
         },
         {
-            title: "PAYMENT",
+            title:  t('Payment'),
         },
     ]
     const items = steps.map((item) => ({ key: item.title, title: item.title }));

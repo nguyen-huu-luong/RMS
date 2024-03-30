@@ -3,41 +3,57 @@ import Link from "next-intl/link";
 import { useLocale, useTranslations } from "next-intl";
 import VoucherPicker from "@/components/order/voucherPicker";
 import { voucherFetcher } from "@/app/api/product/voucher";
-import useSWR from "swr";
-import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import moneyFormatter from "../function/moneyFormatter";
+import { cartFetcher } from "@/app/api/product/cart";
 import Loading from "@/components/loading";
 const SideBar = ({
     onPayOrder,
-    currentCart,
     setAmount,
     setVoucherId,
-    fee
+    fee,
+    token,
 }: {
     onPayOrder: () => void;
-    currentCart: any;
     setAmount: any;
     setVoucherId: any;
     fee: any;
+    token: any;
 }) => {
+    const t = useTranslations("Order");
     const locale = useLocale();
-    const { data: session, status } = useSession();
     // const {
     //     data: vouchers,
     //     error: vouchersError,
     //     isLoading: vouchersLoading,
     // } = useSWR(
-    //     session
-    //         ? [
-    //               `http://localhost:3003/api/vouchers/all`,
-    //               session.user.accessToken,
-    //           ]
-    //         : null,
+    //     token ? [`http://localhost:3003/api/vouchers/all`, token] : null,
     //     ([url, token]) => voucherFetcher(url, token)
     // );
-    if (status === "loading") return <>Loading.....</>;
-    if (status === "unauthenticated") return <>Unauthenticated.....</>;
+    // const {
+    //     data: currentCart,
+    //     error: cartItemsError,
+    //     isLoading: cartItemsLoading,
+    // } = useSWR(
+    //     token ? [`http://localhost:3003/api/carts`, token] : null,
+    //     ([url, token]) => cartFetcher(url, token)
+    // );
+    const [currentCart, setCurrentCart] = useState<any>(null);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const cartData = await cartFetcher(
+                    `http://localhost:3003/api/carts`,
+                    token
+                );
+                console.log(cartData);
+                setCurrentCart(cartData);
+            } catch (error) {
+                console.error("Error fetching cart data:", error);
+            }
+        };
+        fetchData();
+    }, [token]);
     const [modal, setModal] = useState<boolean>(false);
     const openModal = () => {
         setModal(true);
@@ -46,19 +62,21 @@ const SideBar = ({
         setModal(false);
     };
     const [voucher, setVoucher] = useState<any>(null);
-
-    // if (vouchersError) return <div>Failed to load</div>;
-    // if (vouchersLoading) return <Loading />;
+    // if (cartItemsError) return <div>Failed to load</div>;
+    // if (cartItemsLoading) return <Loading />;
+    if (!currentCart) return <Loading />;
     return (
         <div className='w-auto h-auto p-10 rounded-3xl bg-primary-white flex flex-col gap-5 justify-start items-center font-extrabold'>
             <div className='w-full flex flex-row justify-between gap-10'>
-                <span className='w-auto whitespace-nowrap'>Discount Code</span>
+                <span className='w-auto whitespace-nowrap'>
+                    {t("Discount")}
+                </span>
                 <span className='relative w-auto whitespace-nowrap '>
                     <span
                         className='w-full cursor-pointer text-primary'
                         onClick={openModal}
                     >
-                        Choose Code
+                        {t("Choose")}
                     </span>
                     {/* {modal && (
                         <VoucherPicker
@@ -73,14 +91,12 @@ const SideBar = ({
                 </span>
             </div>
             {!voucher && (
-                <span className='font-normal'>
-                    You haven't added any discount codes.
-                </span>
+                <span className='font-normal'>{t("No_discount")}</span>
             )}
             <div className='w-full flex flex-col justify-between gap-2 font-normal'>
                 <div className='w-full flex flex-row justify-between gap-10'>
                     <span className='w-auto whitespace-nowrap'>
-                        Pre-discount amount
+                        {t("Pre_discount")}
                     </span>
                     <span className='relative w-auto whitespace-nowrap '>
                         <span className='w-full cursor-pointe'>
@@ -90,7 +106,7 @@ const SideBar = ({
                 </div>
                 <div className='w-full flex flex-row justify-between gap-10'>
                     <span className='w-auto whitespace-nowrap'>
-                        Discount amount
+                        {t("Discount_amount")}
                     </span>
                     <span className='relative w-auto whitespace-nowrap '>
                         <span className='w-full cursor-pointer'>
@@ -113,7 +129,7 @@ const SideBar = ({
                 </div>
                 <div className='w-full flex flex-row justify-between gap-10'>
                     <span className='w-auto whitespace-nowrap'>
-                        Shipping cost
+                        {t("Shipping")}
                     </span>
                     <span className='relative w-auto whitespace-nowrap '>
                         <span className='w-full cursor-pointer'>{fee}</span>
@@ -121,7 +137,7 @@ const SideBar = ({
                 </div>
             </div>
             <div className='w-full flex flex-row justify-between gap-10'>
-                <span className='w-auto whitespace-nowrap'>Total amount</span>
+                <span className='w-auto whitespace-nowrap'> {t("Total")}</span>
                 <span className='relative w-auto whitespace-nowrap '>
                     <span className='w-full cursor-pointer text-primary'>
                         {currentCart.cart.amount -
@@ -138,7 +154,8 @@ const SideBar = ({
                                     : (voucher.amount *
                                           currentCart.cart.amount) /
                                       100
-                                : 0) + fee}
+                                : 0) +
+                            fee}
                     </span>
                 </span>
             </div>
@@ -159,21 +176,22 @@ const SideBar = ({
                                     : (voucher.amount *
                                           currentCart.cart.amount) /
                                       100
-                                : 0) + fee
+                                : 0) +
+                            fee
                     );
                     setVoucherId(voucher ? voucher.id : null);
                     onPayOrder();
                 }}
                 className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-primary hover:bg-primary-400 text-item-white transition-all duration-300  flex justify-center'
             >
-                Pay and Order
+                {t("Pay")}
             </button>
             <Link
                 className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 hover:bg-primary hover:text-item-white transition-all duration-300 flex justify-center'
                 href={"/cart"}
                 locale={locale}
             >
-                Back to cart
+                {t("Back")}
             </Link>
         </div>
     );
