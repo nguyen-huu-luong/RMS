@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
@@ -20,22 +20,31 @@ const config: Config = {
             menu: "#EA6A12"
         },
 
-        width: {
-            sidebar: "250px",
-        },
-        height: {
-            header: "48px"
-        },
+            width: {
+                sidebar: "250px",
+            },
+            height: {
+                header: "48px",
+            },
 
-        spacing: {
-            sidebar: '250px',
-            header: '48px'
-        }
-        
-    
-      
+            spacing: {
+                sidebar: "250px",
+                header: "48px",
+            },
+        },
     },
-  },
-  plugins: [require("daisyui")],
-}
-export default config
+    plugins: [require("daisyui")],
+    safelist: [
+        'bg-red-500',
+        'bg-orange-500',
+        'bg-amber-500',
+        'bg-yellow-500',
+        'bg-lime-500',
+        'bg-green-500',
+        'bg-teal-500',
+        'bg-indigo-500',
+        'bg-purple-500',
+        'bg-cyan-500',
+    ],
+};
+export default config;

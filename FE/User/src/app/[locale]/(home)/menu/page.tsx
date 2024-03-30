@@ -8,6 +8,8 @@ import { Pagination, ConfigProvider } from "antd";
 import type { PaginationProps } from "antd";
 import FoodDetail from "@/components/menu/foodDetail";
 import useSWR from "swr";
+import Loading from "@/components/loading";
+
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function Menu() {
@@ -59,7 +61,7 @@ export default function Menu() {
     };
     if (foodError) return <div>Failed to load</div>;
     if (categoryError) return <div>Failed to load</div>;
-    if (foodLoading || categoryLoading) return <div>Loading...</div>;
+    if (foodLoading || categoryLoading) return <Loading/>;
     return (
         <div className='w-full h-auto flex flex-col justify-start gap-5'>
             <div className='w-full h-auto rounded-3xl border-2 border-orange-100 bg-primary-white p-2 flex flex-wrap justify-around'>

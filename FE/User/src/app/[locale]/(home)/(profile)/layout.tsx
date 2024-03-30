@@ -1,5 +1,5 @@
 "use client";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { UserOutlined, ShoppingOutlined } from "@ant-design/icons";
@@ -10,7 +10,7 @@ import Image from "next/image";
 export default function Layout({ children }: { children: React.ReactNode }) {
     const locale = useLocale();
     const [current, setCurrent] = useState("profile");
-
+    const t = useTranslations('Profile')
     const onClick: MenuProps["onClick"] = (e) => {
         setCurrent(e.key);
     };
@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {
             label: (
                 <Link href={"/profile"} locale={locale}>
-                    Profile
+                    {t('Profile')}
                 </Link>
             ),
             key: "profile",
@@ -36,7 +36,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {
             label: (
                 <Link href={"/myorder"} locale={locale}>
-                    Manage Order
+                    {t('Manage')}
                 </Link>
             ),
             key: "myorder",
