@@ -30,7 +30,7 @@ export default function Order() {
             ? [`http://localhost:3003/api/carts`, session.user.accessToken]
             : null,
         ([url, token]) => cartFetcher(url, token)
-    );
+    ); 
     if (status === "loading") return <div>Loading.....</div>;
     if (status === "unauthenticated") router.push("/signin");
     const handlePayOrder = async () => {

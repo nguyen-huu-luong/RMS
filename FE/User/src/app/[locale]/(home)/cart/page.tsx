@@ -15,6 +15,7 @@ import useSWR from "swr";
 import { cartFetcher, editCart, removeProduct } from "@/app/api/product/cart";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
+import Loading from "@/components/loading";
 
 export default function Cart() {
     const locale = useLocale()
@@ -25,7 +26,7 @@ export default function Cart() {
         error: cartItemsError,
         isLoading: cartItemsLoading
     } = useSWR(session ? [`http://localhost:3003/api/carts`, session.user.accessToken] : null,  ([url, token]) => cartFetcher(url, token));
-    if (status === "loading") return <>Loading.....</>;
+    if (status === "loading") return <Loading/>;
     if (status === "unauthenticated") router.push('/signin');
     // Order step
     const updateQuantity = async (itemId: number, newQuantity: number) => {
