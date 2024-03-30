@@ -1,7 +1,6 @@
 import { Model, DataTypes, type BelongsToCreateAssociationMixin } from 'sequelize';
 import { sequelize } from '../Configs';
 import Reservation from './Reservation';
-import TableOrder from './TableOrder';
 import TableReservation from './TableReservation';
 import Order from './Order';
 import Floor from './Floor';
@@ -33,7 +32,7 @@ class Table extends Model {
     Table.hasMany(Order, {
       foreignKey: {
         name: "tableId",
-        allowNull: false,
+        allowNull: true,
       },
       sourceKey: "id",
     });

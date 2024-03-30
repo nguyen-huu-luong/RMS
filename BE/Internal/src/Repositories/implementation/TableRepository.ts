@@ -31,7 +31,7 @@ export class TableRepository
 
 	public async createTable(table_name: any, floor: any) {
 		try {
-			let table = await this._model.create({
+			let table: any = await this._model.create({
 				name: table_name,
 				numRes: 0,
 				status: "Free",
@@ -41,7 +41,7 @@ export class TableRepository
 			await this._model.update({ floorId: floor.id }, {
 				where: { name: table_name }
 			})
-			return true
+			return table.id
 		}
 		catch (err) {
 			return false

@@ -18,7 +18,9 @@ import {
 	IFloorRepository,
 	ITableRepository,
 	ITableReservationRepository,
-	IReservationRepository
+	IReservationRepository,
+	ICartItemRepository,
+	CartItemRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -74,7 +76,7 @@ class InversifyContainer {
 		// this.container.bind<IClientController>(TYPES.IClientController).to(ClientController)
 		this.container.bind<IChannelRepository>(TYPES.IChannelRepository).to(ChannelRepository);
 		this.container.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepository);
-
+		this.container.bind<ICartItemRepository>(TYPES.ICartItemRepository).to(CartItemRepository);
 	}
 }
 
