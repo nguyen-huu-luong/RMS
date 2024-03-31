@@ -9,7 +9,7 @@ const SignIn: React.FC = async () => {
     const session = await getServerSession(authOptions) ;
     if (session) {
         console.log(session)
-        // redirect(`/`);
+        redirect(`/`);
     }
 
     return (
