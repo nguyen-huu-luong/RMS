@@ -20,6 +20,7 @@ import EmployeeRouter from "./employee.router";
 import ReservationRouter from "./Reservation.router";
 import TableRouter from "./Table.router";
 import FloorRouter from "./Floor.router";
+import TrackingRouter from "./Tracking.router";
 
 process.on("unhandledRejection", (reason, promise) => {
 	console.error("Unhandled Rejection at:", promise, "reason:", reason);
@@ -39,6 +40,7 @@ class Routers {
 		const reservationRouter = new ReservationRouter()
 		const tableRouter = new TableRouter()
 		const floorRouter = new FloorRouter()
+		const trackingRouter = new TrackingRouter()
 		// declare your router here
 		const router = Router();
         
@@ -55,6 +57,7 @@ class Routers {
 		reservationRouter.initialize(router)
 		tableRouter.initialize(router)
 		floorRouter.initialize(router)
+		trackingRouter.initialize(router)
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 
