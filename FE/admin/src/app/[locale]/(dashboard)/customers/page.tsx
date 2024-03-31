@@ -27,7 +27,6 @@ import type {
 import { CustomerActionBar } from "@/components";
 import fetchClient from "@/lib/fetch-client";
 import Link from "next/link";
-import { customersFetcher } from "@/app/api/client";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<

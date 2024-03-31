@@ -6,15 +6,15 @@ interface fetchClientProps {
   url: string;
   body?: any;
   token?: string;
+  data_return?: boolean
 }
 
-async function fetchClient({ method = "GET", url, body = "", token }: fetchClientProps) {
+async function fetchClient({ method = "GET", url, body = "", token, data_return = false }: fetchClientProps) {
   try {
     const session = await getSession();
     const accessToken = token || session?.accessToken;
 
     console.log("Fetch client" , url, session, accessToken, process.env.NEXT_BACKEND_API_URL )
-
     const response = await axios(process.env.NEXT_PUBLIC_BACKEND_URL + url, {
       method: method,
       headers: {
@@ -24,6 +24,10 @@ async function fetchClient({ method = "GET", url, body = "", token }: fetchClien
       },
       data: body || undefined,
     });
+
+    if (data_return) {
+      return response.data
+    }
 
     return response;
   } catch (error) {

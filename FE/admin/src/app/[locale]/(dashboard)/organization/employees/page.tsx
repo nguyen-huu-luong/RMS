@@ -20,6 +20,7 @@ import type {
 } from "antd/es/table/interface";
 import { EmployeeActionBar } from "@/components/EmployeeActionBar";
 import Link from "antd/es/typography/Link";
+import fetchClient from "@/lib/fetch-client";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -59,7 +60,7 @@ type DataIndex = keyof DataType;
 const EmailTemplate: React.FC = () => {
 	const [data, setData] = useState<DataType[]>();
 	const [loading, setLoading] = useState(false);
-	const [selectedCustomers, setSelectedCustomers] = useState<DataType[]>() ;
+	const [selectedCustomers, setSelectedCustomers] = useState<DataType[]>();
 	const [tableParams, setTableParams] = useState<TableParams>({
 		pagination: {
 			current: 1,
@@ -106,7 +107,7 @@ const EmailTemplate: React.FC = () => {
 			dataIndex: "fullname",
 			key: "fullname",
 			render(value, record, index) {
-				return <Link   href={`./employees/${record.id}`}>{value}</Link>
+				return <Link href={`./employees/${record.id}`}>{value}</Link>
 			},
 		},
 		{
@@ -126,7 +127,7 @@ const EmailTemplate: React.FC = () => {
 		},
 	];
 
-	const fetchData = () => {
+	const fetchData = async () => {
 		setLoading(true);
 		try {
 			let filterQueriesStr = "";
@@ -138,45 +139,28 @@ const EmailTemplate: React.FC = () => {
 					? `&sort=${tableParams.sorter?.field}&order=${tableParams.sorter?.order === "ascend" ? "asc" : "desc"
 					}`
 					: "";
-			fetch(
-				`http://localhost:3003/api/employees/all?page=${tableParams.pagination?.current}
-							&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
-				{
-					headers: {
-						Authorization:
-							"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiTWFyaW9fS29zc0B5YWhvby5jb20iLCJyb2xlIjoibWFuYWdlciIsImlhdCI6MTcwODM1NjUwNCwiZXhwIjoxNzE0MzU2NTA0fQ.naMCtTR_QKTwTMkqjIL6QaMNnbZdOk7wzuojI_H5RNc",
-					},
-				}
-			)
-				.then((res) => res.json())
-				.then((results) => {
-					const data = results.data.map((item: any) => ({
-						...item,
-						key: item.id,
-						fullname: `${item.firstname} ${item.lastname}`,
-					}));
-					setData(data);
-					setLoading(false);
-					setTableParams({
-						...tableParams,
-						pagination: {
-							...tableParams.pagination,
-							pageSize: results.pageSize,
-							current: results.page,
-							total: results.totalCount,
-							// 200 is mock data, you should read it from server
-							// total: data.totalCount,
-						},
-					});
-				})
-				.catch((error) => {
-					console.log(error);
-					setError({
-						isError: true,
-						title: error?.name || "Something went wrong!",
-						message: error?.message || "Unknown error",
-					});
-				});
+			const results = await fetchClient({
+				url: `/employees/all?page=${tableParams.pagination?.current}
+			&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`, data_return: true
+			})
+			const data = results.data.map((item: any) => ({
+				...item,
+				key: item.id,
+				fullname: `${item.firstname} ${item.lastname}`,
+			}));
+			setData(data);
+			setLoading(false);
+			setTableParams({
+				...tableParams,
+				pagination: {
+					...tableParams.pagination,
+					pageSize: results.pageSize,
+					current: results.page,
+					total: results.totalCount,
+					// 200 is mock data, you should read it from server
+					// total: data.totalCount,
+				},
+			});
 		} catch (error: any) {
 			console.log(error);
 			setError({
@@ -265,7 +249,7 @@ const EmailTemplate: React.FC = () => {
 		>
 			<Space direction="vertical" className="w-full">
 				{/* <CustomerFilterBar /> */}
-				<EmployeeActionBar dataSelected={selectedCustomers}/>
+				<EmployeeActionBar dataSelected={selectedCustomers} />
 				{error.isError && (
 					<Alert
 						message={error.title}
@@ -289,15 +273,15 @@ const EmailTemplate: React.FC = () => {
 								label: item.title,
 							}))}
 						/>
-	
+
 						<p>Order: </p>
-	
+
 						<Button onClick={handleToggleSorter} icon={tableParams.sorter?.order === "ascend" ? (
 							<SortAscendingOutlined />
 						) : (
 							<SortDescendingOutlined />
 						)} />
-	{/* 
+						{/* 
 						<p>Filter: </p>
 						<Select
 							style={{ width: "20%" }}
@@ -319,7 +303,7 @@ const EmailTemplate: React.FC = () => {
 						</Space> */}
 					</Space>
 				</div>
-	
+
 				<Table
 					rowSelection={{
 						...rowSelection,

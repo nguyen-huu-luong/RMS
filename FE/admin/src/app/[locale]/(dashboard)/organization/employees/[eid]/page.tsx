@@ -6,6 +6,7 @@ import type { TableProps } from 'antd';
 import useSWR from "swr";
 import { customerFetcher, updateCustomerInfo } from "@/app/api/client";
 import { clientOrderFetcher } from "@/app/api/order";
+import fetchClient from "@/lib/fetch-client";
 import { useParams } from 'next/navigation'
 
 const CustomerProfile = () => {
@@ -30,7 +31,7 @@ const CustomerProfile = () => {
         data: customerInfo,
         error: customerInfoError,
         isLoading: customerInfoLoading
-    } = useSWR([`http://localhost:3003/api/customers/${params.cid}`], ([url]) => customerFetcher(url));
+    } = useSWR( [params.cid], ([customerId]) => fetchClient({url: `/customers/${customerId}`, data_return: true}));
 
 
     if (customerInfoLoading) {
@@ -87,7 +88,7 @@ const CustomerProfile = () => {
                 "firstname": first_name,
                 "lastname": last_name.trim()
             }
-            await updateCustomerInfo(data, params.cid)
+            await fetchClient({method: "PUT",url: `/customers/${params.cid}`, body: data,data_return: true})
 
         }
         setFlag(true)

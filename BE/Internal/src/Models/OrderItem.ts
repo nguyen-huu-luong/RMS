@@ -35,6 +35,11 @@ OrderItem.init(
 			allowNull: false,
 			defaultValue: 0,
 		},
+		status: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			defaultValue: "",
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,

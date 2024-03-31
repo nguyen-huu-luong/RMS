@@ -4,7 +4,8 @@ import { HttpStatusCode } from "../Constants";
 import statusMess from "../Constants/statusMess";
 import { container } from "../Configs";
 import {
-    ITableRepository, IReservationRepository, IFloorRepository
+    ITableRepository, IReservationRepository, IFloorRepository, CartRepository,
+    ICartRepository, ICartItemRepository
 } from "../Repositories";
 import { TYPES } from "../Types/type";
 import { RecordNotFoundError, UnauthorizedError } from "../Errors";
@@ -19,6 +20,12 @@ export class TableService {
         ),
         private floorRepository = container.get<IFloorRepository>(
             TYPES.IFloorRepository
+        ),
+        private cartRepository = container.get<ICartRepository>(
+            TYPES.ICartRepository
+        ),
+        private cartItemRepository = container.get<ICartItemRepository>(
+            TYPES.ICartItemRepository
         ),
     ) { }
 
@@ -58,11 +65,16 @@ export class TableService {
                 else {
                     let floor = await this.floorRepository.findOne(floor_name)
                     let status_request = await this.tableRepository.createTable(table_name, floor)
-                
-                    if (status_request == true) {
+
+                    if (status_request != false) {
                         let updated_info = await this.updateTableFloor()
                         let tables = await this.tableRepository.all()
-                        res.send({ "status": status_request, "floors": updated_info, "tables": tables })
+                        await this.cartRepository.create({
+                            tableId: status_request,
+                            createAt: new Date(),
+                            updateAt: new Date()
+                        })
+                        res.send({ "status": true, "floors": updated_info, "tables": tables })
                     }
                     else {
                         res.send({ "status": status_request, "message": "Something went wrong" })
@@ -137,7 +149,8 @@ export class TableService {
     public async deleteTable(req: Request, res: Response, next: NextFunction) {
         try {
             if (req.action = "delete:any") {
-                const table_names = req.body.request_body.table_names;
+                console.log(req.body)
+                const table_names = req.body.table_names;
                 const result = await this.tableRepository.deleteTable(table_names)
                 await this.viewAllReservationsPage(req, res, next)
 
@@ -175,6 +188,76 @@ export class TableService {
 
             }
             else throw new UnauthorizedError()
+        }
+        catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+
+    public async addToCart(req: Request, res: Response, next: NextFunction) {
+        try {
+            const table_id = Number(req.params.id);
+            const cart = await this.cartRepository.getCartTable(table_id)
+            let amount_items: number = cart.amount
+            const cart_items = req.body
+
+            await Promise.all(
+                cart_items.map(async (item: any) => {
+                    await this.cartItemRepository.create({
+                        cartId: cart.id,
+                        productId: item.id,
+                        amount: item.amount,
+                        quantity: item.quantity,
+                        status: item.status,
+                        createAt: new Date(),
+                        updateAt: new Date()
+                    })
+                    amount_items += item.amount
+                })
+            )
+
+            await this.cartRepository.update(Number(cart.id), { amount: amount_items, total: amount_items })
+            const cart_new = await this.cartRepository.getCartTable(table_id)
+            res.send(cart_new)
+        }
+        catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+
+    public async updateCart(req: Request, res: Response, next: NextFunction) {
+        try {
+            const cart_items = req.body
+            const table_id = Number(req.params.id);
+            const cart = await this.cartRepository.getCartTable(table_id)
+            let amount_items: number = cart.amount
+            await Promise.all(
+                cart_items.map(async (item: any) => {
+                    let same_items = await this.cartItemRepository.findByCond({ productId: item.id, cartId: cart.id, status: item.status })
+                    if (same_items.length == 0) {
+                        await this.cartItemRepository.create({
+                            cartId: cart.id,
+                            productId: item.id,
+                            amount: item.amount,
+                            quantity: item.quantity,
+                            status: item.status,
+                            createAt: new Date(),
+                            updateAt: new Date()
+                        })
+                    }
+                    else {
+                        let same_item = same_items[0]
+                        await this.cartItemRepository.updateItems({ productId: item.id, cartId: cart.id, status: item.status }, { amount: item.amount + same_item.amount, quantity: item.quantity + same_item.quantity })
+                    }
+                    amount_items += item.amount
+                })
+            )
+
+            await this.cartRepository.update(Number(cart.id), { amount: amount_items, total: amount_items })
+            const cart_new = await this.cartRepository.getCartTable(table_id)
+            res.send(cart_new)
         }
         catch (err) {
             console.log(err);

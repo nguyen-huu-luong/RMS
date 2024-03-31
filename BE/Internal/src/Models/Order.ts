@@ -1,17 +1,19 @@
 import { Model, DataTypes } from "sequelize";
 import Loader from "../Loaders";
 import { Product, Client, OrderItem, Table } from ".";
-import TableOrder from "./TableOrder";
 import Voucher from "./Voucher";
 class Order extends Model {
     getProducts: any;
     addProduct: any;
     addProducts: any;
     setVoucher: any;
+    setProducts: any;
+    setProduct: any;
 	static associate() {
 		Order.belongsTo(Client, {
 			foreignKey: {
 				name: "clientId",
+				allowNull: true,
 			},
 		});
 
@@ -21,11 +23,12 @@ class Order extends Model {
 			otherKey: "productId",
 		});
 
-		// Order.belongsToMany(Table, {
-		// 	through: TableOrder,
-		// 	foreignKey: "orderId",
-		// 	otherKey: "tableId",
-		// });
+		Order.belongsTo(Table, {
+            foreignKey: {
+                name: "tableId",
+                allowNull: true,
+            },
+		});
 
 		Order.belongsTo(Voucher, {
             foreignKey: {
