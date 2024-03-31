@@ -13,6 +13,7 @@ declare module "next-auth" {
       firstname: string;
       lastname: string;
       birthday: string;
+      avatar: string;
       gender: boolean;
     } & DefaultSession["user"];
   }

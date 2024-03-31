@@ -1,17 +1,106 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Button, ConfigProvider, DatePicker, Form, Input, Radio } from "antd";
+import {
+    Button,
+    Upload,
+    DatePicker,
+    Form,
+    Input,
+    Radio,
+    message,
+    type FormProps,
+} from "antd";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
 import Loading from "@/components/loading";
+import {
+    editProfile,
+    getProfile,
+    uploadImage,
+} from "@/app/api/profile/profile";
+import type { UploadProps } from "antd";
+import useSWR from "swr";
+import moment from "moment";
+
+type FieldType = {
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+    phone?: string;
+    birthday: string;
+    gender: boolean;
+};
 const Profile = () => {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [edit, setEdit] = useState<boolean>(true);
     const [form] = Form.useForm();
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const {
+        data: profile,
+        error: profileError,
+        isLoading: profileLoading,
+        mutate,
+    } = useSWR(session ? [session.user.accessToken] : null, ([token]) =>
+        getProfile(token)
+    );
+
+    const handleUpload = async ({
+        file,
+        onSuccess,
+    }: {
+        file?: any;
+        onSuccess?: any;
+    }) => {
+        const data = await uploadImage(file);
+        onSuccess("ok");
+        const upload = await updateImage(data.url);
+        mutate();
+    };
+
+    const props: UploadProps = {
+        name: "image",
+        customRequest: handleUpload,
+        onChange(info) {
+            if (info.file.status === "done") {
+                message.success(`Change avatar successfully`);
+            } else if (info.file.status === "error") {
+                message.error(`Change avatar failed.`);
+            }
+        },
+    };
+
+    const updateImage = async (url: string) => {
+        return await editProfile(session?.user.accessToken, {
+            avatar: url,
+        });
+    };
+
+    const updateInformation = async (data: any) => {
+        return await editProfile(session?.user.accessToken, data);
+    };
+
+    const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+        await updateInformation(values);
+        mutate();
+        setLoading(false);
+        setEdit(true);
+        console.log("Success:", values);
+    };
+
+    const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
+        errorInfo
+    ) => {
+        setLoading(false);
+        console.log("Failed:", errorInfo);
+    };
     if (status === "loading") return <Loading />;
     if (status === "unauthenticated") router.push("/signin");
+    if (profileError) return <div>Failed to load</div>;
+    if (profileLoading) return <Loading />;
+    if (!profile) return <Loading />;
     return (
         <>
             <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl py-2 px-3'>
@@ -20,19 +109,22 @@ const Profile = () => {
             <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl py-2 px-3 flex flex-col gap-2 items-center'>
                 <div className='relative w-auto h-auto rounded-full overflow-hidden'>
                     <Image
-                        src={"/avatar-placeholder.png"}
+                        src={
+                            !profile.avatar
+                                ? "/avatar-placeholder.png"
+                                : profile.avatar
+                        }
                         alt={"avatar-placeholder"}
                         width={150}
                         height={150}
+                        className='aspect-square'
                         unoptimized
                     />
-                    {!edit ? (
-                        <div className='absolute top-2/3 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-light text-white backdrop-blur-sm rounded-md cursor-pointer'>
+                    <Upload {...props} maxCount={1} showUploadList={false}>
+                        <button className='absolute top-3/4 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-medium text-black backdrop-blur-sm rounded-md cursor-pointer'>
                             Change
-                        </div>
-                    ) : (
-                        <></>
-                    )}
+                        </button>
+                    </Upload>
                 </div>
                 <div className=''>
                     <Form
@@ -40,46 +132,70 @@ const Profile = () => {
                         name='UserInformation'
                         style={{ maxWidth: 800 }}
                         autoComplete='off'
+                        onFinish={onFinish}
+                        onFinishFailed={onFinishFailed}
                         disabled={edit}
+
                     >
                         <Form.Item
                             label='First Name'
-                            initialValue={session?.user.firstname}
-                            name='first_name'
+                            initialValue={profile.firstname}
+                            name='firstname'
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input your first name!",
+                                },
+                            ]}
                         >
                             <Input />
                         </Form.Item>
                         <Form.Item
                             label='Last Name'
-                            initialValue={session?.user.lastname}
-                            name='last_name'
+                            initialValue={profile.lastname}
+                            name='lastname'
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input your last name!",
+                                },
+                            ]}
                         >
                             <Input />
                         </Form.Item>
                         <Form.Item
                             label='Email'
-                            initialValue={session?.user.email}
+                            initialValue={profile.email}
                             name='email'
                         >
-                            <Input />
+                            <Input disabled />
                         </Form.Item>
                         <Form.Item
                             label='Phone'
-                            initialValue={session?.user.phone}
+                            initialValue={profile.phone}
+
                             name='phone'
+                            rules={[
+                                {
+                                    min: 9,
+                                    max: 11,
+                                    message: "Invalid phone number!",
+                                },
+                                
+                            ]}
                         >
                             <Input />
                         </Form.Item>
                         <Form.Item
                             label='Birthday'
-                            initialValue={session?.user.birthday}
+                            initialValue={moment(profile.birthday)}
                             name='birthday'
                         >
                             <DatePicker />
                         </Form.Item>
                         <Form.Item
                             label='Gender'
-                            initialValue={session?.user.gender}
+                            initialValue={profile.gender}
                             name='gender'
                         >
                             <Radio.Group>
@@ -87,12 +203,19 @@ const Profile = () => {
                                 <Radio value={false}>Female</Radio>
                             </Radio.Group>
                         </Form.Item>
-                    </Form>
+                    </Form>{" "}
                     <div className='w-full flex flex-row justify-end gap-2 pb-5'>
                         {!edit ? (
-                            <Button onClick={() => setEdit(false)}>Save</Button>
+                            <>
+                                <Button onClick={() => {setLoading(true);form.submit()}} loading={loading}>
+                                    Save
+                                </Button>
+                                <Button onClick={() => {setEdit(true); form.resetFields()}}>
+                                    Cancel
+                                </Button>
+                            </>
                         ) : (
-                            <Button onClick={() => setEdit(false)}>
+                            <Button onClick={() => {setEdit(false);}}>
                                 Edit information
                             </Button>
                         )}

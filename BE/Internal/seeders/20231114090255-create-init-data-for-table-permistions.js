@@ -5,6 +5,8 @@ module.exports = {
         let d = new Date();
         return queryInterface.bulkInsert('Permissions', [
             { role: 'user', resource: 'products', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'customers', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'customers', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'carts', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'carts', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'carts', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
