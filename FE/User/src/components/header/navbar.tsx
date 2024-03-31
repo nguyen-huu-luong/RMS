@@ -11,18 +11,20 @@ import {
     ShoppingCartOutlined,
     UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Dropdown } from "antd";
+import { Avatar, Dropdown, Popover } from "antd";
 import type { MenuProps } from "antd";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
-
+import Notification from "./notification/notification";
 const NavBar = () => {
     const locale = useLocale();
     const { data: session, status } = useSession();
     const router = useRouter();
     const [click, setClick] = useState(false);
     const [search, setSearch] = useState(true);
+
+    const t = useTranslations("NavBar");
     const MENU_LISTS = [
         { name: "Home", href: `` },
         { name: "Menu", href: `menu` },
@@ -41,13 +43,13 @@ const NavBar = () => {
                               href={`/profile`}
                               locale={locale}
                           >
-                              Profile
+                              {t("Profile")}
                           </Link>
                       ),
                   },
                   {
                       key: "logout",
-                      label: "Log out",
+                      label: t("LogOut"),
                       onClick: () => {
                           signOut();
                       },
@@ -58,7 +60,7 @@ const NavBar = () => {
                       key: "signin",
                       label: (
                           <Link key={"signin"} href={`/signin`} locale={locale}>
-                              Sign In
+                              {t("SignIn")}{" "}
                           </Link>
                       ),
                   },
@@ -70,7 +72,7 @@ const NavBar = () => {
                               href={`/register`}
                               locale={locale}
                           >
-                              Register
+                              {t("Register")}{" "}
                           </Link>
                       ),
                   },
@@ -82,7 +84,6 @@ const NavBar = () => {
     const toggleSearch = () => {
         setSearch(!search);
     };
-    const t = useTranslations("NavBar");
     return (
         <>
             <nav className='sticky top-0 w-full h-16 shadow-md z-50 bg-primary-white'>
@@ -175,6 +176,7 @@ const NavBar = () => {
                                     style={{ fontSize: "1.4rem" }}
                                 />
                             </div>
+
                             {!search && (
                                 <div
                                     className={`w-full pl-5 flex justify-center `}
@@ -198,15 +200,20 @@ const NavBar = () => {
                                 <>
                                     <LanguageChanger />
                                     {status == "authenticated" ? (
-                                        <Link
-                                            href={"/cart"}
-                                            locale={locale}
-                                            className='hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'
-                                        >
-                                            <ShoppingCartOutlined
-                                                style={{ fontSize: "1.6rem" }}
-                                            />
-                                        </Link>
+                                        <>
+                                            <Notification />{" "}
+                                            <Link
+                                                href={"/cart"}
+                                                locale={locale}
+                                                className='hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'
+                                            >
+                                                <ShoppingCartOutlined
+                                                    style={{
+                                                        fontSize: "1.6rem",
+                                                    }}
+                                                />
+                                            </Link>
+                                        </>
                                     ) : (
                                         <></>
                                     )}

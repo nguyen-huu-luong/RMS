@@ -4,6 +4,8 @@ import { Button, Dropdown, Flex, Input, MenuProps, Modal, Space, Tooltip, Form, 
 import React, { useState } from "react";
 import { AddCustomerForm } from "../AddCustomerForm";
 import { createStyles, useTheme } from 'antd-style';
+import { SendEmailModal } from "../Modals/SendEmailModal";
+import { SendSMSModal } from "../Modals/SendSMSModal";
 
 const useStyle = createStyles(({ token }) => ({
     'my-modal-body': {
@@ -111,6 +113,8 @@ export const CustomerActionBar: React.FC<CustomerActionBarProps> = (props) => {
                         <Button>Send Email</Button>
                         <Button>Send SMS</Button>
                         <Button onClick={showCreateGroup}>Create Group</Button>
+                        <SendEmailModal emailLists={props.dataSelected.map((item) => item.email)}/>
+                        <SendSMSModal />
                         <Button icon={<EllipsisOutlined />} />
                     </Space> :
                     <Space>

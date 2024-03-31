@@ -38,8 +38,6 @@ export const filterReservation = async (token: any, start_day: any, end_day: any
 export const createTable = async (token: any, table_name_: any, floor_name_: any) => {
     try {
         let url = `${process.env.BASE_URL}/tables`
-        console.log(table_name_)
-        console.log(floor_name_)
         let request_body = {
             floor_name: floor_name_,
             table_name: table_name_

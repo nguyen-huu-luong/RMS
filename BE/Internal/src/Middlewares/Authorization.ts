@@ -27,21 +27,31 @@ class Authorization extends BaseMiddleware {
 		);
 
 		let resource = this.request.originalUrl.split("/")[2];
-		resource = resource.split("?")[0]
-		console.log(resource)
-		const allPermissions = await permissionRepository.findAllByRole(this.request.role);
+		resource = resource.split("?")[0];
+		console.log(resource);
+		const allPermissions = await permissionRepository.findAllByRole(
+			this.request.role
+		);
 		const resquestAction = this.getAction();
 		let actions = allPermissions
 			.filter((p: Permission) => p.getDataValue("resource") === resource)
 			.map((p: Permission) => p.getDataValue("action"))
-			.filter((item: string) => item.startsWith(resquestAction));
+			.filter(
+				(item: string) => item.startsWith(resquestAction) || item === "any"
+			);
 
 		if (actions.length === 0) {
 			this.next(new ForbiddenError());
 		}
 
 		this.request.action = actions[0];
-        console.log("Authorization successfully!", "role:", this.request.role, ", actions:", actions)
+		console.log(
+			"Authorization successfully!",
+			"role:",
+			this.request.role,
+			", actions:",
+			actions
+		);
 		this.next();
 	}
 

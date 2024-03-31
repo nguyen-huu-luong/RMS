@@ -1,36 +1,12 @@
-// import createMiddleware from "next-intl/middleware";
-// import { defaultLocale, locales } from "./i18nConfig";
-
-// export default createMiddleware({
-// 	// A list of all locales that are supported
-// 	locales,
-
-// 	defaultLocale,
-// 	// localeDetection: true,
-// 	// localePrefix: "always",
-// });
-
-// export const config = {
-// 	// Skip all paths that should not be internationalized. This example skips
-// 	// certain folders and all pathnames with a dot (e.g. favicon.ico)
-// 	matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
-// };
-
 import { withAuth } from "next-auth/middleware";
 import createIntlMiddleware from "next-intl/middleware";
 import { locales } from "./config";
 import { NextResponse, NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 const publicPages = ["/signin"];
-
-function protectCustomersRoute(req: any) {
-    if (
-        req.nextUrl.pathname.startsWith("/customers") &&
-        req.nextauth.user?.role !== "manager"
-    ) {
-        return NextResponse.rewrite(new URL("/denied", req.url));
-    }
-    return req;
-}
+const authRoutes = ["/", "/customers", "/bussiness", "/chat", "/leads", 
+                    "/marketing", "/organization", "/overview", "/profile", 
+                    "/report", "/sale", "/setting"];
 
 const intlMiddleware = createIntlMiddleware({
     locales,
@@ -39,12 +15,33 @@ const intlMiddleware = createIntlMiddleware({
 });
 
 const authMiddleware = withAuth(
-    (req) => {
-        return intlMiddleware(req);
+    async (request) => {
+        const token = await getToken({
+            req: request,
+            secret: process.env.NEXTAUTH_SECRET,
+        });
+
+
+        if (!token) {
+            const isAuthRoute = authRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
+
+            if (isAuthRoute) {
+                const redirectUrl = new URL("/signin", request.url);
+                redirectUrl.searchParams.set("callbackUrl", request.nextUrl.href);
+                return NextResponse.redirect(redirectUrl);
+            }
+        } 
+        
+        return intlMiddleware(request);
+        
     },
+
     {
         callbacks: {
-            authorized: ({ token }) => token != null,
+            authorized: (session) => {
+                console.log(session.token?.role)
+                return session.token?.role === "manager" ;
+            },
         },
         pages: {
             signIn: "/signin",

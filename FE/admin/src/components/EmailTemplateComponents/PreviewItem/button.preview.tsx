@@ -31,9 +31,15 @@ const defaultStyle: CSSProperties = {
     lineHeight: "120%",
     textDecoration: "none",
     textTransform: "none",
-    margin: "10px 25px",
-    padding: "10px 25px",
-    backgroundPosition: "center center"
+    marginLeft: 8,
+    marginRight: 8,
+    marginBottom: 8,
+    marginTop: 8,
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingBottom: 8,
+    paddingTop: 8,
+    backgroundPosition: "center center",
 };
 
 const ButtonPreview = ({ section, index, path }: IButtonPreview) => {
@@ -79,9 +85,8 @@ const ButtonPreview = ({ section, index, path }: IButtonPreview) => {
     return (
        <div style={{textAlign: objectCss["textAlign"] as any}}>
             <div
-                style={{ ...allStyle }}
-                className="relative"
-                
+                style={{ ...allStyle, textAlign: "center" }}
+                className="relative text-center"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={handleClick}

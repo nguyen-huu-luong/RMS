@@ -1,11 +1,9 @@
 'use client'
 import React from 'react'
-import axios from 'axios';
-import { mutate } from 'swr';
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
-import { resFetcher, filterReservation, createTable, createFloor, deleteItem, updateReservationStatus, deleteReservation, createReservation, updateReservationDetail } from '@/app/api/reservation';
-import { useState, useEffect } from 'react';
+import fetchClient from '@/lib/fetch-client';
+import { useState } from 'react';
 import { UsergroupAddOutlined, TableOutlined, CloseSquareOutlined, CheckSquareOutlined, FileSearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { Button, Modal, Form, Input, type FormProps, notification, Select, DatePicker, TimePicker, InputNumber, } from 'antd';
@@ -39,13 +37,9 @@ function Home() {
         data: resInfo,
         error: resInfoError,
         isLoading: resInfoLoading,
-    } = useSWR(
-        session
-            ? [`reservations/all`, session.user.accessToken]
-            : null,
-        ([sub_path, token]) => resFetcher(sub_path, token)
-    );
+    } = useSWR([`/reservations/all`], ([url]) => fetchClient({ url: url, data_return: true }));
 
+    console.log(resInfo)
 
     const showDetailTable = (tableId: any) => {
         push(`/sale/reservations/${tableId}`);
@@ -62,7 +56,7 @@ function Home() {
         let end_date = event.target.end_date.value
         let table_id = event.target.table_id.value
         let status = ""
-        let data = await filterReservation(session?.user.accessToken, start_date, end_date, table_id, status)
+        let data = await fetchClient({ url: `/reservations?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`, data_return: true })
         resInfo.reservarions = data.reservarions
         setChecker((current_value) => !current_value)
     }
@@ -72,7 +66,7 @@ function Home() {
         let end_date = ""
         let table_id = table_id_
         let status = "Waiting"
-        let data = await filterReservation(session?.user.accessToken, start_date, end_date, table_id, status)
+        let data = await fetchClient({ url: `/reservations?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`, data_return: true })
         resInfo.reservarions = data.reservarions
         setChecker((current_value) => !current_value)
     }
@@ -80,7 +74,7 @@ function Home() {
     const handelCreateFloor: FormProps<FieldType>["onFinish"] = async (values) => {
         setMessError("")
         let floor_name_ = values.floor_name
-        let data = await createFloor(session?.user.accessToken, floor_name_?.trim())
+        let data = await fetchClient({ method: "POST", url: '/floors', body: { floor_name: floor_name_ }, data_return: true })
         if (data.status) {
             resInfo.floors = data.floors
             setIsModalFloorOpen(false);
@@ -96,7 +90,12 @@ function Home() {
         let table_name_ = values.table_name
         let floor_name_ = values.floor_name_temp
         setMessError("")
-        let data = await createTable(session?.user.accessToken, table_name_?.trim(), floor_name_?.trim())
+        let data = await fetchClient({
+            method: "POST", url: '/tables', body: {
+                floor_name: floor_name_,
+                table_name: table_name_
+            }, data_return: true
+        })
         if (data.status) {
             resInfo.floors = data.floors
             resInfo.tables = data.tables
@@ -110,7 +109,7 @@ function Home() {
     }
 
     const handleUpdateReservationStatus = async (status: any, id: any) => {
-        const data = await updateReservationStatus({"status": status },id, session?.user.accessToken)
+        const data = await fetchClient({ method: "PUT", url: `/reservations?id=${id}`, body: { "status": status }, data_return: true })
         resInfo.floors = data.floors
         resInfo.tables = data.tables
         resInfo.reservarions = data.reservarions
@@ -147,7 +146,14 @@ function Home() {
     const handleDeleteItem = async (values: any) => {
         let item_names = values.item_name
         let item_type = values.item_type
-        let data = await deleteItem(session?.user.accessToken, item_type, item_names)
+        var data: any
+        if (item_type == "floor") {
+            data = await fetchClient({ method: "DELETE", url: `/floors`, body: { floor_names: item_names }, data_return: true })
+        }
+        else {
+            data = await fetchClient({ method: "DELETE", url: `/tables`, body: { table_names: item_names }, data_return: true })
+        }
+
         resInfo.floors = data.floors
         resInfo.reservarions = data.reservarions
         resInfo.tables = data.tables
@@ -217,9 +223,9 @@ function Home() {
                 "table_ids": values.table_reservation,
                 "description": values.note,
             }
-            const data = await createReservation(session?.user.accessToken, request_body)
+            const data = await fetchClient({ method: "POST", url: `/reservations`, body: request_body, data_return: true })
 
-            if(data.hasOwnProperty("message")) {
+            if (data.hasOwnProperty("message")) {
                 setMessError(data["message"])
             }
             else {
@@ -231,7 +237,7 @@ function Home() {
                 setIsModalReservationOpen(false);
             }
         }
-       
+
     }
 
 
@@ -241,16 +247,16 @@ function Home() {
         if (item.Tables) {
             let tables: Array<Number> = []
             await item.Tables.map((table: any) => tables.push(table.id))
-            form_reservation_detail.setFieldsValue({customer_name: item.customerName})
-            form_reservation_detail.setFieldsValue({phone_number: item.customerPhone})
-            form_reservation_detail.setFieldsValue({quantity: item.customerCount})
-            form_reservation_detail.setFieldsValue({table_reservation: tables})
-            form_reservation_detail.setFieldsValue({date_reserve: moment(item.dateTo)})
-            form_reservation_detail.setFieldsValue({start_time: dayjs(item.timeTo, timeFormat)})
-            form_reservation_detail.setFieldsValue({end_time: dayjs(item.timeEnd, timeFormat)})
-            form_reservation_detail.setFieldsValue({note: item.description})
-            form_reservation_detail.setFieldsValue({status: item.status})
-            form_reservation_detail.setFieldsValue({res_id: item.id})
+            form_reservation_detail.setFieldsValue({ customer_name: item.customerName })
+            form_reservation_detail.setFieldsValue({ phone_number: item.customerPhone })
+            form_reservation_detail.setFieldsValue({ quantity: item.customerCount })
+            form_reservation_detail.setFieldsValue({ table_reservation: tables })
+            form_reservation_detail.setFieldsValue({ date_reserve: moment(item.dateTo) })
+            form_reservation_detail.setFieldsValue({ start_time: dayjs(item.timeTo, timeFormat) })
+            form_reservation_detail.setFieldsValue({ end_time: dayjs(item.timeEnd, timeFormat) })
+            form_reservation_detail.setFieldsValue({ note: item.description })
+            form_reservation_detail.setFieldsValue({ status: item.status })
+            form_reservation_detail.setFieldsValue({ res_id: item.id })
             setIsModalReservationDetailOpen(true);
         }
     };
@@ -281,9 +287,9 @@ function Home() {
                 "table_ids": values.table_reservation,
                 "description": values.note,
             }
-            const data = await updateReservationDetail(session?.user.accessToken, request_body)
+            const data = await fetchClient({ method: "PUT", url: `/reservations/all`, body: request_body, data_return: true })
 
-            if(data.hasOwnProperty("message")) {
+            if (data.hasOwnProperty("message")) {
                 setMessError(data["message"])
             }
             else {
@@ -299,7 +305,7 @@ function Home() {
 
     const handelDeleteReservation = async () => {
         let res_id = form_reservation_detail.getFieldValue("res_id")
-        let data = await deleteReservation(session?.user.accessToken, res_id)
+        let data = await fetchClient({ method: "DELETE", url: `/reservations?id=${res_id}`, data_return: true })
         resInfo.floors = data.floors
         resInfo.reservarions = data.reservarions
         resInfo.tables = data.tables
@@ -396,7 +402,7 @@ function Home() {
                                                             </p>
                                                             <Form.Item name="date_reserve"
                                                                 rules={[{ required: true, message: 'Please choose date !' }]}>
-                                                                <DatePicker format={dateFormat}/>
+                                                                <DatePicker format={dateFormat} />
                                                             </Form.Item>
                                                         </div>
                                                         <div>
@@ -404,7 +410,7 @@ function Home() {
                                                                 Start time
                                                             </p>
                                                             <Form.Item name="start_time" rules={[{ required: true, message: 'Please choose start time !' }]}>
-                                                                <TimePicker format={timeFormat}/>
+                                                                <TimePicker format={timeFormat} />
                                                             </Form.Item>
                                                         </div>
                                                         <div>
@@ -412,12 +418,12 @@ function Home() {
                                                                 End time
                                                             </p>
                                                             <Form.Item name="end_time" rules={[{ required: true, message: 'Please choose end time !' }]}>
-                                                                <TimePicker format={timeFormat}/>
+                                                                <TimePicker format={timeFormat} />
                                                             </Form.Item>
                                                         </div>
                                                     </div>
                                                     <div className='flex justify-between'>
-                                                        <div style={{width: "48%"}}>
+                                                        <div style={{ width: "48%" }}>
                                                             <p>
                                                                 Quantity
                                                             </p>
@@ -426,31 +432,31 @@ function Home() {
                                                             </Form.Item>
                                                         </div>
 
-                                                        <div style={{width: "48%"}}>
+                                                        <div style={{ width: "48%" }}>
                                                             <p>
                                                                 Status
                                                             </p>
                                                             <Form.Item name="status" rules={[{ required: true, message: 'Please choose reserved tables !' }]}>
-                                                                <Select  allowClear>
-                                                                <Select.Option value="Done">Done</Select.Option>
-                                                                <Select.Option value="Waiting">Waiting</Select.Option>
-                                                                <Select.Option value="Canceled">Canceled</Select.Option>
+                                                                <Select allowClear>
+                                                                    <Select.Option value="Done">Done</Select.Option>
+                                                                    <Select.Option value="Waiting">Waiting</Select.Option>
+                                                                    <Select.Option value="Canceled">Canceled</Select.Option>
                                                                 </Select>
                                                             </Form.Item>
                                                         </div>
                                                     </div>
                                                     <div >
-                                                            <p>
-                                                                Table
-                                                            </p>
-                                                            <Form.Item name="table_reservation" rules={[{ required: true, message: 'Please choose reserved tables !' }]}>
-                                                                <Select mode="multiple" allowClear>
-                                                                    {
-                                                                        resInfo.tables.map((item: any) => <Select.Option value={item.id}>{item.name}</Select.Option>)
-                                                                    }
-                                                                </Select>
-                                                            </Form.Item>
-                                                        </div>
+                                                        <p>
+                                                            Table
+                                                        </p>
+                                                        <Form.Item name="table_reservation" rules={[{ required: true, message: 'Please choose reserved tables !' }]}>
+                                                            <Select mode="multiple" allowClear>
+                                                                {
+                                                                    resInfo.tables.map((item: any) => <Select.Option value={item.id}>{item.name}</Select.Option>)
+                                                                }
+                                                            </Select>
+                                                        </Form.Item>
+                                                    </div>
                                                     <div>
                                                         <p>
                                                             Note
@@ -460,14 +466,14 @@ function Home() {
                                                             <Input />
                                                         </Form.Item>
                                                     </div>
-                                                    <div style={{display: "none"}}>
-                                                    
+                                                    <div style={{ display: "none" }}>
+
                                                         <Form.Item<FieldType>
                                                             name="res_id">
                                                             <Input />
                                                         </Form.Item>
                                                     </div>
-                                                    <p className='mt-0 text-center absolute' style={{ color: "#ff4d4f", bottom: "-22px", left: "50%", transform: "translateX(-50%)"  }}>{messError}</p>
+                                                    <p className='mt-0 text-center absolute' style={{ color: "#ff4d4f", bottom: "-22px", left: "50%", transform: "translateX(-50%)" }}>{messError}</p>
                                                 </div>
                                                 <div >
                                                     <Form.Item >
@@ -520,7 +526,7 @@ function Home() {
 
                                                                                         </div>
                                                                                         <div className=' pr-1 pt-1'>
-                                                                                            <div><button onClick={()  => showModalReservationDetail(item)}><FileSearchOutlined style={{ color: "#4A58EC" }} /></button></div>
+                                                                                            <div><button onClick={() => showModalReservationDetail(item)}><FileSearchOutlined style={{ color: "#4A58EC" }} /></button></div>
                                                                                             {
                                                                                                 item.status == "Waiting" && <>
                                                                                                     <div><button onClick={() => handleUpdateReservationStatus("Done", item.id)}><CheckSquareOutlined style={{ color: "#54B435" }} /></button></div>
@@ -587,7 +593,7 @@ function Home() {
                                                         </p>
                                                         <Form.Item name="date_reserve"
                                                             rules={[{ required: true, message: 'Please choose date !' }]}>
-                                                            <DatePicker format={dateFormat}/>
+                                                            <DatePicker format={dateFormat} />
                                                         </Form.Item>
                                                     </div>
                                                     <div>
@@ -595,7 +601,7 @@ function Home() {
                                                             Start time
                                                         </p>
                                                         <Form.Item name="start_time" rules={[{ required: true, message: 'Please choose start time !' }]}>
-                                                            <TimePicker format={timeFormat}/>
+                                                            <TimePicker format={timeFormat} />
                                                         </Form.Item>
                                                     </div>
                                                     <div>
@@ -603,7 +609,7 @@ function Home() {
                                                             End time
                                                         </p>
                                                         <Form.Item name="end_time" rules={[{ required: true, message: 'Please choose end time !' }]}>
-                                                            <TimePicker format={timeFormat}/>
+                                                            <TimePicker format={timeFormat} />
                                                         </Form.Item>
                                                     </div>
                                                 </div>
@@ -638,7 +644,7 @@ function Home() {
                                                         <Input />
                                                     </Form.Item>
                                                 </div>
-                                                <p className='mt-0 text-center absolute' style={{ color: "#ff4d4f", bottom: "-22px", left: "50%", transform: "translateX(-50%)"  }}>{messError}</p>
+                                                <p className='mt-0 text-center absolute' style={{ color: "#ff4d4f", bottom: "-22px", left: "50%", transform: "translateX(-50%)" }}>{messError}</p>
                                             </div>
                                             <div >
                                                 <Form.Item >

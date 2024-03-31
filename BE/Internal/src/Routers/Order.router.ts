@@ -22,6 +22,10 @@ class OrderRouter {
             .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.removeOrder(req, res, next))
             .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.updateStatus(req, res, next))
 
+        router.route('/orders/chef')
+            .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.updateItems(req, res, next))
+            .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.viewItems(req, res, next))
+
         router.route('/orders/:id')
             .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.orderController.viewOrderItems(req, res, next))
         

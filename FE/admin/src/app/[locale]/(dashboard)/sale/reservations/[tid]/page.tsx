@@ -11,10 +11,11 @@ import { Modal } from "antd";
 import { Radio, Form, Input } from "antd";
 import Image from "next/image";
 import { createOrder } from "@/app/api/product/order";
-import { tableFetcher, updateTable } from "@/app/api/table";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
 import Link from "next-intl/link";
+import fetchClient from "@/lib/fetch-client";
+
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 function Home() {
     const params = useParams<{ locale: string; tid: string }>();
@@ -51,7 +52,7 @@ function Home() {
             table_status = "Free"
         }
         table.status = table_status
-        await updateTable({"status": table_status}, table.id, session?.user.accessToken)
+        await fetchClient({method: "PUT",url: `/tables?id=${table.id}`, body: {"status": table_status}})
         setChecker((current_value) => !current_value)
     }
 
@@ -73,17 +74,17 @@ function Home() {
                     quantity: item.quantity,
                 })),
             };
-            setConfirmLoading(true);
-            const data = await createOrder(
-                session?.user.accessToken,
-                dataBody,
-                formValues.paymentMethod
-            ).then(() => {
-                setConfirmLoading(false);
-                setOpen(false);
-                setItems([]);
-                setFinish(true);
-            });
+            // setConfirmLoading(true);
+            // const data = await createOrder(
+            //     session?.user.accessToken,
+            //     dataBody,
+            //     formValues.paymentMethod
+            // ).then(() => {
+            //     setConfirmLoading(false);
+            //     setOpen(false);
+            //     setItems([]);
+            //     setFinish(true);
+            // });
         } catch (err) {
             console.log("Validation failed:", err);
             setConfirmLoading(false);
@@ -106,10 +107,8 @@ function Home() {
         data: table,
         error: tableError,
         isLoading: tableLoading,
-    } = useSWR(session
-        ? [params.tid, session.user.accessToken]
-        : null,
-        ([table_id, token]) => tableFetcher(table_id, token));
+    } = useSWR( [params.tid],
+        ([table_id]) => fetchClient({url: `/tables?id=${table_id}`, data_return: true}));
     const [currentPage, setCurrentPage] = useState(1);
     const {
         data: categories,
@@ -126,6 +125,10 @@ function Home() {
         });
         return total;
     };
+
+    const handleOrder = () => {
+        console.log(items)
+    }
 
     if (foodError) return <div>Failed to load</div>;
     if (categoryError) return <div>Failed to load</div>;
@@ -263,7 +266,7 @@ function Home() {
                         <>
                             {items.length != 0 ? (
                                 <>
-                                    <div className='flex flex-col gap-3 overflow-y-auto'>
+                                    <div className='gap-3 overflow-y-auto' style={{height: "45%"}}>
                                         {items.map((item: any) => {
                                             return (
                                                 <div
@@ -276,6 +279,9 @@ function Home() {
                                                 </div>
                                             );
                                         })}
+                                    </div>
+                                    <div className="text-center" onClick={handleOrder}>
+                                        <button className="bg-menu px-1 py-1 border-t-menu rounded  text-white">Order</button>
                                     </div>
                                     <div className='h-auto flex flex-col gap-2 justify-between'>
                                         <div className='font-bold text-md py-2 border-t-menu border-t-2'>
