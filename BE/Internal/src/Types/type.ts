@@ -46,6 +46,7 @@ type QueryOptions = {
         page: number,
         pageSize: number
     }
+    type?: string
 }
 
 export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter };
