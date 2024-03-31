@@ -48,11 +48,11 @@ const FoodItem = ({
                 onClick={() => params.openModal(params.food)}
             >
                 <Image
-                    src={'/'}
+                    src={params.food.thumbnails}
                     alt={params.food.name}
                     width={200}
                     height={200}
-                    className='w-full h-auto'
+                    className="aspect-square"
                     unoptimized
                 />
             </div>

@@ -16,7 +16,6 @@ import { cartFetcher, editCart, removeProduct } from "@/app/api/product/cart";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
 import Loading from "@/components/loading";
-import Loading from "@/components/loading";
 
 export default function Cart() {
     const locale = useLocale();
