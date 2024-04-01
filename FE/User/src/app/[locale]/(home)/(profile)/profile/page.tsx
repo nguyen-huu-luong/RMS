@@ -88,6 +88,7 @@ const Profile = () => {
         setLoading(false);
         setEdit(true);
         console.log("Success:", values);
+        form.resetFields()
     };
 
     const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -121,7 +122,7 @@ const Profile = () => {
                         unoptimized
                     />
                     <Upload {...props} maxCount={1} showUploadList={false}>
-                        <button className='absolute top-3/4 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-medium text-black backdrop-blur-sm rounded-md cursor-pointer'>
+                        <button className='absolute top-1/2 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-medium text-black backdrop-blur-sm rounded-md cursor-pointer'>
                             Change
                         </button>
                     </Upload>
@@ -188,7 +189,7 @@ const Profile = () => {
                         </Form.Item>
                         <Form.Item
                             label='Birthday'
-                            initialValue={moment(profile.birthday)}
+                            initialValue={profile.birthday ? moment(profile.birthday) : null}
                             name='birthday'
                         >
                             <DatePicker />
@@ -207,7 +208,7 @@ const Profile = () => {
                     <div className='w-full flex flex-row justify-end gap-2 pb-5'>
                         {!edit ? (
                             <>
-                                <Button onClick={() => {setLoading(true);form.submit()}} loading={loading}>
+                                <Button onClick={() => {setLoading(true); form.submit()}} loading={loading}>
                                     Save
                                 </Button>
                                 <Button onClick={() => {setEdit(true); form.resetFields()}}>
