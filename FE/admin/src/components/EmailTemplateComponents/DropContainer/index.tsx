@@ -1,13 +1,16 @@
 
 import { useDrop } from "react-dnd";
-import { CSSProperties, useState } from "react";
+import React, { CSSProperties, useEffect, useState } from "react";
 import useEmailDataStore from "@/store/email";
 import useEmailHistoryStore from "@/store/email-history";
 import ResponsiveControl from "./editor-controls";
 import EditMode from "./edit-mode";
 import PreviewMode from "./preview-mode";
 
-const DropContainer = () => {
+export interface IDropContainerProps  {
+    view?:  "edit" | "preview" | "desktop-preview",
+}
+const DropContainer: React.FC<IDropContainerProps> = ({view}) => {
     const { emailData, setEmailData, pushTagElement, activeNode } = useEmailDataStore();
     const { pushToUndoStack } = useEmailHistoryStore();
     const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -16,6 +19,12 @@ const DropContainer = () => {
     >("edit");
     const [isMobile, setIsMobile] = useState(false);
 
+
+    useEffect(() => {
+        if (view) {
+            setCurrentView(view) ;
+        }
+    }, [view])
     const [collectedProps, drop] = useDrop(() => ({
         accept: ["mj-section"],
         drop: (item: any, monitor) => {

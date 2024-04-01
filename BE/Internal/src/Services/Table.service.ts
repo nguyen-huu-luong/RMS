@@ -149,7 +149,8 @@ export class TableService {
     public async deleteTable(req: Request, res: Response, next: NextFunction) {
         try {
             if (req.action = "delete:any") {
-                const table_names = req.body.request_body.table_names;
+                console.log(req.body)
+                const table_names = req.body.table_names;
                 const result = await this.tableRepository.deleteTable(table_names)
                 await this.viewAllReservationsPage(req, res, next)
 

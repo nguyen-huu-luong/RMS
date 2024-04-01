@@ -42,19 +42,26 @@ const Setting = () => {
         updateContent(content, activeNode.path);
     }
 
-    return <Space direction="vertical">
+    return <Space direction="vertical" className="w-full">
         <Flex className="border px-2 py-1 w-full rounded items-center">
-            <span className="me-2 whitespace-nowrap">Background Color: </span>
-            <ColorPicker value={formData["background-color"]} className="flex-1 " onChangeComplete={(color => handleChangeColor(color, "bg"))} showText />
+            <b className="me-2 whitespace-nowrap">Background Color: </b>
+            <ColorPicker value={formData["background-color"]} className="justify-start" onChangeComplete={(color => handleChangeColor(color, "bg"))} showText />
         </Flex>
 
         <Flex className="border px-2 py-1 w-full rounded items-center">
-            <span className="me-2 whitespace-nowrap">Text Color: </span>
-            <ColorPicker value={formData.color} className="flex-1 " onChangeComplete={(color => handleChangeColor(color, "text"))} showText />
+            <b className="me-2 whitespace-nowrap">Text Color: </b>
+            <ColorPicker value={formData.color} className="justify-start" onChangeComplete={(color => handleChangeColor(color, "text"))} showText />
         </Flex>
 
-        <TextArea value={content} onChange={(e) => setContent(e.target.value)} autoSize />
-        <Input placeholder="https://example.com" value={formData.href} onChange={handleChangeUrl} />
+        <Flex className="border px-2 py-1 w-full rounded items-center">
+            <b className="me-2 whitespace-nowrap">Content</b>
+            <TextArea value={content} onChange={(e) => setContent(e.target.value)} autoSize/>
+        </Flex>
+
+        <Flex className="border px-2 py-1 w-full rounded items-center">
+            <b className="me-2 whitespace-nowrap">Link to</b>
+            <Input placeholder="https://example.com" value={formData.href} onChange={handleChangeUrl} />
+        </Flex>
 
         <Button type="primary" className="bg-primary" onClick={handleApplyChange}>Apply</Button>
     </Space>

@@ -41,7 +41,7 @@ const PreviewMode = ({ isMobile }: { isMobile: boolean }) => {
           iframeDocument.open();
           iframeDocument.write(respone.data.html || "");
           iframeDocument.close();
-        } 
+        }
       }
     };
 
@@ -82,14 +82,14 @@ const PreviewMode = ({ isMobile }: { isMobile: boolean }) => {
   };
 
   return (
-    <>
+    <div className="border">
       {loadingPreview && "Loading..."}
       <iframe
         ref={iframeRef}
         title="Email preview"
         style={getStyle()}
       ></iframe>
-    </>
+    </div>
   );
 };
 

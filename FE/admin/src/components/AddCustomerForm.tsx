@@ -2,28 +2,15 @@ import React from 'react';
 import {
     Button,
     ConfigProvider,
-    DatePicker,
     Form,
-    Input,
     Select,
-    Space,
     Upload,
     message
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
-import useToken from 'antd/es/theme/useToken';
 import RMSInput from './inputs/RMSInput';
 import RMSDatePicker from './inputs/RMSDatePicker';
 import axios from 'axios';
-
-// const BoldLabelForm = styled(Form)`
-//   .ant-form-item-label {
-//     label {
-//       font-weight: bold;
-//     }
-//   }
-// `; 
 
 interface AddCustomerFormProps {
     afterSubmit: () => void

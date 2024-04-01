@@ -5,13 +5,10 @@ import {
 	Button,
 	ConfigProvider,
 	InputRef,
-	Radio,
 	Table,
 	Input,
 	Space,
-	Checkbox,
 	Select,
-	Row,
 	Alert,
 } from "antd";
 import type { TableProps, GetProp, TableColumnType } from "antd";
@@ -24,14 +21,12 @@ import {
 import Highlighter from "react-highlight-words";
 import type {
 	FilterConfirmProps,
-	FilterValue,
 	Key,
 	SortOrder,
-	SorterResult,
 } from "antd/es/table/interface";
-import { CustomerActionBar, CustomerFilterBar } from "@/components";
+import { CustomerActionBar } from "@/components";
+import fetchClient from "@/lib/fetch-client";
 import Link from "next/link";
-import { customersFetcher } from "@/app/api/client";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -75,7 +70,6 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const EmailTemplate: React.FC = () => {
-	const { data: session, status } = useSession();
 	const [checker, setChecker] = useState(true);
 	const [searchText, setSearchText] = useState("");
 	const [searchedColumn, setSearchedColumn] = useState("");
@@ -291,6 +285,7 @@ const EmailTemplate: React.FC = () => {
 		// 	// ...getColumnSearchProps('updatedAt'),
 		// }
 	];
+
 	const fetchData = async () => {
 		setLoading(true);
 		try {
@@ -303,69 +298,33 @@ const EmailTemplate: React.FC = () => {
 					? `&sort=${tableParams.sorter?.field}&order=${tableParams.sorter?.order === "ascend" ? "asc" : "desc"
 					}`
 					: "";
-			if (session?.user.accessToken) {
-				console.log(session?.user.accessToken)
-				let results = await customersFetcher(session?.user.accessToken, tableParams, sortQueries)
-				const data = results.data.map((item: any) => ({
-					...item,
-					key: item.id,
-					fullname: `${item.firstname} ${item.lastname}`,
-				}));
-				setData(data);
-				setLoading(false);
-				setTableParams({
-					...tableParams,
-					pagination: {
-						...tableParams.pagination,
-						pageSize: results.pageSize,
-						current: results.page,
-						total: results.totalCount,
-						// 200 is mock data, you should read it from server
-						// total: data.totalCount,
-					},
-				});
-			}
+			const respone = await fetchClient({
+				url: `/customers/all?page=${tableParams.pagination?.current}
+				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`
+			})
 
-			// fetch(
-			// 	`http://localhost:3003/api/customers/all?page=${tableParams.pagination?.current}
-			// 				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
-			// 	{
-			// 		headers: {
-			// 			Authorization:
-			// 				"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiTWFyaW9fS29zc0B5YWhvby5jb20iLCJyb2xlIjoibWFuYWdlciIsImlhdCI6MTcwODM1NjUwNCwiZXhwIjoxNzE0MzU2NTA0fQ.naMCtTR_QKTwTMkqjIL6QaMNnbZdOk7wzuojI_H5RNc",
-			// 		},
-			// 	}
-			// )
-			// 	.then((res) => res.json())
-			// 	.then((results) => {
-			// 		const data = results.data.map((item: any) => ({
-			// 			...item,
-			// 			key: item.id,
-			// 			fullname: `${item.firstname} ${item.lastname}`,
-			// 		}));
-			// 		setData(data);
-			// 		setLoading(false);
-			// 		setTableParams({
-			// 			...tableParams,
-			// 			pagination: {
-			// 				...tableParams.pagination,
-			// 				pageSize: results.pageSize,
-			// 				current: results.page,
-			// 				total: results.totalCount,
-			// 				// 200 is mock data, you should read it from server
-			// 				// total: data.totalCount,
-			// 			},
-			// 		});
-			// 	})
-				// .catch((error) => {
-				// 	console.log(error);
-				// 	setError({
-				// 		isError: true,
-				// 		title: error?.name || "Something went wrong!",
-				// 		message: error?.message || "Unknown error",
-				// 	});
-				// });
+			console.log(respone)
+			const results = respone.data
+			const data = results.data.map((item: any) => ({
+				...item,
+				key: item.id,
+				fullname: `${item.firstname} ${item.lastname}`,
+			}));
+			setData(data);
+			setLoading(false);
+			setTableParams({
+				...tableParams,
+				pagination: {
+					...tableParams.pagination,
+					pageSize: results.pageSize,
+					current: results.page,
+					total: results.totalCount,
+				},
+			});
+				
+				
 		} catch (error: any) {
+			setLoading(false)
 			console.log(error);
 			setError({
 				isError: true,
@@ -377,7 +336,7 @@ const EmailTemplate: React.FC = () => {
 
 	useEffect(() => {
 		fetchData();
-	}, [checker,session?.user.accessToken]);
+	}, []);
 
 	const handleTableChange: TableProps["onChange"] = (
 		pagination,
@@ -455,7 +414,7 @@ const EmailTemplate: React.FC = () => {
 				},
 			}}
 		>
-			<Space direction="vertical">
+			<Space direction="vertical" className="w-full">
 				{/* <CustomerFilterBar /> */}
 				<CustomerActionBar dataSelected={selectedCustomers}/>
 				{error.isError && (

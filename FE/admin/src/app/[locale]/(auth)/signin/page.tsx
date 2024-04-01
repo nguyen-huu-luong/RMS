@@ -22,4 +22,3 @@ const SignIn: React.FC = async () => {
 };
 
 export default SignIn;
-

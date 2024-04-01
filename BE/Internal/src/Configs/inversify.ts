@@ -34,6 +34,10 @@ import { FloorRepository, TableRepository, TableReservationRepository, Reservati
 import { TYPES } from "../Types/type";
 import { IChannelRepository } from "../Repositories/IChannelRepository";
 import { IMessageRepository } from "../Repositories/IMessageRepository";
+import { IOpenEventrRepository } from "../Repositories/IOpenEventRepository";
+import { OpenEventRepository } from "../Repositories/implementation/OpenEventRepository";
+import { IClickEventRepository } from "../Repositories/IClickEventRepository";
+import { ClickEventRepository } from "../Repositories/implementation/ClickEventRepository";
 class InversifyContainer {
 	private container;
 	static instance: InversifyContainer ;
@@ -77,6 +81,9 @@ class InversifyContainer {
 		this.container.bind<IChannelRepository>(TYPES.IChannelRepository).to(ChannelRepository);
 		this.container.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepository);
 		this.container.bind<ICartItemRepository>(TYPES.ICartItemRepository).to(CartItemRepository);
+
+		this.container.bind<IOpenEventrRepository>(TYPES.IOpenEventRepository).to(OpenEventRepository);
+		this.container.bind<IClickEventRepository>(TYPES.IClickEventRepository).to(ClickEventRepository);
 	}
 }
 
