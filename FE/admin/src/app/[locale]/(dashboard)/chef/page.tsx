@@ -6,7 +6,9 @@ import { useRouter } from "next-intl/client";
 import useSWR from "swr";
 import { orderItemsFetcher } from "@/app/api/product/order";
 import Column from "@/components/Chef/column";
-import {message} from 'antd';
+import { message } from "antd";
+import useSocket from "@/socket";
+import fetchClient from "@/lib/fetch-client";
 
 function Chef() {
     const router = useRouter();
@@ -16,39 +18,19 @@ function Chef() {
     const [doneItems, setDoneItems] = useState<any>(null);
     const [refetch, setRefetch] = useState<any>(null);
     const { data: session, status } = useSession();
-    const [socket, setSocket] = useState<any>(null);
     const [authenticated, setAuthenticated] = useState(false);
-
+    const socket = useSocket();
     useEffect(() => {
-        if (status === "authenticated") {
-            setAuthenticated(true);
-        } else if (status === "unauthenticated") {
-            router.push("/signin");
-        } else return;
-        const socketClient = io("http://localhost:3003", {
-            auth: {
-                token: session?.user.accessToken,
-            },
-        });
-        socketClient.on("connect", () => {
-            setSocket(socketClient);
-            console.log("Connected to socket server");
-        });
-        socketClient.on("connect_error", (error: any) => {
-            console.log(error);
-        });
-        socketClient.on("order:prepare:fromStaff", (orderId: any) => {
+        if (!socket) return;
+        socket.on("order:prepare:fromStaff", (orderId: any) => {
             message.info(`New order #${orderId}`);
-            refetch(`New order #${orderId}`);
-
-        })
-        socketClient.on("disconnect", () => {
-            console.log("Disconnected from socket server");
+            setRefetch(`New order #${orderId}`);
         });
         return () => {
-            socketClient.disconnect();
+            socket.off("order:prepare:fromStaff");
         };
-    }, [status, router, session?.user.accessToken]);
+    }, [socket]);
+
     useEffect(() => {
         const fetchOrders = async () => {
             if (status === "loading") return;
@@ -57,10 +39,10 @@ function Chef() {
                 return;
             }
             try {
-                const ordersData = await orderItemsFetcher(
-                    "http://localhost:3003/api/orders/chef",
-                    session?.user.accessToken
-                );
+                const ordersData = await fetchClient({
+                    url: "/orders/chef",
+                    data_return: true,
+                });
                 const filteredItems = ordersData.flatMap((order: any) =>
                     order.orderItems.filter(
                         (item: any) =>
@@ -82,7 +64,7 @@ function Chef() {
                     orderId: order.id,
                     createdAt: order.createdAt,
                     descriptions: order.descriptions,
-                    status: order.status
+                    status: order.status,
                 }));
                 setOrders(filteredOrders);
                 setPreparingItems(preparingItems);
@@ -93,14 +75,13 @@ function Chef() {
             }
         };
         fetchOrders();
-    }, [status, router, session?.user.accessToken, refetch]);
+    }, [status, router, refetch]);
     if (!orders) return "Loading...";
     return (
         <div className='flex flex-row justify-between gap-10 w-full h-[680px] p-5'>
             <Column
                 name={"To do"}
                 items={preparingItems}
-                token={session?.user.accessToken}
                 refetch={setRefetch}
                 orders={orders}
                 doneItems={doneItems}
@@ -111,7 +92,6 @@ function Chef() {
             <Column
                 name={"Processing"}
                 items={cookingItems}
-                token={session?.user.accessToken}
                 refetch={setRefetch}
                 orders={orders}
                 doneItems={doneItems}
@@ -122,7 +102,6 @@ function Chef() {
             <Column
                 name={"Done"}
                 items={doneItems}
-                token={session?.user.accessToken}
                 refetch={setRefetch}
                 orders={orders}
                 doneItems={doneItems}

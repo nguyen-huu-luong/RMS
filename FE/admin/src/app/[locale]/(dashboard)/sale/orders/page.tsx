@@ -12,7 +12,6 @@ import {
     Descriptions,
     Tag,
 } from "antd";
-import { io } from "socket.io-client";
 import type { TableProps, GetProp, TableColumnType } from "antd";
 import { variables } from "@/app";
 import {
@@ -26,13 +25,13 @@ import type {
     Key,
     SortOrder,
 } from "antd/es/table/interface";
-import axios from "axios";
-import { Switch, Modal } from "antd";
+import { Modal } from "antd";
 import { useRouter } from "next-intl/client";
-import { createStyles, useTheme } from "antd-style";
-import { useSession } from "next-auth/react";
+import { createStyles } from "antd-style";
 import moment from "moment";
-import {message} from 'antd';
+import { message } from "antd";
+import fetchClient from "@/lib/fetch-client";
+import useSocket from "@/socket";
 
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
@@ -76,69 +75,16 @@ interface TableParams {
 
 type DataIndex = keyof DataType;
 
-const updateOrder = async (requestBody: any, token: any) => {
-    try {
-        const response = await axios.put(
-            `http://localhost:3003/api/orders/admin`,
-            requestBody,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-        return response.data;
-    } catch (error) {
-        console.error("Error adding to cart:", error);
-        throw error;
-    }
-};
-
-function showConfirm() {
-    confirm({
-        title: "Do you want to delete these items?",
-        content:
-            "When clicked the OK button, this dialog will be closed after 1 second",
-        async onOk() {
-            try {
-                return new Promise((resolve, reject) => {
-                    setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-                });
-            } catch (e) {
-                return console.log("Oops errors!");
-            }
-        },
-        onCancel() {},
-    });
-}
-
-const orderFetcher = async (url: any, token: any) => {
-    try {
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching orders:", error);
-        throw error;
-    }
-};
-
 const Order: React.FC = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInput = useRef<InputRef>(null);
     const [data, setData] = useState<DataType[]>();
     const [loading, setLoading] = useState(false);
-    const [socket, setSocket] = useState<any>(null);
     const [selectedOrders, setSelectedOrders] = useState<DataType[]>();
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState<any>([]);
-    const [authenticated, setAuthenticated] = useState(false);
+    const socket = useSocket();
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -195,9 +141,8 @@ const Order: React.FC = () => {
         createdAt: "",
     });
     const { styles } = useStyle();
-    const { data: session, status } = useSession();
 
-    const fetchData = () => {
+    const fetchData = async () => {
         setLoading(true);
         try {
             let filterQueriesStr = "";
@@ -212,42 +157,28 @@ const Order: React.FC = () => {
                               : "desc"
                       }`
                     : "";
-            fetch(
-                `http://localhost:3003/api/orders/admin?page=${tableParams.pagination?.current}
-							&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${session?.user.accessToken}`,
-                    },
-                }
-            )
-                .then((res) => res.json())
-                .then((results) => {
-                    const data = results.data.map((item: any) => ({
-                        ...item.order,
-                        key: item.order.id,
-                        fullname: `${item.client.firstname} ${item.client.lastname}`,
-                    }));
-                    setData(data);
-                    setLoading(false);
-                    setTableParams({
-                        ...tableParams,
-                        pagination: {
-                            ...tableParams.pagination,
-                            pageSize: results.pageSize,
-                            current: results.page,
-                            total: results.totalCount,
-                        },
-                    });
-                })
-                .catch((error) => {
-                    console.log(error);
-                    setError({
-                        isError: true,
-                        title: error?.name || "Something went wrong!",
-                        message: error?.message || "Unknown error",
-                    });
-                });
+
+            const results = await fetchClient({
+                url: `/orders/admin?page=${tableParams.pagination?.current}
+            &pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
+                data_return: true,
+            });
+            const data = results.data.map((item: any) => ({
+                ...item.order,
+                key: item.order.id,
+                fullname: `${item.client.firstname} ${item.client.lastname}`,
+            }));
+            setData(data);
+            setLoading(false);
+            setTableParams({
+                ...tableParams,
+                pagination: {
+                    ...tableParams.pagination,
+                    pageSize: results.pageSize,
+                    current: results.page,
+                    total: results.totalCount,
+                },
+            });
         } catch (error: any) {
             console.log(error);
             setError({
@@ -259,54 +190,27 @@ const Order: React.FC = () => {
     };
 
     useEffect(() => {
-        if (status === "authenticated") {
-            setAuthenticated(true);
-        } else if (status === "unauthenticated") {
-            router.push("/signin");
-        } else return;
-        const socketClient = io("http://localhost:3003", {
-            auth: {
-                token: session?.user.accessToken,
-            },
-        });
-        socketClient.on("connect", () => {
-            setSocket(socketClient);
-            console.log("Connected to socket server");
-        });
-        socketClient.on("connect_error", (error: any) => {
-            console.log(error);
-        });
-        socketClient.on("order:finish:fromChef", (orderId: any) => {
+        if (!socket) return;
+        socket.on("order:finish:fromChef", (orderId: any) => {
             message.success(`Finish order #${orderId}! Ready to deliver!`);
-            fetchData()
-        });
-        socketClient.on("disconnect", () => {
-            console.log("Disconnected from socket server");
+            fetchData();
         });
         return () => {
-            socketClient.disconnect();
+            socket.off("order:finish:fromChef");
         };
-    }, [status, router, session?.user.accessToken]);
+    }, [socket]);
 
     useEffect(() => {
-        if (authenticated) {
-            // Gọi fetchData khi authenticated là true
-            fetchData();
-        }
-    }, [authenticated, JSON.stringify(tableParams)]);
-    // useEffect(() => {
-    //     socket.on("order:finish:fromChef", (orderId: any) => {
-    //         console.log(orderId)
-    //     });
-    // }, [socket]);
+        fetchData();
+    }, []);
+
     const showModal = async (id: any) => {
-        const res = await axios.get(`http://localhost:3003/api/orders/${id}`, {
-            headers: {
-                Authorization: `Bearer ${session?.user.accessToken}`,
-            },
+        const res = await fetchClient({
+            url: `/orders/${id}`,
+            data_return: true,
         });
-        console.log(res.data.items);
-        if (res) setItems(res.data.items);
+        console.log(res);
+        if (res) setItems(res.items);
         setOpen(true);
     };
 
@@ -462,13 +366,12 @@ const Order: React.FC = () => {
             ),
     });
 
-    // rowSelection object indicates the need for row selection
     const rowSelection = {
         onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
             setSelectedOrders(selectedRows);
         },
         getCheckboxProps: (record: DataType) => ({
-            disabled: record.fullname === "", // Column configuration not to be checked
+            disabled: record.fullname === "",
             name: record.fullname,
         }),
     };
@@ -618,7 +521,6 @@ const Order: React.FC = () => {
                     )}
                     {record.status == "Ready" ? (
                         <a
-                            // onClick={() => handleDeliverOrder(record.id)}
                             onClick={() => {
                                 Modal.confirm({
                                     title: "Deliver this order",
@@ -644,7 +546,6 @@ const Order: React.FC = () => {
                         </a>
                     ) : record.status == "Delivering" ? (
                         <a
-                            // onClick={() => handleDoneOrder(record.id)}
                             onClick={() => {
                                 Modal.confirm({
                                     title: "Finish delivering this order",
@@ -733,35 +634,39 @@ const Order: React.FC = () => {
     };
 
     const handleAcceptOrder = async (orderId: number) => {
-        await updateOrder(
-            { orderId: orderId, status: "Preparing" },
-            session?.user.accessToken
-        );
-        socket.emit("staff:order:prepare", orderId);
+        await fetchClient({
+            url: `/orders/admin`,
+            method: "PUT",
+            body: { orderId: orderId, status: "Preparing" },
+        });
+        if (socket) socket.emit("staff:order:prepare", orderId);
         fetchData();
     };
 
     const handleDeliverOrder = async (orderId: number) => {
-        await updateOrder(
-            { orderId: orderId, status: "Delivering" },
-            session?.user.accessToken
-        );
+        await fetchClient({
+            url: `/orders/admin`,
+            method: "PUT",
+            body: { orderId: orderId, status: "Delivering" },
+        });
         fetchData();
     };
 
     const handleDoneOrder = async (orderId: number) => {
-        await updateOrder(
-            { orderId: orderId, status: "Done" },
-            session?.user.accessToken
-        );
+        await fetchClient({
+            url: `/orders/admin`,
+            method: "PUT",
+            body: { orderId: orderId, status: "Done" },
+        });
         fetchData();
     };
 
     const handleRejectOrder = async (orderId: number) => {
-        await updateOrder(
-            { orderId: orderId, status: "Cancel" },
-            session?.user.accessToken
-        );
+        await fetchClient({
+            url: `/orders/admin`,
+            method: "PUT",
+            body: { orderId: orderId, status: "Cabcel" },
+        });
         fetchData();
     };
 

@@ -6,40 +6,18 @@ import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { useRouter } from "next-intl/client";
 import { message } from "antd";
+import useSocket from "@/socket";
 
 function Chat() {
     const [channel, setChannel] = useState(-1);
-    const [socket, setSocket] = useState<any>(null);
     const router = useRouter()
     const [index, setIndex] = useState<number>(1);
     const { data: session, status } = useSession();
     const [messageApi, contextHolder] = message.useMessage();
-
+    const socket = useSocket();
     const success = () => {
         messageApi.success(`Join channel ${1} successfully!`);
     };
-    useEffect(() => {
-        if (status === "loading") return;
-        if (status === "unauthenticated") router.push("/signin");
-        const socketClient = io("http://localhost:3003", {
-            auth: {
-                token: session?.user.accessToken,
-            },
-        });
-        socketClient.on("connect", () => {
-            setSocket(socketClient);
-            console.log("Connected to socket server");
-        });
-        socketClient.on("connect_error", (error: any) => {
-            console.log(error);
-        }); 
-        socketClient.on("disconnect", () => {
-            console.log("Disconnected from socket server");
-        });
-        return () => {
-            socketClient.disconnect();
-        };
-    }, [status, router, session?.user.accessToken]);
     return (
         <>
             {socket != null ? (
@@ -48,7 +26,6 @@ function Chat() {
                         <ChatList
                             socket={socket}
                             setChannel={setChannel}
-                            token={session?.user.accessToken}
                             setIndex={setIndex}
                             staffId={session?.user.id}
                         ></ChatList>
@@ -59,7 +36,6 @@ function Chat() {
                                 socket={socket}
                                 channel={channel}
                                 setChannel={setChannel}
-                                token={session?.user.accessToken}
                                 index={index}
                                 setIndex={setIndex}
 
