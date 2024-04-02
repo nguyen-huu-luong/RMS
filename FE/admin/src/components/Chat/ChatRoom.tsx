@@ -1,4 +1,4 @@
-import { FullscreenExitOutlined, SendOutlined } from "@ant-design/icons";
+import { SendOutlined } from "@ant-design/icons";
 import TimeStamp from "./Timestamp";
 import Message from "./Message";
 import Status from "./Status";
@@ -6,42 +6,6 @@ import { useState, useEffect, useCallback } from "react";
 import moment from "moment";
 import axios from "axios";
 import fetchClient from "@/lib/fetch-client";
-export const seenMessage = async (token: any, id: string) => {
-    try {
-        const response = await axios.put(
-            `http://localhost:3003/api/channels`,
-            { id: id },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-        return response.data;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-};
-
-const sendMessage = async (token: any, requestBody: object) => {
-    try {
-        await axios.post(
-            `http://localhost:3003/api/channels/admin`,
-            requestBody,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-    } catch (error) {
-        console.error("Error sending message:", error);
-        throw error;
-    }
-};
 
 const ChatBox = ({
     channel,
@@ -84,7 +48,7 @@ const ChatBox = ({
 
     useEffect(() => {
         fetchData();
-    }, [fetchData]);
+    }, [fetchData, index]);
 
     useEffect(() => {
         const handleNewMessage = (
@@ -130,6 +94,10 @@ const ChatBox = ({
         };
     }, [socket, channel, data]);
 
+    useEffect(() => {
+        scrollToBottom();
+    }, []);
+
     const handleFocus = () => {
         viewMessage();
         setInputFocused(true);
@@ -146,7 +114,7 @@ const ChatBox = ({
 
     const scrollToTop = () => {
         const messageBody = document.getElementById("messageBody");
-        messageBody?.scrollTo({ top: 20, behavior: "smooth" });
+        messageBody?.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const send = async (e: any) => {
@@ -206,8 +174,7 @@ const ChatBox = ({
                 className='body w-full grow font-normal text-sm overflow-auto max-h-full flex flex-col justify-start gap-2 px-2 py-2'
             >
                 <button onClick={() => setIndex((index: any) => index + 1)}>
-                    {" "}
-                    Load more{" "}
+                    Load more
                 </button>
                 {data.message.map((item: any, index: number) => {
                     const hasPreviousMessage = index > 0;

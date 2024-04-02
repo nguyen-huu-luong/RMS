@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next-intl/link";
 import { useLocale, useTranslations } from "next-intl";
 import Progress from "@/components/order/progressBar";
@@ -16,10 +16,11 @@ import { cartFetcher, editCart, removeProduct } from "@/app/api/product/cart";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
 import Loading from "@/components/loading";
+import fetchClient from "@/lib/fetch-client";
 
 export default function Cart() {
     const locale = useLocale();
-    const t = useTranslations('Cart');
+    const t = useTranslations("Cart");
     const { data: session, status } = useSession();
     const router = useRouter();
     useEffect(() => {
@@ -31,18 +32,17 @@ export default function Cart() {
     const {
         data: cartItems,
         error: cartItemsError,
-        isLoading: cartItemsLoading,   
-        mutate     
+        isLoading: cartItemsLoading,
+        mutate,
     } = useSWR(
-        session
-            ? [`http://localhost:3003/api/carts`, session.user.accessToken]
-            : null,
-        ([url, token]) => cartFetcher(url, token), {
+        session ? [`/carts`] : null,
+        ([url]) => fetchClient({ url: url, data_return: true }),
+        {
             keepPreviousData: true,
             onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
-                if (retryCount >= 10) return
-                setTimeout(() => revalidate({ retryCount }), 2000)
-              }
+                if (retryCount >= 10) return;
+                setTimeout(() => revalidate({ retryCount }), 2000);
+            },
         }
     );
     if (status === "loading") return <Loading />;
@@ -54,19 +54,25 @@ export default function Cart() {
             await removeItem(itemId);
             return;
         }
-        await editCart(session?.user.accessToken, {
-            productId: itemId,
-            quantity: newQuantity,
+        await fetchClient({
+            url: `/carts`,
+            body: {
+                productId: itemId,
+                quantity: newQuantity,
+            },
+            method: "PUT",
         });
+        await mutate();
     };
     const removeItem = async (itemId: number) => {
-        await removeProduct(session?.user.accessToken, itemId);
+        await fetchClient({ url: `/carts/${itemId}`, method: "DELETE" });
+        await mutate();
     };
 
     if (cartItemsError) return <div>Failed to load</div>;
     if (cartItemsLoading) return <Loading />;
     if (!cartItems) return <Loading />;
-    if (cartItems && cartItems.code){
+    if (cartItems && cartItems.code) {
         return setTimeout(() => mutate(), 1000);
     }
     return cartItems.cart.total === 0 ? (

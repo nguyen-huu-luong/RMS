@@ -61,6 +61,7 @@ class SocketConnection {
                 );
             });
             socket.on("staff:message:read", (channelId: string) => {
+                console.log("staff:message:read from channel ", channelId)
                 io.to("Channel_" + channelId).emit(
                     "message:read:fromStaff",
                     channelId

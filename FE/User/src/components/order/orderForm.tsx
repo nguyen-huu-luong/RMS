@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { ConfigProvider, Radio, Form, Input, Select, Row, Col } from "antd";
+import { ConfigProvider, Radio, Form, Input } from "antd";
 import Map from "@/components/map/map";
 
 import { useState, useEffect, useRef, Dispatch } from "react";

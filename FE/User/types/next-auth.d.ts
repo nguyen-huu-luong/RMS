@@ -16,5 +16,6 @@ declare module "next-auth" {
       avatar: string;
       gender: boolean;
     } & DefaultSession["user"];
+    accessToken?: string;
   }
 }
