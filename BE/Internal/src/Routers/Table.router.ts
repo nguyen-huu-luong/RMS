@@ -18,6 +18,7 @@ class TableRouter {
         .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.updateTable(req, res, next))
 
         router.route('/tables/cart/:id')
+        .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.getCartItems(req, res, next))
         .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.addtoCart(req, res, next))
         .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.updateCart(req, res, next))
     }

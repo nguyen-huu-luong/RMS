@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWR from "swr";
 import FoodItem from "@/components/Product/item";
 import { Pagination, ConfigProvider } from "antd";
@@ -11,7 +11,7 @@ import { Modal } from "antd";
 import { Radio, Form, Input } from "antd";
 import Image from "next/image";
 import { createOrder } from "@/app/api/product/order";
-import { tableFetcher, updateTable } from "@/app/api/table";
+import { tableFetcher, updateTable, addToCart, updateCart, getCartItems } from "@/app/api/table";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
 import Link from "next-intl/link";
@@ -19,6 +19,7 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 function Home() {
     const params = useParams<{ locale: string; tid: string }>();
     const [items, setItems] = useState<any>([]);
+    const [cart_items, setCartItems] = useState<any>([]);
     const [currentCategory, setCurrentCategory] = useState<string>("Pizza");
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
@@ -26,6 +27,7 @@ function Home() {
     const [form] = Form.useForm();
     const { data: session, status } = useSession();
     const [checker, setChecker] = useState(true)
+    const [item_status, updateItemStaus] = useState(true)
     const router = useRouter();
 
     const showModal = () => {
@@ -51,7 +53,7 @@ function Home() {
             table_status = "Free"
         }
         table.status = table_status
-        await updateTable({"status": table_status}, table.id, session?.user.accessToken)
+        await updateTable({ "status": table_status }, table.id, session?.user.accessToken)
         setChecker((current_value) => !current_value)
     }
 
@@ -107,28 +109,68 @@ function Home() {
         error: tableError,
         isLoading: tableLoading,
     } = useSWR(session
-        ? [params.tid, session.user.accessToken]
+        ? [params.tid, session.user.accessToken,]
         : null,
         ([table_id, token]) => tableFetcher(table_id, token));
+
+    useEffect(() => {
+        const url = `${process.env.BASE_URL}/tables/cart/${params.tid}`
+        if (cart_items.length == 0) {
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${session?.user.accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data)
+                    setCartItems(data)
+                });
+        }
+    }, [session])
+
+    // const {
+    //         data: cart_items,
+    //         error: CartItemsError,
+    //         isLoading: cartItemsLoading,
+    //     } = useSWR(session
+    //         ? [`${process.env.BASE_URL}/tables/cart/${params.tid}`, session.user.accessToken,]
+    //         : null,
+    //         ([url, token]) => getCartItems(url, token));
+
+
     const [currentPage, setCurrentPage] = useState(1);
+
     const {
         data: categories,
         error: categoryError,
         isLoading: categoryLoading,
     } = useSWR(`${process.env.BASE_URL}/categories/all`, fetcher);
+
     const onChange: PaginationProps["onChange"] = (page) => {
         setCurrentPage(page);
     };
+
     const getTotalAmount = () => {
         let total = 0;
+        if (cart_items) {
+            cart_items.items?.forEach((item: any) => {
+                total += item.amount;
+            })
+        }
+
         items.forEach((item: any) => {
             total += item.quantity * item.price;
         });
         return total;
     };
 
-    const handleOrder = () => {
+    const handleOrder = async () => {
         console.log(items)
+        const data = await updateCart(items, params.tid, session?.user.accessToken)
+        setItems([])
+        setCartItems(data)
     }
 
     if (foodError) return <div>Failed to load</div>;
@@ -143,7 +185,7 @@ function Home() {
                     <div className="inline-block ml-3">
                         {
                             table.status == "Free" ? <button type="button" className="p-1 px-2 text-sm rounded border-0" style={{ color: "white", backgroundColor: "#4A58EC" }} onClick={handleUpdateTable}>Use</button>
-                            : <button onClick={handleUpdateTable} type="button" className="p-1 px-2 text-sm rounded border-0" style={{ color: "white", backgroundColor: "#EA6A12" }}>Free</button>
+                                : <button onClick={handleUpdateTable} type="button" className="p-1 px-2 text-sm rounded border-0" style={{ color: "white", backgroundColor: "#EA6A12" }}>Free</button>
                         }
                     </div>
                 </div>
@@ -265,25 +307,60 @@ function Home() {
                 <div className='rounded-xl bg-white basis-1/4 h-full p-5 text-black flex flex-col justify-between'>
                     {!finish ? (
                         <>
-                            {items.length != 0 ? (
+                            {cart_items ? (
                                 <>
-                                    <div className='gap-3 overflow-y-auto' style={{height: "45%"}}>
-                                        {items.map((item: any) => {
+                                    <div className=' overflow-y-auto' style={{ maxHeight: "200px" }}>
+                                        {cart_items?.items?.map((item: any) => {
                                             return (
-                                                <div
-                                                    key={`Food ${item.category} ${item.id}`}
-                                                    className='duration-300 transition-all ease-in-out w-auto'
-                                                >
-                                                    <PriceItem
-                                                        params={{ food: item }}
-                                                    />
-                                                </div>
+                                                <>
+                                                    {
+                                                        item.status == "cooking" ?
+                                                            <div
+                                                                key={cart_items.products[item.productId].name}
+                                                                className='duration-300 transition-all ease-in-out w-auto  text-yellow-500'
+                                                            >
+                                                                <PriceItem
+                                                                    params={{ food: { name: cart_items.products[item.productId].name, price: cart_items.products[item.productId].price, quantity: item.quantity } }}
+                                                                />
+                                                            </div> : <div
+                                                                key={cart_items.products[item.productId].name}
+                                                                className='duration-300 transition-all ease-in-out w-auto text-blue-500'
+                                                            >
+                                                                <PriceItem
+                                                                    params={{ food: { name: cart_items.products[item.productId].name, price: cart_items.products[item.productId].price, quantity: item.quantity } }}
+                                                                />
+                                                            </div>
+                                                    }
+                                                </>
                                             );
                                         })}
                                     </div>
-                                    <div className="text-center" onClick={handleOrder}>
-                                        <button className="bg-menu px-1 py-1 border-t-menu rounded  text-white">Order</button>
-                                    </div>
+                                    
+
+                                    {items.length != 0 && (
+                                        <div>
+                                            <hr />
+                                            <div className='mt-1 overflow-y-auto' style={{ maxHeight: "170px" }}>
+                                                {items.map((item: any) => {
+                                                    return (
+                                                        <div
+                                                            key={`Food ${item.category} ${item.id}`}
+                                                            className='duration-300 transition-all ease-in-out w-auto'
+                                                        >
+                                                            <PriceItem
+                                                                params={{ food: item }}
+                                                            />
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                            <div className="text-center mt-2" onClick={handleOrder}>
+                                                <button className="bg-menu px-1 py-1 border-t-menu rounded  text-white">Order</button>
+                                            </div>
+                                        </div>
+                                    )}
+
+
                                     <div className='h-auto flex flex-col gap-2 justify-between'>
                                         <div className='font-bold text-md py-2 border-t-menu border-t-2'>
                                             Total: {getTotalAmount()}VNĐ
@@ -329,8 +406,8 @@ function Home() {
                                         setCurrentPage(1);
                                     }}
                                     className={`font-bold cursor-pointer p-2 px-4${category === item.name
-                                            ? " text-white bg-menu"
-                                            : " bg-none text-menu"
+                                        ? " text-white bg-menu"
+                                        : " bg-none text-menu"
                                         } transition-all duration-200`}
                                 >
                                     {item.name}

@@ -5,6 +5,7 @@ import { BaseRepository } from "./BaseRepository";
 import { Client } from "../../Models";
 import Token from "../../Models/Token";
 import { REFRESH_TOKEN } from "../../Constants";
+import { Op } from "sequelize";
 
 @injectable()
 export class ClientRepository
@@ -16,7 +17,6 @@ export class ClientRepository
 	}
 
 	public async findByEmail(email: string): Promise<Client | null> {
-		console.log("fadsfdsa")
 		return await this._model.findOne({ where: { email: email } });
 	}
 
@@ -27,5 +27,11 @@ export class ClientRepository
 		return await user.save();
 	}
 
-	
+	public async checkExist(phone: string, email: Client) {
+		return await this._model.findAll({
+			where: {
+				[Op.or]: [{phone: phone}, {email: email}]
+			}
+		})
+	}
 }

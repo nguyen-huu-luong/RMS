@@ -25,6 +25,10 @@ class TableController {
         this.tableService.updateTable(req, res, next)
     }
 
+    public getCartItems(req: Request, res: Response, next: NextFunction) {
+        this.tableService.getCartItems(req, res, next)
+    }
+
     public addtoCart(req: Request, res: Response, next: NextFunction){
         this.tableService.addToCart(req, res, next)
     }

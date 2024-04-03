@@ -5,7 +5,7 @@ import statusMess from "../Constants/statusMess";
 import { container } from "../Configs";
 import {
     ITableRepository, IReservationRepository, IFloorRepository, CartRepository,
-    ICartRepository, ICartItemRepository
+    ICartRepository, ICartItemRepository, IProductRepository, IClientRepository
 } from "../Repositories";
 import { TYPES } from "../Types/type";
 import { RecordNotFoundError, UnauthorizedError } from "../Errors";
@@ -26,6 +26,12 @@ export class TableService {
         ),
         private cartItemRepository = container.get<ICartItemRepository>(
             TYPES.ICartItemRepository
+        ),
+        private productRepository = container.get<IProductRepository>(
+            TYPES.IProductRepository
+        ),
+        private clientRepository = container.get<IClientRepository>(
+            TYPES.IClientRepository
         ),
     ) { }
 
@@ -194,6 +200,48 @@ export class TableService {
         }
     }
 
+    public async getCartItems(req: Request, res: Response, next: NextFunction){
+        try {
+            const table_id = Number(req.params.id);
+            const cart = await this.cartRepository.getCartTable(table_id)
+            const cart_id = Number(cart.id)
+            const items = await this.cartItemRepository.findByCond({cartId: cart_id})
+            const products: any = {}
+            await Promise.all(
+                items.map(async (item: any) => {
+                    let product = await this.productRepository.findById(item.productId)
+                    products[item.productId] = product
+                })
+            );
+
+            res.send({items: items, products: products})
+        }
+        catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+
+    public async getCartItemInternal(req: Request, res: Response, next: NextFunction, cart_id: number){
+        try {
+            const items = await this.cartItemRepository.findByCond({cartId: cart_id})
+            const products: any = {}
+            await Promise.all(
+                items.map(async (item: any) => {
+                    let product = await this.productRepository.findById(item.productId)
+                    products[item.productId] = product
+                })
+            );
+
+            res.send({items: items, products: products})
+        }
+        catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+    
+
     public async addToCart(req: Request, res: Response, next: NextFunction) {
         try {
             const table_id = Number(req.params.id);
@@ -218,7 +266,7 @@ export class TableService {
 
             await this.cartRepository.update(Number(cart.id), { amount: amount_items, total: amount_items })
             const cart_new = await this.cartRepository.getCartTable(table_id)
-            res.send(cart_new)
+            this.getCartItemInternal(req, res, next, cart.id)
         }
         catch (err) {
             console.log(err);
@@ -232,35 +280,62 @@ export class TableService {
             const table_id = Number(req.params.id);
             const cart = await this.cartRepository.getCartTable(table_id)
             let amount_items: number = cart.amount
+            console.log(cart_items)
             await Promise.all(
                 cart_items.map(async (item: any) => {
-                    let same_items = await this.cartItemRepository.findByCond({ productId: item.id, cartId: cart.id, status: item.status })
+                    let same_items = await this.cartItemRepository.findByCond({ productId: item.id, cartId: cart.id, status: "cooking" })
                     if (same_items.length == 0) {
                         await this.cartItemRepository.create({
                             cartId: cart.id,
                             productId: item.id,
-                            amount: item.amount,
+                            amount: item.price * item.quantity*1.0,
                             quantity: item.quantity,
-                            status: item.status,
+                            status: "cooking",
                             createAt: new Date(),
                             updateAt: new Date()
                         })
                     }
                     else {
                         let same_item = same_items[0]
-                        await this.cartItemRepository.updateItems({ productId: item.id, cartId: cart.id, status: item.status }, { amount: item.amount + same_item.amount, quantity: item.quantity + same_item.quantity })
+                        await this.cartItemRepository.updateItems({ productId: item.id, cartId: cart.id, status: "cooking" }, { amount: item.price * item.quantity*1.0 + same_item.amount, quantity: item.quantity + same_item.quantity })
                     }
-                    amount_items += item.amount
+                    amount_items += item.price * item.quantity*1.0
                 })
             )
 
-            await this.cartRepository.update(Number(cart.id), { amount: amount_items, total: amount_items })
+            await this.cartRepository.update(Number(cart.id), { amount: amount_items*1.0, total: amount_items*1.0 })
             const cart_new = await this.cartRepository.getCartTable(table_id)
-            res.send(cart_new)
+            this.getCartItemInternal(req, res, next, cart.id)
         }
         catch (err) {
             console.log(err);
             next(err);
+        }
+    }
+
+    public async createOrder(req: Request, res: Response, next: NextFunction) {
+        try{
+            if (req.action = "create:any") {
+                const data = req.body
+                const client = await this.clientRepository.checkExist(data.phone, data.email)
+                var cart: any
+                var new_client: any
+                if (client.length == 0) {
+                    new_client = await this.clientRepository.create({...data, createAt: new Date(), updateAt: new Date()})
+                    cart = await this.cartRepository.create({total: 0, amount: 0, clientId: new_client.id})
+                }
+                else {
+                    new_client = client[0]
+                    cart = await this.cartRepository.getCart(new_client.id)
+                }
+                
+            }
+            else {
+                throw new UnauthorizedError()
+            }
+        }
+        catch{
+
         }
     }
 }
