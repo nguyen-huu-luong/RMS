@@ -54,7 +54,16 @@ module.exports = {
         type: Sequelize.STRING
       },
       profit: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
+      total_items: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
+      average: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
       },
       createdAt: {
         allowNull: false,
