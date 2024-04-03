@@ -89,10 +89,22 @@ module.exports = {
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
+        ];
+        let user_carts = [];
 
-        ]
+        for (let i = 1; i <= 10; i++) {
+            let cart = {
+                clientId: i,
+                total: 0,
+                amount: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+            user_carts.push(cart);
+        }
 
         await queryInterface.bulkInsert("Carts", carts);
+        await queryInterface.bulkInsert("Carts", user_carts);
     },
 
     down: async (queryInterface, Sequelize) => {

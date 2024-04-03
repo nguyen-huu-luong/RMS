@@ -17,7 +17,8 @@ import {
 	Category,
 	Voucher,
 	Channel,
-	Message
+	Message,
+	Notification
 } from ".";
 import ClickEvent from "./ClickEvent";
 import OpenEvent from "./OpenEvent";
@@ -45,6 +46,7 @@ class Association {
 			Message.associate();
 			OpenEvent.associate();
 			ClickEvent.associate();
+			Notification.associate();
 		} catch (err) {
 			console.log("Initialize association failed!");
 			console.log(`Err: ${err}`);

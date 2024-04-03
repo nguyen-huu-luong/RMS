@@ -14,11 +14,12 @@ import { useState, useEffect } from "react";
 import { Descriptions, Space, Table } from "antd";
 import moneyFormatter from "@/components/function/moneyFormatter";
 import Loading from "@/components/loading";
+import fetchClient from "@/lib/fetch-client";
 export default function Page({ params }: { params: { id: string } }) {
     const locale = useLocale();
     const { data: session, status } = useSession();
     const router = useRouter();
-    const t = useTranslations('Profile')
+    const t = useTranslations("Profile");
     useEffect(() => {
         if (status === "loading") return;
         if (status === "unauthenticated") {
@@ -29,35 +30,29 @@ export default function Page({ params }: { params: { id: string } }) {
         data: order,
         error: orderErrors,
         isLoading: orderLoading,
-    } = useSWR(
-        session
-            ? [
-                  `http://localhost:3003/api/orders/${params.id}`,
-                  session.user.accessToken,
-              ]
-            : null,
-        ([url, token]) => orderFetcher(url, token)
+    } = useSWR(`/orders/${params.id}`, (url) =>
+        fetchClient({ url: url, data_return: true })
     );
     const columns = [
         {
-            title: t('Name'),
+            title: t("Name"),
             dataIndex: "name",
             key: "name",
         },
         {
-            title: t('Quantity'),
+            title: t("Quantity"),
             dataIndex: "OrderItem",
             key: "quantity",
             render: (record: any) => <span>{record.quantity}</span>,
         },
         {
-            title: t('Price'),
+            title: t("Price"),
             dataIndex: "price",
             key: "price",
             render: (record: any) => <span>{moneyFormatter(record)}</span>,
         },
         {
-            title: t('Amount'),
+            title: t("Amount"),
             dataIndex: "OrderItem",
             key: "amount",
             render: (record: any) => (
@@ -71,51 +66,52 @@ export default function Page({ params }: { params: { id: string } }) {
     return (
         <>
             <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl py-2 px-3'>
-                <Link href={"/myorder"}>{t('Manage')}</Link> / {t('Order')} {params.id}
+                <Link href={"/myorder"}>{t("Manage")}</Link> / {t("Order")}{" "}
+                {params.id}
             </div>
             <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl flex flex-col gap-2 p-3'>
                 <Descriptions title='Overview'>
                     <Descriptions.Item label='Id'>
                         {order.order.id}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('Date')}>
+                    <Descriptions.Item label={t("Date")}>
                         {moment(order.order.createdAt).format("L")}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('Status')}>
+                    <Descriptions.Item label={t("Status")}>
                         {order.order.status}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('Ship')}>
+                    <Descriptions.Item label={t("Ship")}>
                         {order.order.shippingCost}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('Amount')}>
+                    <Descriptions.Item label={t("Amount")}>
                         {order.order.amount}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('Remain')}>
+                    <Descriptions.Item label={t("Remain")}>
                         {order.order.paymentMethod == "CASH"
                             ? order.order.amount
                             : 0}
                     </Descriptions.Item>
                 </Descriptions>
-                <Descriptions title={t('Detail')}>
-                    <Descriptions.Item label={t('Address')}>
+                <Descriptions title={t("Detail")}>
+                    <Descriptions.Item label={t("Address")}>
                         {order.order.shippingAddress
                             ? order.order.shippingAddress
-                            : t('Take')}
+                            : t("Take")}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('Pay')}>
+                    <Descriptions.Item label={t("Pay")}>
                         {order.order.paymentMethod}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('Receiver')}>
+                    <Descriptions.Item label={t("Receiver")}>
                         {session?.user.firstname + " " + session?.user.lastname}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('Phone')}>
+                    <Descriptions.Item label={t("Phone")}>
                         {session?.user.phone}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t('Note')}>
+                    <Descriptions.Item label={t("Note")}>
                         {order.order.descriptions}
                     </Descriptions.Item>
                 </Descriptions>
-                <Descriptions title={t('Item')}></Descriptions>
+                <Descriptions title={t("Item")}></Descriptions>
                 <Table
                     columns={columns}
                     dataSource={order.items}

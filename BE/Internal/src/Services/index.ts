@@ -13,4 +13,5 @@ export * from './Employee.service'
 export * from './Table.service'
 export * from './Reservation.service'
 export * from './Floor.service'
+export * from './Notification.service'
 

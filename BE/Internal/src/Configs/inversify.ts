@@ -20,7 +20,9 @@ import {
 	ITableReservationRepository,
 	IReservationRepository,
 	ICartItemRepository,
-	CartItemRepository
+	CartItemRepository,
+	INotificationRepository,
+	NotificationRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -84,6 +86,7 @@ class InversifyContainer {
 
 		this.container.bind<IOpenEventrRepository>(TYPES.IOpenEventRepository).to(OpenEventRepository);
 		this.container.bind<IClickEventRepository>(TYPES.IClickEventRepository).to(ClickEventRepository);
+		this.container.bind<INotificationRepository>(TYPES.INotificationRepository).to(NotificationRepository)
 	}
 }
 

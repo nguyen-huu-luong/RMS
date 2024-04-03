@@ -17,7 +17,6 @@ const bgClasses: string[] = colors.map((color) => `bg-${color}-500`);
 function Column({
     name,
     items,
-    token,
     refetch,
     orders,
     doneItems,
@@ -27,7 +26,6 @@ function Column({
 }: {
     name: string;
     items: any;
-    token: any;
     refetch: any;
     orders: any;
     doneItems: any;
@@ -51,7 +49,6 @@ function Column({
                         color={
                             bgClasses[item.OrderItem.orderId % bgClasses.length]
                         }
-                        token={token}
                         refetch={refetch}
                         orders={orders}
                         doneItems={doneItems}
