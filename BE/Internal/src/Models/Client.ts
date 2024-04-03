@@ -209,6 +209,15 @@ Client.init(
 		},
 		profit: {
 			type: DataTypes.INTEGER,
+			defaultValue: 0,
+		},
+		average: {
+			type: DataTypes.INTEGER,
+			defaultValue: 0,
+		},
+		total_items: {
+			type: DataTypes.INTEGER,
+			defaultValue: 0,
 		},
 	},
 	{ sequelize: Loader.sequelize }
