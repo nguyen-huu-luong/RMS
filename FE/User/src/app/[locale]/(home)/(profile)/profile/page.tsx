@@ -22,6 +22,7 @@ import {
 import type { UploadProps } from "antd";
 import useSWR from "swr";
 import moment from "moment";
+import fetchClient from "@/lib/fetch-client";
 
 type FieldType = {
     firstname?: string;
@@ -43,8 +44,8 @@ const Profile = () => {
         error: profileError,
         isLoading: profileLoading,
         mutate,
-    } = useSWR(session ? [session.user.accessToken] : null, ([token]) =>
-        getProfile(token)
+    } = useSWR(`/customers`, (url) =>
+        fetchClient({ url: url, data_return: true })
     );
 
     const handleUpload = async ({
@@ -56,8 +57,7 @@ const Profile = () => {
     }) => {
         const data = await uploadImage(file);
         onSuccess("ok");
-        const upload = await updateImage(data.url);
-        mutate();
+        await updateImage(data.url);
     };
 
     const props: UploadProps = {
@@ -73,13 +73,22 @@ const Profile = () => {
     };
 
     const updateImage = async (url: string) => {
-        return await editProfile(session?.user.accessToken, {
-            avatar: url,
+        await fetchClient({
+            url: `/customers`,
+            method: "PUT",
+            body: {
+                avatar: url,
+            },
         });
+        mutate();
     };
 
     const updateInformation = async (data: any) => {
-        return await editProfile(session?.user.accessToken, data);
+        await fetchClient({
+            url: `/customers`,
+            method: "PUT",
+            body: data,
+        });
     };
 
     const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
@@ -87,8 +96,6 @@ const Profile = () => {
         mutate();
         setLoading(false);
         setEdit(true);
-        console.log("Success:", values);
-        form.resetFields()
     };
 
     const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -136,7 +143,6 @@ const Profile = () => {
                         onFinish={onFinish}
                         onFinishFailed={onFinishFailed}
                         disabled={edit}
-
                     >
                         <Form.Item
                             label='First Name'
@@ -174,7 +180,6 @@ const Profile = () => {
                         <Form.Item
                             label='Phone'
                             initialValue={profile.phone}
-
                             name='phone'
                             rules={[
                                 {
@@ -182,14 +187,17 @@ const Profile = () => {
                                     max: 11,
                                     message: "Invalid phone number!",
                                 },
-                                
                             ]}
                         >
                             <Input />
                         </Form.Item>
                         <Form.Item
                             label='Birthday'
-                            initialValue={profile.birthday ? moment(profile.birthday) : null}
+                            initialValue={
+                                profile.birthday
+                                    ? moment(profile.birthday)
+                                    : null
+                            }
                             name='birthday'
                         >
                             <DatePicker />
@@ -208,15 +216,30 @@ const Profile = () => {
                     <div className='w-full flex flex-row justify-end gap-2 pb-5'>
                         {!edit ? (
                             <>
-                                <Button onClick={() => {setLoading(true); form.submit()}} loading={loading}>
+                                <Button
+                                    onClick={() => {
+                                        setLoading(true);
+                                        form.submit();
+                                    }}
+                                    loading={loading}
+                                >
                                     Save
                                 </Button>
-                                <Button onClick={() => {setEdit(true); form.resetFields()}}>
+                                <Button
+                                    onClick={() => {
+                                        setEdit(true);
+                                        form.resetFields();
+                                    }}
+                                >
                                     Cancel
                                 </Button>
                             </>
                         ) : (
-                            <Button onClick={() => {setEdit(false);}}>
+                            <Button
+                                onClick={() => {
+                                    setEdit(false);
+                                }}
+                            >
                                 Edit information
                             </Button>
                         )}

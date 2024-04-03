@@ -476,7 +476,7 @@ const Order: React.FC = () => {
                                         },
                                         okText: "Accept",
                                         onOk: () => {
-                                            handleAcceptOrder(record.id);
+                                            handleAcceptOrder(record);
                                         },
                                         footer: (_, { OkBtn, CancelBtn }) => (
                                             <>
@@ -502,7 +502,7 @@ const Order: React.FC = () => {
                                         },
                                         okText: "Reject",
                                         onOk: () =>
-                                            handleRejectOrder(record.id),
+                                            handleRejectOrder(record),
                                         footer: (_, { OkBtn, CancelBtn }) => (
                                             <>
                                                 <CancelBtn />
@@ -531,7 +531,7 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: "Deliver",
-                                    onOk: () => handleDeliverOrder(record.id),
+                                    onOk: () => handleDeliverOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
                                             <CancelBtn />
@@ -594,6 +594,7 @@ const Order: React.FC = () => {
                     order: firstSorter?.order || prev.sorter?.order,
                 },
             }));
+            fetchData()
         } else {
             setTableParams((prev) => ({
                 pagination,
@@ -603,6 +604,7 @@ const Order: React.FC = () => {
                     order: sorter?.order || prev.sorter?.order,
                 },
             }));
+            fetchData()
         }
     };
 
@@ -633,40 +635,72 @@ const Order: React.FC = () => {
         setError({ isError: false, title: "", message: "" });
     };
 
-    const handleAcceptOrder = async (orderId: number) => {
+    const handleAcceptOrder = async (order: any) => {
         await fetchClient({
             url: `/orders/admin`,
             method: "PUT",
-            body: { orderId: orderId, status: "Preparing" },
+            body: { orderId: order.id, status: "Preparing" },
         });
-        if (socket) socket.emit("staff:order:prepare", orderId);
+        await fetchClient({
+            url: `/notifications/${order.clientId}`,
+            method: "POSt",
+            body: { status: false, orderStatus: `${order.id}-1` },
+        });
+        if (socket) {
+            socket.emit("staff:order:prepare", order.id);
+            socket.emit("staff:notifications:prepare", order.clientId, order.id);
+        }
         fetchData();
     };
 
-    const handleDeliverOrder = async (orderId: number) => {
+    const handleDeliverOrder = async (order: any) => {
         await fetchClient({
             url: `/orders/admin`,
             method: "PUT",
-            body: { orderId: orderId, status: "Delivering" },
+            body: { orderId: order.id, status: "Delivering" },
         });
+        await fetchClient({
+            url: `/notifications/${order.clientId}`,
+            method: "POSt",
+            body: { status: false, orderStatus: `${order.id}-2` },
+        });
+        if (socket) {
+            socket.emit("staff:notifications:deliver", order.clientId, order.id);
+        }
         fetchData();
     };
 
-    const handleDoneOrder = async (orderId: number) => {
+    const handleDoneOrder = async (order: any) => {
         await fetchClient({
             url: `/orders/admin`,
             method: "PUT",
-            body: { orderId: orderId, status: "Done" },
+            body: { orderId: order.id, status: "Done" },
         });
+        await fetchClient({
+            url: `/notifications/${order.clientId}`,
+            method: "POSt",
+            body: { status: false, orderStatus: `${order.id}-3` },
+        });
+        if (socket) {
+            socket.emit("staff:notifications:done", order.clientId, order.id);
+        }
         fetchData();
     };
 
-    const handleRejectOrder = async (orderId: number) => {
+    const handleRejectOrder = async (order: any) => {
         await fetchClient({
             url: `/orders/admin`,
             method: "PUT",
-            body: { orderId: orderId, status: "Cabcel" },
+            body: { orderId: order.id, status: "Cancel" },
         });
+        await fetchClient({
+            url: `/notifications/${order.clientId}`,
+            method: "POSt",
+            body: { status: false, orderStatus: `${order.id}-0` },
+        });
+        if (socket) {
+            socket.emit("staff:notifications:reject", order.clientId, order.id);
+        }
         fetchData();
     };
 

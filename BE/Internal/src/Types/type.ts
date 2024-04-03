@@ -23,7 +23,7 @@ const TYPES = {
     ICartItemRepository: Symbol.for("ICartItemRepository"),
     IClickEventRepository: Symbol.for("IClickEventREpository"),
     IOpenEventRepository: Symbol.for("IOpenEventRepository"),
-
+    INotificationRepository: Symbol.for("INotificationRepository"),
 };
 
 type FilterCondition = {

@@ -25,6 +25,8 @@ module.exports = {
             { role: 'user', resource: 'messages', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'notifications', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'notifications', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
 
             { role: 'employee', resource: 'customers', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'customers', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
@@ -71,6 +73,7 @@ module.exports = {
             { role: 'employee', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'channels', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
 
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
@@ -135,11 +138,14 @@ module.exports = {
             { role: 'manager', resource: 'messages', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
 
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
             { role: 'chef', resource: 'orders', action: 'update:any', attributes: 'status', createdAt: d, updatedAt: d },
             { role: 'chef', resource: 'orders', action: 'read:any', attributes: 'order.items', createdAt: d, updatedAt: d },
+            { role: 'chef', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+
             // Thêm dữ liệu cho các role khác tương tự ở đây
         ], {});
     },
