@@ -45,12 +45,21 @@ function User({
             message: string,
             clientId: string
         ) => {
+            console.log(channelId, "*", message, "*", clientId)
             if (channelId == params.channel.id) {
                 setChannels((prevChannels: any) => {
                     if (!prevChannels) return;
+                    console.log(prevChannels)
                     const updatedChannels = prevChannels.channel.map(
                         (channel: any) => {
                             if (channel.channel.id === channelId) {
+                                console.log({
+                                    content: message,
+                                    createdAt: new Date(),
+                                    employeeId: null,
+                                    clientId: clientId,
+                                    status: "Not seen",
+                                })
                                 return {
                                     ...channel,
                                     latestMessage: {
@@ -179,7 +188,7 @@ function User({
             console.log(e);
         }
     };
-    return (
+    return params.latestMessage ? (
         <div
             onClick={() => {
                 handleJoinRoom();
@@ -193,11 +202,12 @@ function User({
         >
             <div className='Avatar flex-none rounded-full border-2 w-16 h-16 border-primary border-opacity-20 overflow-hidden'>
                 <Image
-                    src={"/abc"}
+                    src={params.userAvatar?params.userAvatar:"/abc"}
                     alt='User avatar'
                     width={16}
                     height={16}
-                    className='h-full w-full min-w-fit'
+                    className='h-full aspect-square w-full min-w-fit'
+                    unoptimized
                 />
             </div>
             <div
@@ -212,8 +222,7 @@ function User({
                             : ""
                     }`}
                 >
-                    {" "}
-                    {params.latestMessage.clientId ? params.userName + ":" : ""}
+                    {params.latestMessage.clientId ? "" : "You:"}
                     {params.latestMessage.content}
                 </div>
                 <div> </div>
@@ -224,6 +233,39 @@ function User({
                 <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'>
                     {TimeDisplay(params.latestMessage.createdAt)}
                 </div>
+            )}
+        </div>
+    ) : (
+        <div
+            onClick={() => {
+                handleJoinRoom();
+            }}
+            className={`px-2 w-full ${"hover:bg-slate-50"} h-20 hover:cursor-pointer transition-all duration-300 flex flex-row items-center justify-between gap-2 font-normal`}
+        >
+            <div className='Avatar flex-none rounded-full border-2 w-16 h-16 border-primary border-opacity-20 overflow-hidden'>
+                <Image
+                    src={params.userAvatar?params.userAvatar:"/abc"}
+                    alt='User avatar'
+                    width={16}
+                    height={16}
+                    className='h-full w-full min-w-fit aspect-square'
+                    unoptimized
+
+                />
+            </div>
+            <div
+                className={`body text-sm flex flex-col justify-between items-start w-full`}
+            >
+                <div className='w-full font-bold'>{params.userName}</div>
+                <div
+                    className={`w-40 overflow-ellipsis whitespace-nowrap overflow-hidden `}
+                ></div>
+                <div> </div>
+            </div>
+            {params.channel.id in channelStatus ? (
+                <Tag color='#87d068'>Active</Tag>
+            ) : (
+                <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'></div>
             )}
         </div>
     );

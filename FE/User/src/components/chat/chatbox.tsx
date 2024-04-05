@@ -28,6 +28,7 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
             });
             if (index == 1) {
                 setData(fetchedData);
+                console.log(fetchedData)
             } else {
                 setData((prevData: any) => ({
                     ...prevData,

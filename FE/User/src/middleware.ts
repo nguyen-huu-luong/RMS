@@ -23,7 +23,10 @@ import {locales} from './config';
 const publicPages = [
   '/',
   '/signin',
-  '/register'
+  '/register',
+  '/anochat',
+  '/about',
+  '/news'
 ];
 
 const intlMiddleware = createIntlMiddleware({

@@ -102,9 +102,19 @@ module.exports = {
             };
             user_carts.push(cart);
         }
-
+        let channels = [];
+        for (let i = 1; i <= 10; i++) {
+            let cart = {
+                clientId: i,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+            channels.push(cart);
+        }
         await queryInterface.bulkInsert("Carts", carts);
         await queryInterface.bulkInsert("Carts", user_carts);
+        await queryInterface.bulkInsert("Channels", channels);
+
     },
 
     down: async (queryInterface, Sequelize) => {
