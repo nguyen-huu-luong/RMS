@@ -10,6 +10,7 @@ import useEmailDataStore from "@/store/email";
 import TextPreview from "./text.preview";
 import { CSSProperties } from "styled-components";
 import ButtonPreview from "./button.preview";
+import ImagePreview from "./image.preview";
 
 interface ITextPreview {
     section: any;
@@ -72,13 +73,26 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
                     />
                 );
             }
-            
+
             case "mj-button": {
                 return (
                     <ButtonPreview
                         section={pSection}
                         index={index}
                         key={tindex}
+                        path={`${path}.children.${tindex}`}
+                    />
+                );
+            }
+
+            case "mj-image": {
+                return (
+                    <ImagePreview
+                        section={pSection}
+                        imageIndex={tindex}
+                        columnIndex={columnIndex}
+                        index={index}
+                        key={index}
                         path={`${path}.children.${tindex}`}
                     />
                 );

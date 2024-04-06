@@ -21,6 +21,8 @@ const TYPES = {
     IReservationRepository: Symbol.for("IReservationRepository"),
     ITableReservationRepository: Symbol.for("ITableReservationRepository"),
     ICartItemRepository: Symbol.for("ICartItemRepository"),
+    IClickEventRepository: Symbol.for("IClickEventREpository"),
+    IOpenEventRepository: Symbol.for("IOpenEventRepository"),
 
 };
 

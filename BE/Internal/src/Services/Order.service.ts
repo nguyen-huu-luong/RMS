@@ -104,7 +104,6 @@ export class OrderService {
             const status: number = HttpStatusCode.Success;
             const { voucherId, ...orderInfor } = req.body;
             if (req.action === "create:own") {
-                console.log(req.userId);
                 const order = await this.orderRepository.create({
                     ...orderInfor,
                     clientId: req.userId,

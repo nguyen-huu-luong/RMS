@@ -8,18 +8,17 @@ import { Pagination, ConfigProvider } from "antd";
 import type { PaginationProps } from "antd";
 import PriceItem from "@/components/Product/price_item";
 import { Modal } from "antd";
-import { Radio, Form, Input } from "antd";
+import { Radio, Form, Input, Button } from "antd";
 import Image from "next/image";
-import { createOrder } from "@/app/api/product/order";
-import { tableFetcher, updateTable, addToCart, updateCart, getCartItems } from "@/app/api/table";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
 import Link from "next-intl/link";
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import fetchClient from "@/lib/fetch-client";
+
 function Home() {
     const params = useParams<{ locale: string; tid: string }>();
     const [items, setItems] = useState<any>([]);
-    const [cart_items, setCartItems] = useState<any>([]);
+    // const [cart_items, setCartItems] = useState<any>([]);
     const [currentCategory, setCurrentCategory] = useState<string>("Pizza");
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
@@ -31,18 +30,9 @@ function Home() {
     const router = useRouter();
 
     const showModal = () => {
-        console.log(items)
         setOpen(true);
     };
 
-    const handleOk = async () => {
-        setConfirmLoading(true);
-        await handlePayOrder();
-        // setTimeout(() => {
-        //     setOpen(false);
-        //     setConfirmLoading(false);
-        // }, 2000);
-    };
 
     const handleUpdateTable = async () => {
         let table_status: string
@@ -53,53 +43,15 @@ function Home() {
             table_status = "Free"
         }
         table.status = table_status
-        await updateTable({ "status": table_status }, table.id, session?.user.accessToken)
+        await fetchClient({ method: "PUT", url: `/tables?id=${table.id}`, body: { "status": table_status } })
         setChecker((current_value) => !current_value)
     }
 
-    const handlePayOrder = async () => {
-        try {
-            await form.validateFields();
-            const formValues = form.getFieldsValue();
-            const payMethod = formValues.paymentMethod;
-            const dataBody = {
-                clientId: 1,
-                status: "Cooking",
-                descriptions: "",
-                shippingAddress: "At restaurant",
-                shippingCost: 0,
-                paymentMethod: formValues.paymentMethod,
-                discountAmount: 0,
-                products: items.map((item: any) => ({
-                    productId: item.id,
-                    quantity: item.quantity,
-                })),
-            };
-            setConfirmLoading(true);
-            const data = await createOrder(
-                session?.user.accessToken,
-                dataBody,
-                formValues.paymentMethod
-            ).then(() => {
-                setConfirmLoading(false);
-                setOpen(false);
-                setItems([]);
-                setFinish(true);
-            });
-        } catch (err) {
-            console.log("Validation failed:", err);
-            setConfirmLoading(false);
-        }
-    };
-
-    const handleCancel = () => {
-        setOpen(false);
-    };
     const {
         data: foods,
         error: foodError,
         isLoading: foodLoading,
-    } = useSWR(`${process.env.BASE_URL}/products/all`, fetcher);
+    } = useSWR([`/products/all`], ([url]) => fetchClient({ url: url, data_return: true }));
     const [category, setCategory] = useState<string>(
         currentCategory !== null ? currentCategory : "Pizza"
     );
@@ -108,45 +60,21 @@ function Home() {
         data: table,
         error: tableError,
         isLoading: tableLoading,
-    } = useSWR(session
-        ? [params.tid, session.user.accessToken,]
-        : null,
-        ([table_id, token]) => tableFetcher(table_id, token));
-
-    useEffect(() => {
-        const url = `${process.env.BASE_URL}/tables/cart/${params.tid}`
-        if (cart_items.length == 0) {
-            fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${session?.user.accessToken}`,
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data)
-                    setCartItems(data)
-                });
-        }
-    }, [session])
-
-    // const {
-    //         data: cart_items,
-    //         error: CartItemsError,
-    //         isLoading: cartItemsLoading,
-    //     } = useSWR(session
-    //         ? [`${process.env.BASE_URL}/tables/cart/${params.tid}`, session.user.accessToken,]
-    //         : null,
-    //         ([url, token]) => getCartItems(url, token));
-
-
+    } = useSWR([params.tid],
+        ([table_id]) => fetchClient({ url: `/tables?id=${table_id}`, data_return: true }));
     const [currentPage, setCurrentPage] = useState(1);
+
+    let {
+        data: cart_items,
+        error: cart_itemsError,
+        isLoading: cart_itemsLoading,
+    } = useSWR([`/tables/cart/${params.tid}`], ([url]) => fetchClient({ url: url, data_return: true }));
 
     const {
         data: categories,
         error: categoryError,
         isLoading: categoryLoading,
-    } = useSWR(`${process.env.BASE_URL}/categories/all`, fetcher);
+    } = useSWR([`/categories/all`], ([url]) => fetchClient({ url: url, data_return: true }));
 
     const onChange: PaginationProps["onChange"] = (page) => {
         setCurrentPage(page);
@@ -166,18 +94,60 @@ function Home() {
         return total;
     };
 
-    const handleOrder = async () => {
-        console.log(items)
-        const data = await updateCart(items, params.tid, session?.user.accessToken)
+    const handleOrder = async (values: any) => {
+        try {
+            let data_body = {
+                "email": values.email,
+                "firstname": values.first_name,
+                "lastname": values.last_name,
+                "pay_method": values.paymentMethod,
+                "phone": values.phone_number
+            }
+            const data_return = await fetchClient({ method: "POST", url: `/tables/order/${params.tid}`, body: data_body, data_return: true })
+            let table_status = "Free"
+            if (data_body.pay_method == "CASH") {
+                table.status = table_status
+                await fetchClient({ method: "PUT", url: `/tables?id=${table.id}`, body: { "status": table_status } })
+                router.push(`/sale/reservations/payment?method=CASH?tid=${params.tid}`);
+            }
+            else {
+                router.push(data_return.payUrl);
+            }
+            setChecker((current_value) => !current_value)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    const addItem = async () => {
+        try {
+            if (table.status == "Free") {
+                table.status = "Occupied"
+                await fetchClient({ method: "PUT", url: `/tables?id=${table.id}`, body: { "status": "Occupied" } })
+            }
+            let data = await fetchClient({ method: "PUT", url: `/tables/cart/${params.tid}`, body: items, data_return: true })
+            cart_items.items = data.items
+            cart_items.products = data.products
+            setItems([])
+            setChecker((current_value) => !current_value)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    const handleCancelOrder = () => {
         setItems([])
-        setCartItems(data)
     }
 
     if (foodError) return <div>Failed to load</div>;
     if (categoryError) return <div>Failed to load</div>;
-    if (foodLoading || categoryLoading) return <div>Loading...</div>;
+    if (foodLoading || categoryLoading || cart_itemsLoading) return <div>Loading...</div>;
     if (status === "loading") return <div>Loading.....</div>;
     if (status === "unauthenticated") router.push("/signin");
+
+
     return (
         <div className="h-full relative">
             {
@@ -194,19 +164,16 @@ function Home() {
                 <Modal
                     title='Make payment'
                     open={open}
-                    onOk={handleOk}
-                    okButtonProps={{
-                        style: { backgroundColor: "#EA6A12", color: "white" },
-                    }}
                     confirmLoading={confirmLoading}
-                    onCancel={handleCancel}
+                    footer={(_, { OkBtn, CancelBtn }) => (<></>)}
+                    onCancel={() => setOpen(false)}
                 >
-                    <Form form={form} layout='vertical'>
+                    <Form form={form} layout='vertical' onFinish={handleOrder}>
                         <Form.Item
-                            name='Name'
+                            name='first_name'
                             label={
                                 <span className='whitespace-nowrap font-bold text-md'>
-                                    Name
+                                    First Name
                                 </span>
                             }
                             rules={[
@@ -219,7 +186,23 @@ function Home() {
                             <Input placeholder='Name' style={{ marginTop: 8 }} />
                         </Form.Item>
                         <Form.Item
-                            name='Phone Number'
+                            name='last_name'
+                            label={
+                                <span className='whitespace-nowrap font-bold text-md'>
+                                    Last Name
+                                </span>
+                            }
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input customer's name!",
+                                },
+                            ]}
+                        >
+                            <Input placeholder='Name' style={{ marginTop: 8 }} />
+                        </Form.Item>
+                        <Form.Item
+                            name='phone_number'
                             label={
                                 <span className='whitespace-nowrap font-bold text-md'>
                                     Phone number
@@ -240,7 +223,7 @@ function Home() {
                         </Form.Item>
 
                         <Form.Item
-                            name='Email'
+                            name='email'
                             label={
                                 <span className='whitespace-nowrap font-bold text-md'>
                                     Email
@@ -302,19 +285,31 @@ function Home() {
                                 </div>
                             </Radio.Group>
                         </Form.Item>
+                        <div >
+                            <Form.Item >
+                                <div className='flex justify-end' style={{ width: "100%" }}>
+                                    <div className='pr-3'>
+                                        <Button style={{ backgroundColor: "#DB3A34", color: "white" }} htmlType='button' onClick={() => setOpen(false)}>Cancel</Button>
+                                    </div>
+                                    <div>
+                                        <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">Confirm</Button>
+                                    </div>
+                                </div>
+                            </Form.Item>
+                        </div>
                     </Form>
                 </Modal>
                 <div className='rounded-xl bg-white basis-1/4 h-full p-5 text-black flex flex-col justify-between'>
                     {!finish ? (
                         <>
-                            {cart_items ? (
+                            {cart_items && cart_items.items?.length != 0 ? (
                                 <>
                                     <div className=' overflow-y-auto' style={{ maxHeight: "200px" }}>
-                                        {cart_items?.items?.map((item: any) => {
+                                        {cart_items.items.map((item: any) => {
                                             return (
                                                 <>
                                                     {
-                                                        item.status == "cooking" ?
+                                                        item.status == "Preparing" ?
                                                             <div
                                                                 key={cart_items.products[item.productId].name}
                                                                 className='duration-300 transition-all ease-in-out w-auto  text-yellow-500'
@@ -335,43 +330,7 @@ function Home() {
                                             );
                                         })}
                                     </div>
-                                    
 
-                                    {items.length != 0 && (
-                                        <div>
-                                            <hr />
-                                            <div className='mt-1 overflow-y-auto' style={{ maxHeight: "170px" }}>
-                                                {items.map((item: any) => {
-                                                    return (
-                                                        <div
-                                                            key={`Food ${item.category} ${item.id}`}
-                                                            className='duration-300 transition-all ease-in-out w-auto'
-                                                        >
-                                                            <PriceItem
-                                                                params={{ food: item }}
-                                                            />
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                            <div className="text-center mt-2" onClick={handleOrder}>
-                                                <button className="bg-menu px-1 py-1 border-t-menu rounded  text-white">Order</button>
-                                            </div>
-                                        </div>
-                                    )}
-
-
-                                    <div className='h-auto flex flex-col gap-2 justify-between'>
-                                        <div className='font-bold text-md py-2 border-t-menu border-t-2'>
-                                            Total: {getTotalAmount()}VNĐ
-                                        </div>
-                                        <div
-                                            onClick={showModal}
-                                            className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-menu hover:bg-orange-400 text-white transition-all duration-300  flex justify-center tex-md font-bold cursor-pointer'
-                                        >
-                                            Make payment
-                                        </div>
-                                    </div>
                                 </>
                             ) : (
                                 <div className='text-black'>
@@ -391,6 +350,46 @@ function Home() {
                             </Link>
                         </>
                     )}
+
+                    {items.length != 0 && (
+                        <div>
+                            <hr />
+                            <div className='mt-1 overflow-y-auto' style={{ maxHeight: "170px" }}>
+                                {items.map((item: any) => {
+                                    return (
+                                        <div
+                                            key={`Food ${item.category} ${item.id}`}
+                                            className='duration-300 transition-all ease-in-out w-auto'
+                                        >
+                                            <PriceItem
+                                                params={{ food: item }}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <div className="text-center mt-2" >
+                                <button className="px-2 py-1 rounded bg-red-600 text-white" onClick={handleCancelOrder}>Cancel</button>
+                                <button className="bg-menu px-1 py-1 border-t-menu rounded  text-white ml-4" onClick={addItem}>Order</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {cart_items && cart_items.items?.length != 0 &&
+                        (<div className='h-auto flex flex-col gap-2 justify-between'>
+                            <div className='font-bold text-md py-2 border-t-menu border-t-2'>
+                                Total: {getTotalAmount()}VNĐ
+                            </div>
+                            <div
+                                onClick={showModal}
+                                className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-menu hover:bg-orange-400 text-white transition-all duration-300  flex justify-center tex-md font-bold cursor-pointer'
+                            >
+                                Make payment
+                            </div>
+                        </div>)
+                    }
+
+
                 </div>
                 <div
                     style={{ backgroundColor: "#FFC789" }}

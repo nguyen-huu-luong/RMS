@@ -27,10 +27,11 @@ export class ClientRepository
 		return await user.save();
 	}
 
-	public async checkExist(phone: string, email: Client) {
+	public async checkExist(phone: string, email: string) {
 		return await this._model.findAll({
 			where: {
-				[Op.or]: [{phone: phone}, {email: email}]
+				phone: phone,
+				email: email
 			}
 		})
 	}

@@ -134,7 +134,7 @@ export class FloorService {
     public async deleteFloor(req: Request, res: Response, next: NextFunction) {
         try {
             if (req.action = "create:any") {
-                const floor_names = req.body.request_body.floor_names;
+                const floor_names = req.body.floor_names;
                 const result = await this.floorRepository.deleteFloor(floor_names)
                 let data = await this.viewAllReservationsPage(req, res, next)
                 res.send(data)

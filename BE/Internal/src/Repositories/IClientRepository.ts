@@ -4,6 +4,6 @@ import { IBaseRepository } from "./IBaseRepository";
 export interface IClientRepository extends IBaseRepository<Client> {
     findByEmail(email : string) : Promise<Client | null> ;
     removeToken(token: string, user: Client): Promise<Client> ;
-    checkExist(phone: string, email: Client): Promise<any> ;
+    checkExist(phone: string, email:string): Promise<any> ;
 }
 

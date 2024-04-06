@@ -4,7 +4,7 @@ import { EditOutlined, EllipsisOutlined, CalendarOutlined, ArrowRightOutlined, U
 import { Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import useSWR from "swr";
-import { customerFetcher, updateCustomerInfo } from "@/app/api/client";
+import fetchClient from "@/lib/fetch-client";
 import { useParams } from 'next/navigation'
 import { useSession } from "next-auth/react";
 
@@ -30,8 +30,7 @@ const CustomerProfile = () => {
         data: customerInfo,
         error: customerInfoError,
         isLoading: customerInfoLoading
-    } = useSWR(
-        session ? [params.cid, session.user.accessToken] : null, ([customerId, token]) => customerFetcher(customerId, token));
+    } = useSWR( [params.cid], ([customerId]) => fetchClient({url: `/customers/${customerId}`, data_return: true}));
 
     let userInfo: any
 
@@ -92,7 +91,7 @@ const CustomerProfile = () => {
                 "firstname": first_name,
                 "lastname": last_name.trim()
             }
-            await updateCustomerInfo(data, params.cid, session?.user.accessToken)
+            await fetchClient({method: "PUT",url: `/customers/${params.cid}`, body: data,data_return: true})
 
         }
         setFlag(true)

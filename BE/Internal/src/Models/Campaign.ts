@@ -13,6 +13,8 @@ import Loader from "../Loaders";
 import TargetList from "./Targetlist";
 import CampaignTargetList from "./CampaignTargetList";
 import EmailCampaign from "./EmailCampaign";
+import ClickEvent from "./ClickEvent";
+import OpenEvent from "./OpenEvent";
 
 class Campaign extends Model {
 	public static associate() {
@@ -23,6 +25,20 @@ class Campaign extends Model {
 		});
 
 		Campaign.hasMany(EmailCampaign, {
+			foreignKey: {
+				name: "campaignId",
+                allowNull: false
+			},
+		});
+
+		Campaign.hasMany(ClickEvent, {
+			foreignKey: {
+				name: "campaignId",
+                allowNull: false
+			},
+		});
+
+		Campaign.hasMany(OpenEvent, {
 			foreignKey: {
 				name: "campaignId",
                 allowNull: false
