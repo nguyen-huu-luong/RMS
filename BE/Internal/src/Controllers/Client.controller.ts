@@ -34,7 +34,7 @@ function LogRequests(target: any) {
 				const pos: number = currentTime.indexOf('GMT')
 
 				currentTime = currentTime.substring(0, pos - 1);
-				
+
 				console.log(`${currentTime} | ${method} ${url} ${host}`);
 				// Execute the original method
 				const result = await originalMethod.apply(this, [req, res, next]);
@@ -99,26 +99,26 @@ class ClientController {
 		if (req.action === "read:any") {
 			const queries = { ...req.body, ...req.query };
 			const options: QueryOptions = parseRequesQueries(queries);
-	
+
 			const data = await this.clientService.getAll(options);
-	
+
 			res.send(data);
 		} else {
 			throw new ForbiddenError();
 		}
-		
+
 	}
 
 	public async getCustomerInfo(req: Request, res: Response, next: NextFunction) {
 		if (req.action === "read:any") {
-			const id = req.params["id"]		
+			const id = req.params["id"]
 			const data = await this.clientService.getById(Number(id));
-	
+
 			res.send(data);
 		} else {
 			throw new ForbiddenError();
 		}
-	
+
 	}
 
 	public async createCustomer(req: Request, res: Response, next: NextFunction) {
@@ -127,39 +127,54 @@ class ClientController {
 		// 	throw new ValidationError(errors.array()[0].msg);
 		// }
 		if (req.action === "create:any") {
-			const customerInfo = req.body["data"] ;
+			const customerInfo = req.body["data"];
 			const data = await this.clientService.create(customerInfo);
-	
+
 			res.send(data);
 		} else {
 			throw new ForbiddenError();
 		}
 	}
 
-	
+
 	public async updateCustomer(req: Request, res: Response, next: NextFunction) {
 		if (req.action === "update:any") {
-			const id = req.params["id"] ;
+			const id = req.params["id"];
 			const customerInfo = req.body
 			const data = await this.clientService.update(Number(id), customerInfo);
 			res.send(data);
 		} else {
 			throw new ForbiddenError();
 		}
-	
+
 	}
 
 	// public async search(req: Request, res: Response, next: NextFunction) {}
 	public async delete(req: Request, res: Response, next: NextFunction) {
 		if (req.action === "delete:any") {
-			const id = req.params["id"] ;
+			const id = req.params["id"];
 			const data = await this.clientService.delete(Number(id));
-	
+
 			res.send(data);
 		} else {
 			throw new ForbiddenError();
 		}
-	
+
+	}
+
+	public async getOpporturnityCustomer(req: Request, res: Response, next: NextFunction) {
+		try {
+			if (req.action === "delete:any") {
+				const data = await this.clientService.getOpportunityCustomer();
+
+				res.send(data);
+			} else {
+				throw new ForbiddenError();
+			}
+		}
+		catch (err) {
+			console.log(err)
+		}
 	}
 }
 

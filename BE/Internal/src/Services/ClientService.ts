@@ -3,7 +3,10 @@ import { container } from '../Configs';
 import { QueryOptions, TYPES } from '../Types/type';
 import { IClientRepository } from '../Repositories/IClientRepository';
 import { IOrderRepository } from "../Repositories/IOrderRepository"; 
+import { ICartRepository, IProductRepository } from '../Repositories';
+import { CartItem } from '../Models';
 import { CustomError, RecordNotFoundError } from '../Errors';
+import { Op, where } from 'sequelize';
 
 
 // export interface IClientService {
@@ -21,7 +24,10 @@ export class ClientService {
         private clientRepository = container.get<IClientRepository>(TYPES.IClientRepository),
         private orderRepository = container.get<IOrderRepository>(
             TYPES.IOrderRepository
-        )
+        ),
+        private cartRepository = container.get<ICartRepository>(TYPES.ICartRepository),
+        private productRepository = container.get<IProductRepository>(TYPES.IProductRepository)
+
     ) {}
 
     public async getAll(options?: QueryOptions) {
@@ -73,5 +79,19 @@ export class ClientService {
 
     public async sort(by: string ) {
         return []
+    }
+
+    public getOpportunityCustomer =  async () => {
+        const carts = this.cartRepository.findByCond(
+            {
+                attributes: ['id', 'clientId'],
+                include: {
+                    model: CartItem
+                }
+            }
+        )
+
+        return carts
+
     }
 }

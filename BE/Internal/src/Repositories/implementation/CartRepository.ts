@@ -25,4 +25,15 @@ export class CartRepository
             message.queryError(err);
         }
     }
+
+    public async findByCond(condition: any){
+        try {
+            const cart = await this._model.findOne(
+                condition
+            );
+            return cart;
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
 }
