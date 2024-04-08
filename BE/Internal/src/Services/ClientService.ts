@@ -52,12 +52,9 @@ export class ClientService {
         if (!user) {
             throw new RecordNotFoundError()
         } 
-        let {birthday, gender, ...info} = data
-        birthday = new Date(Date.parse(birthday))
-        gender = Boolean(JSON.parse(gender))
-        let clientInfo = {"birthday": birthday, "gender": gender, ...info}
-        return await this.clientRepository.update(id, clientInfo); 
+        return await this.clientRepository.update(id, data); 
     }
+    
 
     public async delete(id: number) {
         const user = this.clientRepository.findById(id) ;

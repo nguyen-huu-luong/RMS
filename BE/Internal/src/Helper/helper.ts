@@ -4,10 +4,11 @@ function parseRequesQueries(query: any): QueryOptions {
     const queryOptions: QueryOptions = {
         filter: {},
         sort: { by: "", order: "asc" },
-        paginate: { page: 1, pageSize: 10 } // Giá trị mặc định, thay đổi nếu cần
+        paginate: { page: 1, pageSize: 10 }, // Giá trị mặc định, thay đổi nếu cần
+        type: ""
     };
 
-    const { page, pageSize, sort, order, ...filterOptions } = query;
+    const { page, pageSize, sort, order, type, ...filterOptions } = query;
 
     if (sort) {
         queryOptions.sort = { order: order || "asc", by: sort };
@@ -15,6 +16,10 @@ function parseRequesQueries(query: any): QueryOptions {
 
     if (page && pageSize) {
         queryOptions.paginate = { page, pageSize };
+    }
+
+    if (type) {
+        queryOptions.type = type;
     }
 
     console.log(filterOptions)

@@ -5,6 +5,7 @@ import { LeftCircleOutlined, RightCircleOutlined } from "@ant-design/icons";
 import { Modal, Descriptions, message } from "antd";
 import { createStyles } from "antd-style";
 import moment from "moment";
+import fetchClient from "@/lib/fetch-client";
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
     "my-modal-mask": {},
@@ -16,7 +17,6 @@ const useStyle = createStyles(({ token }) => ({
 function Item({
     item,
     color,
-    token,
     refetch,
     orders,
     doneItems,
@@ -26,7 +26,6 @@ function Item({
 }: {
     item: any;
     color: any;
-    token: any;
     refetch: any;
     orders: any;
     doneItems: any;
@@ -65,23 +64,23 @@ function Item({
         (order: any) => order.orderId === item.OrderItem.orderId
     );
     const updateStatus = async () => {
-        const res = await updateItemsStatus(
-            "http://localhost:3003/api/orders/chef",
-            {
+        const res = await fetchClient({
+            url: "/orders/chef",
+            method: "PUT",
+            body: {
                 orderId: item.OrderItem.orderId,
                 productId: item.OrderItem.productId,
                 dish_status:
                     item.OrderItem.status === "Preparing" ? "Cooking" : "Ready",
             },
-            token
-        );
+        });
         refetch(
             item.OrderItem.orderId +
                 " " +
                 item.OrderItem.productId +
                 (item.OrderItem.status === "Preparing" ? "Cooking" : "Ready")
         );
-        if (res == "Update Order") {
+        if (res.data == "Update Order") {
             message.success(`Finish order #${item.OrderItem.orderId}`);
             socket.emit("chef:order:finish", item.OrderItem.orderId);
         }

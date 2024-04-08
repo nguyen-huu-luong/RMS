@@ -4,50 +4,42 @@ import TimeStamp from "./timestamp";
 import Message from "./message";
 import Status from "./status";
 import styles from "@/app/styles.module.css";
-import {
-    messageFetcher,
-    sendMessage,
-    seenMessage,
-} from "@/app/api/chat/message";
-import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import moment from "moment";
-import { io } from "socket.io-client";
+import useSocket from "@/socket";
+import fetchClient from "@/lib/fetch-client";
+import Loading from "../loading";
 
-let socket: any;
 const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
-    const [socket, setSocket] = useState<any>(null);
+    const socket = useSocket();
     const [inputFocused, setInputFocused] = useState(false);
     const [data, setData] = useState<any>(null);
     const [index, setIndex] = useState<number>(1);
-    const locale = useLocale();
     const { data: session, status } = useSession();
     const [value, setValue] = useState("");
     const router = useRouter();
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
-            if (session?.user.accessToken) {
-                const fetchedData = await messageFetcher(
-                    `http://localhost:3003/api/channels/messages`,
-                    session?.user.accessToken,
-                    !index ? 1 : index
-                );
-                if (index == 1) {
-                    setData(fetchedData);
-                } else {
-                    setData((prevData: any) => ({
-                        ...prevData,
-                        message: [...fetchedData.message, ...prevData.message],
-                    }));
-                    scrollToTop();
-                }
+            const fetchedData = await fetchClient({
+                url: `/channels/messages?index=${!index ? 1 : index}`,
+                data_return: true,
+            });
+            if (index == 1) {
+                setData(fetchedData);
+            } else {
+                setData((prevData: any) => ({
+                    ...prevData,
+                    message: [...fetchedData.message, ...prevData.message],
+                }));
+                scrollToTop();
             }
         } catch (error) {
             console.error("Failed to fetch data:", error);
         }
-    };
+    }, [status, index]);
+
     const scrollToBottom = () => {
         const messageBody = document.getElementById("messageBody");
         messageBody?.scrollTo({
@@ -55,7 +47,7 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
             behavior: "smooth",
         });
     };
-    const [isLoading, setIsLoading] = useState(false);
+
     const scrollToTop = () => {
         const messageBody = document.getElementById("messageBody");
         messageBody?.scrollTo({ top: 20, behavior: "smooth" });
@@ -67,22 +59,12 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
         if (status === "loading") return;
         if (status === "unauthenticated") router.push("/signin");
         fetchData();
-    }, [status]);
+    }, [status, index]);
 
     useEffect(() => {
-        if (!session?.user.accessToken) {
-            return;
-        }
-        const socketClient = io("http://localhost:3003", {
-            auth: {
-                token: session?.user.accessToken,
-            },
-        });
-        socketClient.on("connect", () => {
-            setSocket(socketClient);
-            console.log("Connected to socket server");
-        });
+        if (!socket) return;
         const handleNewMessage = (
+            channelId: string,
             message: string,
             employeeId: string
         ) => {
@@ -102,7 +84,8 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
         };
 
         const handleSeenMessage = (channelId: any) => {
-            if (!data || !data.message || data.message.length === 0) {
+            console.log(data);
+            if (!data) {
                 return;
             }
             const newData = { ...data };
@@ -113,20 +96,16 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
             }
         };
 
-        socketClient.on("message:send:fromStaff", handleNewMessage);
-        socketClient.on("message:read:fromStaff", handleSeenMessage);
-        socketClient.on("connect_error", (error: any) => {
+        socket.on("message:send:fromStaff", handleNewMessage);
+        socket.on("message:read:fromStaff", handleSeenMessage);
+        socket.on("connect_error", (error: any) => {
             console.log(error);
         });
-        socketClient.on("disconnect", () => {
-            console.log("Disconnected from socket server");
-        });
         return () => {
-            socketClient.off("message:send:fromStaff", handleNewMessage);
-            socketClient.off("message:read:fromStaff", handleSeenMessage);
-            socketClient.disconnect();
+            socket.off("message:send:fromStaff", handleNewMessage);
+            socket.off("message:read:fromStaff", handleSeenMessage);
         };
-    }, [session?.user.accessToken]);
+    }, [socket]);
 
     const handleFocus = () => {
         viewMessage();
@@ -139,38 +118,49 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
 
     const send = async (e: any) => {
         e.preventDefault();
-        await sendMessage(session?.user.accessToken, {
-            content: value,
-            status: "Not seen",
-        });
-        setValue("");
-        setData((prevData: any) => ({
-            ...prevData,
-            message: [
-                ...prevData.message,
-                {
-                    content: value,
-                    createdAt: new Date(),
-                    clientId: session?.user.id,
-                    status: "Not seen",
-                },
-            ],
-        }));
-        socket.emit(
-            "client:message:send",
-            data.channel,
-            value,
-            session?.user.id
-        );
-        scrollToBottom();
+        try {
+            if (value != "") {
+                e.preventDefault();
+                await fetchClient({
+                    url: `/channels`,
+                    method: "POST",
+                    body: {
+                        content: value,
+                        status: "Not seen",
+                    },
+                });
+                setValue("");
+                setData((prevData: any) => ({
+                    ...prevData,
+                    message: [
+                        ...prevData.message,
+                        {
+                            content: value,
+                            createdAt: new Date(),
+                            clientId: session?.user.id,
+                            status: "Not seen",
+                        },
+                    ],
+                }));
+                socket.emit(
+                    "client:message:send",
+                    data.channel,
+                    value,
+                    session?.user.id
+                );
+                scrollToBottom();
+            }
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
     };
     const viewMessage = async () => {
-        await seenMessage(session?.user.accessToken);
+        await fetchClient({ url: `/channels`, method: "put", body: {} });
         socket.emit("client:message:read", data.channel);
         setValue("");
         scrollToBottom();
     };
-    if (!data) return <div>Loading...</div>;
+    if (!data) return;
     return (
         <div
             id='chat-popup'

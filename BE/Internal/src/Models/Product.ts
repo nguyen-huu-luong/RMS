@@ -47,7 +47,7 @@ Product.init(
 			allowNull: false,
 		},
 		thumbnails: {
-			type: DataTypes.BLOB,
+			type: DataTypes.STRING,
 			allowNull: true,
 		},
 	},

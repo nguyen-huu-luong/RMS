@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import moneyFormatter from "../function/moneyFormatter";
 import { cartFetcher } from "@/app/api/product/cart";
 import Loading from "@/components/loading";
+import fetchClient from "@/lib/fetch-client";
 const SideBar = ({
     onPayOrder,
     setAmount,
@@ -22,31 +23,14 @@ const SideBar = ({
 }) => {
     const t = useTranslations("Order");
     const locale = useLocale();
-    // const {
-    //     data: vouchers,
-    //     error: vouchersError,
-    //     isLoading: vouchersLoading,
-    // } = useSWR(
-    //     token ? [`http://localhost:3003/api/vouchers/all`, token] : null,
-    //     ([url, token]) => voucherFetcher(url, token)
-    // );
-    // const {
-    //     data: currentCart,
-    //     error: cartItemsError,
-    //     isLoading: cartItemsLoading,
-    // } = useSWR(
-    //     token ? [`http://localhost:3003/api/carts`, token] : null,
-    //     ([url, token]) => cartFetcher(url, token)
-    // );
     const [currentCart, setCurrentCart] = useState<any>(null);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const cartData = await cartFetcher(
-                    `http://localhost:3003/api/carts`,
-                    token
-                );
-                console.log(cartData);
+                const cartData = await fetchClient({
+                    url: `/carts`,
+                    data_return: true,
+                });
                 setCurrentCart(cartData);
             } catch (error) {
                 console.error("Error fetching cart data:", error);
@@ -62,8 +46,6 @@ const SideBar = ({
         setModal(false);
     };
     const [voucher, setVoucher] = useState<any>(null);
-    // if (cartItemsError) return <div>Failed to load</div>;
-    // if (cartItemsLoading) return <Loading />;
     if (!currentCart) return <Loading />;
     return (
         <div className='w-auto h-auto p-10 rounded-3xl bg-primary-white flex flex-col gap-5 justify-start items-center font-extrabold'>

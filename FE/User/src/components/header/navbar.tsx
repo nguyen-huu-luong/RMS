@@ -20,7 +20,6 @@ import Notification from "./notification/notification";
 const NavBar = () => {
     const locale = useLocale();
     const { data: session, status } = useSession();
-    const router = useRouter();
     const [click, setClick] = useState(false);
     const [search, setSearch] = useState(true);
 
