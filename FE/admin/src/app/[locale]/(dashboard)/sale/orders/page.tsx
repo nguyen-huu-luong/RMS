@@ -12,7 +12,7 @@ import {
     Descriptions,
     Tag,
 } from "antd";
-import type { TableProps, GetProp, TableColumnType } from "antd";
+import { TableProps, GetProp, TableColumnType } from "antd";
 import { variables } from "@/app";
 import {
     SearchOutlined,
@@ -556,7 +556,7 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: "Finish",
-                                    onOk: () => handleDoneOrder(record.id),
+                                    onOk: () => handleDoneOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
                                             <CancelBtn />
