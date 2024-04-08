@@ -1,0 +1,15 @@
+export const adminUser = {
+    username: "manager",
+    email: "mock@gmail.com",
+    phone: "0383303912",
+    firstname: "Manager",
+    lastname: "Manager",
+    role: "manager",
+    gender: 1,
+    birthday: new Date(),
+    hashedPassword: "manager",
+    isActive: true,
+    language: "vi",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+};
