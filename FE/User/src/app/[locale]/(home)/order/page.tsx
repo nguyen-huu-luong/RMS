@@ -51,12 +51,13 @@ export default function Order() {
                 url: `/orders?method=${formValues.paymentMethod}`,
                 method: "POST",
                 body: dataBody,
+                data_return: true
             });
-
             if (payMethod == "CASH") {
                 router.push("/payment?method=CASH");
             } else {
                 localStorage.setItem("orderInfo", "1");
+                console.log(data["payUrl"])
                 router.push(data["payUrl"]);
             }
         } catch (err) {
