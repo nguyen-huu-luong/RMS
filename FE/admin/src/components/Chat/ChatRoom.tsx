@@ -2,10 +2,11 @@ import { SendOutlined } from "@ant-design/icons";
 import TimeStamp from "./Timestamp";
 import Message from "./Message";
 import Status from "./Status";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import moment from "moment";
-import axios from "axios";
 import fetchClient from "@/lib/fetch-client";
+import { Spin } from "antd";
+import Loading from "../loading";
 
 const ChatBox = ({
     channel,
@@ -23,6 +24,22 @@ const ChatBox = ({
     const [value, setValue] = useState("");
     const [data, setData] = useState<any>(null);
     const [inputFocused, setInputFocused] = useState(false);
+    const [action, setAction] = useState<string>("Default");
+    const messageContainerRef = useRef<HTMLDivElement>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [isAllLoaded, setIsAllLoaded] = useState<boolean>(false);
+    const [initial, setInitial] = useState<boolean>(false);
+    // HANDLE SCROLL TO BOTTOM
+    const scrollToBottom = () => {
+        const container = messageContainerRef.current;
+        if (container) {
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: "smooth",
+            });
+        }
+    };
+
     const fetchData = useCallback(async () => {
         try {
             const fetchedData = await fetchClient({
@@ -38,18 +55,33 @@ const ChatBox = ({
                     ...prevData,
                     message: [...fetchedData.message, ...prevData.message],
                 }));
-                scrollToTop();
             }
-            scrollToTop();
+            setIsAllLoaded(fetchedData.isAll);
         } catch (error) {
             console.error("Error fetching messages:", error);
+        } finally {
+            setLoading(false);
+            setInitial(true);
         }
     }, [channel, index]);
 
     useEffect(() => {
         fetchData();
-    }, [fetchData, index]);
+    }, [index, channel]);
 
+    useEffect(() => {
+        setLoading(false)
+        setIsAllLoaded(false)
+        setInitial(false)
+        setValue("")
+        
+        setTimeout(() => scrollToBottom(), 1000)
+    }, [channel]);
+
+    useEffect(() => {
+        
+        setTimeout(() => scrollToBottom(), 1000)
+    }, [channel]);
     useEffect(() => {
         const handleNewMessage = (
             channelId: any,
@@ -70,7 +102,7 @@ const ChatBox = ({
                         },
                     ],
                 }));
-                scrollToBottom();
+                setAction("Scroll");
             }
         };
         const handleSeenMessage = (channelId: any) => {
@@ -94,10 +126,6 @@ const ChatBox = ({
         };
     }, [socket, channel, data]);
 
-    useEffect(() => {
-        scrollToBottom();
-    }, []);
-
     const handleFocus = () => {
         viewMessage();
         setInputFocused(true);
@@ -107,17 +135,8 @@ const ChatBox = ({
         setInputFocused(false);
     };
 
-    const scrollToBottom = () => {
-        const messageBody = document.getElementById("messageBody");
-        messageBody?.scrollTo(0, messageBody.scrollHeight);
-    };
-
-    const scrollToTop = () => {
-        const messageBody = document.getElementById("messageBody");
-        messageBody?.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
     const send = async (e: any) => {
+        if (value == "") return;
         e.preventDefault();
         try {
             await fetchClient({
@@ -143,7 +162,7 @@ const ChatBox = ({
                 ],
             }));
             socket.emit("staff:message:send", data.channel, value, value);
-            scrollToBottom();
+            setAction("Scroll");
         } catch (error) {
             console.error("Error sending message:", error);
         }
@@ -159,9 +178,54 @@ const ChatBox = ({
         setValue("");
         scrollToBottom();
     };
+
+    // HANDLE SCROLL WHEN RECEIVE MESSAGE
+    useEffect(() => {
+        if (action === "Scroll") {
+            scrollToBottom();
+            setAction("Default");
+        }
+    }, [data]);
+
+    // HANDLE SCROLL FOR LOADING MORE
+    const loadMore = () => {
+        console.log("Load more1")
+        if (loading || isAllLoaded) return;
+        setLoading(true);
+        setIndex((prevIndex: number) => prevIndex + 1);
+    };
+
+    const handleScroll = () => {
+        console.log("Load more2")
+        const container = messageContainerRef.current;
+        if (container) {
+            if (container.scrollTop === 0) {
+                loadMore();
+            }
+        }
+    };
+    useEffect(() => {
+        const container = messageContainerRef.current;
+        if (container) {
+            container.addEventListener("scroll", handleScroll);
+            if (loading || isAllLoaded) {
+                const addedContentHeight =
+                    container.scrollHeight - container.clientHeight;
+                container.scrollTo({
+                    top: container.scrollTop + addedContentHeight / 2,
+                    behavior: "smooth",
+                });
+            }
+        }
+        return () => {
+            if (container) {
+                container.removeEventListener("scroll", handleScroll);
+            }
+        };
+    }, [loading, isAllLoaded, initial]);
+
     if (channel === -1) return "Choose customer to chat";
-    if (!data) return "loading";
-    scrollToBottom();
+    if (!data) return <Loading/>;
     return (
         <div
             className={` bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full bottom-5 right-5 z-50`}
@@ -170,12 +234,10 @@ const ChatBox = ({
                 <span>Chat</span>
             </div>
             <div
-                id='messageBody'
+                ref={messageContainerRef}
                 className='body w-full grow font-normal text-sm overflow-auto max-h-full flex flex-col justify-start gap-2 px-2 py-2'
             >
-                <button onClick={() => setIndex((index: any) => index + 1)}>
-                    Load more
-                </button>
+                {loading && <Spin size='default'></Spin>}
                 {data.message.map((item: any, index: number) => {
                     const hasPreviousMessage = index > 0;
                     const currentTime = moment(item.createdAt);

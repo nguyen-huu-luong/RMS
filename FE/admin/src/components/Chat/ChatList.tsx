@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import User from "./User";
 import fetchClient from "@/lib/fetch-client";
+import { fetchData } from "next-auth/client/_utils";
+import Loading from "../loading";
 
 const ChatList = ({
     setChannel,
@@ -24,14 +26,12 @@ const ChatList = ({
                 data_return: true,
             });
             setChannels(fetchedData);
+            console.log(fetchedData)
         } catch (error) {
             console.log(error);
         }
     }, [setChannels, searchParams]);
 
-    useEffect(() => {
-        fetchChannels();
-    }, [fetchChannels]);
     useEffect(() => {
         socket.on("initial:channels", (initialChannels: any) => {
             setChannelStatus(initialChannels);
@@ -39,7 +39,32 @@ const ChatList = ({
         socket.on("channel:status:update", (updatedChannels: any) => {
             setChannelStatus(updatedChannels);
         });
-    }, [socket]);
+        socket.on("anonymous:channel:create", async (channelId: string, userName: string, clientId: string) => {
+            if (channels !== null) {
+                const newChannels = [...channels.channel];
+                const newChannel = {
+                    channel:{
+                        id: channelId,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    },
+                    latestMessage: {
+                        id: userName,
+                        content: "Click to chat",
+                        status: "Not seen",
+                        employeeId: null,
+                        clientId: clientId,
+                        channelId: channelId,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    },
+                    userName: userName
+                }
+                newChannels.push(newChannel)
+                setChannels({channel: newChannels})
+            }
+        });
+    }, [socket, channels]);
     const handleKeyDown = (event: any) => {
         if (event.key === "Enter") {
             setSearchParams(searchTerm);
@@ -48,7 +73,12 @@ const ChatList = ({
     const handleChange = (event: any) => {
         setSearchTerm(event.target.value);
     };
-    if (!channels) return "Loading...";
+
+    useEffect(() => {
+        fetchChannels();
+    }, [fetchChannels]);
+
+    if (!channels) return <Loading/>;
     return (
         <>
             <div

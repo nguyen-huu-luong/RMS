@@ -58,9 +58,12 @@ export class ChannelService {
                 : 1;
             const startIndex = (index - 1) * size;
             const endIndex = startIndex + size;
+            let isAll = endIndex >= message.length;
+
             response = {
                 channel: channel.getDataValue("id"),
                 message: message.slice(startIndex, endIndex).reverse(),
+                isAll: isAll
             };
             Message.logMessage(req, status);
             if (res.headersSent) return;
@@ -185,9 +188,12 @@ export class ChannelService {
                 : 1;
             const startIndex = (index - 1) * size;
             const endIndex = startIndex + size;
+            let isAll = endIndex >= message.length;
+
             response = {
                 channel: channel.getDataValue("id"),
                 message: message.slice(startIndex, endIndex).reverse(),
+                isAll: isAll
             };
             Message.logMessage(req, status);
             if (res.headersSent) return;

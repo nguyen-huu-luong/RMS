@@ -1,7 +1,5 @@
 "use client";
-import TimeStamp from "@/components/chat/timestamp";
 import Message from "@/components/chat/message";
-import Status from "@/components/chat/status";
 import moment from "moment";
 import { SendOutlined } from "@ant-design/icons";
 
@@ -25,6 +23,17 @@ export default function Chat() {
             {
                 id: 2,
                 content: "Our staff will reply to you soon!",
+                status: "Not seen",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                clientId: null,
+                employeeId: 1,
+                channelId: 1,
+            },
+            {
+                id: 3,
+                content:
+                    " We will keep this chat history for better service to you!",
                 status: "Not seen",
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -83,10 +92,7 @@ export default function Chat() {
                         },
                     ],
                 }));
-                socket.emit(
-                    "anonymousclient:message:send",
-                    value,
-                );
+                socket.emit("anonymousclient:message:send", value);
             }
         } catch (error) {
             console.error("Error sending message:", error);
@@ -99,9 +105,7 @@ export default function Chat() {
             <div className='header h-10 w-full text-white bg-primary items-center flex flex-row justify-between p-2 font-bold border-b-white border-b-2'>
                 <span>Live chat</span>
             </div>
-            <div
-                className='body w-full grow font-normal text-sm overflow-auto max-h-full flex flex-col justify-start gap-2 px-2 py-2'
-            >
+            <div className='body w-full grow font-normal text-sm overflow-auto max-h-full flex flex-col justify-start gap-2 px-2 py-2'>
                 {data.message.map((item: any, index: number) => {
                     const hasPreviousMessage = index > 0;
                     const currentTime = moment(item.createdAt);
@@ -116,9 +120,6 @@ export default function Chat() {
                         item.clientId != null;
                     return (
                         <>
-                            {(display || index == 0) && (
-                                <TimeStamp time={item.createdAt} />
-                            )}
                             <Message
                                 params={{
                                     content: item.content,
@@ -127,9 +128,6 @@ export default function Chat() {
                                     time: item.createdAt,
                                 }}
                             />
-                            {lastMessage && (
-                                <Status read={item.status != "Not seen"} />
-                            )}
                         </>
                     );
                 })}

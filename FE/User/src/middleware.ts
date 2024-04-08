@@ -24,7 +24,7 @@ const publicPages = [
   '/',
   '/signin',
   '/register',
-  '/anochat',
+  '/chat',
   '/about',
   '/news'
 ];

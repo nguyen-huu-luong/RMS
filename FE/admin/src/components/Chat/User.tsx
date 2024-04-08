@@ -7,7 +7,7 @@ import axios from "axios";
 import { message } from "antd";
 import { Tag } from "antd";
 import fetchClient from "@/lib/fetch-client";
-
+import Avatar from "@/images/avatar.png"
 const TimeDisplay = (time: any) => {
     const momentDate = moment(time);
     const isToday = momentDate.isSame(moment(), "day");
@@ -45,21 +45,12 @@ function User({
             message: string,
             clientId: string
         ) => {
-            console.log(channelId, "*", message, "*", clientId)
             if (channelId == params.channel.id) {
                 setChannels((prevChannels: any) => {
                     if (!prevChannels) return;
-                    console.log(prevChannels)
                     const updatedChannels = prevChannels.channel.map(
                         (channel: any) => {
                             if (channel.channel.id === channelId) {
-                                console.log({
-                                    content: message,
-                                    createdAt: new Date(),
-                                    employeeId: null,
-                                    clientId: clientId,
-                                    status: "Not seen",
-                                })
                                 return {
                                     ...channel,
                                     latestMessage: {
@@ -202,7 +193,7 @@ function User({
         >
             <div className='Avatar flex-none rounded-full border-2 w-16 h-16 border-primary border-opacity-20 overflow-hidden'>
                 <Image
-                    src={params.userAvatar?params.userAvatar:"/abc"}
+                    src={params.userAvatar?params.userAvatar:Avatar}
                     alt='User avatar'
                     width={16}
                     height={16}
@@ -213,7 +204,7 @@ function User({
             <div
                 className={`body text-sm flex flex-col justify-between items-start w-full`}
             >
-                <div className='w-full font-bold'>{params.userName}</div>
+                <div className='w-40 font-bold overflow-ellipsis whitespace-nowrap overflow-hidden pr-2'>{params.userName}</div>
                 <div
                     className={`w-40 overflow-ellipsis whitespace-nowrap overflow-hidden ${
                         params.latestMessage.status == "Not seen" &&
@@ -222,7 +213,6 @@ function User({
                             : ""
                     }`}
                 >
-                    {params.latestMessage.clientId ? "" : "You:"}
                     {params.latestMessage.content}
                 </div>
                 <div> </div>
