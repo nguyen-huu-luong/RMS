@@ -295,6 +295,18 @@ export class OrderService {
             const { orderId, itemId, stt }: any = req.body;
             if (req.action === "read:any") {
                 const orders = await this.orderRepository.all();
+                const carts = await this.cartRepository.all();
+                const cartWithItems = (await Promise.all(
+                    carts.map(async (cart: any) => {
+                        if (cart.tableId && cart.total > 0) {
+                            const cartItems = await cart.getProducts();
+                            return {
+                                ...cart.toJSON(),
+                                cartItems: cartItems.map((item: any) => item.toJSON()),
+                            };
+                        } else return null;
+                    })
+                )).filter((cart: any) => cart !== null)
                 const ordersWithItems = (await Promise.all(
                     orders.map(async (order: any) => {
                         if (order.status === 'Preparing' || order.status === 'Ready') {
@@ -306,6 +318,7 @@ export class OrderService {
                         } else return null;
                     })
                 )).filter((order: any) => order !== null)
+                console.log(cartWithItems)
                 res.status(status).send(ordersWithItems);
             } else throw new UnauthorizedError();
             Message.logMessage(req, status);
