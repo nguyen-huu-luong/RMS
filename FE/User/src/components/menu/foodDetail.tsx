@@ -64,10 +64,11 @@ const FoodDetail = ({
                         <CloseCircleFilled style={{ fontSize: "1.4rem" }} />
                     </button>
                     <Image
-                        src={'/'}
+                        src={food.thumbnails}
                         alt={food.name}
                         width={300}
                         height={300}
+                        className="aspect-square"
                         unoptimized
                     />
                 </div>

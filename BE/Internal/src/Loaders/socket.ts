@@ -1,26 +1,86 @@
 import { NextFunction } from "express";
-import { Channel } from "../Models";
+import { Channel, Client, Message } from "../Models";
 import { TokenUtil } from "../Utils";
+import type { Socket } from "socket.io";
 class SocketConnection {
     private channels: { [channelId: string]: string } = {};
-
+    private employee: Socket[] = [];
+    private client: string[] = [];
     public async init(io: any) {
         io.use(async (socket: any, next: NextFunction) => {
             try {
                 const token = socket.handshake.auth.token;
-                const decoded = await TokenUtil.verify(token);
-                const { id, role, ...data } = decoded;
-                if (role == "user") {
-                    const channel = await Channel.findOne({
-                        where: { clientId: id },
+                if (!token) {
+                    // Create new client
+                    const customId = socket.handshake.query.customId;
+                    const existClient = await Client.findOne({
+                        where: {
+                            firstname: customId,
+                        },
                     });
-                    socket.join("Channel_" + channel?.dataValues.id);
-                } else if (role == "employee" || role == "manager") {
-                    const channels = await Channel.findAll();
-                    channels.forEach((channel: any) => {
-                        socket.join("Channel_" + channel.dataValues.id);
-                    });
-                    socket.join("Kitchen");
+                    if (existClient && customId) {
+                        socket.join("Channel_" + existClient?.dataValues.id);
+                    } else {
+                        const client = {
+                            firstname: socket.id,
+                            lastname: "User",
+                            isRegistered: true,
+                            isActive: true,
+                            language: "vi",
+                            type: "Anonymous Client",
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        };
+                        const anonymousClient = await Client.create(client);
+                        const anonymousChannel = await Channel.create({
+                            clientId: anonymousClient.getDataValue("id"),
+                        });
+                        socket.join(
+                            "Channel_" + anonymousChannel?.dataValues.id
+                        );
+                        this.employee.map((item: Socket) => {
+                            item.join(
+                                "Channel_" + anonymousChannel?.dataValues.id
+                            );
+                        });
+                        socket
+                            .to("Channel_" + anonymousChannel?.dataValues.id)
+                            .emit(
+                                "anonymous:channel:create",
+                                anonymousChannel?.dataValues.id,
+                                `User ${socket.id}`,
+                                anonymousClient.getDataValue("id")
+                            );
+                    }
+                } else {
+                    const decoded = await TokenUtil.verify(token);
+                    const { id, role, ...data } = decoded;
+                    if (role == "user") {
+                        const channel = await Channel.findOne({
+                            where: { clientId: id },
+                        });
+                        this.client.push(channel?.dataValues.id);
+                        socket.join("Channel_" + channel?.dataValues.id);
+                        socket.join("PrivateChannel_" + id);
+                        this.employee.map((item: Socket) => {
+                            let channelId = "Channel_" + channel?.dataValues.id;
+                            if (!(channelId in item.rooms)) {
+                                item.join("Channel_" + channel?.dataValues.id);
+                            }
+                        });
+                    } else if (
+                        role == "employee" ||
+                        role == "manager" ||
+                        role == "chef"
+                    ) {
+                        const channels = await Channel.findAll();
+                        channels.forEach((channel: any) => {
+                            socket.join("Channel_" + channel.dataValues.id);
+                        });
+                        socket.join("Kitchen");
+                        socket.join("Employee");
+                        this.employee.push(socket);
+                    }
                 }
                 next();
             } catch (error) {
@@ -29,9 +89,9 @@ class SocketConnection {
             }
         });
         io.on("connection", (socket: any) => {
-            socket.emit("initial:channels", this.channels);
+            socket.to("Employee").emit("initial:channels", this.channels);
 
-            //Chat
+            // Chat service
             socket.on(
                 "client:message:send",
                 (channelId: string, message: string, clientId: string) => {
@@ -66,18 +126,9 @@ class SocketConnection {
                     channelId
                 );
             });
-
-            //Kitchen
-            socket.on("chef:order:finish", (orderId: string) => {
-                io.to("Kitchen").emit("order:finish:fromChef", orderId);
-            });
-            socket.on("staff:order:prepare", (orderId: string) => {
-                io.to("Kitchen").emit("order:prepare:fromStaff", orderId);
-            });
             socket.on(
                 "staff:channel:join",
                 (channelId: string, staffId: string, callback: any) => {
-                    console.log(this.channels);
                     if (
                         this.channels[channelId] &&
                         this.channels[channelId] != socket.id
@@ -118,6 +169,88 @@ class SocketConnection {
                     }
                 }
             );
+
+            // Chat service - anonymous client
+            socket.on(
+                "anonymousclient:message:send",
+                async (message: string) => {
+                    const id = socket.handshake.query.customId
+                        ? socket.handshake.query.customId
+                        : socket.id;
+                    const client = await Client.findOne({
+                        where: {
+                            firstname: id,
+                        },
+                    });
+                    const channel = await Channel.findOne({
+                        where: {
+                            clientId: client?.dataValues.id,
+                        },
+                    });
+                    await Message.create({
+                        channelId: channel?.dataValues.id,
+                        clientId: client?.dataValues.id,
+                        content: message,
+                        status: "Not seen",
+                    });
+                    console.log(message, channel?.dataValues.id);
+                    io.to("Channel_" + channel?.dataValues.id).emit(
+                        "message:send:fromClient",
+                        channel?.dataValues.id,
+                        message,
+                        client?.dataValues.id
+                    );
+                }
+            );
+
+            // Kitchen display service
+            socket.on("chef:order:finish", (orderId: string) => {
+                io.to("Kitchen").emit("order:finish:fromChef", orderId);
+            });
+            socket.on("staff:order:prepare", (orderId: string) => {
+                io.to("Kitchen").emit("order:prepare:fromStaff", orderId);
+            });
+
+            //Notification service
+            socket.on(
+                "staff:notifications:prepare",
+                (clientId: string, orderId: string) => {
+                    console.log("Channel_" + clientId);
+                    io.to("PrivateChannel_" + clientId).emit(
+                        "notification:prepare:fromStaff",
+                        orderId
+                    );
+                }
+            );
+            socket.on(
+                "staff:notifications:deliver",
+                (clientId: string, orderId: string) => {
+                    io.to("PrivateChannel_" + clientId).emit(
+                        "notification:deliver:fromStaff",
+                        orderId
+                    );
+                }
+            );
+            socket.on(
+                "staff:notifications:done",
+                (clientId: string, orderId: string) => {
+                    io.to("PrivateChannel_" + clientId).emit(
+                        "notification:done:fromStaff",
+                        orderId
+                    );
+                }
+            );
+            socket.on(
+                "staff:notifications:reject",
+                (clientId: string, orderId: string) => {
+                    io.to("PrivateChannel_" + clientId).emit(
+                        "notification:reject:fromStaff",
+                        orderId
+                    );
+                }
+            );
+
+            // Disconnect
             socket.on("disconnect", () => {
                 Object.keys(this.channels).forEach((channelId) => {
                     if (this.channels[channelId] === socket.id) {
@@ -125,6 +258,29 @@ class SocketConnection {
                         io.emit("channel:status:update", this.channels);
                     }
                 });
+                const index = this.employee.indexOf(socket);
+                if (index !== -1) {
+                    this.employee.splice(index, 1);
+                }
+                setTimeout(async () => {
+                    try {
+                        const client = await Client.findOne({
+                            where: {
+                                firstname: socket.id,
+                            },
+                        });
+                        if (client) {
+                            const message = await Message.findOne({
+                                where: {
+                                    clientId: client.getDataValue("id"),
+                                },
+                            });
+                            if (!message) await client.destroy();
+                        }
+                    } catch (error) {
+                        console.error("Error deleting client:", error);
+                    }
+                }, 1 * 60 * 1000);
             });
         });
     }

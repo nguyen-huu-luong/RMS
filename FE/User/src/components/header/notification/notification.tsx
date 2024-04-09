@@ -2,80 +2,116 @@
 import { useRouter, usePathname } from "next-intl/client";
 import { Popover, Switch } from "antd";
 import { useLocale } from "next-intl";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BellOutlined } from "@ant-design/icons";
 import Item from "@/components/header/notification/item";
+import useSocket from "@/socket";
+import { useSession } from "next-auth/react";
+import fetchClient from "@/lib/fetch-client";
+import useSWR from "swr";
+import moment from "moment";
+import useOutsideClick from "@/hooks/clickOutside";
 const Notification = () => {
-    const router = useRouter();
-    const pathname = usePathname();
-    const [open, setOpen] = useState(false);
+    const socket = useSocket();
+    const [child, setChild] = useState<boolean>(false);
     const hide = () => {
         setOpen(false);
     };
-    const handleOpenChange = (newOpen: boolean) => {
-        setOpen(newOpen);
-    };
-    const sampleItems: any = [
-        {
-            orderId: 1,
-            step: 0,
-            status: true,
-            time: "2024-03-27T13:39:22+07:00",
-        },
-        {
-            orderId: 1,
-            step: 1,
-            status: true,
-            time: "2024-03-27T13:39:22+07:00",
-        },
-        {
-            orderId: 1,
-            step: 2,
-            status: true,
-            time: "2024-03-27T13:39:22+07:00",
-        },
-        {
-            orderId: 1,
-            step: 3,
-            status: false,
-            time: "2024-03-27T13:39:22+07:00",
-        },
-    ];
-    return (
-        <Popover
-            autoAdjustOverflow={true}
-            content={
-                <div className='w-80 max-h-[500px] p-1 overflow-hidden'>
-                    <div className='flex flex-col justify-start gap-1'>
-                        <div className='font-bold text-lg'>Notification</div>
-                        <div className='w-full h-full overflow-y-scroll flex flex-col justify-start gap-1'>
-                            {sampleItems.map((item: any) => {
-                                return (
-                                    <Item
-                                        key={`${item.orderId} ${item.step} ${item.status}`}
-                                        params={item}
-                                    ></Item>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
+
+    const ref = useRef<any>(null);
+
+    useEffect(() => {
+        const handleOutsideClick = (event: any) => {
+            if (!child) {
+                if (!ref.current?.contains(event.target)) {
+                    hide();
+                }
             }
-            trigger='click'
-            open={open}
-            onOpenChange={handleOpenChange}
-        >
-            <div className='relative hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'>
+        };
+        document.addEventListener("mousedown", handleOutsideClick);
+        return () => {
+            document.removeEventListener("mousedown", handleOutsideClick);
+        };
+    }, [ref, child]);
+
+    const [open, setOpen] = useState(false);
+    const {
+        data: notifications,
+        error: notificationsError,
+        isLoading: notificationsLoading,
+        mutate,
+    } = useSWR(`/notifications/all`, (url) =>
+        fetchClient({ url: url, data_return: true })
+    );
+
+    useEffect(() => {
+        if (!socket) return;
+        const handleGetNotification = (orderId: any) => {
+            mutate();
+        };
+
+        socket.on("notification:prepare:fromStaff", handleGetNotification);
+        socket.on("notification:deliver:fromStaff", handleGetNotification);
+        socket.on("notification:done:fromStaff", handleGetNotification);
+        socket.on("notification:reject:fromStaff", handleGetNotification);
+
+        socket.on("connect_error", (error: any) => {
+            console.log(error);
+        });
+        return () => {
+            socket.off("notification:prepare:fromStaff", handleGetNotification);
+            socket.off("notification:deliver:fromStaff", handleGetNotification);
+            socket.off("notification:done:fromStaff", handleGetNotification);
+            socket.off("notification:reject:fromStaff", handleGetNotification);
+        };
+    }, [socket]);
+    if (notificationsLoading) return;
+    if (notificationsError) return;
+    if (!notifications) return;
+    return (
+        <>
+            <div
+                className='relative hover:text-primary cursor-pointer w-auto flex p-2 rounded-full hover:bg-primary-100 transition duration-300 ease-in-out'
+                onClick={() => setOpen(true)}
+            >
                 <BellOutlined
                     style={{
                         fontSize: "1.6rem",
                     }}
                 />
                 <div className='z-50 absolute bottom-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-extralight text-xs'>
-                    12
+                    {
+                        notifications.res.filter(
+                            (item: any) => item.status == false
+                        ).length
+                    }
                 </div>
-            </div>{" "}
-        </Popover>
+            </div>
+            {open && (
+                <div
+                    ref={ref}
+                    className='fixed top-20 right-5 z-50 w-auto h-auto bg-white rounded-md border-2 p-4'
+                >
+                    <div className='font-bold text-xl p-2'>Notification</div>
+                    <div className='w-96 max-h-[500px] p-1 overflow-auto'>
+                        <div className='flex flex-col justify-start gap-1'>
+                            <div className='w-full h-full flex flex-col justify-start gap-1'>
+                                {notifications.res.map((item: any) => {
+                                    if (item.orderStatus)
+                                        return (
+                                            <Item
+                                                key={`${item.orderStatus}`}
+                                                params={item}
+                                                setChild={setChild}
+                                            ></Item>
+                                        );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 

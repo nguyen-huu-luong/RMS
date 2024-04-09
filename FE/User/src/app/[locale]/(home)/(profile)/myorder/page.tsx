@@ -14,6 +14,7 @@ import { FileSearchOutlined, CloseSquareOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { cancelOrder } from "@/app/api/product/order";
 import Loading from "@/components/loading";
+import fetchClient from "@/lib/fetch-client";
 const { RangePicker } = DatePicker;
 
 export default function MyOrder() {
@@ -42,12 +43,12 @@ export default function MyOrder() {
                 moment(a.createdAt).unix() - moment(b.createdAt).unix(),
         },
         {
-            title:  t("Status"),
+            title: t("Status"),
             dataIndex: "status",
             key: "status",
         },
         {
-            title:  t("Action"),
+            title: t("Action"),
             key: "action",
             render: (record: any) => (
                 <Space size='middle'>
@@ -76,16 +77,17 @@ export default function MyOrder() {
         data: orders,
         error: ordersErrors,
         isLoading: ordersLoading,
-    } = useSWR(
-        session
-            ? [`http://localhost:3003/api/orders`, session.user.accessToken]
-            : null,
-        ([url, token]) => ordersFetcher(url, token)
+    } = useSWR(`/orders`, (url) =>
+        fetchClient({ url: url, data_return: true })
     );
-    const handleDeleteOrder = (record: any) => {
-        cancelOrder(session?.user.accessToken, {
-            orderId: record.id,
-            status: "Cancel",
+    const handleDeleteOrder = async (record: any) => {
+        await fetchClient({
+            url: `/orders`,
+            method: "PUT",
+            body: {
+                orderId: record.id,
+                status: "Cancel",
+            },
         });
     };
     useEffect(() => {
@@ -102,7 +104,6 @@ export default function MyOrder() {
                 "[]"
             );
         });
-        console.log(filterOrders);
         setFilteredOrders(filteredOrders);
     }, [dateRange, orders]);
     if (ordersErrors) return <div>Failed to load</div>;

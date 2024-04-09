@@ -10,7 +10,7 @@ import { RightCircleFilled } from "@ant-design/icons";
 import { useState } from "react";
 import Loading from "@/components/loading";
 import useSWR from "swr";
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import publicFetcher from "@/lib/public-fetcher";
 export default function Home() {
     const locale = useLocale();
     const t = useTranslations("Home");
@@ -19,12 +19,12 @@ export default function Home() {
         data: food,
         error: foodError,
         isLoading: foodLoading,
-    } = useSWR(`${process.env.BASE_URL}/products/all`, fetcher);
+    } = useSWR(`/products/all`, (url) => publicFetcher({url: url, data_return: true}));
     const {
         data: category,
         error: categoryError,
         isLoading: categoryLoading,
-    } = useSWR(`${process.env.BASE_URL}/categories/all`, fetcher);
+    } = useSWR(`/categories/all`, (url) => publicFetcher({url: url, data_return: true}));
     // Modal for food detail
     const [modal, setModal] = useState<boolean>(false);
     const [detail, setDetail] = useState<{
