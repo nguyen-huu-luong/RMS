@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import User from "./User";
 import fetchClient from "@/lib/fetch-client";
+import { fetchData } from "next-auth/client/_utils";
+import Loading from "../loading";
 
 const ChatList = ({
     setChannel,
@@ -14,32 +16,69 @@ const ChatList = ({
     staffId: any;
 }) => {
     const [channels, setChannels] = useState<any>(null);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [searchParams, setSearchParams] = useState<string>("");
     const [channelStatus, setChannelStatus] = useState<any>({});
     const fetchChannels = useCallback(async () => {
         try {
             const fetchedData = await fetchClient({
-                url: `/channels/admin`,
+                url: `/channels/admin?name=${encodeURI(searchParams)}`,
                 data_return: true,
             });
             setChannels(fetchedData);
+            console.log(fetchedData)
         } catch (error) {
             console.log(error);
         }
-    }, [setChannels]);
+    }, [setChannels, searchParams]);
 
-    useEffect(() => {
-        fetchChannels();
-    }, [fetchChannels]);
     useEffect(() => {
         socket.on("initial:channels", (initialChannels: any) => {
             setChannelStatus(initialChannels);
         });
         socket.on("channel:status:update", (updatedChannels: any) => {
             setChannelStatus(updatedChannels);
-            console.log(updatedChannels);
         });
-    }, [socket]);
-    if (!channels) return "Loading...";
+        socket.on("anonymous:channel:create", async (channelId: string, userName: string, clientId: string) => {
+            if (channels !== null) {
+                const newChannels = [...channels.channel];
+                const newChannel = {
+                    channel:{
+                        id: channelId,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    },
+                    latestMessage: {
+                        id: userName,
+                        content: "Click to chat",
+                        status: "Not seen",
+                        employeeId: null,
+                        clientId: clientId,
+                        channelId: channelId,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    },
+                    userName: userName
+                }
+                newChannels.push(newChannel)
+                setChannels({channel: newChannels})
+            }
+        });
+    }, [socket, channels]);
+    const handleKeyDown = (event: any) => {
+        if (event.key === "Enter") {
+            setSearchParams(searchTerm);
+        }
+    };
+    const handleChange = (event: any) => {
+        setSearchTerm(event.target.value);
+    };
+
+    useEffect(() => {
+        fetchChannels();
+    }, [fetchChannels]);
+
+    if (!channels) return <Loading/>;
     return (
         <>
             <div
@@ -61,9 +100,12 @@ const ChatList = ({
                                         focus:cursor-text focus:border-primary outline-none focus:pr-2
                                         transition-all duration-500 transform w-full z-0
                                         '
-                />{" "}
+                    value={searchTerm}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                />
             </div>
-            <div className='w-80 h-fit flex flex-col justify-start overflow-y-auto'>
+            <div className='w-80 h-full flex flex-col justify-start gap-2 overflow-y-auto'>
                 {channels.channel
                     .sort((a: any, b: any) => {
                         return (
