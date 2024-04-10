@@ -44,3 +44,6 @@ export * from "./implementation/ClientHistoryRepository"
 
 export * from "./ISubscriberRepository"
 export * from "./implementation/SubscriberRepository"
+
+export * from "./IOrderItemRepository"
+export * from "./implementation/OrderItemRepository"

@@ -44,6 +44,8 @@ import { IClickEventRepository } from "../Repositories/IClickEventRepository";
 import { ClickEventRepository } from "../Repositories/implementation/ClickEventRepository";
 import { IClientHistoryRepository } from "../Repositories";
 import { ISubscriberRepository, SubscriberRepository } from "../Repositories";
+import { IOrderItemRepository, OrderItemRepository } from "../Repositories";
+
 class InversifyContainer {
 	private container;
 	static instance: InversifyContainer ;
@@ -69,6 +71,7 @@ class InversifyContainer {
 		// register repository here
 		this.container.bind<IClientRepository>(TYPES.IClientRepository).to(ClientRepository);
 		this.container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository);
+		this.container.bind<IOrderItemRepository>(TYPES.IOrderItemRepository).to(OrderItemRepository);
 		this.container.bind<IEmployeeRepository>(TYPES.IEmployeeRepository).to(EmployeeRepository);
 		this.container.bind<IPermissionRepository>(TYPES.IPermissionRepository).to(PermissionRepository);
 		this.container.bind<IProductRepository>(TYPES.IProductRepository).to(ProductRepository);

@@ -367,4 +367,14 @@ export class OrderService {
             next(err);
         }
     }
+
+    public async getByCond(cond: any) {
+        try{
+            const orders = await this.orderRepository.getByCond(cond)
+            return orders
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }
 }
