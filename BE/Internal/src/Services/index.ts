@@ -14,4 +14,5 @@ export * from './Table.service'
 export * from './Reservation.service'
 export * from './Floor.service'
 export * from './Notification.service'
+export * from './Pos_notification.service'
 

@@ -5,8 +5,10 @@ import statusMess from "../Constants/statusMess";
 import { container } from "../Configs";
 import { IOrderRepository } from "../Repositories/IOrderRepository";
 import {
+    ICartItemRepository,
     ICartRepository,
     IClientRepository,
+    IPos_notificationRepository,
     IProductRepository,
     IVoucherRepository,
 } from "../Repositories";
@@ -29,6 +31,12 @@ export class OrderService {
         ),
         private clientRepository = container.get<IClientRepository>(
             TYPES.IClientRepository
+        ),
+        private posRepository = container.get<IPos_notificationRepository>(
+            TYPES.IPos_notificationRepository
+        ),
+        private cartItemRepository = container.get<ICartItemRepository>(
+            TYPES.ICartItemRepository
         )
     ) {}
 
@@ -244,7 +252,7 @@ export class OrderService {
                             (client.getDataValue("total_items") +
                                 order.getDataValue("num_items")),
                     });
-                    await client.save()
+                    await client.save();
                 }
                 await this.orderRepository.updateStatus(data);
             } else throw new UnauthorizedError();
@@ -279,41 +287,100 @@ export class OrderService {
     public async updateItems(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;
-            const { orderId, productId, dish_status } = req.body;
-            console.log(req.body);
+            const { orderId, productId, dish_status, POS } = req.body;
             if (req.action === "update:any") {
-                const order = await this.orderRepository.findById(orderId);
-                const product = await this.productRepository.findById(
-                    productId
-                );
-                let orderItems = await order.getProducts();
-                const targetOrderItem = orderItems
-                    .map((item: any) => {
-                        if (
-                            item.OrderItem.getDataValue("productId") ==
-                            productId
-                        )
-                            return item.OrderItem;
-                    })
-                    .filter((order: any) => order !== undefined);
-                await order.addProduct(product, {
-                    through: {
-                        quantity: targetOrderItem[0].quantity,
-                        amount:
-                            targetOrderItem[0].quantity *
-                            product.getDataValue("price"),
-                        status: dish_status,
-                        createdAt: targetOrderItem[0].createdAt,
-                        updatedAt: new Date(),
-                    },
-                });
-                orderItems = await order.getProducts();
-                const check = orderItems.every(
-                    (item: any) => item.OrderItem.status === "Ready"
-                );
-                if (check) {
-                    await order.update({ status: dish_status });
-                    return res.status(status).send("Update Order");
+                if (POS) {
+                    const cart = await this.cartRepository.findById(orderId);
+                    const product = await this.productRepository.findById(
+                        productId
+                    );
+                    let preCartItem = await this.cartItemRepository.findByCond({
+                        cartId: cart.getDataValue("id"),
+                        productId: product.getDataValue("id"),
+                        status:
+                            dish_status == "Ready" ? "Cooking" : "Preparing",
+                    });
+                    let cartItem = await this.cartItemRepository.findByCond({
+                        cartId: cart.getDataValue("id"),
+                        productId: product.getDataValue("id"),
+                        status: "Cooking",
+                    });
+                    let readyItem = await this.cartItemRepository.findByCond({
+                        cartId: cart.getDataValue("id"),
+                        productId: product.getDataValue("id"),
+                        status: "Ready",
+                    });
+                    if (cartItem.length != 0 && dish_status == "Cooking") {
+                        cartItem[0].update({
+                            quantity:
+                                cartItem[0].getDataValue("quantity") +
+                                preCartItem[0].getDataValue("quantity"),
+                            amount:
+                                cartItem[0].getDataValue("quantity") +
+                                preCartItem[0].amount,
+                        });
+                        await preCartItem[0].destroy();
+                    } else if (readyItem.length != 0 && dish_status == "Ready") {
+                        readyItem[0].update({
+                            quantity:
+                                readyItem[0].getDataValue("quantity") +
+                                preCartItem[0].getDataValue("quantity"),
+                            amount:
+                                readyItem[0].getDataValue("quantity") +
+                                preCartItem[0].amount,
+                        });
+                        await preCartItem[0].destroy();
+                    } else {
+                        await this.cartItemRepository.create({
+                            cartId: cart.getDataValue("id"),
+                            productId: product.getDataValue("id"),
+                            status: dish_status,
+                            quantity: preCartItem[0].getDataValue("quantity"),
+                            amount: preCartItem[0].getDataValue("amount"),
+                        });
+                        await preCartItem[0].destroy();
+                    }
+                    if (dish_status == "Ready") {
+                        await this.posRepository.create({
+                            table: cart.getDataValue("id"),
+                            content: `${product.getDataValue("name")} is done!`,
+                        });
+                    }
+                } else {
+                    const order = await this.orderRepository.findById(orderId);
+                    const product = await this.productRepository.findById(
+                        productId
+                    );
+                    let orderItems = await order.getProducts();
+                    const targetOrderItem = orderItems
+                        .map((item: any) => {
+                            if (
+                                item.OrderItem.getDataValue("productId") ==
+                                productId
+                            )
+                                return item.OrderItem;
+                        })
+                        .filter((order: any) => order !== undefined);
+
+                    await order.addProduct(product, {
+                        through: {
+                            quantity: targetOrderItem[0].quantity,
+                            amount:
+                                targetOrderItem[0].quantity *
+                                product.getDataValue("price"),
+                            status: dish_status,
+                            createdAt: targetOrderItem[0].createdAt,
+                            updatedAt: new Date(),
+                        },
+                    });
+                    orderItems = await order.getProducts();
+                    const check = orderItems.every(
+                        (item: any) => item.OrderItem.status === "Ready"
+                    );
+                    if (check) {
+                        await order.update({ status: dish_status });
+                        return res.status(status).send("Update Order");
+                    }
                 }
             } else throw new UnauthorizedError();
             Message.logMessage(req, status);
@@ -331,30 +398,44 @@ export class OrderService {
             if (req.action === "read:any") {
                 const orders = await this.orderRepository.all();
                 const carts = await this.cartRepository.all();
-                const cartWithItems = (await Promise.all(
-                    carts.map(async (cart: any) => {
-                        if (cart.tableId && cart.total > 0) {
-                            const cartItems = await cart.getProducts();
-                            return {
-                                ...cart.toJSON(),
-                                cartItems: cartItems.map((item: any) => item.toJSON()),
-                            };
-                        } else return null;
-                    })
-                )).filter((cart: any) => cart !== null)
-                const ordersWithItems = (await Promise.all(
-                    orders.map(async (order: any) => {
-                        if (order.status === 'Preparing' || order.status === 'Ready') {
-                            const orderItems = await order.getProducts();
-                            return {
-                                ...order.toJSON(),
-                                orderItems: orderItems.map((item: any) => item.toJSON()),
-                            };
-                        } else return null;
-                    })
-                )).filter((order: any) => order !== null)
-                console.log(cartWithItems)
-                res.status(status).send(ordersWithItems);
+                const cartWithItems = (
+                    await Promise.all(
+                        carts.map(async (cart: any) => {
+                            if (cart.tableId && cart.total > 0) {
+                                const cartItems = await cart.getProducts();
+                                return {
+                                    ...cart.toJSON(),
+                                    cartItems: cartItems.map((item: any) =>
+                                        item.toJSON()
+                                    ),
+                                };
+                            } else return null;
+                        })
+                    )
+                ).filter((cart: any) => cart !== null);
+                const ordersWithItems = (
+                    await Promise.all(
+                        orders.map(async (order: any) => {
+                            if (
+                                order.status === "Preparing" ||
+                                order.status === "Ready"
+                            ) {
+                                const orderItems = await order.getProducts();
+                                return {
+                                    ...order.toJSON(),
+                                    orderItems: orderItems.map((item: any) =>
+                                        item.toJSON()
+                                    ),
+                                };
+                            } else return null;
+                        })
+                    )
+                ).filter((order: any) => order !== null);
+                const response: any = {
+                    tableItems: cartWithItems,
+                    orderItems: ordersWithItems,
+                };
+                res.status(status).send(response);
             } else throw new UnauthorizedError();
             Message.logMessage(req, status);
         } catch (err) {

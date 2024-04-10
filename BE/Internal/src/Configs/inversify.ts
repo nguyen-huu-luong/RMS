@@ -22,7 +22,8 @@ import {
 	ICartItemRepository,
 	CartItemRepository,
 	INotificationRepository,
-	NotificationRepository
+	NotificationRepository,
+	Pos_notificationRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -40,6 +41,7 @@ import { IOpenEventrRepository } from "../Repositories/IOpenEventRepository";
 import { OpenEventRepository } from "../Repositories/implementation/OpenEventRepository";
 import { IClickEventRepository } from "../Repositories/IClickEventRepository";
 import { ClickEventRepository } from "../Repositories/implementation/ClickEventRepository";
+import { IPos_notificationRepository } from "../Repositories/IPos_notificationRepository";
 class InversifyContainer {
 	private container;
 	static instance: InversifyContainer ;
@@ -87,6 +89,8 @@ class InversifyContainer {
 		this.container.bind<IOpenEventrRepository>(TYPES.IOpenEventRepository).to(OpenEventRepository);
 		this.container.bind<IClickEventRepository>(TYPES.IClickEventRepository).to(ClickEventRepository);
 		this.container.bind<INotificationRepository>(TYPES.INotificationRepository).to(NotificationRepository)
+		this.container.bind<IPos_notificationRepository>(TYPES.IPos_notificationRepository).to(Pos_notificationRepository)
+
 	}
 }
 

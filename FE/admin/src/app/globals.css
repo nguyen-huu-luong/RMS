@@ -53,3 +53,12 @@ label {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #a8bbbf;
 }
+
+@keyframes slideDown {
+  0% {
+    top: -100%;
+  }
+  100% {
+    top: 0;
+  }
+}

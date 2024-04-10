@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import FoodItem from "@/components/Product/item";
-import { Pagination, ConfigProvider } from "antd";
+import { Pagination, ConfigProvider, Drawer } from "antd";
 import type { PaginationProps } from "antd";
 import PriceItem from "@/components/Product/price_item";
 import { Modal } from "antd";
@@ -14,7 +14,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
 import Link from "next-intl/link";
 import fetchClient from "@/lib/fetch-client";
-
+import Loading from "@/components/loading";
+import useSocket from "@/socket";
+import { message } from "antd";
+import moment from "moment";
 function Home() {
     const params = useParams<{ locale: string; tid: string }>();
     const [items, setItems] = useState<any>([]);
@@ -25,33 +28,49 @@ function Home() {
     const [finish, setFinish] = useState(false);
     const [form] = Form.useForm();
     const { data: session, status } = useSession();
-    const [checker, setChecker] = useState(true)
-    const [item_status, updateItemStaus] = useState(true)
+    const [checker, setChecker] = useState(true);
+    const [item_status, updateItemStaus] = useState(true);
     const router = useRouter();
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [notification, setNotification] = useState(false);
+
+    const socket = useSocket();
+
+    const showDrawer = () => {
+        setDrawerOpen(true);
+    };
+
+    const onClose = () => {
+        setDrawerOpen(false);
+    };
 
     const showModal = () => {
         setOpen(true);
     };
 
-
     const handleUpdateTable = async () => {
-        let table_status: string
+        let table_status: string;
         if (table.status == "Free") {
-            table_status = "Occupied"
+            table_status = "Occupied";
+        } else {
+            table_status = "Free";
         }
-        else {
-            table_status = "Free"
-        }
-        table.status = table_status
-        await fetchClient({ method: "PUT", url: `/tables?id=${table.id}`, body: { "status": table_status } })
-        setChecker((current_value) => !current_value)
-    }
+        table.status = table_status;
+        await fetchClient({
+            method: "PUT",
+            url: `/tables?id=${table.id}`,
+            body: { status: table_status },
+        });
+        setChecker((current_value) => !current_value);
+    };
 
     const {
         data: foods,
         error: foodError,
         isLoading: foodLoading,
-    } = useSWR([`/products/all`], ([url]) => fetchClient({ url: url, data_return: true }));
+    } = useSWR([`/products/all`], ([url]) =>
+        fetchClient({ url: url, data_return: true })
+    );
     const [category, setCategory] = useState<string>(
         currentCategory !== null ? currentCategory : "Pizza"
     );
@@ -60,21 +79,36 @@ function Home() {
         data: table,
         error: tableError,
         isLoading: tableLoading,
-    } = useSWR([params.tid],
-        ([table_id]) => fetchClient({ url: `/tables?id=${table_id}`, data_return: true }));
+    } = useSWR([params.tid], ([table_id]) =>
+        fetchClient({ url: `/tables?id=${table_id}`, data_return: true })
+    );
     const [currentPage, setCurrentPage] = useState(1);
 
     let {
         data: cart_items,
         error: cart_itemsError,
         isLoading: cart_itemsLoading,
-    } = useSWR([`/tables/cart/${params.tid}`], ([url]) => fetchClient({ url: url, data_return: true }));
+        mutate: cartMutate,
+    } = useSWR([`/tables/cart/${params.tid}`], ([url]) =>
+        fetchClient({ url: url, data_return: true })
+    );
+
+    let {
+        data: notifications,
+        error: notifications_error,
+        isLoading: notifications_loading,
+        mutate: notificationMutate,
+    } = useSWR([`/pos_notifications/all`], ([url]) =>
+        fetchClient({ url: url, data_return: true })
+    );
 
     const {
         data: categories,
         error: categoryError,
         isLoading: categoryLoading,
-    } = useSWR([`/categories/all`], ([url]) => fetchClient({ url: url, data_return: true }));
+    } = useSWR([`/categories/all`], ([url]) =>
+        fetchClient({ url: url, data_return: true })
+    );
 
     const onChange: PaginationProps["onChange"] = (page) => {
         setCurrentPage(page);
@@ -85,7 +119,7 @@ function Home() {
         if (cart_items) {
             cart_items.items?.forEach((item: any) => {
                 total += item.amount;
-            })
+            });
         }
 
         items.forEach((item: any) => {
@@ -97,75 +131,194 @@ function Home() {
     const handleOrder = async (values: any) => {
         try {
             let data_body = {
-                "email": values.email,
-                "firstname": values.first_name,
-                "lastname": values.last_name,
-                "pay_method": values.paymentMethod,
-                "phone": values.phone_number
-            }
-            const data_return = await fetchClient({ method: "POST", url: `/tables/order/${params.tid}`, body: data_body, data_return: true })
-            let table_status = "Free"
+                email: values.email,
+                firstname: values.first_name,
+                lastname: values.last_name,
+                pay_method: values.paymentMethod,
+                phone: values.phone_number,
+            };
+            const data_return = await fetchClient({
+                method: "POST",
+                url: `/tables/order/${params.tid}`,
+                body: data_body,
+                data_return: true,
+            });
+            let table_status = "Free";
             if (data_body.pay_method == "CASH") {
-                table.status = table_status
-                await fetchClient({ method: "PUT", url: `/tables?id=${table.id}`, body: { "status": table_status } })
-                router.push(`/sale/reservations/payment?method=CASH?tid=${params.tid}`);
-            }
-            else {
+                table.status = table_status;
+                await fetchClient({
+                    method: "PUT",
+                    url: `/tables?id=${table.id}`,
+                    body: { status: table_status },
+                });
+                router.push(
+                    `/sale/reservations/payment?method=CASH?tid=${params.tid}`
+                );
+            } else {
                 router.push(data_return.payUrl);
             }
-            setChecker((current_value) => !current_value)
+            setChecker((current_value) => !current_value);
+        } catch (err) {
+            console.log(err);
         }
-        catch (err) {
-            console.log(err)
-        }
-    }
+    };
 
     const addItem = async () => {
         try {
             if (table.status == "Free") {
-                table.status = "Occupied"
-                await fetchClient({ method: "PUT", url: `/tables?id=${table.id}`, body: { "status": "Occupied" } })
+                table.status = "Occupied";
+                await fetchClient({
+                    method: "PUT",
+                    url: `/tables?id=${table.id}`,
+                    body: { status: "Occupied" },
+                });
             }
-            let data = await fetchClient({ method: "PUT", url: `/tables/cart/${params.tid}`, body: items, data_return: true })
-            cart_items.items = data.items
-            cart_items.products = data.products
-            setItems([])
-            setChecker((current_value) => !current_value)
+            let data = await fetchClient({
+                method: "PUT",
+                url: `/tables/cart/${params.tid}`,
+                body: items,
+                data_return: true,
+            });
+            cart_items.items = data.items;
+            cart_items.products = data.products;
+            setItems([]);
+            setChecker((current_value) => !current_value);
+            socket.emit("staff:table:prepare", params.tid);
+        } catch (err) {
+            console.log(err);
         }
-        catch (err) {
-            console.log(err)
-        }
-    }
+    };
 
     const handleCancelOrder = () => {
-        setItems([])
-    }
+        setItems([]);
+    };
+    useEffect(() => {
+        if (!socket) return;
+        socket.on(
+            "tableItem:finish:fromChef",
+            (tableId: string, name: string) => {
+                message.info(`Finish ${name} for table ${tableId}`);
+                notificationMutate();
+                cartMutate();
+            }
+        );
+        return () => {
+            socket.off("tableItem:finish:fromChef");
+        };
+    }, [socket]);
 
     if (foodError) return <div>Failed to load</div>;
     if (categoryError) return <div>Failed to load</div>;
-    if (foodLoading || categoryLoading || cart_itemsLoading) return <div>Loading...</div>;
+    if (
+        foodLoading ||
+        categoryLoading ||
+        cart_itemsLoading ||
+        notifications_loading
+    )
+        return <Loading />;
     if (status === "loading") return <div>Loading.....</div>;
     if (status === "unauthenticated") router.push("/signin");
-
-
     return (
-        <div className="h-full relative">
-            {
-                table && <div className="w-full bg-white absolute flex items-center rounded" style={{ height: "40px" }}>
-                    <div className="inline-block ml-3">
-                        {
-                            table.status == "Free" ? <button type="button" className="p-1 px-2 text-sm rounded border-0" style={{ color: "white", backgroundColor: "#4A58EC" }} onClick={handleUpdateTable}>Use</button>
-                                : <button onClick={handleUpdateTable} type="button" className="p-1 px-2 text-sm rounded border-0" style={{ color: "white", backgroundColor: "#EA6A12" }}>Free</button>
-                        }
+        <div className='h-full relative overflow-hidden'>
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorBgMask: "transparent",
+                    },
+                }}
+            >
+                <Drawer
+                    title='Notification'
+                    placement='right'
+                    closable={false}
+                    onClose={onClose}
+                    open={drawerOpen}
+                    getContainer={false}
+                >
+                    <div className='w-full h-full overflow-y-auto flex flex-col justify-start gap-2'>
+                        {notifications.map((item: any) => {
+                            return (
+                                <div
+                                    key={item.id}
+                                    className='font-normal text-lg text-black'
+                                >
+                                    <span className='font-bold'>
+                                        &#91;{`Table #${item.table}`}&#93;
+                                    </span>
+                                    - {item.content} -{" "}
+                                    {moment(item.createdAt).format("hh:mm A")}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </Drawer>
+            </ConfigProvider>
+
+            {table && (
+                <div
+                    className='w-full bg-white flex flex-row justify-between items-center rounded pr-2 gap-5'
+                    style={{ height: "40px" }}
+                >
+                    <div className='w-auto flex items-center rounded h-full'>
+                        <div className='inline-block ml-3'>
+                            {table.status == "Free" ? (
+                                <button
+                                    type='button'
+                                    className='p-1 px-2 text-sm rounded border-0'
+                                    style={{
+                                        color: "white",
+                                        backgroundColor: "#4A58EC",
+                                    }}
+                                    onClick={handleUpdateTable}
+                                >
+                                    Use
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleUpdateTable}
+                                    type='button'
+                                    className='p-1 px-2 text-sm rounded border-0'
+                                    style={{
+                                        color: "white",
+                                        backgroundColor: "#EA6A12",
+                                    }}
+                                >
+                                    Free
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <div className='w-full h-full flex flex-row items-center justify-end cursor-pointer' onClick={showDrawer}
+>
+                        <div>
+                            {notifications ? (
+                                <div className='font-normal text-lg text-black'>
+                                    <span className='font-bold'>
+                                        &#91;
+                                        {`Table #${notifications[0].table}`}
+                                        &#93;{" "}
+                                    </span>
+                                    - {notifications[0].content} -{" "}
+                                    {moment(notifications[0].createdAt).format(
+                                        "hh:mm A"
+                                    )}
+                                </div>
+                            ) : (
+                                ""
+                            )}
+                        </div>
                     </div>
                 </div>
-            }
-            <div className='flex w-full gap-5 pb-3' style={{ height: "100%", paddingTop: "50px" }}>
+            )}
+            <div
+                className='flex w-full gap-5 pb-3'
+                style={{ height: "100%", paddingTop: "10px" }}
+            >
                 <Modal
                     title='Make payment'
                     open={open}
                     confirmLoading={confirmLoading}
-                    footer={(_, { OkBtn, CancelBtn }) => (<></>)}
+                    footer={(_, { OkBtn, CancelBtn }) => <></>}
                     onCancel={() => setOpen(false)}
                 >
                     <Form form={form} layout='vertical' onFinish={handleOrder}>
@@ -183,7 +336,10 @@ function Home() {
                                 },
                             ]}
                         >
-                            <Input placeholder='Name' style={{ marginTop: 8 }} />
+                            <Input
+                                placeholder='Name'
+                                style={{ marginTop: 8 }}
+                            />
                         </Form.Item>
                         <Form.Item
                             name='last_name'
@@ -199,7 +355,10 @@ function Home() {
                                 },
                             ]}
                         >
-                            <Input placeholder='Name' style={{ marginTop: 8 }} />
+                            <Input
+                                placeholder='Name'
+                                style={{ marginTop: 8 }}
+                            />
                         </Form.Item>
                         <Form.Item
                             name='phone_number'
@@ -252,7 +411,8 @@ function Home() {
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please choose your payment method!",
+                                    message:
+                                        "Please choose your payment method!",
                                 },
                             ]}
                         >
@@ -285,14 +445,34 @@ function Home() {
                                 </div>
                             </Radio.Group>
                         </Form.Item>
-                        <div >
-                            <Form.Item >
-                                <div className='flex justify-end' style={{ width: "100%" }}>
+                        <div>
+                            <Form.Item>
+                                <div
+                                    className='flex justify-end'
+                                    style={{ width: "100%" }}
+                                >
                                     <div className='pr-3'>
-                                        <Button style={{ backgroundColor: "#DB3A34", color: "white" }} htmlType='button' onClick={() => setOpen(false)}>Cancel</Button>
+                                        <Button
+                                            style={{
+                                                backgroundColor: "#DB3A34",
+                                                color: "white",
+                                            }}
+                                            htmlType='button'
+                                            onClick={() => setOpen(false)}
+                                        >
+                                            Cancel
+                                        </Button>
                                     </div>
                                     <div>
-                                        <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">Confirm</Button>
+                                        <Button
+                                            style={{
+                                                backgroundColor: "#4A58EC",
+                                                color: "white",
+                                            }}
+                                            htmlType='submit'
+                                        >
+                                            Confirm
+                                        </Button>
                                     </div>
                                 </div>
                             </Form.Item>
@@ -304,33 +484,79 @@ function Home() {
                         <>
                             {cart_items && cart_items.items?.length != 0 ? (
                                 <>
-                                    <div className=' overflow-y-auto' style={{ maxHeight: "200px" }}>
+                                    <div
+                                        className=' overflow-y-auto'
+                                        style={{ maxHeight: "200px" }}
+                                    >
                                         {cart_items.items.map((item: any) => {
                                             return (
                                                 <>
-                                                    {
-                                                        item.status == "Preparing" ?
-                                                            <div
-                                                                key={cart_items.products[item.productId].name}
-                                                                className='duration-300 transition-all ease-in-out w-auto  text-yellow-500'
-                                                            >
-                                                                <PriceItem
-                                                                    params={{ food: { name: cart_items.products[item.productId].name, price: cart_items.products[item.productId].price, quantity: item.quantity } }}
-                                                                />
-                                                            </div> : <div
-                                                                key={cart_items.products[item.productId].name}
-                                                                className='duration-300 transition-all ease-in-out w-auto text-blue-500'
-                                                            >
-                                                                <PriceItem
-                                                                    params={{ food: { name: cart_items.products[item.productId].name, price: cart_items.products[item.productId].price, quantity: item.quantity } }}
-                                                                />
-                                                            </div>
-                                                    }
+                                                    {item.status ==
+                                                    "Preparing" ? (
+                                                        <div
+                                                            key={
+                                                                cart_items
+                                                                    .products[
+                                                                    item
+                                                                        .productId
+                                                                ].name
+                                                            }
+                                                            className='duration-300 transition-all ease-in-out w-auto  text-yellow-500'
+                                                        >
+                                                            <PriceItem
+                                                                params={{
+                                                                    food: {
+                                                                        name: cart_items
+                                                                            .products[
+                                                                            item
+                                                                                .productId
+                                                                        ].name,
+                                                                        price: cart_items
+                                                                            .products[
+                                                                            item
+                                                                                .productId
+                                                                        ].price,
+                                                                        quantity:
+                                                                            item.quantity,
+                                                                    },
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            key={
+                                                                cart_items
+                                                                    .products[
+                                                                    item
+                                                                        .productId
+                                                                ].name
+                                                            }
+                                                            className='duration-300 transition-all ease-in-out w-auto text-blue-500'
+                                                        >
+                                                            <PriceItem
+                                                                params={{
+                                                                    food: {
+                                                                        name: cart_items
+                                                                            .products[
+                                                                            item
+                                                                                .productId
+                                                                        ].name,
+                                                                        price: cart_items
+                                                                            .products[
+                                                                            item
+                                                                                .productId
+                                                                        ].price,
+                                                                        quantity:
+                                                                            item.quantity,
+                                                                    },
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )}
                                                 </>
                                             );
                                         })}
                                     </div>
-
                                 </>
                             ) : (
                                 <div className='text-black'>
@@ -354,7 +580,10 @@ function Home() {
                     {items.length != 0 && (
                         <div>
                             <hr />
-                            <div className='mt-1 overflow-y-auto' style={{ maxHeight: "170px" }}>
+                            <div
+                                className='mt-1 overflow-y-auto'
+                                style={{ maxHeight: "170px" }}
+                            >
                                 {items.map((item: any) => {
                                     return (
                                         <div
@@ -368,15 +597,25 @@ function Home() {
                                     );
                                 })}
                             </div>
-                            <div className="text-center mt-2" >
-                                <button className="px-2 py-1 rounded bg-red-600 text-white" onClick={handleCancelOrder}>Cancel</button>
-                                <button className="bg-menu px-1 py-1 border-t-menu rounded  text-white ml-4" onClick={addItem}>Order</button>
+                            <div className='text-center mt-2'>
+                                <button
+                                    className='px-2 py-1 rounded bg-red-600 text-white'
+                                    onClick={handleCancelOrder}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className='bg-menu px-1 py-1 border-t-menu rounded  text-white ml-4'
+                                    onClick={addItem}
+                                >
+                                    Order
+                                </button>
                             </div>
                         </div>
                     )}
 
-                    {cart_items && cart_items.items?.length != 0 &&
-                        (<div className='h-auto flex flex-col gap-2 justify-between'>
+                    {cart_items && cart_items.items?.length != 0 && (
+                        <div className='h-auto flex flex-col gap-2 justify-between'>
                             <div className='font-bold text-md py-2 border-t-menu border-t-2'>
                                 Total: {getTotalAmount()}VNĐ
                             </div>
@@ -386,10 +625,8 @@ function Home() {
                             >
                                 Make payment
                             </div>
-                        </div>)
-                    }
-
-
+                        </div>
+                    )}
                 </div>
                 <div
                     style={{ backgroundColor: "#FFC789" }}
@@ -404,10 +641,11 @@ function Home() {
                                         setCategory(item.name);
                                         setCurrentPage(1);
                                     }}
-                                    className={`font-bold cursor-pointer p-2 px-4${category === item.name
-                                        ? " text-white bg-menu"
-                                        : " bg-none text-menu"
-                                        } transition-all duration-200`}
+                                    className={`font-bold cursor-pointer p-2 px-4${
+                                        category === item.name
+                                            ? " text-white bg-menu"
+                                            : " bg-none text-menu"
+                                    } transition-all duration-200`}
                                 >
                                     {item.name}
                                 </div>
@@ -420,8 +658,9 @@ function Home() {
                                 .filter(
                                     (item: any) =>
                                         category ===
-                                        categories[parseInt(item.categoryId) - 1]
-                                            ?.name
+                                        categories[
+                                            parseInt(item.categoryId) - 1
+                                        ]?.name
                                 )
                                 .slice((currentPage - 1) * 8, currentPage * 8)
                                 .map((item: any) => {
@@ -433,7 +672,10 @@ function Home() {
                                             <FoodItem
                                                 addProduct={setItems}
                                                 items={items}
-                                                params={{ food: item, size: "sm" }}
+                                                params={{
+                                                    food: item,
+                                                    size: "sm",
+                                                }}
                                             />
                                         </div>
                                     );

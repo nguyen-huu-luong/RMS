@@ -24,6 +24,7 @@ const TYPES = {
     IClickEventRepository: Symbol.for("IClickEventREpository"),
     IOpenEventRepository: Symbol.for("IOpenEventRepository"),
     INotificationRepository: Symbol.for("INotificationRepository"),
+    IPos_notificationRepository: Symbol.for("IPos_notificationRepository"),
 };
 
 type FilterCondition = {

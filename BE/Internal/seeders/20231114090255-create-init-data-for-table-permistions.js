@@ -74,6 +74,8 @@ module.exports = {
             { role: 'employee', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'channels', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'pos_notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'pos_notifications', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
 
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
@@ -139,13 +141,15 @@ module.exports = {
             { role: 'manager', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
-
+            { role: 'manager', resource: 'pos_notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'pos_notifications', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
             { role: 'chef', resource: 'orders', action: 'update:any', attributes: 'status', createdAt: d, updatedAt: d },
             { role: 'chef', resource: 'orders', action: 'read:any', attributes: 'order.items', createdAt: d, updatedAt: d },
             { role: 'chef', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
-
+            { role: 'chef', resource: 'pos_notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'chef', resource: 'pos_notifications', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             // Thêm dữ liệu cho các role khác tương tự ở đây
         ], {});
     },

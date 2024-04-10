@@ -14,6 +14,7 @@ export * from './IPermissionRepository'
 export * from './ITokenRepository'
 export * from './ICartItemRepository'
 export * from './INotificationRepository'
+export * from './IPos_notificationRepository'
 
 
 export * from './implementation/BaseRepository'
@@ -38,3 +39,4 @@ export * from "./implementation/MessageTemplateRepository"
 export * from "./implementation/CartItemRepository"
 
 export * from "./implementation/NotificationRepository"
+export * from "./implementation/Pos_notificationRepository"
