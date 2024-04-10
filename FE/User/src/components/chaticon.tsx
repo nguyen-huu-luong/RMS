@@ -8,6 +8,8 @@ import { useEffect } from "react";
 
 const ChatIcon = () => {
     const [popup, showPopup] = useState(false);
+    const {data: session, status} = useSession()
+    if (status === "loading" || status === "unauthenticated") return;
     // const [unreadMessages, setUnreadMessages] = useState(0);
     // const calculateUnreadMessages = (messages: any) => {
     //     let lastNotSeenIndex = -1;

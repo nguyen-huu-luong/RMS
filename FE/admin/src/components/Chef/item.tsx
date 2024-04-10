@@ -5,6 +5,7 @@ import { LeftCircleOutlined, RightCircleOutlined } from "@ant-design/icons";
 import { Modal, Descriptions, message } from "antd";
 import { createStyles } from "antd-style";
 import moment from "moment";
+import fetchClient from "@/lib/fetch-client";
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
     "my-modal-mask": {},
@@ -16,7 +17,6 @@ const useStyle = createStyles(({ token }) => ({
 function Item({
     item,
     color,
-    token,
     refetch,
     orders,
     doneItems,
@@ -26,7 +26,6 @@ function Item({
 }: {
     item: any;
     color: any;
-    token: any;
     refetch: any;
     orders: any;
     doneItems: any;
@@ -61,27 +60,39 @@ function Item({
             padding: 20,
         },
     };
-    const order = orders.find(
-        (order: any) => order.orderId === item.OrderItem.orderId
+    const order = orders.find((order: any) =>
+        item.OrderItem
+            ? order.orderId === item.OrderItem.orderId
+            : order.orderId === item.CartItem.cartId
     );
     const updateStatus = async () => {
-        const res = await updateItemsStatus(
-            "http://localhost:3003/api/orders/chef",
-            {
-                orderId: item.OrderItem.orderId,
-                productId: item.OrderItem.productId,
+        const res = await fetchClient({
+            url: "/orders/chef",
+            method: "PUT",
+            body: {
+                orderId: item.OrderItem
+                    ? item.OrderItem.orderId
+                    : item.CartItem.cartId,
+                productId: item.OrderItem
+                    ? item.OrderItem.productId
+                    : item.CartItem.productId,
                 dish_status:
-                    item.OrderItem.status === "Preparing" ? "Cooking" : "Ready",
+                    (item.OrderItem
+                        ? item.OrderItem.status
+                        : item.CartItem.status) === "Preparing"
+                        ? "Cooking"
+                        : "Ready",
+                POS: item.OrderItem ? false : true,
             },
-            token
-        );
+        });
         refetch(
-            item.OrderItem.orderId +
+            (item.OrderItem ? item.OrderItem.orderId : item.CartItem.cartId) +
                 " " +
-                item.OrderItem.productId +
-                (item.OrderItem.status === "Preparing" ? "Cooking" : "Ready")
+                (item.OrderItem ? item.OrderItem.productId : item.CartItem.productId) +
+                ((item.OrderItem ? item.OrderItem.status : item.CartItem.status) === "Preparing" ? "Cooking" : "Ready")
         );
-        if (res == "Update Order") {
+        if (item.CartItem && item.CartItem.status == "Cooking") socket.emit("chef:tableItem:finish", item.CartItem.cartId, item.name);
+        if (res.data == "Update Order") {
             message.success(`Finish order #${item.OrderItem.orderId}`);
             socket.emit("chef:order:finish", item.OrderItem.orderId);
         }
@@ -112,12 +123,20 @@ function Item({
                     }}
                     className='flex justify-end items-center font-bold text-primary text-md hover:cursor-pointer'
                 >
-                    #{item.OrderItem.orderId}
+                    #
+                    {item.OrderItem
+                        ? item.OrderItem.orderId
+                        : item.CartItem.cartId}
                 </span>
                 <span className='flex justify-start items-center font-bold text-black text-md'>
-                    Quantity: {item.OrderItem.quantity}
+                    Quantity:{" "}
+                    {item.OrderItem
+                        ? item.OrderItem.quantity
+                        : item.CartItem.quantity}
                 </span>
-                {item.OrderItem.status === "Ready" ? (
+                {(item.OrderItem
+                    ? item.OrderItem.status
+                    : item.CartItem.status) === "Ready" ? (
                     ""
                 ) : (
                     <span className='flex justify-end items-center gap-3'>
@@ -134,7 +153,11 @@ function Item({
             <Modal
                 classNames={classNames}
                 styles={modalStyles}
-                title={`Order #${item.OrderItem.orderId}`}
+                title={`${
+                    item.OrderItem
+                        ? "Order #" + item.OrderItem.orderId
+                        : "POS Table #" + item.CartItem.cartId
+                }`}
                 open={open}
                 onOk={handleOk}
                 okType='primary'

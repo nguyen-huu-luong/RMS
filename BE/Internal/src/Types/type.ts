@@ -23,7 +23,8 @@ const TYPES = {
     ICartItemRepository: Symbol.for("ICartItemRepository"),
     IClickEventRepository: Symbol.for("IClickEventREpository"),
     IOpenEventRepository: Symbol.for("IOpenEventRepository"),
-
+    INotificationRepository: Symbol.for("INotificationRepository"),
+    IPos_notificationRepository: Symbol.for("IPos_notificationRepository"),
 };
 
 type FilterCondition = {
@@ -48,6 +49,7 @@ type QueryOptions = {
         page: number,
         pageSize: number
     }
+    type?: string
 }
 
 export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter };

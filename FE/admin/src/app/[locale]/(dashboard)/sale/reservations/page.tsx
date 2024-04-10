@@ -3,18 +3,22 @@ import React from 'react'
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import fetchClient from '@/lib/fetch-client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UsergroupAddOutlined, TableOutlined, CloseSquareOutlined, CheckSquareOutlined, FileSearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { Button, Modal, Form, Input, type FormProps, notification, Select, DatePicker, TimePicker, InputNumber, } from 'antd';
 import moment from "moment";
 import dayjs from 'dayjs';
+import useSocket from '@/socket';
+import { message, ConfigProvider, Drawer  } from "antd";
+import Loading from '@/components/loading';
 
 const Context = React.createContext({ name: 'Default' });
 
 function Home() {
-
+    const socket = useSocket();
     const { data: session, status } = useSession();
+    const [drawerOpen, setDrawerOpen] = useState(false);
     const [api, contextHolder] = notification.useNotification();
     const [deleteOption, setDeleteOption] = useState([])
     const dateFormat = "YYYY-MM-DD";
@@ -22,6 +26,15 @@ function Home() {
     interface Dictionary {
         [Key: string]: string;
     }
+
+    const showDrawer = () => {
+        setDrawerOpen(true);
+    };
+
+    const onClose = () => {
+        setDrawerOpen(false);
+    };
+
     const [form_table] = Form.useForm();
     const [form_delete] = Form.useForm();
     const [form_floor] = Form.useForm();
@@ -39,7 +52,14 @@ function Home() {
         isLoading: resInfoLoading,
     } = useSWR([`/reservations/all`], ([url]) => fetchClient({ url: url, data_return: true }));
 
-    console.log(resInfo)
+    let {
+        data: notifications,
+        error: notifications_error,
+        isLoading: notifications_loading,
+        mutate: notificationMutate,
+    } = useSWR([`/pos_notifications/all`], ([url]) =>
+        fetchClient({ url: url, data_return: true })
+    );
 
     const showDetailTable = (tableId: any) => {
         push(`/sale/reservations/${tableId}`);
@@ -332,13 +352,82 @@ function Home() {
         res_id?: any
     };
 
-    if (resInfoLoading) return <div>Loading...</div>;
+    useEffect(() => {
+        if (!socket) return;
+        socket.on(
+            "tableItem:finish:fromChef",
+            (tableId: string, name: string) => {
+                message.info(`Finish ${name} for table ${tableId}`);
+                notificationMutate();
+            }
+        );
+        return () => {
+            socket.off("tableItem:finish:fromChef");
+        };
+    }, [socket]);
+
+    if (resInfoLoading || notifications_loading) return <Loading/>;
 
     return (
         <>
             {
                 resInfo ? <>
+                    <div className='w-full p-2 h-auto bg-white rounded-xl flex flex-row justify-center mb-2'>
+                        <div className='w-full h-full flex flex-row items-center justify-center cursor-pointer' onClick={showDrawer}
+>
+                        <div>
+                            {notifications ? (
+                                <div className='font-normal text-lg text-black'>
+                                    <span className='font-bold'>
+                                        &#91;
+                                        {`Table #${notifications[0].table}`}
+                                        &#93;{" "}
+                                    </span>
+                                    - {notifications[0].content} -{" "}
+                                    {moment(notifications[0].createdAt).format(
+                                        "hh:mm A"
+                                    )}
+                                </div>
+                            ) : (
+                                ""
+                            )}
+                        </div>
+                    </div>
+                    </div>
                     <div className="flex" style={{ height: "100%", paddingBottom: "10px" }}>
+                        <ConfigProvider
+                            theme={{
+                                token: {
+                                    colorBgMask: "transparent",
+                                },
+                            }}
+                        >
+                            <Drawer
+                                title='Notification'
+                                placement='right'
+                                closable={false}
+                                onClose={onClose}
+                                open={drawerOpen}
+                                getContainer={false}
+                            >
+                                <div className='w-full h-full overflow-y-auto flex flex-col justify-start gap-2'>
+                                    {notifications.map((item: any) => {
+                                        return (
+                                            <div
+                                                key={item.id}
+                                                className='font-normal text-lg text-black'
+                                            >
+                                                <span className='font-bold'>
+                                                    &#91;{`Table #${item.table}`}&#93;
+                                                </span>
+                                                - {item.content} -{" "}
+                                                {moment(item.createdAt).format("hh:mm A")}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </Drawer>
+                        </ConfigProvider>
                         <div className="flex-1 pt-2 bg-white" >
                             <div>
                                 <h2 className="font-semibold text-lg text-center">Reservations</h2>

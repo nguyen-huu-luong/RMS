@@ -113,7 +113,9 @@ class ClientController {
 		if (req.action === "read:any") {
 			const id = req.params["id"]		
 			const data = await this.clientService.getById(Number(id));
-	
+			res.send(data);
+		} if (req.action === "read:own"){
+			const data = await this.clientService.getById(Number(req.userId));
 			res.send(data);
 		} else {
 			throw new ForbiddenError();
@@ -142,6 +144,10 @@ class ClientController {
 			const id = req.params["id"] ;
 			const customerInfo = req.body
 			const data = await this.clientService.update(Number(id), customerInfo);
+			res.send(data);
+		} if (req.action === "update:own"){
+			const customerInfo = req.body
+			const data = await this.clientService.update(Number(req.userId), customerInfo);
 			res.send(data);
 		} else {
 			throw new ForbiddenError();

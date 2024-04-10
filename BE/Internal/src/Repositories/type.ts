@@ -15,6 +15,7 @@ const TYPES = {
     ITableRepository: Symbol.for("ITableRepository"),
     IReservationRepository: Symbol.for("IReservationRepository"),
     ITableReservationRepository: Symbol.for("ITableReservationRepository"),
+    IPos_notificaitonRepository: Symbol.for("IPos_notificaitonRepository"),
 };
 
 export { TYPES };

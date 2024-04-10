@@ -1,5 +1,4 @@
 import React from "react";
-import { CheckOutlined } from "@ant-design/icons";
 function Status({ read }: { read: boolean }) {
     return (
         <div className='flex flex-row justify-end -mt-2'>

@@ -6,25 +6,8 @@ import { useEffect, useCallback } from "react";
 import axios from "axios";
 import { message } from "antd";
 import { Tag } from "antd";
-export const seenMessage = async (token: any, id: string) => {
-    try {
-        const response = await axios.put(
-            `http://localhost:3003/api/channels`,
-            { id: id },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-        return response.data;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-};
-
+import fetchClient from "@/lib/fetch-client";
+import Avatar from "@/images/avatar.png"
 const TimeDisplay = (time: any) => {
     const momentDate = moment(time);
     const isToday = momentDate.isSame(moment(), "day");
@@ -38,7 +21,6 @@ function User({
     setChannel,
     socket,
     setChannels,
-    token,
     setIndex,
     staffId,
     channelStatus,
@@ -53,7 +35,6 @@ function User({
     setChannel: any;
     socket: any;
     setChannels: any;
-    token: any;
     setIndex: any;
     staffId: any;
     channelStatus: any;
@@ -152,7 +133,11 @@ function User({
     }, [socket, setChannels, params.channel.id]);
 
     const viewMessage = async () => {
-        await seenMessage(token, params.channel.id);
+        await fetchClient({
+            url: `/channels`,
+            method: "PUT",
+            body: { id: params.channel.id },
+        });
         socket.emit("staff:message:read", params.channel.id);
         setChannels((prevChannels: any) => {
             if (!prevChannels) return prevChannels;
@@ -194,7 +179,7 @@ function User({
             console.log(e);
         }
     };
-    return (
+    return params.latestMessage ? (
         <div
             onClick={() => {
                 handleJoinRoom();
@@ -208,17 +193,18 @@ function User({
         >
             <div className='Avatar flex-none rounded-full border-2 w-16 h-16 border-primary border-opacity-20 overflow-hidden'>
                 <Image
-                    src={"/abc"}
+                    src={params.userAvatar?params.userAvatar:Avatar}
                     alt='User avatar'
                     width={16}
                     height={16}
-                    className='h-full w-full min-w-fit'
+                    className='h-full aspect-square w-full min-w-fit'
+                    unoptimized
                 />
             </div>
             <div
                 className={`body text-sm flex flex-col justify-between items-start w-full`}
             >
-                <div className='w-full font-bold'>{params.userName}</div>
+                <div className='w-40 font-bold overflow-ellipsis whitespace-nowrap overflow-hidden pr-2'>{params.userName}</div>
                 <div
                     className={`w-40 overflow-ellipsis whitespace-nowrap overflow-hidden ${
                         params.latestMessage.status == "Not seen" &&
@@ -227,8 +213,6 @@ function User({
                             : ""
                     }`}
                 >
-                    {" "}
-                    {params.latestMessage.clientId ? params.userName + ":" : ""}
                     {params.latestMessage.content}
                 </div>
                 <div> </div>
@@ -239,6 +223,39 @@ function User({
                 <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'>
                     {TimeDisplay(params.latestMessage.createdAt)}
                 </div>
+            )}
+        </div>
+    ) : (
+        <div
+            onClick={() => {
+                handleJoinRoom();
+            }}
+            className={`px-2 w-full ${"hover:bg-slate-50"} h-20 hover:cursor-pointer transition-all duration-300 flex flex-row items-center justify-between gap-2 font-normal`}
+        >
+            <div className='Avatar flex-none rounded-full border-2 w-16 h-16 border-primary border-opacity-20 overflow-hidden'>
+                <Image
+                    src={params.userAvatar?params.userAvatar:"/abc"}
+                    alt='User avatar'
+                    width={16}
+                    height={16}
+                    className='h-full w-full min-w-fit aspect-square'
+                    unoptimized
+
+                />
+            </div>
+            <div
+                className={`body text-sm flex flex-col justify-between items-start w-full`}
+            >
+                <div className='w-full font-bold'>{params.userName}</div>
+                <div
+                    className={`w-40 overflow-ellipsis whitespace-nowrap overflow-hidden `}
+                ></div>
+                <div> </div>
+            </div>
+            {params.channel.id in channelStatus ? (
+                <Tag color='#87d068'>Active</Tag>
+            ) : (
+                <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'></div>
             )}
         </div>
     );

@@ -10,6 +10,7 @@ import {
 	type HasOneCreateAssociationMixin,
     HasManyCreateAssociationMixin,
     HasManyRemoveAssociationMixin,
+	HasManyAddAssociationsMixin,
 } from "sequelize";
 import bcrypt from "bcrypt";
 import Loader from "../Loaders";
@@ -29,6 +30,7 @@ import Voucher from "./Voucher";
 import ClientVoucher from "./ClientVoucher";
 import Channel from "./Channel";
 import Message from "./Message";
+import Notification from "./Notification";
 
 class Client extends Person {
 	declare getOrders: HasManyGetAssociationsMixin<Order>;
@@ -42,16 +44,21 @@ class Client extends Person {
     declare getTokens: HasManyGetAssociationsMixin<Token> 
     declare removeTokens: HasManyRemoveAssociationsMixin<Token, number>
 
+	declare getVouchers: HasManyGetAssociationsMixin<Voucher>;
+    declare getChannel: HasOneGetAssociationMixin<Channel>;
+    declare createMessage: HasOneCreateAssociationMixin<Message>;
+	declare createChannel: HasOneCreateAssociationMixin<Channel>;
+    declare getNotifications: HasManyGetAssociationsMixin<Notification>;
+    declare createNotification: HasManyCreateAssociationMixin<Notification>;
+	declare setNotification: HasManySetAssociationsMixin<Notification, Notification>;
+
 	declare id: number;
 	declare firstname: string;
 	declare lastname: string;
 	declare email: string;
 	declare isRegistered: boolean;
 	declare hashedPassword: string;
-    getVouchers: any;
-    getChannel: any;
-    createMessage: any;
-	createChannel: any;
+
 
 	public static associate() {
 		Client.hasMany(Order, {
@@ -122,6 +129,13 @@ class Client extends Person {
 			},
 			sourceKey: "id",
 		});
+		Client.hasMany(Notification, {
+			foreignKey: {
+				name: "clientId",
+				allowNull: false,
+			},
+			sourceKey: "id",
+		});
 	}
 }
 
@@ -160,7 +174,7 @@ Client.init(
 			type: DataTypes.DATE,
 		},
 		avatar: {
-			type: DataTypes.BLOB,
+			type: DataTypes.STRING,
 		},
 		score: {
 			type: DataTypes.INTEGER,
@@ -192,6 +206,18 @@ Client.init(
 			type: DataTypes.STRING,
 			allowNull: false,
 			defaultValue: "vi",
+		},
+		profit: {
+			type: DataTypes.INTEGER,
+			defaultValue: 0,
+		},
+		average: {
+			type: DataTypes.INTEGER,
+			defaultValue: 0,
+		},
+		total_items: {
+			type: DataTypes.INTEGER,
+			defaultValue: 0,
 		},
 	},
 	{ sequelize: Loader.sequelize }
