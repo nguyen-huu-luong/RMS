@@ -111,6 +111,7 @@ function Home() {
                 router.push(`/sale/reservations/payment?method=CASH?tid=${params.tid}`);
             }
             else {
+                localStorage.setItem("orderInfo", "1");
                 router.push(data_return.payUrl);
             }
             setChecker((current_value) => !current_value)
@@ -309,7 +310,7 @@ function Home() {
                                             return (
                                                 <>
                                                     {
-                                                        item.status == "Preparing" ?
+                                                        item.status == "Preparing" &&
                                                             <div
                                                                 key={cart_items.products[item.productId].name}
                                                                 className='duration-300 transition-all ease-in-out w-auto  text-yellow-500'
@@ -317,9 +318,23 @@ function Home() {
                                                                 <PriceItem
                                                                     params={{ food: { name: cart_items.products[item.productId].name, price: cart_items.products[item.productId].price, quantity: item.quantity } }}
                                                                 />
-                                                            </div> : <div
+                                                            </div> 
+                                        }
+                                        {
+                                                            item.status == "Cooking" && <div
                                                                 key={cart_items.products[item.productId].name}
                                                                 className='duration-300 transition-all ease-in-out w-auto text-blue-500'
+                                                            >
+                                                                <PriceItem
+                                                                    params={{ food: { name: cart_items.products[item.productId].name, price: cart_items.products[item.productId].price, quantity: item.quantity } }}
+                                                                />
+                                                            </div>
+                                                    }
+
+{
+                                                            item.status == "Done" && <div
+                                                                key={cart_items.products[item.productId].name}
+                                                                className='duration-300 transition-all ease-in-out w-auto text-green-500'
                                                             >
                                                                 <PriceItem
                                                                     params={{ food: { name: cart_items.products[item.productId].name, price: cart_items.products[item.productId].price, quantity: item.quantity } }}

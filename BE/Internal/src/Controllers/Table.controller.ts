@@ -50,6 +50,10 @@ class TableController {
         }
     }
 
+    public makeMoMoPayment(req: Request, res: Response, next: NextFunction) {
+        this.tableService.makePaymentMoMO(req, res, next)
+    }
+
 }
 
 export default TableController;

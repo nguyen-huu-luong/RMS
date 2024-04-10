@@ -24,6 +24,9 @@ class TableRouter {
 
         router.route('/tables/order/:id')
         .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.makePayment(req, res, next))
+
+        router.route('/tables/order/momo/:id')
+        .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.makeMoMoPayment(req, res, next))
     }
 }
 

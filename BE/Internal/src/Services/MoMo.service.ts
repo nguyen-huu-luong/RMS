@@ -98,6 +98,7 @@ export class MoMoService {
     public async captureWallet(req: Request, res: Response, next: NextFunction) {
         const table_id = Number(req.params.id);
         const fullname = req.body.firstname + " " + req.body.lastname
+        const data = JSON.stringify(req.body)
         let table_cart = await this.cartRepository.getCartTable(Number(table_id))
         var partnerCode = "MOMO";
         var accessKey = "F8BBA842ECF85";
@@ -105,18 +106,15 @@ export class MoMoService {
         var requestId = partnerCode + new Date().getTime();
         var orderId = requestId;
         var orderInfo = `MOMO thanh toan ho cho khach hang ${fullname}`;
-        var redirectUrl = `http://localhost:3000/en/sale/reservations/${table_id}`;
-        var ipnUrl =  `http://localhost:3000/en/sale/reservations/${table_id}`;
+        var redirectUrl = `http://localhost:3000/en/sale/reservations/payment?method=MOMO&tid=${table_id}`;
+        var ipnUrl =  `http://localhost:3000/en/sale/reservations/payment?method=MOMO&tid=${table_id}`;
+        var extraData = Buffer.from(data).toString('base64');
         var amount = table_cart.amount;
         var requestType = "captureWallet"
-        var extraData = ""; //pass empty value if your merchant does not have stores
         
         //before sign HMAC SHA256 with format
         //accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
         var rawSignature = "accessKey="+accessKey+"&amount=" + amount+"&extraData=" + extraData+"&ipnUrl=" + ipnUrl+"&orderId=" + orderId+"&orderInfo=" + orderInfo+"&partnerCode=" + partnerCode +"&redirectUrl=" + redirectUrl+"&requestId=" + requestId+"&requestType=" + requestType
-        //puts raw signature
-        console.log("--------------------RAW SIGNATURE----------------")
-        console.log(rawSignature)
         //signature
         const crypto = require('crypto');
         var signature = crypto.createHmac('sha256', secretkey)
