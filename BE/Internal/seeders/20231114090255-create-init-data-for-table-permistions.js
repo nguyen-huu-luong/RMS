@@ -5,6 +5,8 @@ module.exports = {
         let d = new Date();
         return queryInterface.bulkInsert('Permissions', [
             { role: 'user', resource: 'products', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'customers', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'customers', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'carts', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'carts', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'carts', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
@@ -23,6 +25,12 @@ module.exports = {
             { role: 'user', resource: 'messages', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'user', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'notifications', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'notifications', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'clienthistories', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'clienthistories', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'subscribers', action: 'read:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'user', resource: 'subscribers', action: 'create:own', attributes: '*', createdAt: d, updatedAt: d },
 
             { role: 'employee', resource: 'customers', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'customers', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
@@ -48,9 +56,14 @@ module.exports = {
             { role: 'employee', resource: 'tables', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'tables', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'tables', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'floors', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'floors', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'floors', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'floors', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'reservations', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'reservations', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'reservations', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'reservations', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'chat-messages', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'chat-messages', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'conversations', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
@@ -64,6 +77,13 @@ module.exports = {
             { role: 'employee', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'channels', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'chlienthistories', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'clientistories', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'subscribers', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'subscribers', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'subscribers', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'subscribers', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
 
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
@@ -107,6 +127,10 @@ module.exports = {
             { role: 'manager', resource: 'tables', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'tables', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'tables', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'floors', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'floors', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'floors', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'floors', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'reservations', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'reservations', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'reservations', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
@@ -124,11 +148,20 @@ module.exports = {
             { role: 'manager', resource: 'messages', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'messages', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'clienthistories', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'clienthistories', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'subscribers', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'subscribers', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'subscribers', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'subscribers', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
 
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
             { role: 'chef', resource: 'orders', action: 'update:any', attributes: 'status', createdAt: d, updatedAt: d },
             { role: 'chef', resource: 'orders', action: 'read:any', attributes: 'order.items', createdAt: d, updatedAt: d },
+            { role: 'chef', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+
             // Thêm dữ liệu cho các role khác tương tự ở đây
         ], {});
     },

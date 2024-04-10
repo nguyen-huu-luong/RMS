@@ -2,11 +2,13 @@
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { ConfigProvider, Radio, Form, Input, Select, Row, Col } from "antd";
+import { ConfigProvider, Radio, Form, Input } from "antd";
 import Map from "@/components/map/map";
 
 import { useState, useEffect, useRef, Dispatch } from "react";
+import { useTranslations } from "next-intl";
 const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
+    const t = useTranslations("Order");
     const { data: session, status } = useSession();
     if (status === "unauthenticated") {
         redirect("/en/signin");
@@ -22,43 +24,9 @@ const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
     const [delivery, setDelivery] = useState("DELIVER");
     const handleDelivery = (e: any) => {
         setDelivery(e.target.value);
+        if (e.target.value === "TAKE_AWAY") setFee(0);
     };
 
-    // Get location
-    const [currentProvince, setCurrentProvince] = useState("1");
-    const [provinceList, setProvinceList] = useState([
-        {
-            value: "",
-            label: "",
-        },
-    ]);
-    const onProvinceChange = (value: string) => {
-        setCurrentProvince(value);
-    };
-    const [currentDistrict, setCurrentDistrict] = useState("1");
-    const [districtList, setDistrictList] = useState([
-        {
-            value: "",
-            label: "",
-        },
-    ]);
-    const onDistrictChange = (value: string) => {
-        setCurrentDistrict(value);
-    };
-    const [currentWard, setCurrentWard] = useState("1");
-    const [wardList, setWardList] = useState([
-        {
-            value: "",
-            label: "",
-        },
-    ]);
-    const onWardChange = (value: string) => {
-        setCurrentWard(value);
-    };
-    const filterOption = (
-        input: string,
-        option?: { label: string; value: string }
-    ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
     return (
         <div className='w-full h-auto p-10 rounded-3xl bg-primary-white'>
             <ConfigProvider
@@ -85,19 +53,19 @@ const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
                         name='deliveryType'
                         label={
                             <span className='whitespace-nowrap font-bold text-lg'>
-                                SHIPPING ADDRESS
+                                {t("Ship")}
                             </span>
                         }
                     >
                         <Radio.Group onChange={handleDelivery}>
                             <Radio value='DELIVER'>
                                 <span className='whitespace-nowrap font-bold text-md'>
-                                    Deliver to address
+                                    {t("Deliver")}
                                 </span>
                             </Radio>
                             <Radio value='TAKE_AWAY'>
                                 <span className='whitespace-nowrap font-bold text-md'>
-                                    Receive at restaurant
+                                    {t("Receive")}
                                 </span>
                             </Radio>
                         </Radio.Group>
@@ -111,13 +79,12 @@ const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
                                     rules={[
                                         {
                                             required: true,
-                                            message:
-                                                "Please input your address!",
+                                            message: t("Address_warn"),
                                         },
                                     ]}
                                 >
                                     <Input
-                                        placeholder='Detail Address'
+                                        placeholder={t("Address_plh")}
                                         style={{ marginTop: 8 }}
                                     />
                                 </Form.Item>
@@ -125,23 +92,21 @@ const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
                                     <Input />
                                 </Form.Item>
                             </div>
-                            <div className='w-full h-auto rounded-xl overflow-hidden'>
+                            <div className='w-full h-auto rounded-xl overflow-hidden z-0'>
                                 <Map form={form} setFee={setFee}></Map>
                             </div>
                         </>
                     ) : (
                         // </Form.Item>
                         <div className='pb-6 font-normal text-lg'>
-                            Ground Floor, TOPS Au Co Shopping Center, No. 685 Au
-                            Co, Tan Thanh Ward, Tan Phu District, Ho Chi Minh
-                            City
+                            {t("Address")}
                         </div>
                     )}
                     <Form.Item
                         name='orderNotes'
                         label={
                             <span className='whitespace-nowrap font-bold text-lg'>
-                                ORDER NOTE
+                                {t("Note")}
                             </span>
                         }
                     >
@@ -152,13 +117,13 @@ const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
                         name='paymentMethod'
                         label={
                             <span className='whitespace-nowrap font-bold text-lg'>
-                                PAYMENT METHOD
+                                {t("Method")}
                             </span>
                         }
                         rules={[
                             {
                                 required: true,
-                                message: "Please choose your payment method!",
+                                message: t('Method_warn'),
                             },
                         ]}
                     >
@@ -173,11 +138,11 @@ const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
                                             height={30}
                                             unoptimized
                                         />
-                                        <span> CASH </span>
+                                        <span> {t("Cash")}</span>
                                     </div>
                                 </Radio>
                                 <Radio value='MOMO'>
-                                    <div className='flex flex-row gap-2 items-center'>
+                                    <div className='flex flex-row gap-2 items-center w-auto'>
                                         <Image
                                             src='/momo.png'
                                             alt='Momo'
@@ -185,7 +150,7 @@ const OrderForm = ({ form, setFee }: { form: any; setFee: any }) => {
                                             height={30}
                                             unoptimized
                                         />
-                                        <span> MOMO </span>
+                                        <span> {t("Momo")}</span>
                                     </div>
                                 </Radio>
                             </div>

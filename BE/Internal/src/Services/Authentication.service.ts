@@ -1,5 +1,5 @@
 import { CookieOptions, NextFunction, Request, Response } from "express";
-import { container } from "../Configs";
+import { container, mailler } from "../Configs";
 import { IClientRepository } from "../Repositories/IClientRepository";
 import { TYPES } from "../Types/type";
 import { Client, Employee } from "../Models";
@@ -73,6 +73,13 @@ export class AuthService {
 			}
 
 			this.sendToken(res, user);
+			mailler.sendEmail({
+				from: "minhvuonglht10@gmail.com",
+				to: "vuong.lieu080519@hcmut.edu.vn",
+				subject: "Sending Email using Node.js",
+				html: "<p>Bạn đã đăng nhập vào BK food",
+			})
+
 		} catch (err) {
 			//
 			next(err);
@@ -116,6 +123,7 @@ export class AuthService {
 					clientId: user.getDataValue('id')
 				})
 				await user.createChannel()
+				
 				this.sendToken(res, user);
 			}
 		} catch (err) {

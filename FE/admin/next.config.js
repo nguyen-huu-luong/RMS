@@ -9,6 +9,9 @@ const nextConfig = {
     experimental: {
         serverComponentsExternalPackages: ["mjml"],
       },
+      env: {
+        BASE_URL:"http://localhost:3003/api"
+    },
 }
 
 const withNextIntl = require("next-intl/plugin")(

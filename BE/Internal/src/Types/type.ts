@@ -15,8 +15,17 @@ const TYPES = {
     IMessageTemplateRepository: Symbol.for("IMessageTemplateRepository"),
 
     IMessageRepository: Symbol.for("IMessageRepository"),
-    IChannelRepository: Symbol.for("IChannelRepository")
-
+    IChannelRepository: Symbol.for("IChannelRepository"),
+    ITableRepository: Symbol.for("ITableRepository"),
+    IFloorRepository: Symbol.for("IFloorRepository"),
+    IReservationRepository: Symbol.for("IReservationRepository"),
+    ITableReservationRepository: Symbol.for("ITableReservationRepository"),
+    ICartItemRepository: Symbol.for("ICartItemRepository"),
+    IClickEventRepository: Symbol.for("IClickEventREpository"),
+    IOpenEventRepository: Symbol.for("IOpenEventRepository"),
+    INotificationRepository: Symbol.for("INotificationRepository"),
+    IClientHistoryRepository: Symbol.for("IClientHistoryRepository"),
+    ISubscriberRepository: Symbol.for("ISubscriberRepository"),
 };
 
 type FilterCondition = {
@@ -41,6 +50,7 @@ type QueryOptions = {
         page: number,
         pageSize: number
     }
+    type?: string
 }
 
 export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter };

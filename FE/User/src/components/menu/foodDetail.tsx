@@ -12,7 +12,9 @@ import styles from "@/app/styles.module.css";
 import { useSession } from "next-auth/react";
 import { addToCart } from "@/app/api/product/cart";
 import { useRouter } from "next-intl/client";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect } from "react";
+import fetchClient from "@/lib/fetch-client";
 
 const FoodDetail = ({
     food,
@@ -31,6 +33,7 @@ const FoodDetail = ({
     const { data: session, status } = useSession();
     const router = useRouter();
     const locale = useLocale();
+    const t = useTranslations('Home')
     const handleAddToCart = async () => {
         if (status === "unauthenticated") {
             router.push(`/signin`);
@@ -39,7 +42,7 @@ const FoodDetail = ({
                 productId: food.id,
                 quantity: count,
             });
-            message.success("Added food to cart");
+            message.success(t('Success'));
             closeModal();
         }
     };
@@ -50,6 +53,7 @@ const FoodDetail = ({
     const decrease = () => {
         if (count > 1) setCount(count - 1);
     };
+
     return (
         <>
             <div
@@ -67,6 +71,7 @@ const FoodDetail = ({
                         alt={food.name}
                         width={300}
                         height={300}
+                        className="aspect-square"
                         unoptimized
                     />
                 </div>
@@ -75,12 +80,12 @@ const FoodDetail = ({
                         {food.name}
                     </span>
                     <div className=' text-item-black flex flex-col justify-start gap-0'>
-                        <span className='font-bold'>Description</span>
+                        <span className='font-bold'>{t('Food_des')}</span>
                         <span className='font-normal'>{food.description}</span>
                     </div>
                     <div className='w-full flex flex-row justify-between text-primary font-bold'>
                         <div className='flex flex-col justify-between gap-1'>
-                            <span>Price: {food.price}</span>
+                            <span>{t('Price')}: {food.price}</span>
                             <span className='flex flex-row justify-between'>
                                 <button
                                     className='w-auto h-auto'
@@ -107,7 +112,7 @@ const FoodDetail = ({
                             className='h-auto rounded-md p-2 bg-primary hover:bg-primary-400 text-item-white transition-all duration-300 ease-in-out'
                             onClick={handleAddToCart}
                         >
-                            ADD TO CART
+                            {t('Add')}
                         </button>
                     </div>
                 </div>

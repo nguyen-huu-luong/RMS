@@ -9,28 +9,16 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      type: {
-        type: Sequelize.STRING
+      numRes: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
       status: {
-        type: Sequelize.STRING
-      },
-      startDate: {
-        type: Sequelize.DATE
-      },
-      endDate: {
-        type: Sequelize.DATE
-      },
-      budget: {
-        type: Sequelize.FLOAT
-      },
-      unit: {
-        type: Sequelize.STRING
-      },
-      totalSent: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

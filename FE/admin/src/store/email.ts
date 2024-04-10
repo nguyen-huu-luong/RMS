@@ -65,15 +65,15 @@ const useEmailDataStore = create<StoreState & StoreActions>()(
         console.log("Set email data", html);
         set(
           produce((draft) => {
-			console.log("draft", draft)
+            console.log("draft", draft);
             draft.emailData = html;
           })
         );
       },
 
       setActiveNode: (node) => {
-        console.log("Set active node" , node)
-		set(
+        console.log("Set active node", node);
+        set(
           produce((draft) => {
             draft.activeNode = node;
           })

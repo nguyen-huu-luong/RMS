@@ -22,7 +22,9 @@ class ClientRouter {
         clientRouter.post("", this.clientController.createCustomer.bind(this.clientController));
         clientRouter.put("/:id", this.clientController.updateCustomer.bind(this.clientController));
         clientRouter.delete("/:id", this.clientController.delete.bind(this.clientController));
-        clientRouter.get("/opportunity", this.clientController.getOpporturnityCustomer.bind(this.clientController))
+        clientRouter.put("", this.clientController.updateCustomer.bind(this.clientController));
+        clientRouter.get("", this.clientController.getCustomerInfo.bind(this.clientController));
+        clientRouter.get("/opportunity/all", this.clientController.getOpporturnityCustomer.bind(this.clientController))
         router.use("/customers", AuthMiddleware.initialize, Authorization.initialize, clientRouter);
     }
 }

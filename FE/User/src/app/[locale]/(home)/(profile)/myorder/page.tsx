@@ -13,9 +13,12 @@ import moment, { Moment } from "moment";
 import { FileSearchOutlined, CloseSquareOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { cancelOrder } from "@/app/api/product/order";
+import Loading from "@/components/loading";
+import fetchClient from "@/lib/fetch-client";
 const { RangePicker } = DatePicker;
 
 export default function MyOrder() {
+    const t = useTranslations("Profile");
     const locale = useLocale();
     const [dateRange, setDateRange] = useState<any>(null);
     const [filterOrders, setFilteredOrders] = useState<any>(null);
@@ -32,7 +35,7 @@ export default function MyOrder() {
             key: "id",
         },
         {
-            title: "Date",
+            title: t("Date"),
             dataIndex: "createdAt",
             key: "createdAt",
             render: (text: any) => <span>{moment(text).format("L")}</span>,
@@ -40,12 +43,12 @@ export default function MyOrder() {
                 moment(a.createdAt).unix() - moment(b.createdAt).unix(),
         },
         {
-            title: "Status",
+            title: t("Status"),
             dataIndex: "status",
             key: "status",
         },
         {
-            title: "Action",
+            title: t("Action"),
             key: "action",
             render: (record: any) => (
                 <Space size='middle'>
@@ -55,7 +58,10 @@ export default function MyOrder() {
                         />
                     </Link>
                     {record.status == "Pending" ? (
-                        <div className="cursor-pointer" onClick={() => handleDeleteOrder(record)}>
+                        <div
+                            className='cursor-pointer'
+                            onClick={() => handleDeleteOrder(record)}
+                        >
                             <CloseSquareOutlined
                                 style={{ fontSize: "24px", color: "#08c" }}
                             />
@@ -71,15 +77,19 @@ export default function MyOrder() {
         data: orders,
         error: ordersErrors,
         isLoading: ordersLoading,
-    } = useSWR(
-        session
-            ? [`http://localhost:3003/api/orders`, session.user.accessToken]
-            : null,
-        ([url, token]) => ordersFetcher(url, token)
+    } = useSWR(`/orders`, (url) =>
+        fetchClient({ url: url, data_return: true })
     );
-    const handleDeleteOrder = (record: any) => {
-        cancelOrder(session?.user.accessToken, {orderId: record.id, status: "Cancel"})
-    }
+    const handleDeleteOrder = async (record: any) => {
+        await fetchClient({
+            url: `/orders`,
+            method: "PUT",
+            body: {
+                orderId: record.id,
+                status: "Cancel",
+            },
+        });
+    };
     useEffect(() => {
         if (!orders) return;
         setFilteredOrders(orders);
@@ -94,17 +104,16 @@ export default function MyOrder() {
                 "[]"
             );
         });
-        console.log(filterOrders);
         setFilteredOrders(filteredOrders);
     }, [dateRange, orders]);
     if (ordersErrors) return <div>Failed to load</div>;
-    if (ordersLoading) return <div>Loading...</div>;
-    if (!orders) return <div>Loading...</div>;
-    if (!filterOrders) return <div>Loading...</div>;
+    if (ordersLoading) return <Loading />;
+    if (!orders) return <Loading />;
+    if (!filterOrders) return <Loading />;
     return (
         <>
             <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl py-2 px-3'>
-                Manage Order
+                {t("Manage")}
             </div>
             {orders.length == 0 ? (
                 <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl flex flex-col gap-2 items-center p-10'>
@@ -117,9 +126,7 @@ export default function MyOrder() {
                             unoptimized
                         />
                     </div>
-                    <span className='font-bold'>
-                        You haven't placed any orders yet.
-                    </span>{" "}
+                    <span className='font-bold'>{t("No")}</span>{" "}
                 </div>
             ) : (
                 <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl py-2 px-3 flex flex-col gap-2'>

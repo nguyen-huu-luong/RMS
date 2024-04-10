@@ -1,22 +1,42 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, type BelongsToCreateAssociationMixin } from 'sequelize';
 import { sequelize } from '../Configs';
 import Reservation from './Reservation';
-import TableOrder from './TableOrder';
 import TableReservation from './TableReservation';
 import Order from './Order';
+import Floor from './Floor';
 import Loader from '../Loaders';
+import Cart from './Cart';
 class Table extends Model {
+  declare createFloor: BelongsToCreateAssociationMixin<Floor>;
   static associate() {
     Table.belongsToMany(Reservation, {
       through: TableReservation,
       foreignKey: "tableId",
       otherKey: "reservationId",
     });
-    Table.belongsToMany(Order, {
-      through: TableOrder,
-      foreignKey: "tableId",
-      otherKey: "orderId",
+
+    Table.belongsTo(Floor, {
+			foreignKey: {
+				name: "floorId",
+				allowNull: true,
+			},
+		});
+
+    Table.hasOne(Cart, {
+			foreignKey: {
+				name: "tableId",
+				allowNull: true,
+			},
+			sourceKey: "id",
+		})
+    Table.hasMany(Order, {
+      foreignKey: {
+        name: "tableId",
+        allowNull: true,
+      },
+      sourceKey: "id",
     });
+
   }
 }
 
@@ -24,28 +44,16 @@ Table.init(
   {
     name: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
-    type: {
-      type: DataTypes.STRING,
+    numRes: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     status: {
       type: DataTypes.STRING,
-    },
-    startDate: {
-      type: DataTypes.DATE,
-    },
-    endDate: {
-      type: DataTypes.DATE,
-    },
-    budget: {
-      type: DataTypes.FLOAT,
-    },
-    unit: {
-      type: DataTypes.STRING,
-    },
-    totalSent: {
-      type: DataTypes.INTEGER,
-    },
+      allowNull: false,
+    }
   },
   { sequelize: Loader.sequelize }
 );

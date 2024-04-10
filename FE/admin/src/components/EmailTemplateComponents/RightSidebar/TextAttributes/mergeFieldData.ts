@@ -12,14 +12,14 @@ export const mergeFieldData: IMergeFieldData = {
     "customer": {
       key: 1,
       fields: [
-        { key: 8, value: "customer.id", label: "Id" },
-        { key: 1, value: "customer.firstname", label: "Firstname" },
-        { key: 2, value: "customer.lastname", label: "Lastname" },
-        { key: 3, value: "customer.fullname", label: "Fullname" },
-        { key: 4, value: "customer.email", label: "Email" },
-        { key: 5, value: "customer.phone", label: "Phone" },
-        { key: 6, value: "customer.address", label: "Address" },
-        { key: 7, value: "customer.birthday", label: "Birthday" },
+        { key: 8, value: "id", label: "Id" },
+        { key: 1, value: "firstname", label: "Firstname" },
+        { key: 2, value: "lastname", label: "Lastname" },
+        { key: 3, value: "customer", label: "Fullname" },
+        { key: 4, value: "email", label: "Email" },
+        { key: 5, value: "phone", label: "Phone" },
+        { key: 6, value: "address", label: "Address" },
+        { key: 7, value: "birthday", label: "Birthday" },
       ],
     },
   

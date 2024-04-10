@@ -1,17 +1,16 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useLocale } from "next-intl";
+import { useState, useEffect } from "react";
 import OrderForm from "@/components/order/orderForm";
 import SideBar from "@/components/order/sidebar";
 import Progress from "@/components/order/progressBar";
 import { Form } from "antd";
 import { useSession } from "next-auth/react";
 import { useCreateOrder } from "@/app/api/product/order";
-import useSWR from "swr";
-import { cartFetcher } from "@/app/api/product/cart";
 import { useRouter } from "next-intl/client";
-import Map from "@/components/map/map";
+import Loading from "@/components/loading";
+import fetchClient from "@/lib/fetch-client";
 
 export default function Order() {
     const locale = useLocale();
@@ -21,17 +20,13 @@ export default function Order() {
     const [amount, setAmount] = useState<number>(0);
     const [voucher, setVoucher] = useState<number>(0);
     const [fee, setFee] = useState<any>(0);
-    const {
-        data: cartItems,
-        error: cartItemsError,
-        isLoading: cartItemsLoading,
-    } = useSWR(
-        session
-            ? [`http://localhost:3003/api/carts`, session.user.accessToken]
-            : null,
-        ([url, token]) => cartFetcher(url, token)
-    );
-    if (status === "loading") return <div>Loading.....</div>;
+    useEffect(() => {
+        if (status === "loading") return;
+        if (status === "unauthenticated") {
+            router.push("/signin");
+        }
+    }, [status, router]);
+    if (status === "loading") return <Loading />;
     if (status === "unauthenticated") router.push("/signin");
     const handlePayOrder = async () => {
         try {
@@ -47,19 +42,16 @@ export default function Order() {
                     formValues.deliveryType === "DELIVER"
                         ? formValues.address
                         : "",
-                shippingCost:
-                    formValues.deliveryType === "DELIVER"
-                        ? fee
-                        : 0,
+                shippingCost: formValues.deliveryType === "DELIVER" ? fee : 0,
                 paymentMethod: formValues.paymentMethod,
                 discountAmount: amount,
                 voucherId: voucher,
             };
-            const data = await useCreateOrder(
-                session?.user.accessToken,
-                dataBody,
-                formValues.paymentMethod
-            );
+            const data = await fetchClient({
+                url: `/orders?method=${formValues.paymentMethod}`,
+                method: "POST",
+                body: dataBody,
+            });
 
             if (payMethod == "CASH") {
                 router.push("/payment?method=CASH");
@@ -71,8 +63,7 @@ export default function Order() {
             console.log("Validation failed:", err);
         }
     };
-    if (cartItemsError) return <div>Failed to load</div>;
-    if (cartItemsLoading) return <div>Loading...</div>;
+
     // Form state
     return (
         <div className='flex flex-col lg:flex-row justify-between gap-5 p-10'>
@@ -83,10 +74,10 @@ export default function Order() {
             {/* CART STATE */}
             <SideBar
                 onPayOrder={handlePayOrder}
-                currentCart={cartItems}
                 setAmount={setAmount}
                 setVoucherId={setVoucher}
                 fee={fee}
+                token={session?.user.accessToken}
             />
         </div>
     );

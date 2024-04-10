@@ -4,7 +4,7 @@ import { QueryOptions, TYPES } from '../Types/type';
 import { IClientRepository } from '../Repositories/IClientRepository';
 import { IOrderRepository } from "../Repositories/IOrderRepository"; 
 import { ICartRepository, IProductRepository } from '../Repositories';
-import { CartItem } from '../Models';
+import { Product, Client } from '../Models';
 import { CustomError, RecordNotFoundError } from '../Errors';
 import { Op, where } from 'sequelize';
 
@@ -58,12 +58,9 @@ export class ClientService {
         if (!user) {
             throw new RecordNotFoundError()
         } 
-        let {birthday, gender, ...info} = data
-        birthday = new Date(Date.parse(birthday))
-        gender = Boolean(JSON.parse(gender))
-        let clientInfo = {"birthday": birthday, "gender": gender, ...info}
-        return await this.clientRepository.update(id, clientInfo); 
+        return await this.clientRepository.update(id, data); 
     }
+    
 
     public async delete(id: number) {
         const user = this.clientRepository.findById(id) ;
@@ -82,12 +79,21 @@ export class ClientService {
     }
 
     public getOpportunityCustomer =  async () => {
-        const carts = this.cartRepository.findByCond(
+        const carts = await this.cartRepository.findByCond(
             {
-                attributes: ['id', 'clientId'],
-                include: {
-                    model: CartItem
-                }
+                attributes: ['id', 'clientId', 'amount'],
+                where: {
+                    clientId: {
+                        [Op.ne]: null
+                    },
+                    amount: {
+                        [Op.ne]: 0
+                    }
+                },
+                include: [{
+                    model: Product
+                },
+                {   model: Client}]
             }
         )
 

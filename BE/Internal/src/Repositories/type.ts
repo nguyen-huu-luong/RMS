@@ -10,7 +10,13 @@ const TYPES = {
     ICategoryRepository: Symbol.for("ICategoryRepository"),
     IVoucherRepository: Symbol.for("IVoucherRepository"),
     IChannelRepository: Symbol.for("IChannelRepository"),
-    IMessageRepository: Symbol.for("IMessageRepository")
+    IMessageRepository: Symbol.for("IMessageRepository"),
+    IFloorRepository: Symbol.for("IFloorRepository"),
+    ITableRepository: Symbol.for("ITableRepository"),
+    IReservationRepository: Symbol.for("IReservationRepository"),
+    ITableReservationRepository: Symbol.for("ITableReservationRepository"),
+    IClientHistoryRepository: Symbol.for("IClientHistoryRepository"),
+    ISubscriberRepository: Symbol.for("ISubscriberRepository"),
 };
 
 export { TYPES };

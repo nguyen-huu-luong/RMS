@@ -1,8 +1,6 @@
 import { NextFunction } from "express";
-import DBConnect from "./db";
 import { Channel } from "../Models";
 import { TokenUtil } from "../Utils";
-import { UnauthorizedError } from "../Errors";
 class SocketConnection {
     private channels: { [channelId: string]: string } = {};
 
@@ -17,13 +15,14 @@ class SocketConnection {
                         where: { clientId: id },
                     });
                     socket.join("Channel_" + channel?.dataValues.id);
+                    socket.join("PrivateChannel_" + id)
                 } else if (role == "employee" || role == "manager") {
                     const channels = await Channel.findAll();
                     channels.forEach((channel: any) => {
                         socket.join("Channel_" + channel.dataValues.id);
                     });
-                    console.log(socket.rooms);
-                }
+                    socket.join("Kitchen");
+                } 
                 next();
             } catch (error) {
                 console.log(error);
@@ -32,6 +31,8 @@ class SocketConnection {
         });
         io.on("connection", (socket: any) => {
             socket.emit("initial:channels", this.channels);
+
+            // Chat service
             socket.on(
                 "client:message:send",
                 (channelId: string, message: string, clientId: string) => {
@@ -61,6 +62,7 @@ class SocketConnection {
                 );
             });
             socket.on("staff:message:read", (channelId: string) => {
+                console.log("staff:message:read from channel ", channelId);
                 io.to("Channel_" + channelId).emit(
                     "message:read:fromStaff",
                     channelId
@@ -69,8 +71,10 @@ class SocketConnection {
             socket.on(
                 "staff:channel:join",
                 (channelId: string, staffId: string, callback: any) => {
-                    console.log(this.channels)
-                    if (this.channels[channelId] && this.channels[channelId] != socket.id) {
+                    if (
+                        this.channels[channelId] &&
+                        this.channels[channelId] != socket.id
+                    ) {
                         callback({
                             status: "0",
                         });
@@ -107,16 +111,41 @@ class SocketConnection {
                     }
                 }
             );
+
+
+            // Kitchen display service
+            socket.on("chef:order:finish", (orderId: string) => {
+                io.to("Kitchen").emit("order:finish:fromChef", orderId);
+            });
+            socket.on("staff:order:prepare", (orderId: string) => {
+                io.to("Kitchen").emit("order:prepare:fromStaff", orderId);
+            });
+
+
+            //Notification service
+            socket.on("staff:notifications:prepare", (clientId:string, orderId: string) => {
+                console.log("Channel_" + clientId);
+                io.to("PrivateChannel_" + clientId).emit("notification:prepare:fromStaff", orderId);
+            });
+            socket.on("staff:notifications:deliver", (clientId:string, orderId: string) => {
+                io.to("PrivateChannel_" + clientId).emit("notification:deliver:fromStaff", orderId);
+            });
+            socket.on("staff:notifications:done", (clientId:string, orderId: string) => {
+                io.to("PrivateChannel_" + clientId).emit("notification:done:fromStaff", orderId);
+            });
+            socket.on("staff:notifications:reject", (clientId:string, orderId: string) => {
+                io.to("PrivateChannel_" + clientId).emit("notification:reject:fromStaff", orderId);
+            });
+
+            // Disconnect
             socket.on("disconnect", () => {
                 Object.keys(this.channels).forEach((channelId) => {
                     if (this.channels[channelId] === socket.id) {
                         delete this.channels[channelId];
                         io.emit("channel:status:update", this.channels);
-                        // io.to(channelId).emit("room:update", { type: "disconnect", staffId: socket.id });
                     }
                 });
             });
-
         });
     }
 }

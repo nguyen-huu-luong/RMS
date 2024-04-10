@@ -1,16 +1,14 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import {
 	Button,
 	ConfigProvider,
 	InputRef,
-	Radio,
 	Table,
 	Input,
 	Space,
-	Checkbox,
 	Select,
-	Row,
 	Alert,
 } from "antd";
 import type { TableProps, GetProp, TableColumnType } from "antd";
@@ -23,12 +21,11 @@ import {
 import Highlighter from "react-highlight-words";
 import type {
 	FilterConfirmProps,
-	FilterValue,
 	Key,
 	SortOrder,
-	SorterResult,
 } from "antd/es/table/interface";
-import { CustomerActionBar, CustomerFilterBar } from "@/components";
+import { CustomerActionBar } from "@/components";
+import fetchClient from "@/lib/fetch-client";
 import Link from "next/link";
 
 type ColumnsType<T> = TableProps<T>["columns"];
@@ -73,6 +70,7 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const EmailTemplate: React.FC = () => {
+	const [checker, setChecker] = useState(true);
 	const [searchText, setSearchText] = useState("");
 	const [searchedColumn, setSearchedColumn] = useState("");
 	const searchInput = useRef<InputRef>(null);
@@ -228,8 +226,8 @@ const EmailTemplate: React.FC = () => {
 			title: "Fullname",
 			dataIndex: "fullname",
 			key: "fullname",
-			render: (text) => <a>{text}</a>,
-			...getColumnSearchProps("fullname"),
+			render: (text, row) => <a style={{ color: "#4A58EC" }} href={`./customers/${row.id}`}>{text}</a>,
+			// ...getColumnSearchProps("fullname"),
 		},
 		{
 			title: "Phone number",
@@ -288,7 +286,7 @@ const EmailTemplate: React.FC = () => {
 		// }
 	];
 
-	const fetchData = () => {
+	const fetchData = async () => {
 		setLoading(true);
 		try {
 			let filterQueriesStr = "";
@@ -300,46 +298,33 @@ const EmailTemplate: React.FC = () => {
 					? `&sort=${tableParams.sorter?.field}&order=${tableParams.sorter?.order === "ascend" ? "asc" : "desc"
 					}`
 					: "";
-			fetch(
-				`http://localhost:3003/api/customers/all?page=${tableParams.pagination?.current}
-							&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
-				{
-					headers: {
-						Authorization:
-							"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiTWFyaW9fS29zc0B5YWhvby5jb20iLCJyb2xlIjoibWFuYWdlciIsImlhdCI6MTcwODM1NjUwNCwiZXhwIjoxNzE0MzU2NTA0fQ.naMCtTR_QKTwTMkqjIL6QaMNnbZdOk7wzuojI_H5RNc",
-					},
-				}
-			)
-				.then((res) => res.json())
-				.then((results) => {
-					const data = results.data.map((item: any) => ({
-						...item,
-						key: item.id,
-						fullname: `${item.firstname} ${item.lastname}`,
-					}));
-					setData(data);
-					setLoading(false);
-					setTableParams({
-						...tableParams,
-						pagination: {
-							...tableParams.pagination,
-							pageSize: results.pageSize,
-							current: results.page,
-							total: results.totalCount,
-							// 200 is mock data, you should read it from server
-							// total: data.totalCount,
-						},
-					});
-				})
-				.catch((error) => {
-					console.log(error);
-					setError({
-						isError: true,
-						title: error?.name || "Something went wrong!",
-						message: error?.message || "Unknown error",
-					});
-				});
+			const respone = await fetchClient({
+				url: `/customers/all?page=${tableParams.pagination?.current}
+				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`
+			})
+
+			console.log(respone)
+			const results = respone.data
+			const data = results.data.map((item: any) => ({
+				...item,
+				key: item.id,
+				fullname: `${item.firstname} ${item.lastname}`,
+			}));
+			setData(data);
+			setLoading(false);
+			setTableParams({
+				...tableParams,
+				pagination: {
+					...tableParams.pagination,
+					pageSize: results.pageSize,
+					current: results.page,
+					total: results.totalCount,
+				},
+			});
+				
+				
 		} catch (error: any) {
+			setLoading(false)
 			console.log(error);
 			setError({
 				isError: true,
@@ -351,7 +336,7 @@ const EmailTemplate: React.FC = () => {
 
 	useEffect(() => {
 		fetchData();
-	}, [JSON.stringify(tableParams)]);
+	}, []);
 
 	const handleTableChange: TableProps["onChange"] = (
 		pagination,
@@ -384,6 +369,8 @@ const EmailTemplate: React.FC = () => {
 				},
 			}));
 		}
+
+		setChecker(prevState => !prevState)
 	};
 
 	const handleSortFieldChange = (key: string) => {
@@ -392,6 +379,7 @@ const EmailTemplate: React.FC = () => {
 			...prev,
 			sorter: { ...prev.sorter, field: key },
 		}));
+		setChecker(prevState => !prevState)
 		console.log(tableParams);
 	};
 
@@ -403,6 +391,7 @@ const EmailTemplate: React.FC = () => {
 				order: prev.sorter?.order === "ascend" ? "descend" : "ascend",
 			},
 		}));
+		setChecker(prevState => !prevState)
 	};
 
 	const handleClearFilter = () => { };
@@ -425,7 +414,7 @@ const EmailTemplate: React.FC = () => {
 				},
 			}}
 		>
-			<Space direction="vertical">
+			<Space direction="vertical" className="w-full">
 				{/* <CustomerFilterBar /> */}
 				<CustomerActionBar dataSelected={selectedCustomers}/>
 				{error.isError && (

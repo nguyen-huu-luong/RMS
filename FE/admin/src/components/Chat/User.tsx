@@ -6,24 +6,7 @@ import { useEffect, useCallback } from "react";
 import axios from "axios";
 import { message } from "antd";
 import { Tag } from "antd";
-export const seenMessage = async (token: any, id: string) => {
-    try {
-        const response = await axios.put(
-            `http://localhost:3003/api/channels`,
-            { id: id },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-        return response.data;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-};
+import fetchClient from "@/lib/fetch-client";
 
 const TimeDisplay = (time: any) => {
     const momentDate = moment(time);
@@ -38,7 +21,6 @@ function User({
     setChannel,
     socket,
     setChannels,
-    token,
     setIndex,
     staffId,
     channelStatus,
@@ -53,7 +35,6 @@ function User({
     setChannel: any;
     socket: any;
     setChannels: any;
-    token: any;
     setIndex: any;
     staffId: any;
     channelStatus: any;
@@ -152,7 +133,11 @@ function User({
     }, [socket, setChannels, params.channel.id]);
 
     const viewMessage = async () => {
-        await seenMessage(token, params.channel.id);
+        await fetchClient({
+            url: `/channels`,
+            method: "PUT",
+            body: { id: params.channel.id },
+        });
         socket.emit("staff:message:read", params.channel.id);
         setChannels((prevChannels: any) => {
             if (!prevChannels) return prevChannels;
@@ -234,7 +219,7 @@ function User({
                 <div> </div>
             </div>
             {params.channel.id in channelStatus ? (
-                <Tag color="#87d068">Active</Tag>
+                <Tag color='#87d068'>Active</Tag>
             ) : (
                 <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'>
                     {TimeDisplay(params.latestMessage.createdAt)}

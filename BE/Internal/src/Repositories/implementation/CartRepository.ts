@@ -26,9 +26,22 @@ export class CartRepository
         }
     }
 
+    public async getCartTable(tableId: number) {
+        try {
+            const cart = await this._model.findOne({
+                where: {
+                    tableId: tableId,
+                },
+            });
+            return cart;
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+
     public async findByCond(condition: any){
         try {
-            const cart = await this._model.findOne(
+            const cart = await this._model.findAll(
                 condition
             );
             return cart;

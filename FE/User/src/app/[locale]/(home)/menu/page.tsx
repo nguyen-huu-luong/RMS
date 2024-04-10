@@ -8,7 +8,9 @@ import { Pagination, ConfigProvider } from "antd";
 import type { PaginationProps } from "antd";
 import FoodDetail from "@/components/menu/foodDetail";
 import useSWR from "swr";
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import Loading from "@/components/loading";
+import publicFetcher from "@/lib/public-fetcher";
+import fetchClient from "@/lib/fetch-client";
 
 export default function Menu() {
     const searchParams = useSearchParams();
@@ -23,12 +25,12 @@ export default function Menu() {
         data: foods,
         error: foodError,
         isLoading: foodLoading,
-    } = useSWR(`${process.env.BASE_URL}/products/all`, fetcher);
+    } = useSWR(`/products/all`, (url) => publicFetcher({url: url, data_return: true}));
     const {
         data: categories,
         error: categoryError,
         isLoading: categoryLoading,
-    } = useSWR(`${process.env.BASE_URL}/categories/all`, fetcher);
+    } = useSWR(`/categories/all`, (url) => publicFetcher({url: url, data_return: true}));
 
     // Modal for food detail
     const [modal, setModal] = useState<boolean>(false);
@@ -47,7 +49,13 @@ export default function Menu() {
         price: 0,
         categoryId: "",
     });
-    const openModal = (item: typeof detail) => {
+    const openModal = async (item: typeof detail) => {
+        await fetchClient({method: "POST", url: `/clienthistories`, body: {
+            action: "view_item",
+            productId: item.id,
+            updatedAt:  new Date(),
+            createdAt: new Date()
+        }})
         setDetail(item)
         setModal(true);
     };
@@ -59,7 +67,7 @@ export default function Menu() {
     };
     if (foodError) return <div>Failed to load</div>;
     if (categoryError) return <div>Failed to load</div>;
-    if (foodLoading || categoryLoading) return <div>Loading...</div>;
+    if (foodLoading || categoryLoading) return <Loading/>;
     return (
         <div className='w-full h-auto flex flex-col justify-start gap-5'>
             <div className='w-full h-auto rounded-3xl border-2 border-orange-100 bg-primary-white p-2 flex flex-wrap justify-around'>

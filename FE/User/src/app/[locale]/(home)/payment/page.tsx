@@ -16,7 +16,7 @@ export default function Payment() {
     const locale = useLocale();
     const searchParams = useSearchParams()
     const router = useRouter()
-
+    const t = useTranslations('Order')
     const payMethod = searchParams.get('method')
     const resultCode = searchParams.get('resultCode')
     const { data: session, status } = useSession()
@@ -51,13 +51,13 @@ export default function Payment() {
 
     const steps = [
         {
-            title: "CART",
+            title: t('Cart'),
         },
         {
-            title: "ORDER",
+            title:  t('Order'),
         },
         {
-            title: "PAYMENT",
+            title:  t('Payment'),
         },
     ];
     const items = steps.map((item) => ({ key: item.title, title: item.title }));
@@ -89,14 +89,14 @@ export default function Payment() {
                             />
                         </div>
                         <span className='font-extrabold text-xl'>
-                            ORDER SUCCESSFULLY
+                            {t('Success')}
                         </span>
                         <Link
                             href={"/myorder"}
                             locale={locale}
                             className='p-2 px-10 w-auto h-auto rounded-lg font-extrabold text-lg border-orange-500 border-2 hover:bg-primary-400 bg-primary text-item-white transition-all duration-300 flex justify-center'
                         >
-                            View order
+                            {t('View')}
                         </Link>
                     </div>
                 </div>

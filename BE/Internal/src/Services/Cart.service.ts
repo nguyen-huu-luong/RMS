@@ -3,7 +3,7 @@ import { Message } from "../Utils";
 import { HttpStatusCode } from "../Constants";
 import { container } from "../Configs";
 import { ICartRepository } from "../Repositories/ICartRepository";
-import { IProductRepository } from "../Repositories";
+import { IProductRepository, IClientHistoryRepository } from "../Repositories";
 import { TYPES } from "../Types/type";
 import statusMess from "../Constants/statusMess";
 import { RecordNotFoundError } from "../Errors";
@@ -14,6 +14,9 @@ export class CartService {
         ),
         private productRepository = container.get<IProductRepository>(
             TYPES.IProductRepository
+        ),
+        private clientHistoryRepository = container.get<IClientHistoryRepository>(
+            TYPES.IClientHistoryRepository
         )
     ) {}
 
@@ -32,7 +35,9 @@ export class CartService {
                 items: cartItems.map((item: any) => item.toJSON()),
             };
             Message.logMessage(req, status);
-            return res.status(status).send(response);
+            if (res.headersSent !== true) {
+                res.status(status).send(response);
+            }
         } catch (err) {
             console.log(err);
             next(err);
@@ -51,16 +56,23 @@ export class CartService {
             const cartItem = await cart.getProducts({
                 where: { id: req.body.productId },
             });
+
+            await this.clientHistoryRepository.create({
+                action: "add_to_cart",
+                clientId: req.userId,
+                productId: req.body.productId,
+                updatedAt:  new Date(),
+                createdAt: new Date()
+            })
+
             if (cartItem.length > 0) {
                 await cart.addProduct(product, {
                     through: {
                         quantity:
-                            req.body.quantity +
-                            cartItem[0].CartItem.quantity,
+                            req.body.quantity + cartItem[0].CartItem.quantity,
                         amount:
                             product.getDataValue("price") *
-                            (req.body.quantity +
-                                cartItem[0].CartItem.quantity),
+                            (req.body.quantity + cartItem[0].CartItem.quantity),
                         createdAt: cartItem[0].CartItem.createdAt,
                         updatedAt: new Date(),
                     },
@@ -128,7 +140,7 @@ export class CartService {
             if (req.body.quantity === 0) {
                 await cart.removeProduct(product);
             } else {
-                console.log("Success")
+                console.log("Success");
                 await cart.addProduct(product, {
                     through: {
                         quantity: req.body.quantity,
