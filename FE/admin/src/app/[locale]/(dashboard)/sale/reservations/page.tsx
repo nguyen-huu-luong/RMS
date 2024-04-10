@@ -61,8 +61,6 @@ function Home() {
         fetchClient({ url: url, data_return: true })
     );
 
-    console.log(resInfo)
-
     const showDetailTable = (tableId: any) => {
         push(`/sale/reservations/${tableId}`);
     }

@@ -149,6 +149,8 @@ export class OrderService {
                         });
                     })
                 );
+                const client = await this.clientRepository.findById(req.userId);
+                if (client.getDataValue('type') == "lead") await client.update({type:"customer"})
                 await cart.setProducts([]);
                 await this.cartRepository.update(cart?.getDataValue("id"), {
                     total: 0,
