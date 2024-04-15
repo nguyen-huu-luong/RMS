@@ -4,21 +4,23 @@ const faker = require("faker");
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         let orders = [];
-        for (let i = 1; i <= 10; i++) {
-            for (let j = 0; j < 3; j++) {
-                orders.push({
-                    clientId: i,
-                    num_items: faker.random.number({ min: 1, max: 5 }),
-                    amount: 0,
-                    status: "Done",
-                    paymentMethod: "CASH",
-                    createdAt: faker.date.past(),
-                    updatedAt: new Date(),
-                });
-            }
+        const currentDate = new Date();
+        const twoYearsAgo = new Date(currentDate.getFullYear() - 2, currentDate.getMonth(), currentDate.getDate());
+        
+        for (let i = 1; i <= 300; i++) {
+            orders.push({
+                clientId: faker.random.number({ min: 1, max: 10 }),
+                num_items: faker.random.number({ min: 1, max: 5 }),
+                amount: 0,
+                status: "Done",
+                paymentMethod: "CASH",
+                createdAt: faker.date.between(twoYearsAgo, currentDate),
+                updatedAt: new Date(),
+            });
         }
+
         let orderItems = [];
-        for (let orderId = 0; orderId < 30; orderId++) {
+        for (let orderId = 0; orderId < 300; orderId++) {
             let preProducts = [];
             for (let j = 0; j < orders[orderId].num_items; j++) {
                 let randomProduct;
@@ -29,24 +31,18 @@ module.exports = {
                 preProducts.push(randomProduct);
 
                 quantity = faker.random.number({ min: 1, max: 5 });
-
                 orderItems.push({
                     orderId: orderId + 1,
                     productId: randomProduct,
                     quantity: quantity,
-                    amount:
-                        quantity *
-                        faker.random.number({
-                            min: 40000,
-                            max: 70000,
-                            precision: 5000,
-                        }),
+                    amount: quantity * faker.random.number({ min: 40000, max: 70000, precision: 5000 }),
                     status: "Done",
                     createdAt: faker.date.past(),
                     updatedAt: new Date(),
                 });
             }
         }
+
         let base = 0;
         for (let order of orderItems) {
             orders[order.orderId - 1].amount += order.amount;
@@ -55,11 +51,9 @@ module.exports = {
 
         let clientAmounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         let temp = 0;
-        for (let orderId = 0; orderId < 30; orderId++) {
-            clientAmounts[temp] += orders[orderId].amount;
-            if ((orderId + 1) % 3 == 0) {
-                temp++;
-            }
+        for (let order of orders) {
+            clientAmounts[temp] += order.amount;
+            temp = (temp + 1) % 10;
         }
 
         const promises = clientAmounts.map((profit, index) => {

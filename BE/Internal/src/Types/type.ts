@@ -51,4 +51,10 @@ type QueryOptions = {
     type?: string
 }
 
-export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter };
+type ChartQueryOptions = {
+    type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM",
+    beginDate?: Date,
+    endDate?: Date
+}
+
+export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter, ChartQueryOptions };

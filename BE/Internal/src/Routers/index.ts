@@ -22,6 +22,7 @@ import TableRouter from "./Table.router";
 import FloorRouter from "./Floor.router";
 import TrackingRouter from "./Tracking.router";
 import NotificationRouter from "./Notification.router";
+import ReportRouter from "./Report.router";
 
 process.on("unhandledRejection", (reason, promise) => {
 	console.error("Unhandled Rejection at:", promise, "reason:", reason);
@@ -43,6 +44,7 @@ class Routers {
 		const floorRouter = new FloorRouter()
 		const trackingRouter = new TrackingRouter()
 		const notificationRouter = new NotificationRouter();
+		const reportRouter = new ReportRouter();
 		// declare your router here
 		const router = Router();
         
@@ -61,6 +63,7 @@ class Routers {
 		floorRouter.initialize(router)
 		trackingRouter.initialize(router)
 		notificationRouter.initialize(router)
+		reportRouter.initialize(router)
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 
