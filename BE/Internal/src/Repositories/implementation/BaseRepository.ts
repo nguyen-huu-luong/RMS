@@ -1,7 +1,7 @@
-import { FindOptions, Model, ModelStatic, Sequelize } from "sequelize";
+import { FindOptions, Model, ModelStatic, Op, Sequelize, where } from "sequelize";
 import { IBaseRepository } from "../IBaseRepository";
 import { injectable, unmanaged } from "inversify";
-import { Filter, QueryOptions } from "../../Types/type";
+import { Filter, FilterObject, QueryOptions } from "../../Types/type";
 import { RecordNotFoundError } from "../../Errors";
 
 @injectable()
@@ -39,15 +39,24 @@ export abstract class BaseRepository<M extends Model>
                 ],
             };
 
-            if (type === "Lead") {
-                findOptions.where = { type: "Lead" };
+            if (options.filter) {
+                const sequelizeFilterObject = this.mappingToSequelizeFilterOpject(options.filter)
+                if (sequelizeFilterObject) {
+                    findOptions.where = sequelizeFilterObject
+                }
             }
+
+            // if (type === "Lead") {
+            //     findOptions.where = { type: "Lead" };
+            // }
             if (this.attributes[0] != "*") {
                 findOptions.attributes = this.attributes;
             }
+            
             const { count, rows } = await this._model.findAndCountAll(
-                findOptions
+                findOptions,
             );
+
             return {
                 data: rows,
                 totalCount: count,
@@ -59,6 +68,9 @@ export abstract class BaseRepository<M extends Model>
             if (this.attributes[0] === "*") {
                 return this._model.findAll({ order: [["id", "ASC"]] });
             }
+
+           
+            const op = "[Op.in]"
             return this._model.findAll({
                 attributes: this.attributes,
                 order: [["id", "ASC"]],
@@ -67,15 +79,21 @@ export abstract class BaseRepository<M extends Model>
     }
 
     public async findById(id: number, attributes?: string[]): Promise<M> {
-        const resource = await this._model.findByPk(id, {
-            attributes,
-        });
-
+        const resource = await this.getById(id, attributes)
         if (resource) {
             return resource;
         }
 
-        throw new Error();
+        throw new RecordNotFoundError();
+    }
+
+
+    public async getById(id: number, attributes?: string[]): Promise<M | null> {
+        const resource = await this._model.findByPk(id, {
+            attributes,
+        });
+
+        return resource ;
     }
 
     public async create(data: any): Promise<M> {
@@ -83,7 +101,7 @@ export abstract class BaseRepository<M extends Model>
     }
 
     public async update(id: number, data: any): Promise<M> {
-        const resource = await this.findById(id);
+        const resource = await this._model.findByPk(id);
 
         if (resource) {
             return resource.update(data);
@@ -103,28 +121,36 @@ export abstract class BaseRepository<M extends Model>
         throw new RecordNotFoundError();
     }
 
-    /*
-	Input: filterOptions 
-	Output -> Sequelize Where clause 
-	{
-		firstname: fadfda -> fisrtname: dfafdas
-		age: {
-			value: 312,
-			op: "gt"
-		} --> {
-			age: {
-				gt: 312
-			}
-		}
-	}
-
-	*/
-    // private mappingToWhereClause(filterOptions: Filter) {
-    // 	const result = {}
-    // 	for (const key in filterOptions) {
-    // 		if (typeof filterOptions[key] === "string") {
-    // 			result[key] = filterOptions[key] ;
-    // 		}
-    // 	}
-    // }
+    private mappingToSequelizeFilterOpject(filter: FilterObject): any {
+        const sequelizeFilter: any = {};
+        
+        for (const filterName in filter) {
+          console.log(filterName);
+          if (filter.hasOwnProperty(filterName)) {
+            const filterConditions = filter[filterName];
+            for (const operator in filterConditions) {
+              const value = (filterConditions as any)[operator];
+              console.log(operator, value);
+              switch (operator) {
+                    case "lt":
+                    case "gt":
+                    case "lte":
+                    case "gte":
+                    case "in":
+                    case "eq":
+                    case "between":
+                    case "notBetween":
+                    case "startsWith":
+                    case "endsWith":
+                        sequelizeFilter[filterName] = { ...sequelizeFilter[filterName], [Op[operator]]: value };
+                        break;
+                    case "contains":
+                        sequelizeFilter[filterName] = { ...sequelizeFilter[filterName], [Op["substring"]]: value };
+                // Handle other operators if needed
+              }
+            }
+          }
+        }
+        return sequelizeFilter;
+      }
 }
