@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { ClientService } from "../Services";
+import { CampaignService, ClientService } from "../Services";
 import { QueryOptions, TYPES } from "../Types/type";
 import { parseRequesQueries } from "../Helper/helper";
 import { BadRequestError, ForbiddenError } from "../Errors";
@@ -14,9 +14,11 @@ import { MailOptions } from "nodemailer/lib/json-transport";
 class MarketingController {
 	protected marketingService: MarketingService;
 	protected emailService: EmailService;
+	protected campaignService: CampaignService ;
 	constructor() {
 		this.marketingService = new MarketingService();
 		this.emailService = new EmailService();
+		this.campaignService = new CampaignService() ;
 	}
 
 	// "/customers/all?type=lead&firstname=fafda&age=31&page=2&pageSize=10&sort_by=asc(number)"
@@ -115,8 +117,15 @@ class MarketingController {
 
 	public async sendEmail(req: Request, res: Response, next: NextFunction) {
 		console.log(req.body);
-		const { sender, receivers, subject, emailCampaignName, html, type } =
+		let { sender, receivers, subject, campaignId, campaignName, html, type } =
 			req.body.emailData;
+
+		if (!campaignId) {
+			const campaign = await this.campaignService.create({name: campaignName})
+			
+			campaignId = campaign.getDataValue("id")
+			// CREATE EMAIL CAMPAIGN
+		} 
 
 		for (let email of receivers) {
 			console.log(email);
@@ -126,7 +135,7 @@ class MarketingController {
 				subject,
 				html,
 				type,
-			});
+			}, campaignId);
 
 			console.log(result);
 		}

@@ -40,6 +40,10 @@ import { IOpenEventrRepository } from "../Repositories/IOpenEventRepository";
 import { OpenEventRepository } from "../Repositories/implementation/OpenEventRepository";
 import { IClickEventRepository } from "../Repositories/IClickEventRepository";
 import { ClickEventRepository } from "../Repositories/implementation/ClickEventRepository";
+import { ICamPaignRepository } from "../Repositories/ICampaignRepository";
+import { CampaignRepository } from "../Repositories/implementation/CampaignRepository";
+import { ITargetListRepository } from "../Repositories/ITargetListRepository";
+import { TargetListRepository } from "../Repositories/implementation/TargetListRepository";
 class InversifyContainer {
 	private container;
 	static instance: InversifyContainer ;
@@ -87,6 +91,10 @@ class InversifyContainer {
 		this.container.bind<IOpenEventrRepository>(TYPES.IOpenEventRepository).to(OpenEventRepository);
 		this.container.bind<IClickEventRepository>(TYPES.IClickEventRepository).to(ClickEventRepository);
 		this.container.bind<INotificationRepository>(TYPES.INotificationRepository).to(NotificationRepository)
+
+
+		this.container.bind<ICamPaignRepository>(TYPES.ICampaignRepository).to(CampaignRepository);
+		this.container.bind<ITargetListRepository>(TYPES.ITargetListRepository).to(TargetListRepository);
 	}
 }
 

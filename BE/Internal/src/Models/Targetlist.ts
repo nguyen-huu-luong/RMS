@@ -1,18 +1,23 @@
 import {
 	Model,
 	DataTypes,
-	type HasManyAddAssociationMixin,
-	type HasManySetAssociationsMixin,
-	type HasManyGetAssociationsMixin,
-	type HasManyRemoveAssociationsMixin,
-	type HasOneGetAssociationMixin,
-	type HasOneSetAssociationMixin,
-	type HasOneCreateAssociationMixin,
+	
+	BelongsToManyAddAssociationMixin,
+	BelongsToManyAddAssociationsMixin,
+	BelongsToManySetAssociationsMixin,
+	BelongsToManyRemoveAssociationMixin,
+	BelongsToManyRemoveAssociationsMixin,
 } from "sequelize";
 import Loader from "../Loaders";
 import Client from "./Client";
 import { CampaignTargetList, Campaign, ClientTargetList } from ".";
 class TargetList extends Model {
+	declare setClients: BelongsToManySetAssociationsMixin<Client, Client["id"]>;
+	declare addClient:  BelongsToManyAddAssociationMixin<Client, Client["id"]> ;
+	declare addClients:   BelongsToManyAddAssociationsMixin<Client, Client["id"]> ;
+	declare removeClient: BelongsToManyRemoveAssociationMixin<Client, number> ;
+	declare removeClients: BelongsToManyRemoveAssociationsMixin<Client, number> ;
+	declare id: number
 	public static associate() {
 		TargetList.belongsToMany(Client, {
 			through: ClientTargetList,

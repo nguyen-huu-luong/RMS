@@ -140,6 +140,21 @@ module.exports = {
             { role: 'manager', resource: 'channels', action: 'update:own', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
 
+            { role: 'manager', resource: 'targetlists', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'targetlists', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'targetlists', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'targetlists', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
+
+
+            { role: 'manager', resource: 'track-urls', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'track-urls', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'track-urls', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'track-urls', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
+
+            { role: 'manager', resource: 'mass-email', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'mass-email', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'mass-email', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'mass-email', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
             { role: 'chef', resource: 'orders', action: 'update:any', attributes: 'status', createdAt: d, updatedAt: d },

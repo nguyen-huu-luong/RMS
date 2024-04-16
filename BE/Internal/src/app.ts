@@ -25,7 +25,7 @@ declare global {
         }
     }
 }
-class Server {
+export class Server {
     protected app: Application;
     protected server: any;
 

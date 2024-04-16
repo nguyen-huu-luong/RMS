@@ -10,7 +10,7 @@ class MarketingRouter {
     } 
     
     public initialize(router: Router) {
-        const marketingRouter  = Router()
+        const marketingRouter = Router()
         marketingRouter.get("/message-templates/all",this.marketingController.getAllTemplate.bind(this.marketingController));
         marketingRouter.get("/message-templates/:id",this.marketingController.getTemplateInfo.bind(this.marketingController));
         marketingRouter.put("/message-templates/:id",this.marketingController.updateMessageTemplate.bind(this.marketingController));
@@ -18,7 +18,10 @@ class MarketingRouter {
         marketingRouter.post("/message-templates",this.marketingController.createMessageTempate.bind(this.marketingController));
         marketingRouter.post("/send-email", this.marketingController.sendEmail.bind(this.marketingController))
         
-        router.use("", AuthMiddleware.initialize, Authorization.initialize, marketingRouter);
+
+        marketingRouter.use("\\",AuthMiddleware.initialize, Authorization.initialize, marketingRouter)
+        
+        router.use(marketingRouter);
 
     }
 }
