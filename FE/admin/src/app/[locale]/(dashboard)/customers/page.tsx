@@ -321,8 +321,6 @@ const EmailTemplate: React.FC = () => {
 					total: results.totalCount,
 				},
 			});
-				
-				
 		} catch (error: any) {
 			setLoading(false)
 			console.log(error);
@@ -336,7 +334,7 @@ const EmailTemplate: React.FC = () => {
 
 	useEffect(() => {
 		fetchData();
-	}, []);
+	}, [JSON.stringify(tableParams)]);
 
 	const handleTableChange: TableProps["onChange"] = (
 		pagination,
