@@ -1,15 +1,11 @@
-"use client";
+"use client"
 import React, { useEffect, useRef, useState } from "react";
 import {
-    Button,
     ConfigProvider,
-    Table,
+    Flex,
     Input,
     Space,
-    Select,
-    Flex, Form, DatePicker, InputNumber,
-    message,
-    Popconfirm
+    Table,
 } from "antd";
 import type { TableProps, GetProp } from "antd";
 import { variables } from "@/app";
@@ -19,24 +15,26 @@ import type {
 } from "antd/es/table/interface";
 import { SearchOutlined } from "@ant-design/icons";
 import fetchClient from "@/lib/fetch-client";
-import { CreateCampaignModal } from "@/components/Modals/CreateCampaignModal";
+import { AnyObject } from "antd/es/_util/type";
+import { CreateModal } from "./CreateModal";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
     GetProp<TableProps, "pagination">,
     boolean
 >;
-
-interface DataType {
-    key?: React.Key;
-    id: number;
-    name: string;
-    type: string;
-    status: string;
-    start_date: string;
-    end_date: string;
-
+interface ITableRenderProps<T> {
+    // data: readonly Record<string, any>[];
+    columns: ColumnsType<T>;
+    url: string,
+    formCreateElement: React.ReactNode
+    onSelected?: {
+        handle?: (selecteds: T[]) => void,
+        render?: () => React.ReactNode
+    },
+    excludeDataHasIds?: number[]
 }
+
 
 type SorterParams = {
     field?: Key | readonly Key[];
@@ -55,11 +53,12 @@ interface TableParams {
     filters?: Parameters<GetProp<TableProps, "onChange">>[1];
 }
 
-const Campaign: React.FC = () => {
+
+const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreateElement, ...props }: ITableRenderProps<T>) => {
     const [checker, setChecker] = useState(true);
-    const [data, setData] = useState<DataType[]>([]);
+    const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(false);
-    const [selectedRows, setSelectedRows] = useState<DataType[]>([]);
+    const [isSelectedRows, setIsSelectedRows] = useState(false);
     const [error, setError] = useState<ErrorType>({
         isError: false,
         message: "",
@@ -80,53 +79,23 @@ const Campaign: React.FC = () => {
 
     // rowSelection object indicates the need for row selection
     const rowSelection = {
-        onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+        onChange: (selectedRowKeys: React.Key[], selectedRows: T[]) => {
             console.log(
                 `selectedRowKeys: ${selectedRowKeys}`,
                 "selectedRows: ",
                 selectedRows
             );
-            setSelectedRows(selectedRows)
+            setIsSelectedRows(selectedRows.length > 0)
+            onSelected?.handle && onSelected?.handle(selectedRows)
 
             console.log(selectedRows)
         },
-        getCheckboxProps: (record: DataType) => ({
-
-        }),
     };
-    const columns: ColumnsType<DataType> = [
-        {
-            title: "ID",
-            dataIndex: "id",
-            key: "id",
-        },
-        {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-            render: (text, row) => <a style={{ color: "#4A58EC" }} href={`./campaigns/${row.id}`}>{text}</a>
-        },
-        {
-            title: "Type",
-            dataIndex: "type",
-            key: "type",
-        },
-        {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
-        },
-        {
-            title: "Sart date",
-            dataIndex: "start_date",
-            key: "start_date",
-        },
-        {
-            title: "End date",
-            dataIndex: "end_date",
-            key: "end_date",
-        }
-    ];
+
+
+    useEffect(() => {
+        fetchData();
+    }, [JSON.stringify(tableParams)]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -141,17 +110,20 @@ const Campaign: React.FC = () => {
                     }`
                     : "";
             const respone = await fetchClient({
-                url: `/campaigns/all?page=${tableParams.pagination?.current}
+                url: `${url}/all?page=${tableParams.pagination?.current}
 				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`
             })
 
             console.log(respone)
             const results = respone.data
-            const data = results.data.map((item: any) => ({
+            let data = results.data.map((item: any) => ({
                 ...item,
                 key: item.id,
                 fullname: `${item.firstname} ${item.lastname}`,
             }));
+            if (props.excludeDataHasIds) {
+                data = data.filter((item:any) => !props.excludeDataHasIds?.includes(item.id))
+            }
             setData(data);
             setLoading(false);
             setTableParams({
@@ -213,21 +185,6 @@ const Campaign: React.FC = () => {
         setChecker(prevState => !prevState)
     };
 
-    const handleDeleteCampaign = async () => {
-        const ids = selectedRows.map(item => item.id);
-        console.log(ids);
-
-        try {
-            const result = await fetchClient({ method: "DELETE", url: "/campaigns", body: ids })
-
-            fetchData()
-        } catch (error) {
-            message.error(error as any)
-        }
-    }
-
-
-
     return (
         <ConfigProvider
             theme={{
@@ -271,25 +228,18 @@ const Campaign: React.FC = () => {
                             </Space>
                         }
 
-                        {selectedRows.length > 0 &&
-                            <Popconfirm title='Are you sure' onConfirm={handleDeleteCampaign}>
-                                <Button danger>
-                                    Delete {selectedRows.length} campaigns
-                                </Button>
-                            </Popconfirm>
+                        {onSelected && isSelectedRows && onSelected?.render &&  onSelected.render()
                         }
-                        <CreateCampaignModal afterCreated={() => fetchData()}/>
+                        <CreateModal afterCreated={() => fetchData()} createUrl={url} formElement={formCreateElement} />
                     </Flex>
-
-
                 </div>
 
                 <div className="mt-2">
-                    <Table
+                    <Table<T>
                         rowSelection={{
                             ...rowSelection,
                         }}
-                        columns={columns}   
+                        columns={columns}
                         pagination={{
                             className: "bg-white rounded px-4 py-2",
                             showTotal: (total: number) => `Total ${total} items`,
@@ -306,7 +256,7 @@ const Campaign: React.FC = () => {
                 </div>
             </div>
         </ConfigProvider>
-    );
+    )
 };
 
-export default Campaign;
+export default TableRender;
