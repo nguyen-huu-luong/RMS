@@ -2,9 +2,6 @@ import { ErrorName, HttpStatusCode } from "../Constants";
 import { container } from "../Configs";
 import { ChartQueryOptions, QueryOptions, TYPES } from "../Types/type";
 import { IOrderRepository } from "../Repositories/IOrderRepository";
-import { CustomError, RecordNotFoundError } from "../Errors";
-import PasswordUtil from "../Utils/Password";
-import { Order } from "../Models";
 import { IClientRepository, IProductRepository } from "../Repositories";
 
 export class ReportService {
@@ -21,7 +18,6 @@ export class ReportService {
     ) { }
 
     public async getProfit(options?: ChartQueryOptions) {
-        console.log(options)
         if (options?.type === "DAILY"){
             const { todayOrders, yesterdayOrders } = await this.orderRepository.getDailyOrder();
             const todayProfit = todayOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
@@ -57,10 +53,7 @@ export class ReportService {
     }
 
     public async getLead(options?: ChartQueryOptions) {
-        // const result = await this.reportRepository.all(options);
-        // return {
-        //     ...result,
-        // };
+
     }
 
     public async getProductChart(options?: ChartQueryOptions) {

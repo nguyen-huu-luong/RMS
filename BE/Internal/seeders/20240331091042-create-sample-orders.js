@@ -5,11 +5,11 @@ module.exports = {
     up: async (queryInterface, Sequelize) => {
         let orders = [];
         const currentDate = new Date();
-        const twoYearsAgo = new Date(currentDate.getFullYear() - 2, currentDate.getMonth(), currentDate.getDate());
+        const twoYearsAgo = new Date(currentDate.getFullYear() - 3, currentDate.getMonth(), currentDate.getDate());
         
-        for (let i = 1; i <= 300; i++) {
+        for (let i = 1; i <= 900; i++) {
             orders.push({
-                clientId: faker.random.number({ min: 1, max: 10 }),
+                clientId: faker.random.number({ min: 1, max: 30 }),
                 num_items: faker.random.number({ min: 1, max: 5 }),
                 amount: 0,
                 status: "Done",
@@ -49,13 +49,16 @@ module.exports = {
             orders[order.orderId - 1].num_items += order.quantity;
         }
 
-        let clientAmounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let clientAmounts = []
+        for (let i = 1; i <= 30; i++) {
+            clientAmounts.push(0);
+        }
         let temp = 0;
         for (let order of orders) {
             clientAmounts[temp] += order.amount;
-            temp = (temp + 1) % 10;
+            temp = (temp + 1) % 30;
         }
-
+        console.log(clientAmounts);
         const promises = clientAmounts.map((profit, index) => {
             return queryInterface.sequelize.query(
                 `

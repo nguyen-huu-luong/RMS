@@ -8,7 +8,7 @@ type Option = {
     beginDate?: Date;
     endDate?: Date;
 };
-const TimeBar = ({ option, setOption }: { option: Option; setOption: any }) => {
+const TimeBar = ({ option, setOption, setComponent }: { option: Option; setOption: any; setComponent: any }) => {
     const [type, setType] = useState<string>("MONTHLY")
     const options = [
         {
@@ -27,13 +27,25 @@ const TimeBar = ({ option, setOption }: { option: Option; setOption: any }) => {
     const onChangeType = ({ target: { value } }: { target: any }) => {
         if (value != "CUSTOM") setOption({ ...option, type: value });
         setType(value);
+        if (value != "CUSTOM") setComponent({
+            dailyStats: false,
+            monthlyStats: true,
+            topProducts: false,
+            topCustomers: false,
+        })
     };
 
     const handleRangeChange = (dates: any) => {
         if (dates.length > 0) setOption({ type: "CUSTOM", beginDate: dates[0], endDate: dates[1] });
+        setComponent({
+            dailyStats: false,
+            monthlyStats: true,
+            topProducts: false,
+            topCustomers: false,
+        })
     };
     return (
-        <div className='w-full h-auto flex flex-row p-2 rounded-xl border-2 bg-white text-black justify-center gap-4'>
+        <div className='w-full h-auto flex flex-row p-2 shadow-md rounded-xl bg-white text-black justify-center gap-4'>
             <div className='w-60'>
                 <Radio.Group
                     options={options}

@@ -29,7 +29,6 @@ export class ClientRepository
     }
 
     public async findByEmail(email: string): Promise<Client | null> {
-        console.log("fadsfdsa");
         return await this._model.findOne({ where: { email: email } });
     }
 
@@ -49,6 +48,12 @@ export class ClientRepository
                 1
             );
             const endOfMonth = today;
+            const startOfLastMonth = new Date(
+                today.getFullYear(),
+                today.getMonth() - 1,
+                1
+            );
+            const endOfLastMonth = startOfMonth;
             const clients = await this._model.findAll();
             const clientAmounts: Map<number, number> = new Map();
             for (const client of clients) {
@@ -69,7 +74,7 @@ export class ClientRepository
             const clientAmountsArray: [number, number, number][] = Array.from(clientAmounts).map(([clientId, amount]) => [clientId, amount, -10]);;
             clientAmountsArray.sort((a, b) => b[1] - a[1]);
             const topClients = clientAmountsArray.slice(0, 10);
-            const previousMonth = await this.getCustomTopCustomer(startOfMonth, endOfMonth);
+            const previousMonth = await this.getCustomTopCustomer(startOfLastMonth, endOfLastMonth);
             if (previousMonth) {
                 const result: [number, number, number][] = topClients.map(([clientId, amount], index) => {
                     const indexInPrevious = previousMonth.findIndex((pre: any) => pre[0] === clientId);
@@ -90,6 +95,8 @@ export class ClientRepository
             const today = new Date();
             const startOfYear = new Date(today.getFullYear(), 0, 1);
             const endOfYear = new Date();
+            const startOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
+            const endOfLastYear = startOfYear;
             const clients = await this._model.findAll();
             const clientAmounts: Map<number, number> = new Map();
             for (const client of clients) {
@@ -110,7 +117,7 @@ export class ClientRepository
             const clientAmountsArray: [number, number, number][] = Array.from(clientAmounts).map(([clientId, amount]) => [clientId, amount, -10]);;
             clientAmountsArray.sort((a, b) => b[1] - a[1]);
             const topClients = clientAmountsArray.slice(0, 10);
-            const previousYear = await this.getCustomTopCustomer(startOfYear, endOfYear);    
+            const previousYear = await this.getCustomTopCustomer(startOfLastYear, endOfLastYear);    
             if (previousYear) {
                 const result: [number, number, number][] = topClients.map(([clientId, amount], index) => {
                     const indexInPrevious = previousYear.findIndex((pre: any) => pre[0] === clientId);

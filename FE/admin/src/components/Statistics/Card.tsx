@@ -11,7 +11,7 @@ const Card = ({
     before: number;
 }) => {
     return (
-        <div className='w-full h-32 border-2 rounded-xl p-5 bg-white shadow-sm flex justify-center items-center'>
+        <div className='w-full h-32 rounded-xl p-5 bg-white shadow-md flex justify-center items-center'>
             <div className='w-auto h-auto flex justify-between gap-2 items-center text-black'>
                 <div className='flex flex-col justify-between gap-1 items-center'>
                     <span>{convertUnit(current)}</span>
