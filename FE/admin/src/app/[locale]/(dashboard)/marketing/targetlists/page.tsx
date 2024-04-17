@@ -7,8 +7,9 @@ import {
 import type { TableProps} from "antd";
 
 import Link from "next/link";
-import TableRender from "@/components/TableComponents";
+import TableRender, { FilterItemType } from "@/components/TableComponents";
 import TextArea from "antd/es/input/TextArea";
+import TimeFormatter from "@/components/TimeFormatter";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 
@@ -17,8 +18,8 @@ interface DataType {
     id: number;
     name: string;
     description: string;
-    type: string;
-    count: number;
+    createdAt: Date
+    updatedAt: Date
 }
 
 
@@ -34,7 +35,7 @@ const TargetList: React.FC = () => {
             title: "Name",
             dataIndex: "name",
             key: "name",
-            render: (text, row, record) => <Link href={`marketing/targetlists/${row.id}`}>{text}</Link>
+            render: (text, row, record) => <Link href={`/targetlists/${row.id}`}>{text}</Link>
         },
         {
             title: "Description",
@@ -42,16 +43,40 @@ const TargetList: React.FC = () => {
             key: "description",
         },
         {
-            title: "Type",
-            dataIndex: "type",
-            key: "type",
+            title: "CreatedAt",
+            dataIndex: "createdAt",
+            key: "createdAt",
+            render: (text) => <TimeFormatter time={text} />
         },
         {
-            title: "Count",
-            dataIndex: "count",
-            key: "count",
-        }
+            title: "UpdatedAt",
+            dataIndex: "updatedAt",
+            key: "updatedAt",
+            render: (text) => <TimeFormatter time={text} />
+        },
+        
     ];
+
+    const filterItems : FilterItemType[] = [
+        {
+            key: "1",
+            type: "input" ,
+            fieldName: 'name',
+            title: "Name",
+        },
+        {
+            key: "2",
+            type: "input" ,
+            fieldName: 'description',
+            title: "Description",
+        },
+        {
+            key: "3",
+            type: "date" ,
+            fieldName: 'createdAt',
+            title: "CreatedAt",
+        }
+    ]
 
     const onSelectedRows = {
         handle: (selecteds: DataType[]) => setSelectedRows(selecteds),
@@ -73,6 +98,7 @@ const TargetList: React.FC = () => {
                     </Form.Item>
                 </>
             }
+            filterItems={filterItems}
         />
     );
 };

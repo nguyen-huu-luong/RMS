@@ -2,7 +2,7 @@ import { FindOptions, Model, ModelStatic, Op, Sequelize, where } from "sequelize
 import { IBaseRepository } from "../IBaseRepository";
 import { injectable, unmanaged } from "inversify";
 import { Filter, FilterObject, QueryOptions } from "../../Types/type";
-import { RecordNotFoundError } from "../../Errors";
+import { BadRequestError, RecordNotFoundError } from "../../Errors";
 
 @injectable()
 export abstract class BaseRepository<M extends Model>
@@ -27,18 +27,27 @@ export abstract class BaseRepository<M extends Model>
             const limit = options.paginate?.pageSize || this.DEFAULT_PAGE_SIZE;
             const offset = (page - 1) * limit;
             const type = options.type ? options.type : "";
+            
             const findOptions: FindOptions = {
                 // attributes: ['*'],
                 limit,
                 offset,
-                order: [
-                    [
-                        options.sort?.by || "id",
-                        options.sort?.order.toLocaleUpperCase() || "ASC",
-                    ],
-                ],
             };
+            if (options.sort && options.sort.by) {
+              
+                    const allAttrs = this.attributes[0] === "*"  ? Object.keys(this._model.getAttributes())
+                                                                : this.attributes ;
+                    if (!allAttrs.includes(options.sort.by)) {
+                        throw new BadRequestError("Can not sort by field " + options.sort.by)
+                    }
 
+                    findOptions.order =  [
+                            [
+                                options.sort?.by || "id",
+                                options.sort?.order.toLocaleUpperCase() || "ASC",
+                            ],
+                        ]
+            }
             if (options.filter) {
                 const sequelizeFilterObject = this.mappingToSequelizeFilterOpject(options.filter)
                 if (sequelizeFilterObject) {
