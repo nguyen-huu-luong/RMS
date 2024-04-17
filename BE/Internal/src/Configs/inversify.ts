@@ -22,7 +22,9 @@ import {
 	ICartItemRepository,
 	CartItemRepository,
 	INotificationRepository,
-	NotificationRepository
+	NotificationRepository,
+	ClientHistoryRepository
+
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -31,7 +33,7 @@ import { ProductRepository } from "../Repositories";
 import { CartRepository } from "../Repositories";
 import { ICategoryRepository } from "../Repositories/ICategoryRepository";
 import { CategoryRepository } from "../Repositories/implementation/CategoryRepository";
-import { FloorRepository, TableRepository, TableReservationRepository, ReservationRepository } from "../Repositories";
+import { FloorRepository, TableRepository, TableReservationRepository, ReservationRepository, } from "../Repositories";
 // import { IClientService } from "../Services";
 import { TYPES } from "../Types/type";
 import { IChannelRepository } from "../Repositories/IChannelRepository";
@@ -44,6 +46,10 @@ import { ICamPaignRepository } from "../Repositories/ICampaignRepository";
 import { CampaignRepository } from "../Repositories/implementation/CampaignRepository";
 import { ITargetListRepository } from "../Repositories/ITargetListRepository";
 import { TargetListRepository } from "../Repositories/implementation/TargetListRepository";
+import { IClientHistoryRepository } from "../Repositories";
+import { ISubscriberRepository, SubscriberRepository } from "../Repositories";
+import { IOrderItemRepository, OrderItemRepository } from "../Repositories";
+
 class InversifyContainer {
 	private container;
 	static instance: InversifyContainer ;
@@ -69,6 +75,7 @@ class InversifyContainer {
 		// register repository here
 		this.container.bind<IClientRepository>(TYPES.IClientRepository).to(ClientRepository);
 		this.container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository);
+		this.container.bind<IOrderItemRepository>(TYPES.IOrderItemRepository).to(OrderItemRepository);
 		this.container.bind<IEmployeeRepository>(TYPES.IEmployeeRepository).to(EmployeeRepository);
 		this.container.bind<IPermissionRepository>(TYPES.IPermissionRepository).to(PermissionRepository);
 		this.container.bind<IProductRepository>(TYPES.IProductRepository).to(ProductRepository);
@@ -95,6 +102,8 @@ class InversifyContainer {
 
 		this.container.bind<ICamPaignRepository>(TYPES.ICampaignRepository).to(CampaignRepository);
 		this.container.bind<ITargetListRepository>(TYPES.ITargetListRepository).to(TargetListRepository);
+		this.container.bind<IClientHistoryRepository>(TYPES.IClientHistoryRepository).to(ClientHistoryRepository)
+		this.container.bind<ISubscriberRepository>(TYPES.ISubscriberRepository).to(SubscriberRepository)
 	}
 }
 

@@ -25,7 +25,9 @@ class ProductController {
         this.productService.getProduct(req, res, next);
     }
 
-
+    public async getRecommendItem(req: Request, res: Response, next: NextFunction) {
+        this.productService.getRecommendItem(req, res, next)
+    }
 }
 
 export default ProductController;

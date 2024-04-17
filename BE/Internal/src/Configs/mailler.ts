@@ -13,7 +13,6 @@ class NodeMailerConfig {
         if (NodeMailerConfig.instance) {
             throw new Error("Using InversifyContainer.getInstance() instead")
         }
-        console.log(process.env.GMAIL_USER,process.env.GMAIL_PASSWORD)
         this.transporter = nodemailer.createTransport({
           service: "gmail",
           auth: {

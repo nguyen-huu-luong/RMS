@@ -24,6 +24,9 @@ import TrackingRouter from "./Tracking.router";
 import NotificationRouter from "./Notification.router";
 import CampaignRouter from "./Campaign.router";
 import TargetListRouter from "./TargetList.router";
+import ClientHistoryRouter from "./ClientHistory.router";
+import SubscriberRouter from "./Subscriber.router";
+import OrderItemRouter from "./OrderItem.router";
 
 process.on("unhandledRejection", (reason, promise) => {
 	console.error("Unhandled Rejection at:", promise, "reason:", reason);
@@ -47,12 +50,17 @@ class Routers {
 		const notificationRouter = new NotificationRouter();
 		const campaignRouter = new CampaignRouter()
 		const targetListRouter = new TargetListRouter()
+		const clienthistoryRouter = new ClientHistoryRouter();
+		const subscriberRouter = new SubscriberRouter()
+		const orderItemRouter = new OrderItemRouter()
 		// declare your router here
 		const router = Router();
         
 		trackingRouter.initialize(router)
 		orderRouter.initialize(router);
 		productRouter.initialize(router);
+		orderItemRouter.initialize(router)
+		subscriberRouter.initialize(router)
 		cartRouter.initialize(router);
 		categoryRouter.initialize(router);
 		voucherRouter.initialize(router)
@@ -67,6 +75,7 @@ class Routers {
 		notificationRouter.initialize(router)
 		campaignRouter.initialize(router)
 		targetListRouter.initialize(router)
+		clienthistoryRouter.initialize(router)
 		app.use("/api/users", authRouter.initialize());
 		app.use("/api", router);
 

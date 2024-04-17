@@ -26,8 +26,6 @@ class CampaignValidator {
 			.withMessage("endDate of Campaign CANNOT be empty")
             .isDate()
             .withMessage("Invalid endDate")
-        
-        
 	];
 }
 
