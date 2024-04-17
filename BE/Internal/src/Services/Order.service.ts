@@ -4,6 +4,7 @@ import { HttpStatusCode } from "../Constants";
 import statusMess from "../Constants/statusMess";
 import { container } from "../Configs";
 import { IOrderRepository } from "../Repositories/IOrderRepository";
+import { IClientHistoryRepository } from "../Repositories";
 import {
     ICartRepository,
     IClientRepository,
@@ -29,6 +30,9 @@ export class OrderService {
         ),
         private clientRepository = container.get<IClientRepository>(
             TYPES.IClientRepository
+        ),
+        private clientHistoryRepository = container.get<IClientHistoryRepository>(
+            TYPES.IClientHistoryRepository
         )
     ) {}
 
@@ -109,11 +113,17 @@ export class OrderService {
             const { voucherId, ...orderInfor } = req.body;
             if (req.action === "create:own") {
                 console.log(req.userId);
-                const order = await this.orderRepository.create({
+                const order: any = await this.orderRepository.create({
                     ...orderInfor,
                     clientId: req.userId,
                 });
-
+                await this.clientHistoryRepository.create({
+                    action: "order",
+                    clientId: req.userId,
+                    orderId: order.id,
+                    updatedAt:  new Date(),
+                    createdAt: new Date()
+                })
                 if (voucherId != 0 && voucherId != null) {
                     const voucher = await this.voucherRepository.findById(
                         voucherId
@@ -355,6 +365,16 @@ export class OrderService {
         } catch (err) {
             console.log(err);
             next(err);
+        }
+    }
+
+    public async getByCond(cond: any) {
+        try{
+            const orders = await this.orderRepository.getByCond(cond)
+            return orders
+        }
+        catch (err) {
+            console.log(err);
         }
     }
 }

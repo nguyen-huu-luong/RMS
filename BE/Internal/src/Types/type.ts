@@ -5,6 +5,7 @@ const TYPES = {
     IBaseRepository: Symbol.for("IBaseRepository"),
     IClientRepository: Symbol.for("IClientRepository"),
     IOrderRepository: Symbol.for("IOrderRepository"),
+    IOrderItemRepository: Symbol.for("IOrderItemRepository"),
     IEmployeeRepository: Symbol.for("EmployeeRepository"),
     IPermissionRepository: Symbol.for("IPermissionRepository"),
     IProductRepository: Symbol.for("IProductRepository"),
@@ -24,6 +25,9 @@ const TYPES = {
     IClickEventRepository: Symbol.for("IClickEventREpository"),
     IOpenEventRepository: Symbol.for("IOpenEventRepository"),
     INotificationRepository: Symbol.for("INotificationRepository"),
+    IClientHistoryRepository: Symbol.for("IClientHistoryRepository"),
+    ISubscriberRepository: Symbol.for("ISubscriberRepository"),
+    
 };
 
 type FilterCondition = {

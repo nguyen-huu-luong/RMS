@@ -2,6 +2,7 @@ import { Model, DataTypes } from "sequelize";
 import Loader from "../Loaders";
 import { Product, Client, OrderItem, Table } from ".";
 import Voucher from "./Voucher";
+import ClientHistory from "./ClientHistory";
 class Order extends Model {
     getProducts: any;
     addProduct: any;
@@ -43,6 +44,15 @@ class Order extends Model {
                 allowNull: true,
             },
         });
+
+		Order.hasMany(ClientHistory, {
+			foreignKey: {
+				name: "orderId",
+				allowNull: true,
+			},
+			sourceKey: "id",
+		});
+		
 	}
 }
 

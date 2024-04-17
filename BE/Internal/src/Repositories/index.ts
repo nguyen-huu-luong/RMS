@@ -38,3 +38,12 @@ export * from "./implementation/MessageTemplateRepository"
 export * from "./implementation/CartItemRepository"
 
 export * from "./implementation/NotificationRepository"
+
+export * from "./IClientHistoryRepository"
+export * from "./implementation/ClientHistoryRepository"
+
+export * from "./ISubscriberRepository"
+export * from "./implementation/SubscriberRepository"
+
+export * from "./IOrderItemRepository"
+export * from "./implementation/OrderItemRepository"
