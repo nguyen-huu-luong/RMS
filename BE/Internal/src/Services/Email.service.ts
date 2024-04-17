@@ -39,7 +39,7 @@ export class EmailService {
         )
     ) { }
 
-    public async sendEmail(message: IEmailMessage, campaignId: number) {
+    public async sendEmail(message: IEmailMessage, campaignId?: number) {
         const { html, type } = message;
 
         if (type === "mjml") {

@@ -2,10 +2,10 @@
 import React, { useState } from "react";
 import { type TableProps, type GetProp, Form, Upload, Button, Select } from "antd";
 import { CustomerActionBar } from "@/components";
-import TableRender, { FilterItemType } from "@/components/TableComponents";
 import { UploadOutlined } from "@ant-design/icons";
 import RMSInput from "@/components/inputs/RMSInput";
 import RMSDatePicker from "@/components/inputs/RMSDatePicker";
+import TableRender, { FilterItemType } from "@/components/TableComponents";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 interface DataType {
