@@ -13,6 +13,8 @@ import { useSession } from "next-auth/react";
 import { addToCart } from "@/app/api/product/cart";
 import { useRouter } from "next-intl/client";
 import { useLocale, useTranslations } from "next-intl";
+import { useEffect } from "react";
+import fetchClient from "@/lib/fetch-client";
 
 const FoodDetail = ({
     food,
@@ -51,6 +53,7 @@ const FoodDetail = ({
     const decrease = () => {
         if (count > 1) setCount(count - 1);
     };
+
     return (
         <>
             <div

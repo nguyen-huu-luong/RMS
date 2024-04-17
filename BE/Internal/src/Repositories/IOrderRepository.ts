@@ -5,4 +5,5 @@ export interface IOrderRepository extends IBaseRepository<Order> {
     updateStatus(data: any): Promise<any>;
     getOne(userId?: number, orderId?:number): Promise<any>;
     createOrder(userId: number, data: any): Promise<any>;
+    getByCond(cond: any): Promise<any>;
 } 
