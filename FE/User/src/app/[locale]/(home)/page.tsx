@@ -7,26 +7,21 @@ import FoodDetail from "@/components/menu/foodDetail";
 import Slider from "@/components/home/slider";
 import WelcomeImage from "@/components/home/welcome";
 import { RightCircleFilled } from "@ant-design/icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Loading from "@/components/loading";
 import useSWR from "swr";
 import publicFetcher from "@/lib/public-fetcher";
 import fetchClient from "@/lib/fetch-client";
+import fetchGeneral from "@/lib/fetch-general";
+import { getSession } from "next-auth/react";
 export default function Home() {
     const locale = useLocale();
     const t = useTranslations("Home");
     const [currentCategory, setCurrentCategory] = useState<string>("Pizza");
-    const {
-        data: food,
-        error: foodError,
-        isLoading: foodLoading,
-    } = useSWR(`/products/all`, (url) => publicFetcher({url: url, data_return: true}));
-    const {
-        data: category,
-        error: categoryError,
-        isLoading: categoryLoading,
-    } = useSWR(`/categories/all`, (url) => publicFetcher({url: url, data_return: true}));
-    // Modal for food detail
+    const [bestSeller, setBestSeller] = useState([])
+    const [food, setFood] = useState<any>([])
+    const [category, setCategory] = useState<any>([])
+    const [isLoading, setIsLoading] = useState(true)
     const [modal, setModal] = useState<boolean>(false);
     const [detail, setDetail] = useState<{
         id: number;
@@ -64,9 +59,45 @@ export default function Home() {
         "https://ict-imgs.vgcloud.vn/2022/05/13/17/shopeefood-ngay-15-sale-dong-gia-kham-pha-ngay-bo-suu-tap-mon-ngon-chi-tu-1-000-dong-2.jpg",
         "https://ict-imgs.vgcloud.vn/2022/05/13/17/shopeefood-ngay-15-sale-dong-gia-kham-pha-ngay-bo-suu-tap-mon-ngon-chi-tu-1-000-dong-1.jpg",
     ];
-    if (foodError) return <div>Failed to load</div>;
-    if (categoryError) return <div>Failed to load</div>;
-    if (foodLoading || categoryLoading) return <Loading></Loading>;
+    // if (foodError) return <div>Failed to load</div>;
+    // if (categoryError) return <div>Failed to load</div>;
+
+
+    const getBestSeller = async () => {
+        const session = await getSession();
+        var best_items: any
+        if (session) {
+            best_items = await fetchClient({method: "GET", url: "/products/recomendation", data_return: true})
+        }
+        else {
+            best_items =await fetchGeneral({method: "GET", url: "/orderitems/bestseller", data_return: true})
+        }
+        console.log(best_items) 
+        setBestSeller(best_items)
+    }
+
+    const getFood = async () => {
+        const data = await publicFetcher({url: '/products/all', data_return: true})
+        setFood(data)
+    }
+
+    const getCategory = async () => {
+        const data = await publicFetcher({url: '/categories/all', data_return: true})
+        setCategory(data)
+    
+    }
+
+    useEffect(() => {
+        setIsLoading(true)
+        getFood()
+        getCategory()
+        getBestSeller()
+        setIsLoading(false)
+    }, [])
+
+
+    if (isLoading) return <Loading></Loading>;
+
     return (
         <div className='h-auto py-4 flex flex-col justify-center items-center gap-10'>
             {/* Home welcome and carousel banner */}
@@ -159,7 +190,7 @@ export default function Home() {
                 </div>
                 <div className='w-full h-auto flex flex-col justify-center items-center'>
                     <div className='w-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 lg:gap-10 items-center'>
-                        {food.slice(0, 6).map((item: any) => {
+                        {bestSeller.map((item: any) => {
                             return (
                                 <div
                                     key={`Food ${item.categoryId} ${item.id}`}

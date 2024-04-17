@@ -78,24 +78,81 @@ export class ClientService {
         return []
     }
 
-    public getOpportunityCustomer =  async () => {
-        const carts = await this.cartRepository.findByCond(
-            {
-                attributes: ['id', 'clientId', 'amount'],
-                where: {
-                    clientId: {
-                        [Op.ne]: null
+    public getOpportunityCustomer =  async (sort_factor: any, order: any) => {
+        let carts: any
+        if (sort_factor == "amount") {
+            carts = await this.cartRepository.findByCond(
+                {
+                    attributes: ['id', 'clientId', 'amount'],
+                    where: {
+                        clientId: {
+                            [Op.ne]: null
+                        },
+                        amount: {
+                            [Op.ne]: 0
+                        }
                     },
-                    amount: {
-                        [Op.ne]: 0
-                    }
-                },
-                include: [{
-                    model: Product
-                },
-                {   model: Client}]
-            }
-        )
+                    order: [
+                        [sort_factor, order]
+                    ],
+                    include: [{
+                        model: Product,
+                    },
+                    {   model: Client,
+                    }]
+                }
+            )
+        }
+        else if (sort_factor == "fullname") {
+            carts = await this.cartRepository.findByCond(
+                {
+                    attributes: ['id', 'clientId', 'amount'],
+                    where: {
+                        clientId: {
+                            [Op.ne]: null
+                        },
+                        amount: {
+                            [Op.ne]: 0
+                        }
+                    },
+                    include: [{
+                        model: Product,
+                    },
+                    {   model: Client,
+                        as: 'Client',
+                    }],
+                    order: [
+                        ['Client', 'firstname', order],
+                        ['Client', 'lastname', order],
+                    ],
+                }
+            ) 
+        }
+
+        else if (sort_factor == "type") {
+            carts = await this.cartRepository.findByCond(
+                {
+                    attributes: ['id', 'clientId', 'amount'],
+                    where: {
+                        clientId: {
+                            [Op.ne]: null
+                        },
+                        amount: {
+                            [Op.ne]: 0
+                        }
+                    },
+                    include: [{
+                        model: Product,
+                    },
+                    {   model: Client,
+                        as: 'Client',
+                    }],
+                    order: [
+                        ['Client', 'type', order]
+                    ],
+                }
+            )
+        }
 
         return carts
 

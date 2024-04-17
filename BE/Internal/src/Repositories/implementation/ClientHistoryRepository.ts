@@ -12,4 +12,8 @@ export class ClientHistoryRepository extends BaseRepository<ClientHistory> imple
         super(ClientHistory);
     }
 
+    public async findByCond(cond: any){
+        return await this._model.findAll(cond)
+	}
+
 }

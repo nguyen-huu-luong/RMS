@@ -70,9 +70,6 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const Opportunities: React.FC = () => {
-    const [searchText, setSearchText] = useState("");
-    const [searchedColumn, setSearchedColumn] = useState("");
-    const searchInput = useRef<InputRef>(null);
     const [data, setData] = useState<DataType[]>();
     const [rawData, setRawData] = useState<any[]>();
     const [cartItems, setCartItems] = useState<any>();
@@ -86,131 +83,29 @@ const Opportunities: React.FC = () => {
         },
         filters: {},
         sorter: {
-            field: "id",
+            field: "amount",
             order: "ascend",
         },
     });
+    const [isSorting, setIsSorting] = useState(true)
+    const list_sort = [
+        {
+            key: "fullname",
+            title: "Fullname"
+        },
+        {
+            key: "amount",
+            title: "Amount"
+        },
+        {
+            key: "type",
+            title: "Type"
+        },
+    ]
     const [error, setError] = useState<ErrorType>({
         isError: false,
         message: "",
         title: "",
-    });
-
-    const handleSearch = (
-        selectedKeys: string[],
-        confirm: (param?: FilterConfirmProps) => void,
-        dataIndex: DataIndex
-    ) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
-
-    const handleReset = (clearFilters: () => void) => {
-        clearFilters();
-        setSearchText("");
-    };
-    const getColumnSearchProps = (
-        dataIndex: DataIndex
-    ): TableColumnType<DataType> => ({
-        filterDropdown: ({
-            setSelectedKeys,
-            selectedKeys,
-            confirm,
-            clearFilters,
-            close,
-        }: any) => (
-            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) =>
-                        setSelectedKeys(e.target.value ? [e.target.value] : [])
-                    }
-                    onPressEnter={() =>
-                        handleSearch(
-                            selectedKeys as string[],
-                            confirm,
-                            dataIndex
-                        )
-                    }
-                    style={{ marginBottom: 8, display: "block" }}
-                />
-                <Space>
-                    <Button
-                        type='primary'
-                        onClick={() =>
-                            handleSearch(
-                                selectedKeys as string[],
-                                confirm,
-                                dataIndex
-                            )
-                        }
-                        icon={<SearchOutlined />}
-                        size='small'
-                        style={{ width: 90 }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            clearFilters && handleReset(clearFilters)
-                        }
-                        size='small'
-                        style={{ width: 90 }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type='link'
-                        size='small'
-                        onClick={() => {
-                            confirm({ closeDropdown: false });
-                            setSearchText((selectedKeys as string[])[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
-                    </Button>
-                    <Button
-                        type='link'
-                        size='small'
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered: boolean) => (
-            <SearchOutlined
-                style={{ color: filtered ? "#1677ff" : undefined }}
-            />
-        ),
-        onFilter: (value: any, record: any) =>
-            record[dataIndex]
-                .toString()
-                .toLowerCase()
-                .includes((value as string).toLowerCase()),
-        onFilterDropdownOpenChange: (visible: any) => {
-            if (visible) {
-                setTimeout(() => searchInput.current?.select(), 100);
-            }
-        },
-        render: (text: string) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ""}
-                />
-            ) : (
-                text
-            ),
     });
 
     const rowSelection = {
@@ -312,7 +207,7 @@ const Opportunities: React.FC = () => {
             ...prev,
             sorter: { ...prev.sorter, field: key },
         }));
-        console.log(tableParams);
+        setIsSorting((current) => !current)
     };
 
     const handleToggleSorter = () => {
@@ -323,32 +218,48 @@ const Opportunities: React.FC = () => {
                 order: prev.sorter?.order === "ascend" ? "descend" : "ascend",
             },
         }));
+        setIsSorting((current) => !current)
     };
 
-    const handleClearFilter = () => { };
-
-    const handleClearAll = () => { };
+    const handleClearAll = () => {
+        setTableParams((prev) => ({
+            ...prev,
+            sorter: {
+                field: "amount",
+                order: "ascend",
+            },
+        }));
+        setIsSorting((current) => !current)
+    };
 
     const handleCloseError = () => {
         console.log(error);
         setError({ isError: false, title: "", message: "" });
     };
 
-    const fetchData = async () => {
+    const fetchData = async (sort=false) => {
         setLoading(true);
         try {
             let filterQueriesStr = "";
             for (const key in tableParams.filters) {
                 filterQueriesStr = `${filterQueriesStr}&${key}=${tableParams.filters[key]}`;
             }
-            let sortQueries =
-                tableParams.sorter?.field && tableParams.sorter?.order
-                    ? `&sort=${tableParams.sorter?.field}&order=${tableParams.sorter?.order === "ascend" ? "asc" : "desc"
-                    }`
-                    : "";
+            let url = ""
+            if(sort) {
+                const sort_factor = tableParams.sorter?.field
+                const order = tableParams.sorter?.order
+                url = `/customers/opportunity/all?sort_factor=${sort_factor}&order=${order}`
+            }
+            else {
+                url = "/customers/opportunity/all"
+            }
+
+            console.log(url)
+
             const response = await fetchClient({
-                url: `/customers/opportunity/all`, data_return: true
+                url: url, data_return: true
             })
+
             console.log(response)
             setRawData(response)
             const results = response
@@ -410,6 +321,19 @@ const Opportunities: React.FC = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        setTableParams({
+            ...tableParams,
+            pagination: {
+                current: 1,
+                pageSize: 10,
+                total: 0,
+            }
+        });
+
+        fetchData(true)
+    }, [isSorting])
+
 
     return (
         <>
@@ -449,7 +373,7 @@ const Opportunities: React.FC = () => {
                                     "id"
                                 }
                                 onChange={handleSortFieldChange}
-                                options={columns.map((item) => ({
+                                options={list_sort.map((item) => ({
                                     value: item.key,
                                     label: item.title,
                                 }))}
@@ -467,11 +391,8 @@ const Opportunities: React.FC = () => {
                                     )
                                 }
                             />
-                            <Button onClick={handleClearFilter}>
-                                Clear filters
-                            </Button>
                             <Button onClick={handleClearAll}>
-                                Clear filters and sorters
+                                Clear sorters
                             </Button>
                         </div>
                     </div>

@@ -196,7 +196,19 @@ class ClientController {
 	public async getOpporturnityCustomer(req: Request, res: Response, next: NextFunction) {
 		try {
 			if (req.action === "read:any") {
-				const data = await this.clientService.getOpportunityCustomer();
+				let sort_factor: any = req.query.sort_factor
+				let order: any = req.query.order
+
+				if (typeof sort_factor == 'undefined'){
+					sort_factor = 'amount'
+				}
+
+				if (typeof order == 'undefined') {
+					order = 'ascend'
+				}
+				order = order === 'ascend' ? 'ASC' : 'DESC'
+
+				const data = await this.clientService.getOpportunityCustomer(sort_factor, order);
 
 				res.send(data);
 			} else {
