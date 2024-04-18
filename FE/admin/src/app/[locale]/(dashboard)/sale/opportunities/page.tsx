@@ -3,23 +3,17 @@ import React, { useEffect, useRef, useState } from "react";
 import {
     Button,
     ConfigProvider,
-    InputRef,
     Table,
-    Input,
-    Space,
     Select,
     Alert,
 } from "antd";
-import { TableProps, GetProp, TableColumnType } from "antd";
+import { TableProps, GetProp} from "antd";
 import { variables } from "@/app";
 import {
-    SearchOutlined,
     SortAscendingOutlined,
     SortDescendingOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import type {
-    FilterConfirmProps,
     Key,
     SortOrder,
 } from "antd/es/table/interface";
@@ -361,7 +355,7 @@ const Opportunities: React.FC = () => {
                     )}
                     <div className='border bg-white shadow p-3 w-full'>
                         <div
-                            style={{ marginBottom: 16 }}
+                            style={{ marginBottom: 0 }}
                             className='flex items-center gap-2'
                         >
                             <p>Sort by: </p>
