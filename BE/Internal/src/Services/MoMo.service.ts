@@ -94,6 +94,78 @@ export class MoMoService {
         req_payment.write(requestBody);
         req_payment.end();
     }
+
+    public async captureWallet(req: Request, res: Response, next: NextFunction) {
+        const table_id = Number(req.params.id);
+        const fullname = req.body.firstname + " " + req.body.lastname
+        const data = JSON.stringify(req.body)
+        let table_cart = await this.cartRepository.getCartTable(Number(table_id))
+        var partnerCode = "MOMO";
+        var accessKey = "F8BBA842ECF85";
+        var secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+        var requestId = partnerCode + new Date().getTime();
+        var orderId = requestId;
+        var orderInfo = `MOMO thanh toan ho cho khach hang ${fullname}`;
+        var redirectUrl = `http://localhost:3000/en/sale/reservations/payment?method=MOMO&tid=${table_id}`;
+        var ipnUrl =  `http://localhost:3000/en/sale/reservations/payment?method=MOMO&tid=${table_id}`;
+        var extraData = Buffer.from(data).toString('base64');
+        var amount = table_cart.amount;
+        var requestType = "captureWallet"
+        
+        //before sign HMAC SHA256 with format
+        //accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
+        var rawSignature = "accessKey="+accessKey+"&amount=" + amount+"&extraData=" + extraData+"&ipnUrl=" + ipnUrl+"&orderId=" + orderId+"&orderInfo=" + orderInfo+"&partnerCode=" + partnerCode +"&redirectUrl=" + redirectUrl+"&requestId=" + requestId+"&requestType=" + requestType
+        //signature
+        const crypto = require('crypto');
+        var signature = crypto.createHmac('sha256', secretkey)
+            .update(rawSignature)
+            .digest('hex');
+        
+        //json object send to MoMo endpoint
+        const requestBody = JSON.stringify({
+            partnerCode : partnerCode,
+            accessKey : accessKey,
+            requestId : requestId,
+            amount : amount,
+            orderId : orderId,
+            orderInfo : orderInfo,
+            redirectUrl : redirectUrl,
+            ipnUrl : ipnUrl,
+            extraData : extraData,
+            requestType : requestType,
+            signature : signature,
+            lang: 'en'
+        });
+        //Create the HTTPS objects
+        const https = require('https');
+        const options = {
+            hostname: 'test-payment.momo.vn',
+            port: 443,
+            path: '/v2/gateway/api/create',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(requestBody)
+            }
+        }
+        //Send the request and get the response
+        const req_payment = https.request(options, (res_payment: any) => {
+            res_payment.setEncoding('utf8');
+            res_payment.on('data', (body: any) => {
+                res.send(body)
+            });
+            res_payment.on('end', () => {
+                console.log('No more data in response.');
+            });
+        })
+        
+        req_payment.on('error', (e: any) => {
+            console.log(`problem with request: ${e.message}`);
+        });
+
+        req_payment.write(requestBody);
+        req_payment.end();
+    } 
 }
 
 export default MoMoService

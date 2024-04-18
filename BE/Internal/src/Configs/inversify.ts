@@ -24,7 +24,8 @@ import {
 	INotificationRepository,
 	NotificationRepository,
 	ClientHistoryRepository
-
+,
+	Pos_notificationRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -50,6 +51,7 @@ import { IClientHistoryRepository } from "../Repositories";
 import { ISubscriberRepository, SubscriberRepository } from "../Repositories";
 import { IOrderItemRepository, OrderItemRepository } from "../Repositories";
 
+import { IPos_notificationRepository } from "../Repositories/IPos_notificationRepository";
 class InversifyContainer {
 	private container;
 	static instance: InversifyContainer ;
@@ -104,6 +106,8 @@ class InversifyContainer {
 		this.container.bind<ITargetListRepository>(TYPES.ITargetListRepository).to(TargetListRepository);
 		this.container.bind<IClientHistoryRepository>(TYPES.IClientHistoryRepository).to(ClientHistoryRepository)
 		this.container.bind<ISubscriberRepository>(TYPES.ISubscriberRepository).to(SubscriberRepository)
+		this.container.bind<IPos_notificationRepository>(TYPES.IPos_notificationRepository).to(Pos_notificationRepository)
+
 	}
 }
 
