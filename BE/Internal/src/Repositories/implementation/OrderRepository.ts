@@ -7,7 +7,7 @@ import "reflect-metadata";
 import { IOrderRepository } from "../IOrderRepository";
 import { BaseRepository } from "./BaseRepository";
 import { ForbiddenError, RecordNotFoundError } from "../../Errors";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 @injectable()
 export class OrderRepository
     extends BaseRepository<Order>
@@ -121,7 +121,7 @@ export class OrderRepository
             const startOfMonth = new Date(
                 today.getFullYear(),
                 today.getMonth(),
-                1
+                2
             );
             const endOfMonth = today;
             const startOfLastMonth = new Date(
@@ -129,12 +129,10 @@ export class OrderRepository
                 today.getMonth() - 1,
                 1
             );
-            const endOfLastMonth = startOfMonth;
-            console.log(
-                startOfMonth,
-                endOfMonth,
-                startOfLastMonth,
-                endOfLastMonth
+            const endOfLastMonth = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                1
             );
             const [currentMonthOrders, lastMonthOrders] = await Promise.all([
                 this._model.findAll({
@@ -162,6 +160,31 @@ export class OrderRepository
             message.queryError(err);
         }
     }
+
+    public async getChart(beginDate?: Date, endDate?: Date) {
+        try {
+            const currentMonthOrders = await Promise.all([
+                this._model.findAll({
+                    where: {
+                        createdAt: {
+                            [Op.between]: [beginDate, endDate],
+                        },
+                        status: "Done",
+                    },
+                    attributes: [
+                        [Sequelize.literal(`DATE("createdAt")`), "date"],
+                        [Sequelize.literal(`COUNT(*)`), "count"],
+                        [Sequelize.fn('sum', Sequelize.col('amount')), 'total_amount']
+                    ],
+                    group: ["date"],
+                }),
+            ]);
+            return currentMonthOrders;
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+
 
     public async getYearlyOrder() {
         try {
@@ -219,13 +242,13 @@ export class OrderRepository
             const startOfMonth = new Date(
                 today.getFullYear(),
                 today.getMonth(),
-                1
+                2
             );
             const endOfMonth = today;
             const startOfLastMonth = new Date(
                 today.getFullYear(),
-                today.getMonth() - 1,
-                1
+                today.getMonth(),
+                2
             );
             const endOfLastMonth = startOfMonth;
             const orders = await this._model.findAll({
@@ -244,22 +267,37 @@ export class OrderRepository
                     if (!productSales.has(productId)) {
                         productSales.set(productId, quantity);
                     } else {
-                        productSales.set(productId, productSales.get(productId) + quantity);
+                        productSales.set(
+                            productId,
+                            productSales.get(productId) + quantity
+                        );
                     }
                 }
             }
-            const previousMonth = await this.getCustomTopProduct(startOfLastMonth, endOfLastMonth);
-            const productSalesArray: [number, number, number][] = Array.from(productSales).map(([productId, quantity]) => [productId, quantity, -10]);
+            const previousMonth = await this.getCustomTopProduct(
+                startOfLastMonth,
+                endOfLastMonth
+            );
+            const productSalesArray: [number, number, number][] = Array.from(
+                productSales
+            ).map(([productId, quantity]) => [productId, quantity, -10]);
             productSalesArray.sort((a, b) => b[1] - a[1]);
             const topProducts = productSalesArray.slice(0, 10);
-            if (previousMonth){
-                const result: [number, number, number][] = topProducts.map(([productId, quantity, rank], index) => {
-                    const indexInPrevious =  previousMonth.findIndex((pre: any) => pre[0] === productId);
-                    const indexChange = indexInPrevious !== -1 ? indexInPrevious - index : -10;
-                    return [productId, quantity, indexChange];
-                });
+            if (previousMonth) {
+                const result: [number, number, number][] = topProducts.map(
+                    ([productId, quantity, rank], index) => {
+                        const indexInPrevious = previousMonth.findIndex(
+                            (pre: any) => pre[0] === productId
+                        );
+                        const indexChange =
+                            indexInPrevious !== -1
+                                ? indexInPrevious - index
+                                : -10;
+                        return [productId, quantity, indexChange];
+                    }
+                );
                 return result;
-            } else return topProducts
+            } else return topProducts;
         } catch (err) {
             message.queryError(err);
         }
@@ -288,28 +326,46 @@ export class OrderRepository
                     if (!productSales.has(productId)) {
                         productSales.set(productId, quantity);
                     } else {
-                        productSales.set(productId, productSales.get(productId) + quantity);
+                        productSales.set(
+                            productId,
+                            productSales.get(productId) + quantity
+                        );
                     }
                 }
             }
-            const previosYear = await this.getCustomTopProduct(startOfLastYear, endOfLastYear);
-            const productSalesArray: [number, number, number][] = Array.from(productSales).map(([productId, quantity]) => [productId, quantity, -10]);
+            const previosYear = await this.getCustomTopProduct(
+                startOfLastYear,
+                endOfLastYear
+            );
+            const productSalesArray: [number, number, number][] = Array.from(
+                productSales
+            ).map(([productId, quantity]) => [productId, quantity, -10]);
             productSalesArray.sort((a, b) => b[1] - a[1]);
             const topProducts = productSalesArray.slice(0, 10);
-            if (previosYear){
-                const result: [number, number, number][] = topProducts.map(([productId, quantity, rank], index) => {
-                    const indexInPrevious =  previosYear.findIndex((pre: any) => pre[0] === productId);
-                    const indexChange = indexInPrevious !== -1 ? indexInPrevious - index : -10;
-                    return [productId, quantity, indexChange];
-                });
+            if (previosYear) {
+                const result: [number, number, number][] = topProducts.map(
+                    ([productId, quantity, rank], index) => {
+                        const indexInPrevious = previosYear.findIndex(
+                            (pre: any) => pre[0] === productId
+                        );
+                        const indexChange =
+                            indexInPrevious !== -1
+                                ? indexInPrevious - index
+                                : -10;
+                        return [productId, quantity, indexChange];
+                    }
+                );
                 return result;
-            } else return topProducts
+            } else return topProducts;
         } catch (err) {
             message.queryError(err);
         }
     }
-    
-    public async getCustomTopProduct(beginDate: Date, endDate: Date = new Date()) {
+
+    public async getCustomTopProduct(
+        beginDate: Date,
+        endDate: Date = new Date()
+    ) {
         try {
             const orders = await this._model.findAll({
                 where: {
@@ -327,11 +383,15 @@ export class OrderRepository
                     if (!productSales.has(productId)) {
                         productSales.set(productId, quantity);
                     } else {
-                        productSales.set(productId, productSales.get(productId) + quantity);
+                        productSales.set(
+                            productId,
+                            productSales.get(productId) + quantity
+                        );
                     }
                 }
             }
-            const productSalesArray: [number, number][] = Array.from(productSales);
+            const productSalesArray: [number, number][] =
+                Array.from(productSales);
             productSalesArray.sort((a, b) => b[1] - a[1]);
             const topProducts = productSalesArray.slice(0, 10);
             return topProducts;

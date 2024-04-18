@@ -32,6 +32,7 @@ const TimeBar = ({ option, setOption, setComponent }: { option: Option; setOptio
             monthlyStats: true,
             topProducts: false,
             topCustomers: false,
+            orderChart: false
         })
     };
 
@@ -42,6 +43,7 @@ const TimeBar = ({ option, setOption, setComponent }: { option: Option; setOptio
             monthlyStats: true,
             topProducts: false,
             topCustomers: false,
+            orderChart: false
         })
     };
     return (

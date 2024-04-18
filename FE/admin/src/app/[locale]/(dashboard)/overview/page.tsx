@@ -3,6 +3,7 @@ import React, { useState, Suspense } from "react";
 import Stats from "@/components/Statistics/Stats";
 import TimeBar from "@/components/Statistics/TimeBar";
 import TopChart from "@/components/Statistics/TopChart";
+import OrderChart from "@/components/Statistics/OrderChart";
 type Option = {
     type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM";
     beginDate?: Date;
@@ -19,6 +20,7 @@ function Overview() {
         monthlyStats: false,
         topProducts: false,
         topCustomers: false,
+        orderChart: false,
     });
     return (
         <div className='w-full h-auto overflow-scroll p-4 flex flex-col gap-4 justify-start items-center'>
@@ -59,6 +61,7 @@ function Overview() {
                     />
                 )}
             </div>
+            {component.orderChart && <OrderChart option={option} />}
         </div>
     );
 }

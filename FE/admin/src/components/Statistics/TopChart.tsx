@@ -37,7 +37,9 @@ const TopChart = ({
 
     useEffect(() => {
         if (!chartLoading) {
-            setComponent({...component, topCustomers: true});
+            if (type == "products"){
+                setComponent({...component, topCustomers: true});
+            } else setComponent({...component, orderChart: true});
         }
     }, [chartLoading, type]);
 

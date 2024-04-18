@@ -18,42 +18,72 @@ export class ReportService {
     ) { }
 
     public async getProfit(options?: ChartQueryOptions) {
-        if (options?.type === "DAILY"){
+        let profitNow = 0;
+        let profitBefore = 0;
+        let orderNow = 0;
+        let orderBefore = 0;
+    
+        if (options?.type === "DAILY") {
             const { todayOrders, yesterdayOrders } = await this.orderRepository.getDailyOrder();
-            const todayProfit = todayOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
-            const yesterdayProfit = yesterdayOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
-            return {
-                now: todayProfit,
-                before: yesterdayProfit
-            }
-        } else if (options?.type === "MONTHLY"){
+            profitNow = todayOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
+            profitBefore = yesterdayOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
+            orderNow = todayOrders.length;
+            orderBefore = yesterdayOrders.length;
+        } else if (options?.type === "MONTHLY") {
             const { currentMonthOrders, lastMonthOrders } = await this.orderRepository.getMonthlyOrder();
-            const currentMonthProfit = currentMonthOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
-            const lastMonthProfit = lastMonthOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
-            return {
-                now: currentMonthProfit,
-                before: lastMonthProfit
-            };
-        } else if (options?.type === "YEARLY"){
+            profitNow = currentMonthOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
+            profitBefore = lastMonthOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
+            orderNow = currentMonthOrders.length;
+            orderBefore = lastMonthOrders.length;
+        } else if (options?.type === "YEARLY") {
             const { currentYearOrders, lastYearOrders } = await this.orderRepository.getYearlyOrder();
-            const currentYearProfit = currentYearOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
-            const lastYearProfit = lastYearOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
-            return {
-                now: currentYearProfit,
-                before: lastYearProfit
-            };
-        } else if (options?.type === "CUSTOM"){
-            const { orders } = await this.orderRepository.getOrdersByDate(options.beginDate, options.endDate)
-            const profit = orders.reduce((amount: number, order: any) => amount + order.amount, 0);
-            return {
-                now: profit,
-                before: 0
-            }
+            profitNow = currentYearOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
+            profitBefore = lastYearOrders.reduce((amount: number, order: any) => amount + order.amount, 0);
+            orderNow = currentYearOrders.length;
+            orderBefore = lastYearOrders.length;
+        } else if (options?.type === "CUSTOM") {
+            const { orders } = await this.orderRepository.getOrdersByDate(options.beginDate, options.endDate);
+            profitNow = orders.reduce((amount: number, order: any) => amount + order.amount, 0);
+            orderNow = orders.length;
         }
+    
+        return {
+            profit: {
+                now: profitNow,
+                before: profitBefore,
+            },
+            orders: {
+                now: orderNow,
+                before: orderBefore,
+            },
+        };
     }
 
     public async getLead(options?: ChartQueryOptions) {
 
+    }
+
+    public async getChart(options?: ChartQueryOptions) {
+        if (options?.type === "MONTHLY"){
+            const today = new Date();
+            const startOfMonth = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                2
+            );
+            const endOfMonth = today;
+            const chart = await this.orderRepository.getChart(startOfMonth, endOfMonth);
+            return chart;
+        } else if (options?.type === "YEARLY"){
+            const today = new Date();
+            const startOfYear = new Date(today.getFullYear(), 0, 1);
+            const endOfYear = today;
+            const chart = await this.orderRepository.getChart(startOfYear, endOfYear);
+            return chart;
+        } else if (options?.type === "CUSTOM"){
+            const chart = await this.orderRepository.getChart(options.beginDate, options.endDate);
+            return chart;
+        }
     }
 
     public async getProductChart(options?: ChartQueryOptions) {

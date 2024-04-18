@@ -12,8 +12,8 @@ class ReportRouter {
 
     public initialize(router: Router) {
         const reportRouter = Router();
-        reportRouter.get("/profit",this.ReportController.getProfit.bind(this.ReportController));
-        reportRouter.get("/lead",this.ReportController.getLead.bind(this.ReportController));
+        reportRouter.get("/statistics",this.ReportController.getProfit.bind(this.ReportController));
+        reportRouter.get("/charts",this.ReportController.getChart.bind(this.ReportController));
         reportRouter.get("/products",this.ReportController.getProductChart.bind(this.ReportController));
         reportRouter.get("/customers",this.ReportController.getCustomerChart.bind(this.ReportController));
 

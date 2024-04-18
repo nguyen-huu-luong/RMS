@@ -20,36 +20,36 @@ const Stats = ({
     setComponent: any;
 }) => {
     const {
-        data: profit,
-        error: profitError,
-        isLoading: profitLoading,
+        data: stats,
+        error: statsError,
+        isLoading: statsLoading,
     } = useSWR(
         option.beginDate && option.endDate
-            ? `/reports/profit?type=${option.type}&beginDate=${option.beginDate}&endDate=${option.endDate}`
-            : `/reports/profit?type=${option.type}`,
+            ? `/reports/statistics?type=${option.type}&beginDate=${option.beginDate}&endDate=${option.endDate}`
+            : `/reports/statistics?type=${option.type}`,
         async (url: string) =>
             await fetchClient({ url: url, data_return: true })
     );
 
     useEffect(() => {
-        if (!profitLoading) {
+        if (!statsLoading) {
             if (option.type === "DAILY") {
                 setComponent({ ...component, monthlyStats: true });
             } else {
                 setComponent({ ...component, topProducts: true });
             }
         }
-    }, [profitLoading, option.type]);
+    }, [statsLoading, option.type]);
 
-    if (profitLoading || !profit) return <Loading />;
+    if (statsLoading || !stats) return <Loading />;
 
     return (
         <div className='flex flex-row justify-between w-full gap-4'>
-            <Card name={"Orders"} before={150000} current={100000} />
+            <Card name={"Orders"} before={stats.orders.before} current={stats.orders.now} />
             <Card
                 name={"Profits"}
-                before={profit.before}
-                current={profit.now}
+                before={stats.profit.before}
+                current={stats.profit.now}
             />
             <Card name={"Orders"} before={150000} current={100000} />
             <Card name={"Orders"} before={150000} current={100000} />
