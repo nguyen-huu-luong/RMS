@@ -21,18 +21,18 @@ import moment from "moment";
 function Home() {
     const params = useParams<{ locale: string; tid: string }>();
     const [items, setItems] = useState<any>([]);
-    // const [cart_items, setCartItems] = useState<any>([]);
     const [currentCategory, setCurrentCategory] = useState<string>("Pizza");
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [finish, setFinish] = useState(false);
+    const [ready, setReady] = useState<Boolean>(false);
     const [form] = Form.useForm();
     const { data: session, status } = useSession();
     const [checker, setChecker] = useState(true);
     const [item_status, updateItemStaus] = useState(true);
     const router = useRouter();
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [notification, setNotification] = useState(false);
+    const [notification, setNotification] = useState(null);
 
     const socket = useSocket();
 
@@ -84,21 +84,12 @@ function Home() {
     );
     const [currentPage, setCurrentPage] = useState(1);
 
-    let {
+    const {
         data: cart_items,
         error: cart_itemsError,
         isLoading: cart_itemsLoading,
         mutate: cartMutate,
     } = useSWR([`/tables/cart/${params.tid}`], ([url]) =>
-        fetchClient({ url: url, data_return: true })
-    );
-
-    let {
-        data: notifications,
-        error: notifications_error,
-        isLoading: notifications_loading,
-        mutate: notificationMutate,
-    } = useSWR([`/pos_notifications/all`], ([url]) =>
         fetchClient({ url: url, data_return: true })
     );
 
@@ -108,6 +99,22 @@ function Home() {
         isLoading: categoryLoading,
     } = useSWR([`/categories/all`], ([url]) =>
         fetchClient({ url: url, data_return: true })
+    );
+
+    useEffect(() => {
+        if (!categoryLoading || !foodLoading || !tableLoading || !cart_itemsLoading) {
+            setReady(true);
+        }
+    }, [categoryLoading, tableLoading, foodLoading, cart_itemsLoading]);
+
+    const {
+        data: notifications,
+        error: notifications_error,
+        isLoading: notifications_loading,
+        mutate: notificationMutate,
+    } = useSWR(
+        ready ? [`/pos_notifications/all`] : null,
+        ready ? ([url]) => fetchClient({ url: url, data_return: true }) : null
     );
 
     const onChange: PaginationProps["onChange"] = (page) => {
@@ -198,7 +205,7 @@ function Home() {
             "tableItem:finish:fromChef",
             (tableId: string, name: string) => {
                 message.info(`Finish ${name} for table ${tableId}`);
-                notificationMutate();
+                // notificationMutate();
                 cartMutate();
             }
         );
@@ -212,12 +219,11 @@ function Home() {
     if (
         foodLoading ||
         categoryLoading ||
+        tableLoading ||
         cart_itemsLoading ||
         notifications_loading
     )
         return <Loading />;
-    if (status === "loading") return <div>Loading.....</div>;
-    if (status === "unauthenticated") router.push("/signin");
     return (
         <div className='h-full relative overflow-hidden'>
             <ConfigProvider
@@ -236,7 +242,7 @@ function Home() {
                     getContainer={false}
                 >
                     <div className='w-full h-full overflow-y-auto flex flex-col justify-start gap-2'>
-                        {notifications.map((item: any) => {
+                        {notifications && notifications.map((item: any) => {
                             return (
                                 <div
                                     key={item.id}
@@ -288,10 +294,12 @@ function Home() {
                             )}
                         </div>
                     </div>
-                    <div className='w-full h-full flex flex-row items-center justify-end cursor-pointer' onClick={showDrawer}
->
+                    <div
+                        className='w-full h-full flex flex-row items-center justify-end cursor-pointer'
+                        onClick={showDrawer}
+                    >
                         <div>
-                            {notifications ? (
+                            {notifications && notifications.length > 0 ? (
                                 <div className='font-normal text-lg text-black'>
                                     <span className='font-bold'>
                                         &#91;
