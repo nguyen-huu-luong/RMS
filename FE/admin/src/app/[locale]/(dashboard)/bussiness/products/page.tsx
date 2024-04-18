@@ -20,7 +20,7 @@ function Home() {
                                     <AuditOutlined style={{ fontSize: "100px", color: "#1677ff" }} />
                                 </div>
                                 <div className="mt-7 text-center">
-                                    <Button size="large" style={{ backgroundColor: "#1677ff", color: "white" }}>Go To Page</Button>
+                                    <Button onClick={() => push(`/bussiness/products/dishes`)} size="large" style={{ backgroundColor: "#1677ff", color: "white" }}>Go To Page</Button>
                                 </div>
                             </div>
                         </div>

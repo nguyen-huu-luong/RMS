@@ -27,9 +27,9 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
         customRequest: handleUpload,
         onChange(info) {
             if (info.file.status === "done") {
-                message.success(`Change avatar successfully`);
+                message.success(`Change icon successfully`);
             } else if (info.file.status === "error") {
-                message.error(`Change avatar failed.`);
+                message.error(`Change icon failed.`);
             }
         },
     };
@@ -73,8 +73,8 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
                                     {
                                         message: 'This category already exists',
                                         validator: (_, value) => {
-                                            const temp_value = value.trim() 
-                                            if (data.some((e: any) => e.name == temp_value)) {
+                                            const temp_value = value ? value.trim() : "" 
+                                            if ( data.some((e: any) => e.name == temp_value)) {
                                                 return Promise.reject("This category already exists");
                                             } else {
                                                 return Promise.resolve();

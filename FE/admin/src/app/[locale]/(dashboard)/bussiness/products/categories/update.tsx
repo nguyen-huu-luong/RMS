@@ -34,9 +34,9 @@ const UpdateCategory = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data
             customRequest: handleUpload,
             onChange(info) {
                 if (info.file.status === "done") {
-                    message.success(`Change avatar successfully`);
+                    message.success(`Change icon successfully`);
                 } else if (info.file.status === "error") {
-                    message.error(`Change avatar failed.`);
+                    message.error(`Change icon failed.`);
                 }
             },
             defaultFileList: [
@@ -56,9 +56,9 @@ const UpdateCategory = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data
             customRequest: handleUpload,
             onChange(info) {
                 if (info.file.status === "done") {
-                    message.success(`Change avatar successfully`);
+                    message.success(`Change icon successfully`);
                 } else if (info.file.status === "error") {
-                    message.error(`Change avatar failed.`);
+                    message.error(`Change icon failed.`);
                 }
             }
         };

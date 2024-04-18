@@ -133,7 +133,7 @@ const Category = () => {
             title: "Icon",
             dataIndex: "thumnails",
             key: "thumnails",
-            render: (text, row) => <>{ <img style={{width: "20px", height: "20px"}} src={text ? text : ""} />}</>
+            render: (text, row) => <>{ <img style={{width: "40px", height: "40px"}} src={text ? text : ""} />}</>
 
         },
         {
@@ -141,8 +141,8 @@ const Category = () => {
             dataIndex: "action",
             key: "action",
             render: (text, row) => <>
-                <button><FormOutlined style={{ color: "#4A58EC", fontSize: "18px" }} onClick={() => handleUpdateItem({id: row.id, name: row.name, description: row.description, thumnails: row.thumnails})} /></button>
-                <button><CloseSquareOutlined className="ml-2" style={{ color: "#DB3A34", fontSize: "18px" }} onClick={() => handleDeleteItem({id: row.id, name: row.name, description: row.description, thumnails: row.thumnails})} /></button>
+                <div><button><FormOutlined style={{ color: "#4A58EC", fontSize: "18px" }} onClick={() => handleUpdateItem({id: row.id, name: row.name, description: row.description, thumnails: row.thumnails})} /></button></div>
+                <div><button><CloseSquareOutlined  style={{ color: "#DB3A34", fontSize: "18px" }} onClick={() => handleDeleteItem({id: row.id, name: row.name, description: row.description, thumnails: row.thumnails})} /></button></div>
             </>
         }
     ];
@@ -284,6 +284,7 @@ const Category = () => {
                             headerBg: variables.backgroundSecondaryColor,
                             footerBg: "#fff",
                         },
+            
                     },
                 }}
             >
