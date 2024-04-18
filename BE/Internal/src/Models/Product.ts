@@ -10,8 +10,9 @@ import {
 	type HasOneCreateAssociationMixin,
 } from "sequelize";
 import Loader from "../Loaders";
-import { Cart, Order, OrderItem, CartItem } from ".";
+import { Cart, Order, OrderItem, CartItem, } from ".";
 import Category from "./Category";
+import ClientHistory from "./ClientHistory";
 class Product extends Model {
 	public static associate() {
 		Product.belongsToMany(Cart, {
@@ -30,6 +31,14 @@ class Product extends Model {
                 allowNull: false,
             },
         });
+
+		Product.hasMany(ClientHistory, {
+			foreignKey: {
+				name: "productId",
+				allowNull: true,
+			},
+			sourceKey: "id",
+		});
 	}
 }
 Product.init(

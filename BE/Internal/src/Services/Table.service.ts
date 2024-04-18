@@ -394,4 +394,9 @@ export class TableService {
             next(err);
         }
     }
+
+    public async makePaymentMoMO(req: Request, res: Response, next: NextFunction){
+        await this.makePayment(req, res, next)
+    }
+
 }

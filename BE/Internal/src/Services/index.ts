@@ -15,4 +15,7 @@ export * from './Reservation.service'
 export * from './Floor.service'
 export * from './Notification.service'
 export * from './Pos_notification.service'
+export * from './Campaign.service'
 
+export * from './ClientHistory.service'
+export * from './OrderItem.service'

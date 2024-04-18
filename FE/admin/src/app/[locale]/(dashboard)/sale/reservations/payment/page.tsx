@@ -5,11 +5,45 @@ import {
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from 'next/navigation'
+import { useEffect } from "react";
+import { useRouter } from "next-intl/client";
+import { useParams } from "next/navigation";
+import fetchClient from "@/lib/fetch-client";
 
 const TablePayment = () => {
     const searchParams = useSearchParams()
+    const payMethod = searchParams.get('method')
+    const resultCode = searchParams.get('resultCode')
+    const tableId = searchParams.get('tid')
+    const router = useRouter()
+
+    const updateOrder = async (orderInfoJS: any) => {
+        console.log(orderInfoJS)
+        await fetchClient({ method: "POST", url: `/tables/order/momo/${tableId}`, body: orderInfoJS })
+        await fetchClient({ method: "PUT", url: `/tables?id=${tableId}`, body: { "status": "Free" } })
+    }
+
+    useEffect(() => {
+        let checker = localStorage.getItem("orderInfo")
+        let orderInfo = searchParams.get('extraData')
+        console.log(checker)
+        console.log(resultCode)
+        if (resultCode == "0" && checker == "1" && orderInfo) {
+            localStorage.setItem('orderInfo', "0")
+            let orderInfoJS = Buffer.from(orderInfo, "base64").toString()
+            orderInfoJS = JSON.parse(orderInfoJS)
+            updateOrder(orderInfoJS)
+        }
+    }, [])
  
-    const tid = searchParams.get('tid')
+    console.log(payMethod)
+    if (payMethod == "MOMO") {
+        if (resultCode == "0") {}
+        else {
+            router.push(`/sale/reservations/${tableId}`)
+            return
+        }
+    }
 
     return (
 

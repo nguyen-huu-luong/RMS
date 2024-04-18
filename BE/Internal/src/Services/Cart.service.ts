@@ -3,7 +3,7 @@ import { Message } from "../Utils";
 import { HttpStatusCode } from "../Constants";
 import { container } from "../Configs";
 import { ICartRepository } from "../Repositories/ICartRepository";
-import { IProductRepository } from "../Repositories";
+import { IProductRepository, IClientHistoryRepository } from "../Repositories";
 import { TYPES } from "../Types/type";
 import statusMess from "../Constants/statusMess";
 import { RecordNotFoundError } from "../Errors";
@@ -14,6 +14,9 @@ export class CartService {
         ),
         private productRepository = container.get<IProductRepository>(
             TYPES.IProductRepository
+        ),
+        private clientHistoryRepository = container.get<IClientHistoryRepository>(
+            TYPES.IClientHistoryRepository
         )
     ) {}
 
@@ -53,6 +56,15 @@ export class CartService {
             const cartItem = await cart.getProducts({
                 where: { id: req.body.productId },
             });
+
+            await this.clientHistoryRepository.create({
+                action: "add_to_cart",
+                clientId: req.userId,
+                productId: req.body.productId,
+                updatedAt:  new Date(),
+                createdAt: new Date()
+            })
+
             if (cartItem.length > 0) {
                 await cart.addProduct(product, {
                     through: {

@@ -5,6 +5,8 @@ interface IBaseRepository<M extends Model> {
     all(options?: QueryOptions): Promise<M[]>;
   
     findById(id: number, attributes?: string[]): Promise<M>;
+
+    getById(id: number, attributes?: string[]): Promise<M | null>
   
     create(data: any): Promise<M>;
   

@@ -8,6 +8,11 @@ import {
 	type HasOneGetAssociationMixin,
 	type HasOneSetAssociationMixin,
 	type HasOneCreateAssociationMixin,
+	BelongsToManySetAssociationsMixin,
+	BelongsToManyAddAssociationMixin,
+	BelongsToManyRemoveAssociationMixin,
+	BelongsToManyAddAssociationsMixin,
+	BelongsToManyRemoveAssociationsMixin,
 } from "sequelize";
 import Loader from "../Loaders";
 import TargetList from "./Targetlist";
@@ -17,6 +22,14 @@ import ClickEvent from "./ClickEvent";
 import OpenEvent from "./OpenEvent";
 
 class Campaign extends Model {
+	declare setTargetLists: BelongsToManySetAssociationsMixin<TargetList, TargetList["id"]>;
+	declare addTargetList: BelongsToManyAddAssociationMixin<TargetList, TargetList["id"]> ;
+	declare addTargetLists: BelongsToManyAddAssociationsMixin<TargetList, TargetList["id"]> ;
+	declare removeTargetList: BelongsToManyRemoveAssociationMixin<TargetList, number> ;
+	declare removeTargetLists: BelongsToManyRemoveAssociationsMixin<TargetList, number> ;
+
+	declare setEmailCampaign: HasManySetAssociationsMixin<EmailCampaign, number>;
+
 	public static associate() {
 		Campaign.belongsToMany(TargetList, {
 			through: CampaignTargetList,

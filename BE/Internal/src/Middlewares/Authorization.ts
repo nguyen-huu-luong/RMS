@@ -43,15 +43,15 @@ class Authorization extends BaseMiddleware {
 		if (actions.length === 0) {
 			this.next(new ForbiddenError());
 		}
-
+		console.log(actions)
 		this.request.action = actions[0];
-		console.log(
-			"Authorization successfully!",
-			"role:",
-			this.request.role,
-			", actions:",
-			actions
-		);
+		// console.log(
+		// 	"Authorization successfully!",
+		// 	"role:",
+		// 	this.request.role,
+		// 	", actions:",
+		// 	actions
+		// );
 		this.next();
 	}
 

@@ -47,7 +47,7 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
                 <NextIntlClientProvider locale={locale} messages={messages}>
                     <Provider>
                         <div
-                            className='flex relative justify-center h-screen'
+                            className='flex relative justify-center min-h-screen'
                             style={{
                                 backgroundColor: Colors.defaultBackgroundColor,
                             }}

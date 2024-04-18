@@ -39,18 +39,21 @@ export class EmailService {
         )
     ) { }
 
-    public async sendEmail(message: IEmailMessage) {
+    public async sendEmail(message: IEmailMessage, campaignId?: number) {
         const { html, type } = message;
 
         if (type === "mjml") {
             const emailData = JSON.parse(html);
+            
+
+            console.log(emailData)
             const withHtml = {
                 tagName: "mjml",
                 attributes: {},
                 children: [emailData],
             };
             const xmlEmail = jsonToXML(withHtml)
-            console.log(xmlEmail)
+            // console.log(xmlEmail)
             const client = await this.clientRepository.findByEmail(message.to)
             if (!client) {
                 throw new RecordNotFoundError("Customer not found!")
@@ -69,10 +72,14 @@ export class EmailService {
 
             const renderedMJML = mustache.render(xmlEmail, client);
 
+            const imgSrc = `http://localhost:3003/api/track/email?email=${encodeURIComponent(message.to)}&campaign=${campaignId}`;
+            const script = `<script>function onLoad() { var xhr = new XMLHttpRequest(); xhr.open("GET", "${imgSrc}", true); xhr.onload = function () { if (xhr.status >= 200 && xhr.status < 300) { console.log("API call successful"); } else { console.error("API call failed with status code: " + xhr.status); } }; xhr.onerror = function () { console.error("API call failed"); }; xhr.send(); }</script>`;
+            const imgTag = `<img src="${imgSrc}" style="display:none;" onload="onLoad()">`;
+            const finalHtml = `${renderedMJML}\n${imgTag}`;
 
             return await mailler.sendEmail({
                 ...message,
-                html: mjml2html(renderedMJML).html,
+                html: `${mjml2html(renderedMJML).html}\n${imgTag}`,
             });
         }
         const result = await mailler.sendEmail({ ...message, html });
