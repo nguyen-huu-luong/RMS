@@ -6,9 +6,12 @@ import { UploadOutlined } from '@ant-design/icons';
 import { uploadImage } from '@/app/api/upload';
 import fetchClient from '@/lib/fetch-client';
 
-const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreate: any, setIsCreate: any, setIsReFetch: any, data: any }) => {
+const UpdateCategory = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data }: { isUpdate: any, setIsUpdate: any, setIsReFetch: any,  currentItem:any,data: any }) => {
 
-    const [form_create_category] = Form.useForm();
+    const [form_update_category] = Form.useForm();
+    const real_name = currentItem?.name
+    
+    form_update_category.setFields([{name: "category_name", value: currentItem?.name}, {name: "description", value: currentItem?.description }])
 
     const handleUpload = async ({
         file,
@@ -18,49 +21,77 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
         onSuccess?: any;
     }) => {
         const data = await uploadImage(file, "Dish");
-        form_create_category.setFieldValue("image", data.url)
+        form_update_category.setFieldValue("image", data.url)
         onSuccess("ok");
     };
 
-    const props: UploadProps = {
-        name: "image",
-        customRequest: handleUpload,
-        onChange(info) {
-            if (info.file.status === "done") {
-                message.success(`Change avatar successfully`);
-            } else if (info.file.status === "error") {
-                message.error(`Change avatar failed.`);
-            }
-        },
-    };
+    let props: UploadProps
 
-    const handleCancel = () => {
-        form_create_category.resetFields()
-        setIsCreate(false)
+    if(currentItem && (currentItem?.thumnails != null && currentItem?.thumnails != "")) {
+        console.log(currentItem?.thumnails)
+        const pros_temp: UploadProps = {
+            name: "image",
+            customRequest: handleUpload,
+            onChange(info) {
+                if (info.file.status === "done") {
+                    message.success(`Change avatar successfully`);
+                } else if (info.file.status === "error") {
+                    message.error(`Change avatar failed.`);
+                }
+            },
+            defaultFileList: [
+                {
+                  uid: '1',
+                  name: 'icon.png',
+                  status: 'done',
+                  url: currentItem?.thumnails,
+                },
+            ]
+        };
+        props = pros_temp
+    }
+    else {
+        const pros_temp: UploadProps = {
+            name: "image",
+            customRequest: handleUpload,
+            onChange(info) {
+                if (info.file.status === "done") {
+                    message.success(`Change avatar successfully`);
+                } else if (info.file.status === "error") {
+                    message.error(`Change avatar failed.`);
+                }
+            }
+        };
+        props = pros_temp
     }
 
-    const handleCreate = async () => {
+    const handleCancel = () => {
+        form_update_category.resetFields()
+        setIsUpdate(false)
+    }
+
+    const handleUpdate = async () => {
         const data_body = {
-            name: form_create_category.getFieldValue("category_name"),
-            description: form_create_category.getFieldValue("description"),
-            thumnails: form_create_category.getFieldValue("image")
+            name: form_update_category.getFieldValue("category_name"),
+            description: form_update_category.getFieldValue("description"),
+            thumnails: form_update_category.getFieldValue("image")
         }
         console.log(data_body)
-        await fetchClient({ method: "POST", url: "/categories", body: data_body })
-        form_create_category.resetFields()
-        setIsCreate(false)
+        await fetchClient({ method: "PUT", url: `/categories/${currentItem?.id}`, body: data_body })
+        form_update_category.resetFields()
+        setIsUpdate(false)
         setIsReFetch((current: any) => !current)
     }
 
     const handleRemove = async () => {
-        form_create_category.setFieldValue("image", "")
+        form_update_category.setFieldValue("image", "")
     }
 
     return (
         <>
 
-            <Modal title="Category Information" open={isCreate} onCancel={handleCancel} destroyOnClose={true} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
-                <Form form={form_create_category} name="basic" onFinish={handleCreate}>
+            <Modal title="Category Information Detail" open={isUpdate} onCancel={handleCancel} destroyOnClose={true} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
+                <Form form={form_update_category} name="basic"  onFinish={handleUpdate}>
                     <div className='relative'>
                         <div className='flex justify-between'>
                             <div style={{ width: "48%" }}>
@@ -74,7 +105,7 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
                                         message: 'This category already exists',
                                         validator: (_, value) => {
                                             const temp_value = value.trim() 
-                                            if (data.some((e: any) => e.name == temp_value)) {
+                                            if (temp_value != real_name && data.some((e: any) => e.name == temp_value)) {
                                                 return Promise.reject("This category already exists");
                                             } else {
                                                 return Promise.resolve();
@@ -122,7 +153,7 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
                                     <Button style={{ backgroundColor: "#989898", color: "white" }} htmlType="button" onClick={handleCancel}>CANCEL</Button>
                                 </div>
                                 <div>
-                                    <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">CONFIRM</Button>
+                                    <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">CHANGE</Button>
                                 </div>
                             </div>
                         </Form.Item>
@@ -134,4 +165,4 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
     )
 }
 
-export default CreateCategory
+export default UpdateCategory

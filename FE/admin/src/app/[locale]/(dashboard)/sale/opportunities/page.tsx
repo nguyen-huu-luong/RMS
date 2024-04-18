@@ -311,9 +311,9 @@ const Opportunities: React.FC = () => {
         }
     }
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    // useEffect(() => {
+    //     fetchData();
+    // }, []);
 
     useEffect(() => {
         setTableParams({

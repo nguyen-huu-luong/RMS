@@ -25,6 +25,8 @@ import { Modal } from "antd";
 import { useRouter } from "next-intl/client";;
 import fetchClient from "@/lib/fetch-client";
 import CreateCategory from "./create";
+import DeleteItem from "./delete";
+import UpdateCategory from "./update";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -67,6 +69,8 @@ const Category = () => {
     const [rawData, setRawData] = useState<any[]>();
     const [loading, setLoading] = useState(false);
     const [isCreate, setIsCreate] = useState(false)
+    const [isDelete, setIsDelete] = useState(false)
+    const [isUpdate, setIsUpdate] = useState(false)
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -80,6 +84,8 @@ const Category = () => {
         },
     });
     const [isSorting, setIsSorting] = useState(true)
+    const [isReFetch, setIsReFetch] = useState(true)
+    const [currentItem, setCurrentItem] = useState<any>()
     const list_sort = [
         {
             key: "id",
@@ -127,6 +133,7 @@ const Category = () => {
             title: "Icon",
             dataIndex: "thumnails",
             key: "thumnails",
+            render: (text, row) => <>{ <img style={{width: "20px", height: "20px"}} src={text ? text : ""} />}</>
 
         },
         {
@@ -134,8 +141,8 @@ const Category = () => {
             dataIndex: "action",
             key: "action",
             render: (text, row) => <>
-                <button><FormOutlined style={{ color: "#4A58EC", fontSize: "18px" }} /></button>
-                <button><CloseSquareOutlined className="ml-2" style={{ color: "#DB3A34", fontSize: "18px" }} /></button>
+                <button><FormOutlined style={{ color: "#4A58EC", fontSize: "18px" }} onClick={() => handleUpdateItem({id: row.id, name: row.name, description: row.description, thumnails: row.thumnails})} /></button>
+                <button><CloseSquareOutlined className="ml-2" style={{ color: "#DB3A34", fontSize: "18px" }} onClick={() => handleDeleteItem({id: row.id, name: row.name, description: row.description, thumnails: row.thumnails})} /></button>
             </>
         }
     ];
@@ -184,6 +191,16 @@ const Category = () => {
         setError({ isError: false, title: "", message: "" });
     };
 
+    const handleDeleteItem = async (item: any) => {
+        setCurrentItem(item)
+        setIsDelete(true)
+    }
+
+    const handleUpdateItem = async (item: any) => {
+        setCurrentItem(item)
+        setIsUpdate(true)
+    }
+
     const fetchData = async (sort = false) => {
         setLoading(true);
         try {
@@ -195,7 +212,7 @@ const Category = () => {
             if (sort) {
                 const sort_factor = tableParams.sorter?.field
                 const order = tableParams.sorter?.order
-                url = `/customers/opportunity/all?sort_factor=${sort_factor}&order=${order}`
+                url = `/categories/all?sort_factor=${sort_factor}&order=${order}`
             }
             else {
                 url = "/categories/all"
@@ -213,6 +230,7 @@ const Category = () => {
                 description: item.description,
                 thumnails: item.thumnails
             }));
+            console.log(data)
             setData(data);
             console.log(data)
             setLoading(false);
@@ -241,20 +259,21 @@ const Category = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [isReFetch]);
 
-    // useEffect(() => {
-    //     setTableParams({
-    //         ...tableParams,
-    //         pagination: {
-    //             current: 1,
-    //             pageSize: 10,
-    //             total: 0,
-    //         }
-    //     });
 
-    //     fetchData(true)
-    // }, [isSorting])
+    useEffect(() => {
+        setTableParams({
+            ...tableParams,
+            pagination: {
+                current: 1,
+                pageSize: 10,
+                total: 0,
+            }
+        });
+
+        fetchData(true)
+    }, [isSorting])
 
     return (
         <>
@@ -349,7 +368,9 @@ const Category = () => {
                 </div>
             </ConfigProvider>
 
-            <CreateCategory isCreate={isCreate} setIsCreate={setIsCreate} />
+            <CreateCategory isCreate={isCreate} setIsCreate={setIsCreate} setIsReFetch={setIsReFetch} data={data} />
+            <DeleteItem isDelete={isDelete} setIsDelete={setIsDelete} setIsReFetch={setIsReFetch} currentItem={currentItem}/>
+            <UpdateCategory isUpdate={isUpdate} setIsUpdate={setIsUpdate} setIsReFetch={setIsReFetch} data={data} currentItem={currentItem} />
         </>
     )
 }
