@@ -270,10 +270,10 @@ const CustomerProfile = () => {
                                         <div>
                                             <p className="font-bold ">Source</p>
                                             <select className="rounded-md py-1.5" defaultValue={userInfo.source ? userInfo.source : "none"} style={style} disabled={editFlag} name="source">
-                                                <option value={"website 1"}>Website 1</option>
-                                                <option value={"website 2"}>Website 2</option>
-                                                <option value={"website 3"}>Website 3</option>
-                                                <option value={"website 4"}>Website 4</option>
+                                                <option value={"Tiktok"}>Tiktok</option>
+                                                <option value={"Facebook"}>Facebook</option>
+                                                <option value={"Website"}>Website</option>
+                                                <option value={"At Restaurant"}>At Restaurant</option>
                                                 <option value={"none"}>None</option>
                                             </select>
                                         </div>

@@ -1,4 +1,6 @@
 import { DataTypes, Model } from "sequelize";
+import Order from "./Order";
+import Product from "./Product";
 import Loader from "../Loaders";
 
 class OrderItem extends Model {}
@@ -9,7 +11,7 @@ OrderItem.init(
 			type: DataTypes.INTEGER,
 			primaryKey: true,
 			references: {
-				model: "Orders",
+				model: Order,
 				key: "id",
 			},
 			allowNull: false,
@@ -19,7 +21,7 @@ OrderItem.init(
 			type: DataTypes.INTEGER,
 			primaryKey: true,
 			references: {
-				model: "Products",
+				model: Product,
 				key: "id",
 			},
 			allowNull: false,

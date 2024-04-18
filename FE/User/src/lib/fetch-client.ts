@@ -13,22 +13,24 @@ async function fetchClient({ method = "GET", url, body = "", token, data_return 
   try {
     const session = await getSession();
     const accessToken = token || session?.user.accessToken;
-    console.log("Fetch client" , url, session, accessToken, process.env.NEXT_BACKEND_API_URL )
-    const response = await axios("http://localhost:3003/api" + url, {
-      method: method,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + accessToken,
-      },
-      data: body || undefined,
-    });
+    if (accessToken) {
+      console.log("Fetch client", url, session, accessToken, process.env.NEXT_BACKEND_API_URL)
+      const response = await axios("http://localhost:3003/api" + url, {
+        method: method,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken,
+        },
+        data: body || undefined,
+      });
 
-    if (data_return) {
-      return response.data
+      if (data_return) {
+        return response.data
+      }
+
+      return response;
     }
-
-    return response;
   } catch (error) {
     console.log(error)
     if (error instanceof Response) {

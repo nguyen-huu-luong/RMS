@@ -7,10 +7,31 @@ import {
     YoutubeOutlined,
     InstagramOutlined,
 } from "@ant-design/icons";
+import fetchGeneral from "@/lib/fetch-general";
+import { useState } from "react";
 
 const Footer = () => {
     const locale = useLocale();
     const t = useTranslations("Footer");
+    const [notiSub, setNotiSub] = useState('')
+    const handleCreateSubscriber = async (event: any) => {
+        event.preventDefault()
+        const data_body = {
+            name: event.target.name.value,
+            email: event.target.email.value,
+            phone: event.target.phone.value
+        } 
+        const data = await fetchGeneral({method: "POST", url: '/subscribers', body: data_body, data_return: true})
+        if (data.status == 'Success') {
+            event.target.name.value = ''
+            event.target.email.value = ''
+            event.target.phone.value = ''
+            setNotiSub('')
+        }
+        else {
+            setNotiSub(data.message)
+        }
+    }
     return (
         <div className='bg-primary h-auto text-item-white pt-10 z-30'>
             <Container> 
@@ -70,7 +91,7 @@ const Footer = () => {
                                 {t("Contacts")}
                             </div>
                             <div className='w-auto h-auto py-2 font-thin'>
-                                Email: homecuisine.vn@gmail.com
+                                Email: homecuisine.rms.global@gmail.com
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 {t("Phone")}: 0123456789
@@ -154,6 +175,7 @@ const Footer = () => {
                             </div>
                         </div>
                         {/* Receive information */}
+                        <form onSubmit={(e) => handleCreateSubscriber(e)}>
                         <div className='flex flex-col text-center md:text-left'>
                             <div className='w-auto h-auto font-extrabold text-lg pb-4'>
                                 {t("Receive-info")}
@@ -165,27 +187,35 @@ const Footer = () => {
                                     placeholder={t("Name-plh")}
                                     className='rounded-md w-full p-2 focus:bg-white
                   focus:cursor-text outline-none text-placeholder'
-                                ></input>
+                                    id="name"
+                                required></input>
                             </div>
                             <div className='w-auto h-auto py-2 flex flex-row gap-1 items-center'>
                                 <span className='whitespace-nowrap w-auto'>
                                     {t("Phone")}:{" "}
                                 </span>
                                 <input
+                                    required
                                     type='text'
                                     placeholder={t("Phone-plh")}
                                     className='rounded-md w-full p-2 focus:bg-primary-white
                   focus:cursor-text outline-none text-placeholder'
+                                    id="phone"
                                 ></input>
                             </div>
                             <div className='w-auto h-auto py-2 flex flex-row gap-1 items-center'>
                                 <span className='w-auto'>Email:</span>
                                 <input
+                                    required
                                     type='text'
                                     placeholder={t("Email-plh")}
                                     className='rounded-md w-full p-2 focus:bg-primary-white
                   focus:cursor-text outline-none text-placeholder'
+                                    id="email"
                                 ></input>
+                            </div>
+                            <div className='w-auto h-auto text-center'>
+                                <p  style={{fontSize: "12px"}}>{notiSub}</p>
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <button className='w-full bg-primary-white hover:bg-primary-100 transition-all p-2 duration-200 text-primary rounded-md'>
@@ -193,6 +223,7 @@ const Footer = () => {
                                 </button>
                             </div>
                         </div>
+                        </form>
                     </div>
                     <div className='h-auto w-auto font-extrabold text-3xl text-center font-serif py-8'>
                         HOME CUISINE

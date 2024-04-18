@@ -124,6 +124,7 @@ export class AuthService {
 					clientId: user.getDataValue('id')
 				})
 				await user.createChannel()
+				
 				this.sendToken(res, user);
 			}
 		} catch (err) {

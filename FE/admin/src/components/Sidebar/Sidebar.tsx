@@ -67,6 +67,11 @@ export default function Sidebar() {
 									itemId: "/sale/reservations",
 									navigateTo: "/sale/reservations",
 								},
+								{
+									title: t("opportunity"),
+									itemId: "/sale/opportunities",
+									navigateTo: "/sale/opportunities",
+								},
 							],
 						},
 						{
