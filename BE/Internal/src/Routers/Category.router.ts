@@ -21,6 +21,9 @@ class CategoryRouter {
             .get((req: Request, res: Response, next: NextFunction) =>
                 this.categoryController.getProducts(req, res, next)
             )
+            .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
+            this.categoryController.updateCategory(req, res, next)
+        )
             .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.categoryController.deleteCategory(req, res, next)
             )
