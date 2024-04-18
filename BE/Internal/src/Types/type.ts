@@ -27,32 +27,52 @@ const TYPES = {
     INotificationRepository: Symbol.for("INotificationRepository"),
     IClientHistoryRepository: Symbol.for("IClientHistoryRepository"),
     ISubscriberRepository: Symbol.for("ISubscriberRepository"),
+
+    ICampaignRepository: Symbol.for("ICampaignReposittory"),
+    ITargetListRepository: Symbol.for("ITargetListRepository"),
     
 };
 
-type FilterCondition = {
-    value: string | number;  // hoặc có thể sử dụng union type nếu giá trị có thể là nhiều kiểu khác nhau
-    op: string | "gt"| "lt"| "gte" | "lte";
-};
-
-type RegularFilter = Record<string, string>;
 
 type Filter = {
-    [key: string]: FilterCondition[] | string;
+  [key: string]: FilterObject;
 };
 
+export interface FilterObject {
+  [filterName: string]: {
+    eq?: any;
+    neq?: any;
+    not?: any;
+    gt?: any;
+    gte?: any;
+    lt?: any;
+    lte?: any;
+    between?: [any, any];
+    notBetween?: [any, any];
+    in?: any[];
+    notIn?: any[];
 
-type QueryOptions = {
-    filter: Filter,
-    sort?: {
-        order: "asc" | "desc",
-        by: string
-    },
-    paginate?: {
-        page: number,
-        pageSize: number
-    }
-    type?: string
+    like?: any[];
+    notLike?: any[];
+    startsWith?: any[];
+    endsWith?: any[];
+    substring?: any[];
+    iLike?: any[];
+    notILike?: any[];
+  };
 }
 
-export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter };
+type QueryOptions = {
+  filter: Filter;
+  sort?: {
+    order: "asc" | "desc";
+    by: string;
+  };
+  paginate?: {
+    page: number;
+    pageSize: number;
+  };
+  type?: string;
+};
+
+export { TYPES, QueryOptions, Filter};

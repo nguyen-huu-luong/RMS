@@ -1,0 +1,11 @@
+.ant-form-item-label > label {
+    width: 100%;
+}
+
+
+.my-label .editicon{
+    display: none;
+}
+.my-label:hover .editicon {
+    display: block
+}

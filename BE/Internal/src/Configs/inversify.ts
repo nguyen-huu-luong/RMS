@@ -42,6 +42,10 @@ import { IOpenEventrRepository } from "../Repositories/IOpenEventRepository";
 import { OpenEventRepository } from "../Repositories/implementation/OpenEventRepository";
 import { IClickEventRepository } from "../Repositories/IClickEventRepository";
 import { ClickEventRepository } from "../Repositories/implementation/ClickEventRepository";
+import { ICamPaignRepository } from "../Repositories/ICampaignRepository";
+import { CampaignRepository } from "../Repositories/implementation/CampaignRepository";
+import { ITargetListRepository } from "../Repositories/ITargetListRepository";
+import { TargetListRepository } from "../Repositories/implementation/TargetListRepository";
 import { IClientHistoryRepository } from "../Repositories";
 import { ISubscriberRepository, SubscriberRepository } from "../Repositories";
 import { IOrderItemRepository, OrderItemRepository } from "../Repositories";
@@ -94,6 +98,10 @@ class InversifyContainer {
 		this.container.bind<IOpenEventrRepository>(TYPES.IOpenEventRepository).to(OpenEventRepository);
 		this.container.bind<IClickEventRepository>(TYPES.IClickEventRepository).to(ClickEventRepository);
 		this.container.bind<INotificationRepository>(TYPES.INotificationRepository).to(NotificationRepository)
+
+
+		this.container.bind<ICamPaignRepository>(TYPES.ICampaignRepository).to(CampaignRepository);
+		this.container.bind<ITargetListRepository>(TYPES.ITargetListRepository).to(TargetListRepository);
 		this.container.bind<IClientHistoryRepository>(TYPES.IClientHistoryRepository).to(ClientHistoryRepository)
 		this.container.bind<ISubscriberRepository>(TYPES.ISubscriberRepository).to(SubscriberRepository)
 	}
