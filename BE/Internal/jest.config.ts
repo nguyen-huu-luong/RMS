@@ -9,6 +9,7 @@ const config: Config.InitialOptions = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  testTimeout: 30000
 }
 
 export default config

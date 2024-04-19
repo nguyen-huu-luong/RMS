@@ -1,0 +1,21 @@
+export const mockCartItem = [{
+    id: 1,
+    name: "Pizza Margherita",
+    description: "Một loại pizza cổ điển từ Napoli với sốt cà chua, phô mai Mozzarella, và lá bạc hà.",
+    price: 75000,
+    thumbnails: "link_to_image_1.jpg",
+    categoryId: 1,
+    quantity: 1,
+},
+{
+    id: 2,
+    name: "Pizza Pepperoni",
+    description: "Pizza với sốt cà chua, phô mai Mozzarella và xúc xích.",
+    price: 85000,
+    thumbnails: "link_to_image_2.jpg",
+    categoryId: 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    quantity: 1,
+},
+]

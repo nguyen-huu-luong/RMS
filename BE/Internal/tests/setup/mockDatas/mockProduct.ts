@@ -1,0 +1,38 @@
+export const mockProducts = [
+    {
+        name: "Pizza Margherita",
+        description: "Một loại pizza cổ điển từ Napoli với sốt cà chua, phô mai Mozzarella, và lá bạc hà.",
+        price: 75000,
+        thumbnails: "link_to_image_1.jpg",
+        categoryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        name: "Pizza Pepperoni",
+        description: "Pizza với sốt cà chua, phô mai Mozzarella và xúc xích.",
+        price: 85000,
+        thumbnails: "link_to_image_2.jpg",
+        categoryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        name: "Coca-Cola",
+        description: "Đồ uống giải khát phổ biến với hương vị ngọt ngào và sảng khoái.",
+        price: 25000,
+        thumbnails: "link_to_image_3.jpg",
+        categoryId: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        name: "Fresh Orange Juice",
+        description: "Nước cam tươi nguyên chất, giàu vitamin C và hương vị tươi mát.",
+        price: 35000,
+        thumbnails: "link_to_image_4.jpg",
+        categoryId: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+];
