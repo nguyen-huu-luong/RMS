@@ -33,3 +33,46 @@ export const updateTable = async (requestBody: any, id: string,token: any) => {
         console.log(error)
     }
 };
+
+export const getCartItems = async ( url: string,token: any) => {
+    try {
+        // let url = `${process.env.BASE_URL}/tables/cart/${id}`
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        return response.json();
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const addToCart = async (requestBody: any, id: string,token: any) => {
+    try {
+        const response = await axios.post(`${process.env.BASE_URL}/tables/cart/${id}`, requestBody, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const updateCart = async (requestBody: any, id: string,token: any) => {
+    try {
+        const response = await axios.put(`${process.env.BASE_URL}/tables/cart/${id}`, requestBody, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+        return response.data;
+    } catch (error) {
+        console.log(error)
+    }
+}

@@ -25,13 +25,14 @@ const TYPES = {
     IClickEventRepository: Symbol.for("IClickEventREpository"),
     IOpenEventRepository: Symbol.for("IOpenEventRepository"),
     INotificationRepository: Symbol.for("INotificationRepository"),
+    IPos_notificationRepository: Symbol.for("IPos_notificationRepository"),
     IClientHistoryRepository: Symbol.for("IClientHistoryRepository"),
     ISubscriberRepository: Symbol.for("ISubscriberRepository"),
 
     ICampaignRepository: Symbol.for("ICampaignReposittory"),
     ITargetListRepository: Symbol.for("ITargetListRepository"),
-    
 };
+    
 
 
 type Filter = {

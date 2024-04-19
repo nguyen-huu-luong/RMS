@@ -87,6 +87,8 @@ module.exports = {
             { role: 'employee', resource: 'categories', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'categories', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'categories', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'pos_notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'pos_notifications', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
 
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
@@ -161,28 +163,21 @@ module.exports = {
             { role: 'manager', resource: 'categories', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'categories', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'categories', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'pos_notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'manager', resource: 'pos_notifications', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
 
             { role: 'manager', resource: 'targetlists', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'targetlists', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'targetlists', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'manager', resource: 'targetlists', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
 
-
-            { role: 'manager', resource: 'track-urls', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'manager', resource: 'track-urls', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'manager', resource: 'track-urls', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'manager', resource: 'track-urls', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
-
-            { role: 'manager', resource: 'mass-email', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'manager', resource: 'mass-email', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'manager', resource: 'mass-email', action: 'update:any', attributes: '*', createdAt: d, updatedAt: d },
-            { role: 'manager', resource: 'mass-email', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
             // Thêm dữ liệu cho các role khác tương tự ở đây
 
             { role: 'chef', resource: 'orders', action: 'update:any', attributes: 'status', createdAt: d, updatedAt: d },
             { role: 'chef', resource: 'orders', action: 'read:any', attributes: 'order.items', createdAt: d, updatedAt: d },
             { role: 'chef', resource: 'notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
-
+            { role: 'chef', resource: 'pos_notifications', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'chef', resource: 'pos_notifications', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
             // Thêm dữ liệu cho các role khác tương tự ở đây
         ], {});
     },

@@ -20,7 +20,7 @@ const sources = [
 ]
 
 const types = [
-    "Lead", "Customer"
+    "lead", "customer"
 ]
 
 const newData = [
