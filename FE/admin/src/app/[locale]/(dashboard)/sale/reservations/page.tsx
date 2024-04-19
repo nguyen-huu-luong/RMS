@@ -40,6 +40,9 @@ function Home() {
     const [api, contextHolder] = notification.useNotification();
     const [ready, setReady] = useState<Boolean>(false);
     const [deleteOption, setDeleteOption] = useState([]);
+    const [notifications, setNotifications] = useState<any>()
+    const [resInfo, setResInfo] = useState<any>()
+    const [isLoading, setIsLoading] = useState(true)
     const dateFormat = "YYYY-MM-DD";
     const timeFormat = "HH:mm";
     interface Dictionary {
@@ -69,29 +72,29 @@ function Home() {
         Canceled: "#DB3A34",
     };
 
-    const {
-        data: resInfo,
-        error: resInfoError,
-        isLoading: resInfoLoading,
-    } = useSWR([`/reservations/all`], ([url]) =>
-        fetchClient({ url: url, data_return: true })
-    );
+    const fetchResInfo = async () => {
+        setIsLoading(true)
+        const data = await fetchClient({ url: `/reservations/all`, data_return: true })
+        setResInfo(data)
+        setIsLoading(false)
+    }
 
-    useEffect(() => {
-        if (!resInfoLoading) {
-            setReady(true);
-        }
-    }, [resInfoLoading]);
+    const fetchNotification = async () => {
+        setIsLoading(true)
+        const data = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
+        setNotifications(data)
+        setIsLoading(false)
+    }
 
-    const {
-        data: notifications,
-        error: notifications_error,
-        isLoading: notifications_loading,
-        mutate: notificationMutate,
-    } = useSWR(
-        ready ? [`/pos_notifications/all`] : null,
-        ready ? ([url]) => fetchClient({ url: url, data_return: true }) : null
-    );
+    const fetchAllData = async () => {
+        setIsLoading(true)
+        const res_info = await fetchClient({ url: `/reservations/all`, data_return: true })
+        const notification = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
+        setResInfo(res_info)
+        console.log(notification)
+        setNotifications(notification)
+        setIsLoading(false)
+    }
 
     const showDetailTable = (tableId: any) => {
         push(`/sale/reservations/${tableId}`);
@@ -109,10 +112,10 @@ function Home() {
         let table_id = event.target.table_id.value;
         let status = "";
         let data = await fetchClient({
-            url: `/reservations?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
+            url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
             data_return: true,
         });
-        resInfo.reservarions = data.reservarions;
+        setResInfo({ ...resInfo, reservarions: data.reservarions })
         setChecker((current_value) => !current_value);
     };
 
@@ -122,10 +125,10 @@ function Home() {
         let table_id = table_id_;
         let status = "Waiting";
         let data = await fetchClient({
-            url: `/reservations?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
+            url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
             data_return: true,
         });
-        resInfo.reservarions = data.reservarions;
+        setResInfo({ ...resInfo, reservarions: data.reservarions })
         setChecker((current_value) => !current_value);
     };
 
@@ -136,12 +139,13 @@ function Home() {
         let floor_name_ = values.floor_name;
         let data = await fetchClient({
             method: "POST",
-            url: "/floors",
+            url: "/floors/all",
             body: { floor_name: floor_name_ },
             data_return: true,
         });
         if (data.status) {
-            resInfo.floors = data.floors;
+            setResInfo({ ...resInfo, floors: data.floors })
+            form_floor.resetFields()
             setIsModalFloorOpen(false);
             setChecker((current_value) => !current_value);
         } else {
@@ -157,7 +161,7 @@ function Home() {
         setMessError("");
         let data = await fetchClient({
             method: "POST",
-            url: "/tables",
+            url: "/tables/detail",
             body: {
                 floor_name: floor_name_,
                 table_name: table_name_,
@@ -167,6 +171,7 @@ function Home() {
         if (data.status) {
             resInfo.floors = data.floors;
             resInfo.tables = data.tables;
+            form_table.resetFields()
             setIsModalTableOpen(false);
             setChecker((current_value) => !current_value);
         } else {
@@ -177,7 +182,7 @@ function Home() {
     const handleUpdateReservationStatus = async (status: any, id: any) => {
         const data = await fetchClient({
             method: "PUT",
-            url: `/reservations?id=${id}`,
+            url: `/reservations/detail?id=${id}`,
             body: { status: status },
             data_return: true,
         });
@@ -219,23 +224,20 @@ function Home() {
         if (item_type == "floor") {
             data = await fetchClient({
                 method: "DELETE",
-                url: `/floors`,
+                url: `/floors/all`,
                 body: { floor_names: item_names },
                 data_return: true,
             });
         } else {
             data = await fetchClient({
                 method: "DELETE",
-                url: `/tables`,
+                url: `/tables/detail`,
                 body: { table_names: item_names },
                 data_return: true,
             });
         }
 
-        resInfo.floors = data.floors;
-        resInfo.reservarions = data.reservarions;
-        resInfo.tables = data.tables;
-        resInfo.table_reservations = data.table_reservations;
+        setResInfo(data)
         setChecker((current_value) => !current_value);
         setIsModalDeleteOpen(false);
     };
@@ -298,7 +300,7 @@ function Home() {
             };
             const data = await fetchClient({
                 method: "POST",
-                url: `/reservations`,
+                url: `/reservations/detail`,
                 body: request_body,
                 data_return: true,
             });
@@ -306,10 +308,8 @@ function Home() {
             if (data.hasOwnProperty("message")) {
                 setMessError(data["message"]);
             } else {
-                resInfo.floors = data.floors;
-                resInfo.reservarions = data.reservarions;
-                resInfo.tables = data.tables;
-                resInfo.table_reservations = data.table_reservations;
+                setResInfo(data)
+                form_reservation_detail.resetFields()
                 setChecker((current_value) => !current_value);
                 setIsModalReservationOpen(false);
             }
@@ -385,10 +385,7 @@ function Home() {
             if (data.hasOwnProperty("message")) {
                 setMessError(data["message"]);
             } else {
-                resInfo.floors = data.floors;
-                resInfo.reservarions = data.reservarions;
-                resInfo.tables = data.tables;
-                resInfo.table_reservations = data.table_reservations;
+                setResInfo(resInfo)
                 setChecker((current_value) => !current_value);
                 setIsModalReservationDetailOpen(false);
             }
@@ -399,13 +396,10 @@ function Home() {
         let res_id = form_reservation_detail.getFieldValue("res_id");
         let data = await fetchClient({
             method: "DELETE",
-            url: `/reservations?id=${res_id}`,
+            url: `/reservations/detail?id=${res_id}`,
             data_return: true,
         });
-        resInfo.floors = data.floors;
-        resInfo.reservarions = data.reservarions;
-        resInfo.tables = data.tables;
-        resInfo.table_reservations = data.table_reservations;
+        setResInfo(data)
         setChecker((current_value) => !current_value);
         setIsModalReservationDetailOpen(false);
     };
@@ -434,7 +428,7 @@ function Home() {
             "tableItem:finish:fromChef",
             (tableId: string, name: string) => {
                 message.info(`Finish ${name} for table ${tableId}`);
-                notificationMutate();
+                fetchNotification();
             }
         );
         return () => {
@@ -442,30 +436,34 @@ function Home() {
         };
     }, [socket]);
 
-    if (resInfoLoading || notifications_loading || !notifications) return <Loading />;
+    useEffect(() => {
+        fetchAllData()
+    }, [])
+
+    if (isLoading) return <Loading />;
     return (
         <>
             {resInfo ? (
                 <>
-                    {notifications && notifications.length > 0 ?<div className='w-full p-2 h-auto bg-white rounded-xl flex flex-row justify-center mb-2'>
+                    {notifications && notifications.length > 0 ? <div className='w-full p-2 h-auto bg-white rounded-xl flex flex-row justify-center mb-2'>
                         <div
                             className='w-full h-full flex flex-row items-center justify-center cursor-pointer'
                             onClick={showDrawer}
                         >
 
-                                    <div className='font-normal text-lg text-black'>
-                                        <span className='font-bold'>
-                                            &#91;
-                                            {`Table #${notifications[0].table}`}
-                                            &#93;{" "}
-                                        </span>
-                                        - {notifications[0].content} -{" "}
-                                        {moment(
-                                            notifications[0].createdAt
-                                        ).format("hh:mm A")}
-                                    </div>
+                            <div className='font-normal text-lg text-black'>
+                                <span className='font-bold'>
+                                    &#91;
+                                    {`Table #${notifications[0].table}`}
+                                    &#93;{" "}
+                                </span>
+                                - {notifications[0].content} -{" "}
+                                {moment(
+                                    notifications[0].createdAt
+                                ).format("hh:mm A")}
+                            </div>
                         </div>
-                    </div>:<></>}
+                    </div> : <></>}
                     <div
                         className='flex'
                         style={{ height: "100%", paddingBottom: "10px" }}
@@ -588,6 +586,7 @@ function Home() {
                                         }}
                                     >
                                         <Modal
+                                            destroyOnClose={true}
                                             title='Reservation information detail'
                                             open={isModalReservationDetail}
                                             onCancel={
@@ -913,8 +912,8 @@ function Home() {
                                                                                                 "1px",
                                                                                             borderColor:
                                                                                                 reservationStatus[
-                                                                                                    item
-                                                                                                        .status
+                                                                                                item
+                                                                                                    .status
                                                                                                 ],
                                                                                         }}
                                                                                     >
@@ -974,8 +973,8 @@ function Home() {
                                                                                                             "0px 0px 0px 1px",
                                                                                                         borderColor:
                                                                                                             reservationStatus[
-                                                                                                                item
-                                                                                                                    .status
+                                                                                                            item
+                                                                                                                .status
                                                                                                             ],
                                                                                                     }}
                                                                                                 >
@@ -999,7 +998,7 @@ function Home() {
                                                                                                                 {
                                                                                                                     resInfo
                                                                                                                         .table_reservations[
-                                                                                                                        `${item.id}`
+                                                                                                                    `${item.id}`
                                                                                                                     ]
                                                                                                                 }
                                                                                                             </span>{" "}
@@ -1034,41 +1033,41 @@ function Home() {
                                                                                             </div>
                                                                                             {item.status ==
                                                                                                 "Waiting" && (
-                                                                                                <>
-                                                                                                    <div>
-                                                                                                        <button
-                                                                                                            onClick={() =>
-                                                                                                                handleUpdateReservationStatus(
-                                                                                                                    "Done",
-                                                                                                                    item.id
-                                                                                                                )
-                                                                                                            }
-                                                                                                        >
-                                                                                                            <CheckSquareOutlined
-                                                                                                                style={{
-                                                                                                                    color: "#54B435",
-                                                                                                                }}
-                                                                                                            />
-                                                                                                        </button>
-                                                                                                    </div>
-                                                                                                    <div>
-                                                                                                        <button
-                                                                                                            onClick={() =>
-                                                                                                                handleUpdateReservationStatus(
-                                                                                                                    "Canceled",
-                                                                                                                    item.id
-                                                                                                                )
-                                                                                                            }
-                                                                                                        >
-                                                                                                            <CloseSquareOutlined
-                                                                                                                style={{
-                                                                                                                    color: "#DB3A34",
-                                                                                                                }}
-                                                                                                            />
-                                                                                                        </button>
-                                                                                                    </div>
-                                                                                                </>
-                                                                                            )}
+                                                                                                    <>
+                                                                                                        <div>
+                                                                                                            <button
+                                                                                                                onClick={() =>
+                                                                                                                    handleUpdateReservationStatus(
+                                                                                                                        "Done",
+                                                                                                                        item.id
+                                                                                                                    )
+                                                                                                                }
+                                                                                                            >
+                                                                                                                <CheckSquareOutlined
+                                                                                                                    style={{
+                                                                                                                        color: "#54B435",
+                                                                                                                    }}
+                                                                                                                />
+                                                                                                            </button>
+                                                                                                        </div>
+                                                                                                        <div>
+                                                                                                            <button
+                                                                                                                onClick={() =>
+                                                                                                                    handleUpdateReservationStatus(
+                                                                                                                        "Canceled",
+                                                                                                                        item.id
+                                                                                                                    )
+                                                                                                                }
+                                                                                                            >
+                                                                                                                <CloseSquareOutlined
+                                                                                                                    style={{
+                                                                                                                        color: "#DB3A34",
+                                                                                                                    }}
+                                                                                                                />
+                                                                                                            </button>
+                                                                                                        </div>
+                                                                                                    </>
+                                                                                                )}
                                                                                         </div>
                                                                                     </div>
                                                                                 </>
@@ -1111,6 +1110,7 @@ function Home() {
                                         Reserve
                                     </button>
                                     <Modal
+                                        destroyOnClose={true}
                                         title='Reservation information form'
                                         open={isModalReservation}
                                         onCancel={handleCanceModalReservation}
@@ -1359,6 +1359,7 @@ function Home() {
                                     </button>
 
                                     <Modal
+                                        destroyOnClose={true}
                                         title='Floor'
                                         open={isModalFloorOpen}
                                         onCancel={handleCanceModalFloor}
@@ -1480,6 +1481,7 @@ function Home() {
                                         Delete
                                     </button>
                                     <Modal
+                                        destroyOnClose={true}
                                         title='Item option'
                                         open={isModalDeleteOpen}
                                         onCancel={handleCanceModalDelete}
@@ -1650,6 +1652,7 @@ function Home() {
                             >
                                 <>
                                     <Modal
+                                        destroyOnClose={true}
                                         title='Table'
                                         open={isModalTableOpen}
                                         onCancel={handleCanceModalTable}
@@ -1823,7 +1826,7 @@ function Home() {
                                                                                     }}
                                                                                 >
                                                                                     {item.status ==
-                                                                                    "Free" ? (
+                                                                                        "Free" ? (
                                                                                         <p
                                                                                             onClick={() =>
                                                                                                 showDetailTable(
@@ -1873,52 +1876,52 @@ function Home() {
 
                                                                                     {item.numRes !=
                                                                                         0 && (
-                                                                                        <div
-                                                                                            className='inline-block absolute'
-                                                                                            style={{
-                                                                                                right: "-10px",
-                                                                                                top: "-10px",
-                                                                                            }}
-                                                                                        >
                                                                                             <div
-                                                                                                className='bg-white relative'
+                                                                                                className='inline-block absolute'
                                                                                                 style={{
-                                                                                                    borderRadius:
-                                                                                                        "180px",
-                                                                                                    borderWidth:
-                                                                                                        "1px",
-                                                                                                    borderStyle:
-                                                                                                        "solid",
-                                                                                                    width: "23px",
-                                                                                                    height: "23px",
-                                                                                                    borderColor:
-                                                                                                        "#54B435",
-                                                                                                    cursor: "pointer",
+                                                                                                    right: "-10px",
+                                                                                                    top: "-10px",
                                                                                                 }}
-                                                                                                onClick={() =>
-                                                                                                    handelFilterShortCut(
-                                                                                                        item.id
-                                                                                                    )
-                                                                                                }
                                                                                             >
-                                                                                                <p
-                                                                                                    className=' font-semibold absolute'
+                                                                                                <div
+                                                                                                    className='bg-white relative'
                                                                                                     style={{
-                                                                                                        fontSize:
-                                                                                                            "10px",
-                                                                                                        top: "50%",
-                                                                                                        left: "50%",
-                                                                                                        transform:
-                                                                                                            "translate(-50%, -50%)",
+                                                                                                        borderRadius:
+                                                                                                            "180px",
+                                                                                                        borderWidth:
+                                                                                                            "1px",
+                                                                                                        borderStyle:
+                                                                                                            "solid",
+                                                                                                        width: "23px",
+                                                                                                        height: "23px",
+                                                                                                        borderColor:
+                                                                                                            "#54B435",
+                                                                                                        cursor: "pointer",
                                                                                                     }}
-                                                                                                >
-                                                                                                    {
-                                                                                                        item.numRes
+                                                                                                    onClick={() =>
+                                                                                                        handelFilterShortCut(
+                                                                                                            item.id
+                                                                                                        )
                                                                                                     }
-                                                                                                </p>
+                                                                                                >
+                                                                                                    <p
+                                                                                                        className=' font-semibold absolute'
+                                                                                                        style={{
+                                                                                                            fontSize:
+                                                                                                                "10px",
+                                                                                                            top: "50%",
+                                                                                                            left: "50%",
+                                                                                                            transform:
+                                                                                                                "translate(-50%, -50%)",
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        {
+                                                                                                            item.numRes
+                                                                                                        }
+                                                                                                    </p>
+                                                                                                </div>
                                                                                             </div>
-                                                                                        </div>
-                                                                                    )}
+                                                                                        )}
                                                                                 </div>
                                                                             </>
                                                                         );

@@ -16,8 +16,9 @@ import Link from "next-intl/link";
 import fetchClient from "@/lib/fetch-client";
 import Loading from "@/components/loading";
 import useSocket from "@/socket";
-import { message } from "antd";
+import { message, notification } from "antd";
 import moment from "moment";
+
 function Home() {
     const params = useParams<{ locale: string; tid: string }>();
     const [items, setItems] = useState<any>([]);
@@ -32,7 +33,18 @@ function Home() {
     const [item_status, updateItemStaus] = useState(true);
     const router = useRouter();
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [notification, setNotification] = useState(null);
+    const [notifications, setNotifications] = useState<any>();
+    const [table, setTable] = useState<any>()
+    const [foods, setFood] = useState<any>()
+    const [cart_items, setCart_Items] = useState<any>()
+    const [categories, setCategories] = useState<any>()
+    const [isLoading, setIsLoading] = useState(true)
+    const [currentPage, setCurrentPage] = useState(1);
+    const [loadingButton, setLoadingButton] = useState(false)
+    const [api_notification, contextHolder] = notification.useNotification();
+    const [category, setCategory] = useState<string>(
+        currentCategory !== null ? currentCategory : "Pizza"
+    );
 
     const socket = useSocket();
 
@@ -45,7 +57,20 @@ function Home() {
     };
 
     const showModal = () => {
-        setOpen(true);
+        const current_items = cart_items.items
+        if (current_items.some((e: any) => e.status != "Done")) {
+            api_notification.warning({
+                message: 'Order Warning',
+                description:
+                    'There are some items in processing',
+                onClick: () => {
+                    console.log('Notification Clicked!');
+                },
+            });
+        }
+        else {
+            setOpen(true);
+        }
     };
 
     const handleUpdateTable = async () => {
@@ -55,67 +80,41 @@ function Home() {
         } else {
             table_status = "Free";
         }
-        table.status = table_status;
+        setTable({ ...table, status: table_status })
+
         await fetchClient({
             method: "PUT",
-            url: `/tables?id=${table.id}`,
+            url: `/tables/detail?id=${table.id}`,
             body: { status: table_status },
         });
         setChecker((current_value) => !current_value);
     };
 
-    const {
-        data: foods,
-        error: foodError,
-        isLoading: foodLoading,
-    } = useSWR([`/products/all`], ([url]) =>
-        fetchClient({ url: url, data_return: true })
-    );
-    const [category, setCategory] = useState<string>(
-        currentCategory !== null ? currentCategory : "Pizza"
-    );
+    const fetchFood = async () => {
+        const data = await fetchClient({ url: `/products/all`, data_return: true })
+        setFood(data)
+    }
 
-    const {
-        data: table,
-        error: tableError,
-        isLoading: tableLoading,
-    } = useSWR([params.tid], ([table_id]) =>
-        fetchClient({ url: `/tables?id=${table_id}`, data_return: true })
-    );
-    const [currentPage, setCurrentPage] = useState(1);
+    const fetchTable = async () => {
+        const data = await fetchClient({ url: `/tables/detail?id=${params.tid}`, data_return: true })
+        setTable(data)
+    }
 
-    const {
-        data: cart_items,
-        error: cart_itemsError,
-        isLoading: cart_itemsLoading,
-        mutate: cartMutate,
-    } = useSWR([`/tables/cart/${params.tid}`], ([url]) =>
-        fetchClient({ url: url, data_return: true })
-    );
+    const fetchCartItems = async () => {
+        const data = await fetchClient({ url: `/tables/cart/${params.tid}`, data_return: true })
+        console.log(data)
+        setCart_Items(data)
+    }
 
-    const {
-        data: categories,
-        error: categoryError,
-        isLoading: categoryLoading,
-    } = useSWR([`/categories/all`], ([url]) =>
-        fetchClient({ url: url, data_return: true })
-    );
+    const fetchCategory = async () => {
+        const data = await fetchClient({ url: `/categories/all`, data_return: true })
+        setCategories(data)
+    }
 
-    useEffect(() => {
-        if (!categoryLoading || !foodLoading || !tableLoading || !cart_itemsLoading) {
-            setReady(true);
-        }
-    }, [categoryLoading, tableLoading, foodLoading, cart_itemsLoading]);
-
-    const {
-        data: notifications,
-        error: notifications_error,
-        isLoading: notifications_loading,
-        mutate: notificationMutate,
-    } = useSWR(
-        ready ? [`/pos_notifications/all`] : null,
-        ready ? ([url]) => fetchClient({ url: url, data_return: true }) : null
-    );
+    const fetchNotification = async () => {
+        const data = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
+        setNotifications(data)
+    }
 
     const onChange: PaginationProps["onChange"] = (page) => {
         setCurrentPage(page);
@@ -152,10 +151,10 @@ function Home() {
             });
             let table_status = "Free";
             if (data_body.pay_method == "CASH") {
-                table.status = table_status;
+                setTable({ ...table, status: table_status })
                 await fetchClient({
                     method: "PUT",
-                    url: `/tables?id=${table.id}`,
+                    url: `/tables/detail?id=${table.id}`,
                     body: { status: table_status },
                 });
                 router.push(
@@ -173,10 +172,10 @@ function Home() {
     const addItem = async () => {
         try {
             if (table.status == "Free") {
-                table.status = "Occupied";
+                setTable({ ...table, status: "Occupied" })
                 await fetchClient({
                     method: "PUT",
-                    url: `/tables?id=${table.id}`,
+                    url: `/tables/detail?id=${table.id}`,
                     body: { status: "Occupied" },
                 });
             }
@@ -186,8 +185,7 @@ function Home() {
                 body: items,
                 data_return: true,
             });
-            cart_items.items = data.items;
-            cart_items.products = data.products;
+            setCart_Items({ ...cart_items, items: data.items, products: data.products })
             setItems([]);
             setChecker((current_value) => !current_value);
             socket.emit("staff:table:prepare", params.tid);
@@ -199,14 +197,14 @@ function Home() {
     const handleCancelOrder = () => {
         setItems([]);
     };
+
     useEffect(() => {
         if (!socket) return;
         socket.on(
             "tableItem:finish:fromChef",
             (tableId: string, name: string) => {
                 message.info(`Finish ${name} for table ${tableId}`);
-                // notificationMutate();
-                cartMutate();
+                fetchCartItems()
             }
         );
         return () => {
@@ -214,18 +212,22 @@ function Home() {
         };
     }, [socket]);
 
-    if (foodError) return <div>Failed to load</div>;
-    if (categoryError) return <div>Failed to load</div>;
-    if (
-        foodLoading ||
-        categoryLoading ||
-        tableLoading ||
-        cart_itemsLoading ||
-        notifications_loading
-    )
+    useEffect(() => {
+        setIsLoading(true)
+        fetchTable()
+        fetchCategory()
+        fetchFood()
+        fetchNotification()
+        fetchCartItems()
+        setIsLoading(false)
+    }, [])
+
+    if (isLoading) {
         return <Loading />;
+    }
     return (
-        <div className='h-full relative overflow-hidden'>
+        <div className='h-full relative overflow-hidden pb-10' >
+            {contextHolder}
             <ConfigProvider
                 theme={{
                     token: {
@@ -500,7 +502,7 @@ function Home() {
                                             return (
                                                 <>
                                                     {item.status ==
-                                                    "Preparing" ? (
+                                                        "Preparing" ? (
                                                         <div
                                                             key={
                                                                 cart_items
@@ -612,12 +614,12 @@ function Home() {
                                 >
                                     Cancel
                                 </button>
-                                <button
+                                <Button
                                     className='bg-menu px-1 py-1 border-t-menu rounded  text-white ml-4'
                                     onClick={addItem}
                                 >
                                     Order
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     )}
@@ -627,11 +629,13 @@ function Home() {
                             <div className='font-bold text-md py-2 border-t-menu border-t-2'>
                                 Total: {getTotalAmount()}VNĐ
                             </div>
-                            <div
-                                onClick={showModal}
-                                className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-menu hover:bg-orange-400 text-white transition-all duration-300  flex justify-center tex-md font-bold cursor-pointer'
-                            >
-                                Make payment
+                            <div>
+                                <div
+                                    onClick={showModal}
+                                    className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-menu hover:bg-orange-400 text-white transition-all duration-300  flex justify-center tex-md font-bold cursor-pointer'
+                                >
+                                    Make payment
+                                </div>
                             </div>
                         </div>
                     )}
@@ -641,7 +645,7 @@ function Home() {
                     className='rounded-xl basis-3/4 h-full p-5 flex flex-row justify-start gap-5'
                 >
                     <div className='w-auto h-auto rounded-3xl bg-white py-2 flex flex-col justify-around'>
-                        {categories.map((item: any) => {
+                        {categories?.map((item: any) => {
                             return (
                                 <div
                                     key={`Category ${item.name}`}
@@ -649,11 +653,10 @@ function Home() {
                                         setCategory(item.name);
                                         setCurrentPage(1);
                                     }}
-                                    className={`font-bold cursor-pointer p-2 px-4${
-                                        category === item.name
-                                            ? " text-white bg-menu"
-                                            : " bg-none text-menu"
-                                    } transition-all duration-200`}
+                                    className={`font-bold cursor-pointer p-2 px-4${category === item.name
+                                        ? " text-white bg-menu"
+                                        : " bg-none text-menu"
+                                        } transition-all duration-200`}
                                 >
                                     {item.name}
                                 </div>
@@ -662,14 +665,13 @@ function Home() {
                     </div>
                     <div className='w-full h-full flex flex-col justify-between items-center gap-5'>
                         <div className='w-auto grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
-                            {foods
-                                .filter(
-                                    (item: any) =>
-                                        category ===
-                                        categories[
-                                            parseInt(item.categoryId) - 1
-                                        ]?.name
-                                )
+                            {foods?.filter(
+                                (item: any) =>
+                                    category ===
+                                    categories[
+                                        parseInt(item.categoryId) - 1
+                                    ]?.name
+                            )
                                 .slice((currentPage - 1) * 8, currentPage * 8)
                                 .map((item: any) => {
                                     return (
@@ -702,7 +704,7 @@ function Home() {
                                 current={currentPage}
                                 onChange={onChange}
                                 total={
-                                    foods.filter(
+                                    foods?.filter(
                                         (food: any) =>
                                             category ===
                                             categories[

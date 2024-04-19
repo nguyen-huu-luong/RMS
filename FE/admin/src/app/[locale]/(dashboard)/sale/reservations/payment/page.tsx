@@ -20,7 +20,7 @@ const TablePayment = () => {
     const updateOrder = async (orderInfoJS: any) => {
         console.log(orderInfoJS)
         await fetchClient({ method: "POST", url: `/tables/order/momo/${tableId}`, body: orderInfoJS })
-        await fetchClient({ method: "PUT", url: `/tables?id=${tableId}`, body: { "status": "Free" } })
+        await fetchClient({ method: "PUT", url: `/tables/detail?id=${tableId}`, body: { "status": "Free" } })
     }
 
     useEffect(() => {

@@ -11,7 +11,7 @@ class FloorRouter {
     }
 
     public initialize(router: Router) {
-        router.route('/floors')
+        router.route('/floors/all')
         .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.floorController.createFloor(req, res, next))
         .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.floorController.deleteFloor(req, res, next))
     }

@@ -11,7 +11,7 @@ class TableRouter {
     }
 
     public initialize(router: Router) {
-        router.route('/tables')
+        router.route('/tables/detail')
         .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.getTable(req, res, next))
         .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.createTable(req, res, next))
         .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.tableController.deleteTable(req, res, next))
