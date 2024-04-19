@@ -4,6 +4,7 @@ import { HttpStatusCode } from '../Constants';
 import { container } from '../Configs';
 import statusMess from '../Constants/statusMess';
 import { IOrderItemRepository, IOrderRepository, IProductRepository, IClientHistoryRepository } from '../Repositories';
+import { Category } from '../Models';
 import { TYPES } from "../Types/type";
 import { validationResult } from "express-validator";
 /// <reference path="./types/globle.d.ts" />
@@ -37,6 +38,29 @@ export class ProductService {
             next(err);
         }
     }
+
+    public async getAllFullInformation(req: Request, res: Response, next: NextFunction) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                throw new ValidationError(errors.array()[0].msg);
+            }
+            const status: number = HttpStatusCode.Success;
+            const data = await this.productRepository.findByCond({
+                include: [{
+                    model: Category
+                }
+                ]
+            });
+            res.status(status).send(data);
+            Message.logMessage(req, status);
+        }
+        catch (err) {
+            console.log(err)
+            next(err);
+        }
+    }
+
     public async updateProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const status: number = HttpStatusCode.Success;

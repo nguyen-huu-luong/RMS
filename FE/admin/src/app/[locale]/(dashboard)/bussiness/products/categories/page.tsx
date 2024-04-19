@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import {
     Button,
@@ -7,11 +8,14 @@ import {
     Select,
     Alert,
 } from "antd";
-import { TableProps, GetProp} from "antd";
+import { TableProps, GetProp } from "antd";
 import { variables } from "@/app";
 import {
     SortAscendingOutlined,
     SortDescendingOutlined,
+    FormOutlined,
+    CloseSquareOutlined,
+    PlusCircleOutlined
 } from "@ant-design/icons";
 import type {
     Key,
@@ -20,6 +24,9 @@ import type {
 import { Modal } from "antd";
 import { useRouter } from "next-intl/client";;
 import fetchClient from "@/lib/fetch-client";
+import CreateCategory from "./create";
+import DeleteItem from "./delete";
+import UpdateCategory from "./update";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -29,19 +36,12 @@ type TablePaginationConfig = Exclude<
 interface DataType {
     key: React.Key;
     id: number;
-    fullname: string;
-    amount: string;
-    type: string;
+    name: string;
+    description: string;
+    thumnails: string;
     action: string;
 }
 
-interface ItemDataType {
-    key: React.Key;
-    name: string;
-    amount: number;
-    quantity: number;
-    update_time: string;
-}
 
 
 type ErrorType = {
@@ -63,12 +63,14 @@ interface TableParams {
 
 type DataIndex = keyof DataType;
 
-const Opportunities: React.FC = () => {
+const Category = () => {
+
     const [data, setData] = useState<DataType[]>();
     const [rawData, setRawData] = useState<any[]>();
-    const [cartItems, setCartItems] = useState<any>();
     const [loading, setLoading] = useState(false);
-    const [isModalCart, setIsModalCart] = useState(false)
+    const [isCreate, setIsCreate] = useState(false)
+    const [isDelete, setIsDelete] = useState(false)
+    const [isUpdate, setIsUpdate] = useState(false)
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -77,23 +79,21 @@ const Opportunities: React.FC = () => {
         },
         filters: {},
         sorter: {
-            field: "amount",
+            field: "id",
             order: "ascend",
         },
     });
     const [isSorting, setIsSorting] = useState(true)
+    const [isReFetch, setIsReFetch] = useState(true)
+    const [currentItem, setCurrentItem] = useState<any>()
     const list_sort = [
         {
-            key: "fullname",
-            title: "Fullname"
+            key: "id",
+            title: "ID"
         },
         {
-            key: "amount",
-            title: "Amount"
-        },
-        {
-            key: "type",
-            title: "Type"
+            key: "name",
+            title: "Name"
         },
     ]
     const [error, setError] = useState<ErrorType>({
@@ -119,51 +119,34 @@ const Opportunities: React.FC = () => {
             key: "id",
         },
         {
-            title: "Fullname",
-            dataIndex: "fullname",
-            key: "fullname",
-        },
-        {
-            title: "Amount",
-            dataIndex: "amount",
-            key: "amount",
-            render: (text, row) => <p>{text} VND</p>
-        },
-        {
-            title: "Type",
-            dataIndex: "type",
-            key: "type",
-        },
-        {
-            title: "Action",
-            dataIndex: "action",
-            key: "action",
-            render: (text, row) => <Button color="primary" onClick={() => handleOpenModalCart(row.id - 1, row.fullname, row.amount)}>View cart</Button>
-        }];
-
-
-    const items_columns: ColumnsType<DataType> = [
-        {
             title: "Name",
             dataIndex: "name",
             key: "name",
         },
         {
-            title: "Quantity",
-            dataIndex: "quantity",
-            key: "quantity",
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+
         },
         {
-            title: "Amount",
-            dataIndex: "amount",
-            key: "amount",
-            render: (text, row) => <p>{text} VND</p>
+            title: "Icon",
+            dataIndex: "thumnails",
+            key: "thumnails",
+            render: (text, row) => <>{ <img style={{width: "40px", height: "40px"}} src={text ? text : ""} />}</>
+
         },
         {
-            title: "Update Time",
-            dataIndex: "update_time",
-            key: "update_timeaction",
-        }];
+            title: "Action",
+            dataIndex: "action",
+            key: "action",
+            render: (text, row) => <>
+                <div><button><FormOutlined style={{ color: "#4A58EC", fontSize: "18px" }} onClick={() => handleUpdateItem({id: row.id, name: row.name, description: row.description, thumnails: row.thumnails})} /></button></div>
+                <div><button><CloseSquareOutlined  style={{ color: "#DB3A34", fontSize: "18px" }} onClick={() => handleDeleteItem({id: row.id, name: row.name, description: row.description, thumnails: row.thumnails})} /></button></div>
+            </>
+        }
+    ];
+
 
     const handleTableChange: TableProps["onChange"] = (
         pagination,
@@ -171,29 +154,6 @@ const Opportunities: React.FC = () => {
         sorter,
         extra
     ) => {
-        // if (Array.isArray(sorter)) {
-        //     const firstSorter = sorter[0];
-        //     setTableParams((prev) => ({
-        //         ...prev,
-        //         pagination,
-        //         filters,
-        //         sorter: {
-        //             field: firstSorter?.field || prev.sorter?.field,
-        //             order: firstSorter?.order || prev.sorter?.order,
-        //         },
-        //     }));
-        //     fetchData()
-        // } else {
-        //     setTableParams((prev) => ({
-        //         pagination,
-        //         filters,
-        //         sorter: {
-        //             field: sorter?.field || prev.sorter?.field,
-        //             order: sorter?.order || prev.sorter?.order,
-        //         },
-        //     }));
-        //     fetchData()
-        // }
     };
 
     const handleSortFieldChange = (key: string) => {
@@ -219,7 +179,7 @@ const Opportunities: React.FC = () => {
         setTableParams((prev) => ({
             ...prev,
             sorter: {
-                field: "amount",
+                field: "id",
                 order: "ascend",
             },
         }));
@@ -231,7 +191,17 @@ const Opportunities: React.FC = () => {
         setError({ isError: false, title: "", message: "" });
     };
 
-    const fetchData = async (sort=false) => {
+    const handleDeleteItem = async (item: any) => {
+        setCurrentItem(item)
+        setIsDelete(true)
+    }
+
+    const handleUpdateItem = async (item: any) => {
+        setCurrentItem(item)
+        setIsUpdate(true)
+    }
+
+    const fetchData = async (sort = false) => {
         setLoading(true);
         try {
             let filterQueriesStr = "";
@@ -239,32 +209,30 @@ const Opportunities: React.FC = () => {
                 filterQueriesStr = `${filterQueriesStr}&${key}=${tableParams.filters[key]}`;
             }
             let url = ""
-            if(sort) {
+            if (sort) {
                 const sort_factor = tableParams.sorter?.field
                 const order = tableParams.sorter?.order
-                url = `/customers/opportunity/all?sort_factor=${sort_factor}&order=${order}`
+                url = `/categories/all?sort_factor=${sort_factor}&order=${order}`
             }
             else {
-                url = "/customers/opportunity/all"
+                url = "/categories/all"
             }
-
-            console.log(url)
 
             const response = await fetchClient({
                 url: url, data_return: true
             })
 
-            console.log(response)
             setRawData(response)
             const results = response
             const data = results.map((item: any, index: any) => ({
-                key: index,
-                id: index + 1,
-                amount: item.amount,
-                type: item.Client.type,
-                fullname: `${item.Client.firstname} ${item.Client.lastname}`,
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                thumnails: item.thumnails
             }));
+            console.log(data)
             setData(data);
+            console.log(data)
             setLoading(false);
             setTableParams({
                 ...tableParams,
@@ -288,32 +256,11 @@ const Opportunities: React.FC = () => {
         }
     };
 
-    const handleCloseModalCart = () => {
-        setIsModalCart(false)
-    }
 
-    const handleOpenModalCart = (index: any, fullname: any, amount: any) => {
-        if (rawData) {
-            const data: any = rawData[index]
-            const items: any = data.Products.map((item: any) => ({
-                name: item.name,
-                amount: item.CartItem.amount,
-                quantity: item.CartItem.quantity,
-                update_time: item.CartItem.updatedAt.split('T')[0],
-            }))
-            let cart_items = {
-                username: fullname,
-                amount: amount,
-                items: items
-            }
-            setCartItems(cart_items)
-            setIsModalCart(true)
-        }
-    }
+    useEffect(() => {
+        fetchData();
+    }, [isReFetch]);
 
-    // useEffect(() => {
-    //     fetchData();
-    // }, []);
 
     useEffect(() => {
         setTableParams({
@@ -328,7 +275,6 @@ const Opportunities: React.FC = () => {
         fetchData(true)
     }, [isSorting])
 
-
     return (
         <>
             <ConfigProvider
@@ -338,6 +284,7 @@ const Opportunities: React.FC = () => {
                             headerBg: variables.backgroundSecondaryColor,
                             footerBg: "#fff",
                         },
+            
                     },
                 }}
             >
@@ -354,40 +301,48 @@ const Opportunities: React.FC = () => {
                         />
                     )}
                     <div className='border bg-white shadow p-3 w-full'>
-                        <div
-                            style={{ marginBottom: 0 }}
-                            className='flex items-center gap-2'
-                        >
-                            <p>Sort by: </p>
-                            <Select
-                                // style={{ width: '20%' }}
-                                placeholder='Columns'
-                                value={
-                                    tableParams.sorter?.field?.toString() ||
-                                    "id"
-                                }
-                                onChange={handleSortFieldChange}
-                                options={list_sort.map((item) => ({
-                                    value: item.key,
-                                    label: item.title,
-                                }))}
-                            />
+                        <div className="flex justify-between">
+                            <div
+                                style={{ marginBottom: 0 }}
+                                className='flex items-center gap-2'
+                            >
+                                <p>Sort by: </p>
+                                <Select
+                                    // style={{ width: '20%' }}
+                                    placeholder='Columns'
+                                    value={
+                                        tableParams.sorter?.field?.toString() ||
+                                        "id"
+                                    }
+                                    onChange={handleSortFieldChange}
+                                    options={list_sort.map((item) => ({
+                                        value: item.key,
+                                        label: item.title,
+                                    }))}
+                                />
 
-                            <p>Order: </p>
+                                <p>Order: </p>
 
-                            <Button
-                                onClick={handleToggleSorter}
-                                icon={
-                                    tableParams.sorter?.order === "ascend" ? (
-                                        <SortAscendingOutlined />
-                                    ) : (
-                                        <SortDescendingOutlined />
-                                    )
-                                }
-                            />
-                            <Button onClick={handleClearAll}>
-                                Clear sorters
-                            </Button>
+                                <Button
+                                    onClick={handleToggleSorter}
+                                    icon={
+                                        tableParams.sorter?.order === "ascend" ? (
+                                            <SortAscendingOutlined />
+                                        ) : (
+                                            <SortDescendingOutlined />
+                                        )
+                                    }
+                                />
+                                <Button onClick={handleClearAll}>
+                                    Clear sorters
+                                </Button>
+                            </div>
+
+                            <div>
+                                <Button icon={<PlusCircleOutlined />} onClick={() => setIsCreate(true)}>
+                                    New
+                                </Button>
+                            </div>
                         </div>
                     </div>
                     <div className='w-full h-auto'>
@@ -414,38 +369,11 @@ const Opportunities: React.FC = () => {
                 </div>
             </ConfigProvider>
 
-            <Modal title="Cart Information" open={isModalCart} onCancel={handleCloseModalCart} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
-                {
-                    cartItems &&
-                    <div>
-                        <div className="flex justify-between">
-                            <div>
-                                <p className="font-semibold">Full Name</p>
-                                <p>
-                                    {cartItems.username}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="font-semibold">Total amount</p>
-                                <p>
-                                    {cartItems.amount} VND
-                                </p>
-                            </div>
-                        </div>
-                        <div className='w-full h-auto mt-5'>
-                            <Table
-                                columns={items_columns}
-                                dataSource={cartItems.items}
-                                pagination={{
-                                    pageSize: 4,
-                                }}
-                            />
-                        </div>
-                    </div>
-                }
-            </Modal>
+            <CreateCategory isCreate={isCreate} setIsCreate={setIsCreate} setIsReFetch={setIsReFetch} data={data} />
+            <DeleteItem isDelete={isDelete} setIsDelete={setIsDelete} setIsReFetch={setIsReFetch} currentItem={currentItem}/>
+            <UpdateCategory isUpdate={isUpdate} setIsUpdate={setIsUpdate} setIsReFetch={setIsReFetch} data={data} currentItem={currentItem} />
         </>
-    );
-};
+    )
+}
 
-export default Opportunities;
+export default Category

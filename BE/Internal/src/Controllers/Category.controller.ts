@@ -15,6 +15,11 @@ class CategoryController {
     public createCategory(req: Request, res: Response, next: NextFunction) {
         this.categoryService.createCategory(req, res, next);
     }
+
+    public updateCategory(req: Request, res: Response, next: NextFunction) {
+        this.categoryService.updateCategory(req, res, next);
+    }
+
     public deleteCategory(req: Request, res: Response, next: NextFunction) {
         this.categoryService.deleteCategory(req, res, next);
     }

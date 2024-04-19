@@ -12,6 +12,11 @@ class ProductController {
     public getAll(req: Request, res: Response, next: NextFunction) {
         this.productService.getAll(req, res, next);
     }
+
+    public  getAllFullInformation(req: Request, res: Response, next: NextFunction){
+        this.productService.getAllFullInformation(req, res, next);
+    }
+
     public updateProduct(req: Request, res: Response, next: NextFunction) {
         this.productService.updateProduct(req, res, next);
     }
