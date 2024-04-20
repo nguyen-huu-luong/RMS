@@ -27,7 +27,6 @@ export abstract class BaseRepository<M extends Model>
             const limit = options.paginate?.pageSize || this.DEFAULT_PAGE_SIZE;
             const offset = (page - 1) * limit;
             const type = options.type ? options.type : "";
-            
             const findOptions: FindOptions = {
                 // attributes: ['*'],
                 limit,
@@ -55,12 +54,15 @@ export abstract class BaseRepository<M extends Model>
                 }
             }
 
-            // if (type === "Lead") {
-            //     findOptions.where = { type: "Lead" };
-            // }
+            if (type) {
+                findOptions.where = { type: type };
+            }
+
             if (this.attributes[0] != "*") {
                 findOptions.attributes = this.attributes;
             }
+            
+            console.log(this.attributes)
             
             const { count, rows } = await this._model.findAndCountAll(
                 findOptions,

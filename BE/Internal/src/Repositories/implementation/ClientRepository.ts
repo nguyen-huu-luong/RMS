@@ -12,11 +12,10 @@ export class ClientRepository
 	implements IClientRepository
 {
 	constructor() {
-		super(Client, ["id", "firstname", "lastname", "phone", "email", "gender","type", "birthday", "score", "createdAt", "updatedAt"]);
+		super(Client, ["id", "firstname", "lastname", "phone", "email", "gender","type", "birthday", "source", "score", "createdAt", "updatedAt"]);
 	}
 
 	public async findByEmail(email: string): Promise<Client | null> {
-		console.log("fadsfdsa")
 		return await this._model.findOne({ where: { email: email } });
 	}
 
