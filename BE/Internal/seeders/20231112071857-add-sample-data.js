@@ -77,56 +77,6 @@ module.exports = {
             clients.push(client);
         }
 
-        for (let i = 0; i < newData.length; i++) {
-            const [firstName, middleName, lastName, birthday, address, email] = newData[i];
-            const client = {
-                email: faker.internet.email(),
-                phone: phone[i],
-                firstname: firstName,
-                lastname: lastName,
-                gender: faker.random.boolean(),
-                birthday: new Date(birthday),
-                avatar: avatar[i],
-                score: 0,
-                address: address,
-                source: sources[Math.floor(Math.random() * sources.length)],
-                type: 'lead',
-                hashedPassword: clientPassword,
-                isRegistered: true,
-                isActive: true,
-                language: "vi",
-                profit: faker.random.number({ min: 200000, max: 500000,  precision: 10000  }),
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            };
-            clients.push(client);
-        }
-
-        for (let i = 0; i < newData.length; i++) {
-            const [firstName, middleName, lastName, birthday, address, email] = newData[i];
-            const client = {
-                email: email,
-                phone: phone[i],
-                firstname: firstName,
-                lastname: lastName,
-                gender: faker.random.boolean(),
-                birthday: new Date(birthday),
-                avatar: avatar[i],
-                score: 0,
-                address: address,
-                source: sources[Math.floor(Math.random() * sources.length)],
-                type: types[Math.floor(Math.random() * types.length)],
-                hashedPassword: clientPassword,
-                isRegistered: true,
-                isActive: true,
-                language: "vi",
-                profit: faker.random.number({ min: 200000, max: 500000,  precision: 10000  }),
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            };
-            clients.push(client);
-        }
-
         const admins = [
             {
                 username: "manager",
