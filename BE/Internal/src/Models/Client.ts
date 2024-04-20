@@ -189,6 +189,10 @@ Client.init(
 			type: DataTypes.STRING,
 			values: [],
 		},
+		convertDate: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
 		hashedPassword: {
 			type: DataTypes.STRING,
 		},

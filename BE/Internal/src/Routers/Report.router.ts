@@ -16,6 +16,7 @@ class ReportRouter {
         reportRouter.get("/charts",this.ReportController.getChart.bind(this.ReportController));
         reportRouter.get("/products",this.ReportController.getProductChart.bind(this.ReportController));
         reportRouter.get("/customers",this.ReportController.getCustomerChart.bind(this.ReportController));
+        reportRouter.get("/leads",this.ReportController.getLeadChart.bind(this.ReportController));
 
         router.use("/reports", AuthMiddleware.initialize, Authorization.initialize, reportRouter);
     }

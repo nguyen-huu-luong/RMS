@@ -45,7 +45,7 @@ const TopChart = ({
 
     if (chartLoading || !chartData) return <Loading />;
     return (
-        <div className='flex flex-col gap-2 justify-start w-full shadow-md h-[400px]'>
+        <div className='flex flex-col gap-2 justify-start w-full shadow-md h-[400px] text-black'>
             <div className='p-7 font-bold text-xl text-black flex flex-row justify-between items-center w-full h-auto bg-white rounded-xl -mb-5'>
                 <span>{name}</span>
             </div>

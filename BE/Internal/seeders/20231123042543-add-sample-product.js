@@ -390,7 +390,7 @@ module.exports = {
         const products_pizza = pizza_items.map((pizza) =>    ( {
             name: pizza.name,
             description: pizza.description,
-            price: faker.random.number({ min: 50000, max: 90000,  precision: 5000  }),
+            price: faker.datatype.number({ min: 50000, max: 90000,  precision: 5000  }),
             thumbnails: pizza.thumbnail,
             categoryId: 1,
             createdAt: new Date(),
@@ -400,7 +400,7 @@ module.exports = {
         const products_drink = drink_items.map((pizza) =>    ( {
             name: pizza.name,
             description: pizza.description,
-            price: faker.random.number({ min: 30000, max: 60000,  precision: 5000  }),
+            price: faker.datatype.number({ min: 30000, max: 60000,  precision: 5000  }),
             thumbnails: pizza.thumbnail,
             categoryId: 2,
             createdAt: new Date(),
@@ -410,7 +410,7 @@ module.exports = {
         const products_fruit = fruit_items.map((pizza) =>    ( {
             name: pizza.name,
             description: pizza.description,
-            price: faker.random.number({ min: 40000, max: 80000,  precision: 5000  }),
+            price: faker.datatype.number({ min: 40000, max: 80000,  precision: 5000  }),
             thumbnails: pizza.thumbnail,
             categoryId: 3,
             createdAt: new Date(),
@@ -420,7 +420,7 @@ module.exports = {
         const products_hotdog = hotdog_items.map((pizza) =>    ( {
             name: pizza.name,
             description: pizza.description,
-            price: faker.random.number({ min: 40000, max: 80000,  precision: 5000  }),
+            price: faker.datatype.number({ min: 40000, max: 80000,  precision: 5000  }),
             thumbnails: pizza.thumbnail,
             categoryId: 4,
             createdAt: new Date(),
@@ -430,7 +430,7 @@ module.exports = {
         const products_snack = snack_items.map((pizza) =>    ( {
             name: pizza.name,
             description: pizza.description,
-            price: faker.random.number({ min: 40000, max: 80000,  precision: 5000  }),
+            price: faker.datatype.number({ min: 40000, max: 80000,  precision: 5000  }),
             thumbnails: pizza.thumbnail,
             categoryId: 5,
             createdAt: new Date(),
@@ -440,7 +440,7 @@ module.exports = {
         const products_burger = burger_items.map((pizza) =>    ( {
             name: pizza.name,
             description: pizza.description,
-            price: faker.random.number({ min: 40000, max: 80000,  precision: 5000  }),
+            price: faker.datatype.number({ min: 40000, max: 80000,  precision: 5000  }),
             thumbnails: pizza.thumbnail,
             categoryId: 6,
             createdAt: new Date(),
@@ -451,7 +451,7 @@ module.exports = {
         const products_veggie = veggie_items.map((pizza) =>    ( {
             name: pizza.name,
             description: pizza.description,
-            price: faker.random.number({ min: 40000, max: 80000,  precision: 5000  }),
+            price: faker.datatype.number({ min: 40000, max: 80000,  precision: 5000  }),
             thumbnails: pizza.thumbnail,
             categoryId: 7,
             createdAt: new Date(),

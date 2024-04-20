@@ -7,10 +7,10 @@ module.exports = {
         const currentDate = new Date();
         const twoYearsAgo = new Date(currentDate.getFullYear() - 3, currentDate.getMonth(), currentDate.getDate());
         
-        for (let i = 1; i <= 900; i++) {
+        for (let i = 1; i <= 1000; i++) {
             orders.push({
-                clientId: faker.random.number({ min: 1, max: 30 }),
-                num_items: faker.random.number({ min: 1, max: 5 }),
+                clientId: faker.datatype.number({ min: 1, max: 30 }),
+                num_items: faker.datatype.number({ min: 1, max: 5 }),
                 amount: 0,
                 status: "Done",
                 paymentMethod: "CASH",
@@ -20,7 +20,7 @@ module.exports = {
         }
 
         let orderItems = [];
-        for (let orderId = 0; orderId < 300; orderId++) {
+        for (let orderId = 0; orderId < 1000; orderId++) {
             let preProducts = [];
             for (let j = 0; j < orders[orderId].num_items; j++) {
                 let randomProduct;
@@ -30,12 +30,12 @@ module.exports = {
                 } while (preProducts.includes(randomProduct));
                 preProducts.push(randomProduct);
 
-                quantity = faker.random.number({ min: 1, max: 5 });
+                quantity = faker.datatype.number({ min: 1, max: 5 });
                 orderItems.push({
                     orderId: orderId + 1,
                     productId: randomProduct,
                     quantity: quantity,
-                    amount: quantity * faker.random.number({ min: 40000, max: 70000, precision: 5000 }),
+                    amount: quantity * faker.datatype.number({ min: 40000, max: 70000, precision: 5000 }),
                     status: "Done",
                     createdAt: faker.date.past(),
                     updatedAt: new Date(),
@@ -50,15 +50,14 @@ module.exports = {
         }
 
         let clientAmounts = []
-        for (let i = 1; i <= 30; i++) {
+        for (let i = 1; i <= 500; i++) {
             clientAmounts.push(0);
         }
         let temp = 0;
         for (let order of orders) {
             clientAmounts[temp] += order.amount;
-            temp = (temp + 1) % 30;
+            temp = (temp + 1) % 500;
         }
-        console.log(clientAmounts);
         const promises = clientAmounts.map((profit, index) => {
             return queryInterface.sequelize.query(
                 `

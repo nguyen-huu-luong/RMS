@@ -31,7 +31,7 @@ ChartJS.register(
     BarController
 );
 
-const OrderChart = ({ option, component, setComponent }: { option: any, component: any, setComponent: any }) => {
+const LeadChart = ({ option, component, setComponent }: { option: any, component: any, setComponent: any }) => {
     const [data, setData] = useState<any>(null);
 
     const {
@@ -40,15 +40,15 @@ const OrderChart = ({ option, component, setComponent }: { option: any, componen
         isLoading: chartLoading,
     } = useSWR(
         option.beginDate && option.endDate
-            ? `/reports/charts?type=${option.type}&beginDate=${option.beginDate}&endDate=${option.endDate}`
-            : `/reports/charts?type=${option.type}`,
+            ? `/reports/leads?type=${option.type}&beginDate=${option.beginDate}&endDate=${option.endDate}`
+            : `/reports/leads?type=${option.type}`,
         async (url: string) =>
             await fetchClient({ url: url, data_return: true })
     );
     useEffect(() => {
         if (!chartLoading && chartData) {
-            setComponent({...component, leadChart: true});
-            const sortedChartData = chartData[0].sort((a: any, b: any) => {
+            setComponent({...component, segmentationChart: true});
+            const sortedChartData = chartData.conversions.sort((a: any, b: any) => {
                 return new Date(a.date).valueOf() - new Date(b.date).valueOf();
             });
 
@@ -59,20 +59,20 @@ const OrderChart = ({ option, component, setComponent }: { option: any, componen
                 if (!groupedData[yearMonth]) {
                     groupedData[yearMonth] = {
                         date: yearMonth,
-                        count: 0,
-                        total_amount: 0,
+                        newLeads: 0,
+                        newCustomers: 0,
                     };
                 }
-                groupedData[yearMonth].count += parseInt(item.count, 10);
-                groupedData[yearMonth].total_amount += parseInt(
-                    item.total_amount,
+                groupedData[yearMonth].newLeads += parseInt(item.newLeads, 10);
+                groupedData[yearMonth].newCustomers += parseInt(
+                    item.newCustomers,
                     10
                 );
             });
             Object.keys(groupedData).forEach((key) => {
                 custom.push(groupedData[key]);
             });
-           
+           console.log(custom, sortedChartData)
             setData({
                 labels:
                     (option.type == "YEARLY" || option.type == "CUSTOM") &&
@@ -86,7 +86,7 @@ const OrderChart = ({ option, component, setComponent }: { option: any, componen
                 datasets: [
                     {
                         type: "line",
-                        label: "Orders",
+                        label: "New leads",
                         borderColor: "rgb(233, 101, 45)",
                         borderWidth: 2,
                         data:
@@ -94,26 +94,26 @@ const OrderChart = ({ option, component, setComponent }: { option: any, componen
                                 option.type == "CUSTOM") &&
                             custom.length > 3
                                 ? custom.map((item: any) => {
-                                      return item.count;
+                                      return item.newLeads;
                                   })
                                 : sortedChartData.map((item: any) => {
-                                      return item.count;
+                                      return item.newLeads;
                                   }),
                         yAxisID: "y",
                     },
                     {
                         type: "line",
-                        label: "Profit",
+                        label: "New customers",
                         backgroundColor: "rgb(14, 156, 255)",
                         data:
                             (option.type == "YEARLY" ||
                                 option.type == "CUSTOM") &&
                             custom.length > 3
                                 ? custom.map((item: any) => {
-                                      return item.total_amount;
+                                      return item.newCustomers;
                                   })
                                 : sortedChartData.map((item: any) => {
-                                      return item.total_amount;
+                                      return item.newCustomers;
                                   }),
                         borderWidth: 2,
                         yAxisID: "y1",
@@ -127,7 +127,7 @@ const OrderChart = ({ option, component, setComponent }: { option: any, componen
     return (
         <div className='flex flex-col gap-2 justify-start w-full shadow-md h-auto rounded-xl bg-white'>
             <div className='p-7 font-bold text-xl text-black flex flex-row justify-between items-center w-full h-auto bg-white rounded-xl -mb-5'>
-                <span>Order Chart</span>
+                <span>Conversion Chart</span>
             </div>
             <div className='p-7 w-full h-[450px]'>
                 <Chart
@@ -163,4 +163,4 @@ const OrderChart = ({ option, component, setComponent }: { option: any, componen
     );
 };
 
-export default OrderChart;
+export default LeadChart;

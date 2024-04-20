@@ -6,8 +6,7 @@ import { Client } from "../../Models";
 import Token from "../../Models/Token";
 import { REFRESH_TOKEN } from "../../Constants";
 import message from "../../Utils/Message";
-import { Op } from "sequelize";
-
+import { Op, Sequelize } from "sequelize";
 @injectable()
 export class ClientRepository
     extends BaseRepository<Client>
@@ -71,16 +70,28 @@ export class ClientRepository
                 }
                 clientAmounts.set(client.getDataValue("id"), totalAmount);
             }
-            const clientAmountsArray: [number, number, number][] = Array.from(clientAmounts).map(([clientId, amount]) => [clientId, amount, -10]);;
+            const clientAmountsArray: [number, number, number][] = Array.from(
+                clientAmounts
+            ).map(([clientId, amount]) => [clientId, amount, -10]);
             clientAmountsArray.sort((a, b) => b[1] - a[1]);
             const topClients = clientAmountsArray.slice(0, 10);
-            const previousMonth = await this.getCustomTopCustomer(startOfLastMonth, endOfLastMonth);
+            const previousMonth = await this.getCustomTopCustomer(
+                startOfLastMonth,
+                endOfLastMonth
+            );
             if (previousMonth) {
-                const result: [number, number, number][] = topClients.map(([clientId, amount], index) => {
-                    const indexInPrevious = previousMonth.findIndex((pre: any) => pre[0] === clientId);
-                    const indexChange = indexInPrevious !== -1 ? indexInPrevious - index : -10;
-                    return [clientId, amount, indexChange];
-                });
+                const result: [number, number, number][] = topClients.map(
+                    ([clientId, amount], index) => {
+                        const indexInPrevious = previousMonth.findIndex(
+                            (pre: any) => pre[0] === clientId
+                        );
+                        const indexChange =
+                            indexInPrevious !== -1
+                                ? indexInPrevious - index
+                                : -10;
+                        return [clientId, amount, indexChange];
+                    }
+                );
                 return result;
             } else {
                 return topClients;
@@ -89,7 +100,7 @@ export class ClientRepository
             message.queryError(err);
         }
     }
-    
+
     public async getYearlyTopCustomer() {
         try {
             const today = new Date();
@@ -114,16 +125,28 @@ export class ClientRepository
                 }
                 clientAmounts.set(client.getDataValue("id"), totalAmount);
             }
-            const clientAmountsArray: [number, number, number][] = Array.from(clientAmounts).map(([clientId, amount]) => [clientId, amount, -10]);;
+            const clientAmountsArray: [number, number, number][] = Array.from(
+                clientAmounts
+            ).map(([clientId, amount]) => [clientId, amount, -10]);
             clientAmountsArray.sort((a, b) => b[1] - a[1]);
             const topClients = clientAmountsArray.slice(0, 10);
-            const previousYear = await this.getCustomTopCustomer(startOfLastYear, endOfLastYear);    
+            const previousYear = await this.getCustomTopCustomer(
+                startOfLastYear,
+                endOfLastYear
+            );
             if (previousYear) {
-                const result: [number, number, number][] = topClients.map(([clientId, amount], index) => {
-                    const indexInPrevious = previousYear.findIndex((pre: any) => pre[0] === clientId);
-                    const indexChange = indexInPrevious !== -1 ? indexInPrevious - index : -10;
-                    return [clientId, amount, indexChange];
-                });
+                const result: [number, number, number][] = topClients.map(
+                    ([clientId, amount], index) => {
+                        const indexInPrevious = previousYear.findIndex(
+                            (pre: any) => pre[0] === clientId
+                        );
+                        const indexChange =
+                            indexInPrevious !== -1
+                                ? indexInPrevious - index
+                                : -10;
+                        return [clientId, amount, indexChange];
+                    }
+                );
                 return result;
             } else {
                 return topClients;
@@ -133,31 +156,231 @@ export class ClientRepository
         }
     }
 
-	public async getCustomTopCustomer(beginDate: Date, endDate: Date) {
-		try {
-			const clients = await this._model.findAll();
-			const clientAmounts: Map<number, number> = new Map();
-			for (const client of clients) {
-				const orders = await client.getOrders({
-					where: {
-						createdAt: {
-							[Op.between]: [beginDate, endDate],
-						},
-						status: "Done",
-					},
-				});
-				let totalAmount = 0;
-				for (const order of orders) {
-					totalAmount += order.getDataValue("amount");
-				}
-				clientAmounts.set(client.getDataValue("id"), totalAmount);
-			}
-			const clientAmountsArray: [number, number][] = Array.from(clientAmounts);
-			clientAmountsArray.sort((a, b) => b[1] - a[1]);
-			const topClients = clientAmountsArray.slice(0, 10);
-			return topClients;
-		} catch (err) {
-			message.queryError(err);
-		}
-	}
+    public async getCustomTopCustomer(beginDate: Date, endDate: Date) {
+        try {
+            const clients = await this._model.findAll();
+            const clientAmounts: Map<number, number> = new Map();
+            for (const client of clients) {
+                const orders = await client.getOrders({
+                    where: {
+                        createdAt: {
+                            [Op.between]: [beginDate, endDate],
+                        },
+                        status: "Done",
+                    },
+                });
+                let totalAmount = 0;
+                for (const order of orders) {
+                    totalAmount += order.getDataValue("amount");
+                }
+                clientAmounts.set(client.getDataValue("id"), totalAmount);
+            }
+            const clientAmountsArray: [number, number][] =
+                Array.from(clientAmounts);
+            clientAmountsArray.sort((a, b) => b[1] - a[1]);
+            const topClients = clientAmountsArray.slice(0, 10);
+            return topClients;
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+
+    public async getDailyConversion() {
+        try {
+            const today = new Date();
+            const startOfToday = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                today.getDate()
+            );
+            const endOfToday = today;
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+            const [todayConversions, yesterdayConversions] = await Promise.all([
+                this._model.findAll({
+                    where: {
+                        convertDate: {
+                            [Op.between]: [startOfToday, endOfToday],
+                        },
+                    },
+                }),
+                this._model.findAll({
+                    where: {
+                        convertDate: {
+                            [Op.between]: [startOfToday, endOfToday],
+                        },
+                    },
+                }),
+            ]);
+            return {
+                todayConversions: todayConversions,
+                yesterdayConversions: yesterdayConversions,
+            };
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+
+    public async getMonthlyConversion() {
+        try {
+            const today = new Date();
+            const startOfMonth = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                2
+            );
+            const endOfMonth = today;
+            const startOfLastMonth = new Date(
+                today.getFullYear(),
+                today.getMonth() - 1,
+                1
+            );
+            const endOfLastMonth = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                1
+            );
+            const [currentMonthConversions, lastMonthConversions] =
+                await Promise.all([
+                    this._model.findAll({
+                        where: {
+                            convertDate: {
+                                [Op.between]: [startOfMonth, endOfMonth],
+                            },
+                        },
+                    }),
+                    this._model.findAll({
+                        where: {
+                            convertDate: {
+                                [Op.between]: [
+                                    startOfLastMonth,
+                                    endOfLastMonth,
+                                ],
+                            },
+                        },
+                    }),
+                ]);
+            return {
+                currentMonthConversions: currentMonthConversions,
+                lastMonthConversions: lastMonthConversions,
+            };
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+
+    public async getYearlyConversion() {
+        try {
+            const today = new Date();
+            const startOfYear = new Date(today.getFullYear(), 0, 1);
+            const endOfYear = today;
+            const startOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
+            const endOfLastYear = startOfYear;
+            const [currentYearConversions, lastYearConversions] =
+                await Promise.all([
+                    this._model.findAll({
+                        where: {
+                            convertDate: {
+                                [Op.between]: [startOfYear, endOfYear],
+                            },
+                        },
+                    }),
+                    this._model.findAll({
+                        where: {
+                            convertDate: {
+                                [Op.between]: [startOfLastYear, endOfLastYear],
+                            },
+                        },
+                    }),
+                ]);
+            return {
+                currentYearConversions: currentYearConversions,
+                lastYearConversions: lastYearConversions,
+            };
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+
+    public async getConversionsByDate(
+        beginDate: Date,
+        endDate: Date = new Date()
+    ) {
+        try {
+            const conversions = await this._model.findAll({
+                where: {
+                    convertDate: {
+                        [Op.between]: [beginDate, endDate],
+                    },
+                },
+            });
+            return { conversions: conversions };
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
+
+    public async getConversionChart(beginDate?: Date, endDate?: Date) {
+        try {
+            const leads = await this._model.findAll({
+                where: {
+                    [Op.or]: [
+                        {
+                            type: "lead",
+                            createdAt: {
+                                [Op.between]: [beginDate, endDate],
+                            },
+                        },
+                        {
+                            type: "customer",
+                            createdAt: {
+                                [Op.between]: [beginDate, endDate],
+                            },
+                        },
+                    ],
+                },
+                attributes: [
+                    [Sequelize.literal(`DATE("createdAt")`), "date"],
+                    [Sequelize.literal(`COUNT(*)`), "count"],
+                ],
+                group: ["date"],
+            });
+
+            const customers = await this._model.findAll({
+                where: {
+                    type: "customer",
+                    convertDate: {
+                        [Op.between]: [beginDate, endDate],
+                    },
+                },
+                attributes: [
+                    [Sequelize.literal(`DATE("convertDate")`), "date"],
+                    [Sequelize.literal(`COUNT(*)`), "count"],
+                ],
+                group: ["date"],
+            });
+            const leadsMap = Object.fromEntries(
+                leads.map((item: any) => [item.getDataValue('date'), item.getDataValue('count')])
+            );
+            const customersMap = Object.fromEntries(
+                customers.map((item: any) => [item.getDataValue('date'), item.getDataValue('count')])
+            );
+
+            const dates = new Set([
+                ...leads.map((item: any) => item.getDataValue('date')),
+                ...customers.map((item: any) => item.getDataValue('date')),
+            ]);
+            const result = [];
+            for (const date of dates) {
+                result.push({
+                    date,
+                    newLeads: leadsMap[date] || 0,
+                    newCustomers: customersMap[date] || 0,
+                });
+            }
+            return { conversions: result };
+        } catch (err) {
+            message.queryError(err);
+        }
+    }
 }

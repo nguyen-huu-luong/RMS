@@ -20,7 +20,7 @@ const sources = [
 ]
 
 const types = [
-    "Lead", "Customer"
+    "lead", "customer"
 ]
 
 const newData = [
@@ -51,6 +51,8 @@ const phone = [
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         const clientPassword = await bcrypt.hash("client", 10) ;
+        const currentDate = new Date();
+        const twoYearsAgo = new Date(currentDate.getFullYear() - 3, currentDate.getMonth(), currentDate.getDate());
         const clients = [];
         for (let i = 0; i < newData.length; i++) {
             const [firstName, middleName, lastName, birthday, address, email] = newData[i];
@@ -71,12 +73,19 @@ module.exports = {
                 isActive: true,
                 language: "vi",
                 profit: 0,
-                createdAt: new Date(),
                 updatedAt: new Date(),
             };
+            if (client.type === "customer") {
+                client.convertDate = faker.date.between(twoYearsAgo, currentDate);
+                let date = new Date(client.convertDate)
+                date.setMonth(date.getMonth() - Math.floor(Math.random() * 5) + 1)
+                client.createdAt = date
+            } else {
+                client.createdAt = faker.date.between(twoYearsAgo, currentDate);
+            }
             clients.push(client);
         }
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 490; i++) {
             const client = {
                 email: faker.internet.email(),
                 phone: "0822 740 644",
@@ -94,9 +103,16 @@ module.exports = {
                 isActive: true,
                 language: "vi",
                 profit: 0,
-                createdAt: new Date(),
                 updatedAt: new Date(),
             };
+            if (client.type === "customer") {
+                client.convertDate = faker.date.between(twoYearsAgo, currentDate);
+                let date = new Date(client.convertDate)
+                date.setMonth(date.getMonth() - Math.floor(Math.random() * 5) + 1)
+                client.createdAt = date
+            } else {
+                client.createdAt = faker.date.between(twoYearsAgo, currentDate);
+            }
             clients.push(client);
         }
         const admins = [

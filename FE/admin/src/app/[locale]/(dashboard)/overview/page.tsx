@@ -4,6 +4,8 @@ import Stats from "@/components/Statistics/Stats";
 import TimeBar from "@/components/Statistics/TimeBar";
 import TopChart from "@/components/Statistics/TopChart";
 import OrderChart from "@/components/Statistics/OrderChart";
+import LeadChart from "@/components/Statistics/LeadChart";
+import SegmentationChart from "@/components/Statistics/SegmentationChart";
 type Option = {
     type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM";
     beginDate?: Date;
@@ -21,6 +23,8 @@ function Overview() {
         topProducts: false,
         topCustomers: false,
         orderChart: false,
+        leadChart: false,
+        segmentationChart: false,
     });
     return (
         <div className='w-full h-auto overflow-scroll p-4 flex flex-col gap-4 justify-start items-center'>
@@ -61,7 +65,9 @@ function Overview() {
                     />
                 )}
             </div>
-            {component.orderChart && <OrderChart option={option} />}
+            {component.orderChart && <OrderChart option={option} component={component} setComponent={setComponent} />}
+            {component.leadChart && <LeadChart option={option} component={component} setComponent={setComponent} />}
+            {component.segmentationChart && <SegmentationChart option={option} />}
         </div>
     );
 }

@@ -7,6 +7,10 @@ export interface IClientRepository extends IBaseRepository<Client> {
     getMonthlyTopCustomer(): Promise<any> ;
     getYearlyTopCustomer(): Promise<any> ;
     getCustomTopCustomer(beginDate?: Date, endDate?:Date): Promise<any> ;
-
+    getDailyConversion(): Promise<any>;
+    getMonthlyConversion(): Promise<any>;
+    getYearlyConversion(): Promise<any>;
+    getConversionsByDate(beginDate?: Date, endDate?: Date): Promise<any>;
+    getConversionChart(beginDate?: Date, endDate?: Date): Promise<any>;
 }
 

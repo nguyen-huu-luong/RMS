@@ -110,6 +110,27 @@ class ReportController {
         }
     }
 
+    public async getLeadChart(req: Request, res: Response, next: NextFunction) {
+        if (req.action === "read:any") {
+            if (!req.query.type) {
+                throw new Error("Type parameter is missing.");
+            }
+            const type: string = req.query.type as string;
+            let beginDate: Date | undefined;
+            let endDate: Date | undefined;
+            if (req.query.beginDate) {
+                beginDate = new Date(req.query.beginDate as string);
+            }
+            if (req.query.endDate) {
+                endDate = new Date(req.query.endDate as string);
+            }
+            const queries: ChartQueryOptions = { type, beginDate, endDate };
+            const data = await this.reportService.getLeadChart(queries);
+            res.send(data);
+        } else {
+            throw new ForbiddenError();
+        }
+    }
 }
 
 export default ReportController;

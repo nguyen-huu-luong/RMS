@@ -11,13 +11,13 @@ const Card = ({
     before: number;
 }) => {
     return (
-        <div className='w-full h-32 border-2 rounded-xl p-5 bg-white shadow-sm flex justify-center items-center'>
+        <div className='w-full h-32 rounded-xl p-5 bg-white shadow-md flex justify-center items-center'>
             <div className='w-auto h-auto flex justify-between gap-2 items-center text-black'>
                 <div className='flex flex-col justify-between gap-1 items-center'>
                     <span>{convertUnit(current)}</span>
                     <span>{name}</span>
                 </div>
-                <div
+                {((current - before) != 0) &&<div
                     className={`w-auto h-auto flex justify-start gap-1 items-center ${
                         current - before < 0 ? "text-red-600" : "text-green-600"
                     }`}
@@ -34,7 +34,7 @@ const Card = ({
                             ? convertUnit(before - current)
                             : convertUnit(current - before)}
                     </span>
-                </div>
+                </div>}
             </div>
         </div>
     );

@@ -51,8 +51,8 @@ const Stats = ({
                 before={stats.profit.before}
                 current={stats.profit.now}
             />
-            <Card name={"Orders"} before={150000} current={100000} />
-            <Card name={"Orders"} before={150000} current={100000} />
+            <Card name={"Customers"} before={stats.clients.before} current={stats.clients.now} />
+            <Card name={"Emails"} before={150000} current={100000} />
         </div>
     );
 };
