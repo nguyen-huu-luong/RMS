@@ -18,6 +18,7 @@ import {
     ChartData,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
+import moment from "moment";
 ChartJS.register(
     LinearScale,
     CategoryScale,
@@ -31,7 +32,7 @@ ChartJS.register(
 );
 
 const OrderChart = ({ option }: { option: any }) => {
-    const [data,setData] = useState<any>(null)
+    const [data, setData] = useState<any>(null);
 
     const {
         data: chartData,
@@ -46,40 +47,117 @@ const OrderChart = ({ option }: { option: any }) => {
     );
     useEffect(() => {
         if (!chartLoading && chartData) {
-            console.log(chartData)
+            const sortedChartData = chartData[0].sort((a: any, b: any) => {
+                return new Date(a.date).valueOf() - new Date(b.date).valueOf();
+            });
+
+            const custom: any = [];
+            const groupedData: any = {};
+            sortedChartData.forEach((item: any) => {
+                const yearMonth = moment(item.date).format("YYYY-MM");
+                if (!groupedData[yearMonth]) {
+                    groupedData[yearMonth] = {
+                        date: yearMonth,
+                        count: 0,
+                        total_amount: 0,
+                    };
+                }
+                groupedData[yearMonth].count += parseInt(item.count, 10);
+                groupedData[yearMonth].total_amount += parseInt(
+                    item.total_amount,
+                    10
+                );
+            });
+            Object.keys(groupedData).forEach((key) => {
+                custom.push(groupedData[key]);
+            });
+           
             setData({
-                labels: chartData[0].map((item: any)=> {return item.date}),
+                labels:
+                    (option.type == "YEARLY" || option.type == "CUSTOM") &&
+                    custom.length > 3
+                        ? custom.map((item: any) => {
+                              return item.date;
+                          })
+                        : sortedChartData.map((item: any) => {
+                              return item.date;
+                          }),
                 datasets: [
                     {
                         type: "line",
                         label: "Orders",
                         borderColor: "rgb(233, 101, 45)",
                         borderWidth: 2,
-                        data: chartData[0].map((item: any)=> {return item.count}),
+                        data:
+                            (option.type == "YEARLY" ||
+                                option.type == "CUSTOM") &&
+                            custom.length > 3
+                                ? custom.map((item: any) => {
+                                      return item.count;
+                                  })
+                                : sortedChartData.map((item: any) => {
+                                      return item.count;
+                                  }),
+                        yAxisID: "y",
                     },
                     {
                         type: "line",
                         label: "Profit",
                         backgroundColor: "rgb(14, 156, 255)",
-                        data: chartData[0].map((item: any)=> {return item.total_amount}),
+                        data:
+                            (option.type == "YEARLY" ||
+                                option.type == "CUSTOM") &&
+                            custom.length > 3
+                                ? custom.map((item: any) => {
+                                      return item.total_amount;
+                                  })
+                                : sortedChartData.map((item: any) => {
+                                      return item.total_amount;
+                                  }),
                         borderWidth: 2,
+                        yAxisID: "y1",
                     },
                 ],
-            })
+            });
         }
-    }, [chartLoading])
+    }, [chartLoading]);
     if (chartLoading || !chartData) return <Loading />;
-    if (!data) return <Loading/>
+    if (!data) return <Loading />;
     return (
         <div className='flex flex-col gap-2 justify-start w-full shadow-md h-auto rounded-xl bg-white'>
             <div className='p-7 font-bold text-xl text-black flex flex-row justify-between items-center w-full h-auto bg-white rounded-xl -mb-5'>
                 <span>Order Chart</span>
             </div>
-            <Chart
-                type="bar"
-                data={data}
-                options={{ responsive: true,maintainAspectRatio: false, aspectRatio: 2}}
-              />
+            <div className='p-7 w-full h-[450px]'>
+                <Chart
+                    type='bar'
+                    data={data}
+                    options={{
+                        elements: {
+                            line: {
+                                tension: 0.5,
+                            },
+                        },
+                        maintainAspectRatio: false,
+                        aspectRatio: 1,
+                        scales: {
+                            y: {
+                                type: "linear" as const,
+                                display: true,
+                                position: "left" as const,
+                            },
+                            y1: {
+                                type: "linear" as const,
+                                display: true,
+                                position: "right" as const,
+                                grid: {
+                                    drawOnChartArea: false,
+                                },
+                            },
+                        },
+                    }}
+                />
+            </div>
         </div>
     );
 };
