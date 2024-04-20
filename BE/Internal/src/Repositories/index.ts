@@ -49,3 +49,6 @@ export * from "./implementation/SubscriberRepository"
 
 export * from "./IOrderItemRepository"
 export * from "./implementation/OrderItemRepository"
+
+export * from "./IGroupRepository"
+export * from "./implementation/GroupRepository"

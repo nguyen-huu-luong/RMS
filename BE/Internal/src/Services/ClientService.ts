@@ -1,12 +1,14 @@
-import {ErrorName, HttpStatusCode} from '../Constants';
+import { ErrorName, HttpStatusCode } from '../Constants';
 import { container } from '../Configs';
 import { QueryOptions, TYPES } from '../Types/type';
 import { IClientRepository } from '../Repositories/IClientRepository';
-import { IOrderRepository } from "../Repositories/IOrderRepository"; 
+import { IOrderRepository } from "../Repositories/IOrderRepository";
 import { ICartRepository, IProductRepository } from '../Repositories';
 import { Product, Client } from '../Models';
 import { CustomError, RecordNotFoundError } from '../Errors';
 import { Op, where } from 'sequelize';
+import * as dotenv from 'dotenv';
+const axios = require('axios').default;
 
 
 // export interface IClientService {
@@ -20,7 +22,7 @@ import { Op, where } from 'sequelize';
 // }
 
 export class ClientService {
-    constructor( 
+    constructor(
         private clientRepository = container.get<IClientRepository>(TYPES.IClientRepository),
         private orderRepository = container.get<IOrderRepository>(
             TYPES.IOrderRepository
@@ -28,10 +30,10 @@ export class ClientService {
         private cartRepository = container.get<ICartRepository>(TYPES.ICartRepository),
         private productRepository = container.get<IProductRepository>(TYPES.IProductRepository)
 
-    ) {}
+    ) { }
 
     public async getAll(options?: QueryOptions) {
-        const result =  await this.clientRepository.all(options);
+        const result = await this.clientRepository.all(options);
         return {
             ...result
         }
@@ -40,10 +42,10 @@ export class ClientService {
     public async getById(id: number) {
         let customerInfo = await this.clientRepository.findById(id);
         let orderInfo = await await this.orderRepository.viewOrders(id);
-        return {...customerInfo["dataValues"], orderInfo}
-    } 
-    public async create(data: any)  {
-        const {phone, email} = data;
+        return { ...customerInfo["dataValues"], orderInfo }
+    }
+    public async create(data: any) {
+        const { phone, email } = data;
         const user = await this.clientRepository.findByEmail(email)
 
         if (user) {
@@ -52,33 +54,33 @@ export class ClientService {
 
         return await this.clientRepository.create(data)
     }
-    
+
     public async update(id: number, data: any) {
-        const user = this.clientRepository.findById(id) ;
+        const user = this.clientRepository.findById(id);
         if (!user) {
             throw new RecordNotFoundError()
-        } 
-        return await this.clientRepository.update(id, data); 
+        }
+        return await this.clientRepository.update(id, data);
     }
-    
+
 
     public async delete(id: number) {
-        const user = this.clientRepository.findById(id) ;
+        const user = this.clientRepository.findById(id);
         if (!user) {
             throw new RecordNotFoundError()
-        } 
-        return await this.clientRepository.delete(id) ; 
+        }
+        return await this.clientRepository.delete(id);
     }
 
     public async search(key: string, by: string) {
         return []
     }
 
-    public async sort(by: string ) {
+    public async sort(by: string) {
         return []
     }
 
-    public getOpportunityCustomer =  async (sort_factor: any, order: any) => {
+    public getOpportunityCustomer = async (sort_factor: any, order: any) => {
         let carts: any
         if (sort_factor == "amount") {
             carts = await this.cartRepository.findByCond(
@@ -98,7 +100,8 @@ export class ClientService {
                     include: [{
                         model: Product,
                     },
-                    {   model: Client,
+                    {
+                        model: Client,
                     }]
                 }
             )
@@ -118,7 +121,8 @@ export class ClientService {
                     include: [{
                         model: Product,
                     },
-                    {   model: Client,
+                    {
+                        model: Client,
                         as: 'Client',
                     }],
                     order: [
@@ -126,7 +130,7 @@ export class ClientService {
                         ['Client', 'lastname', order],
                     ],
                 }
-            ) 
+            )
         }
 
         else if (sort_factor == "type") {
@@ -144,7 +148,8 @@ export class ClientService {
                     include: [{
                         model: Product,
                     },
-                    {   model: Client,
+                    {
+                        model: Client,
                         as: 'Client',
                     }],
                     order: [
@@ -156,5 +161,93 @@ export class ClientService {
 
         return carts
 
+    }
+
+    public updateCustomerGroup = async (group_info: any, update_convert_time: boolean) => {
+        console.log("Update")
+        if (update_convert_time) {
+            await Promise.all(
+                group_info.map(async (item: any) => {
+                    await this.clientRepository.updateBaseCond({
+                        groupId: item.groupId,
+                        type: "customer",
+                        convertDate: new Date()
+                    }, {
+                        where: {
+                            id: item.id,
+                            [Op.or]: [
+                                {
+                                    groupId: {
+                                        [Op.is]: null
+                                    }
+                                },
+                                {
+                                    groupId: {
+                                        [Op.ne]: item.groupId
+                                    }
+                                },
+                            ]
+                        }
+                    })
+                }
+                )
+            )
+        }
+        else {
+            await Promise.all(
+                group_info.map(async (item: any) => {
+                    await this.clientRepository.update(item.id, {
+                        groupId: item.groupId,
+                    })
+                }
+                )
+            )
+        }
+    }
+
+    public segmentProcess = async (customers: any, update_convert_time = false) => {
+        const res = await axios.post(`http://${process.env.FLASK_HOST}:${process.env.FLASK_PORT}/api/segment`, customers);
+        await this.updateCustomerGroup(res.data, update_convert_time)
+    }
+
+    public segmentCustomerAll = async () => {
+        try {
+            const customers = await this.clientRepository.findByCond({
+                attributes: ['id', 'birthday', 'profit', 'total_items'],
+                where: {
+                    type: "customer"
+                }
+            })
+
+            if (customers.length > 0) {
+                await this.segmentProcess(customers)
+            }
+
+            return { "status": "success" }
+        }
+        catch (err) {
+            console.log(err)
+            return { "status": "failed" }
+        }
+    }
+
+    public segmentCustomer = async (id_: number) => {
+        try {
+            const customer = await this.clientRepository.findByCond({
+                attributes: ['id', 'birthday', 'profit', 'total_items'],
+                where: {
+                    id: id_,
+                }
+            })
+
+            if (customer.length > 0) {
+                await this.segmentProcess(customer, true)
+            }
+            return { "status": "success" }
+        }
+        catch (err) {
+            console.log(err)
+            return { "status": "failed" }
+        }
     }
 }
