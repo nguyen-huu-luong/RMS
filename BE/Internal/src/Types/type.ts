@@ -31,6 +31,7 @@ const TYPES = {
 
     ICampaignRepository: Symbol.for("ICampaignReposittory"),
     ITargetListRepository: Symbol.for("ITargetListRepository"),
+    IGroupRepository: Symbol.for("IGroupRepository")
 };
     
 
