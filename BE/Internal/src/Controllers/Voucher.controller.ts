@@ -30,6 +30,9 @@ class VoucherController {
     public consumeVoucher(req: Request, res: Response, next: NextFunction) {
         this.voucherService.consumeVoucher(req, res, next);
     }
+    public getVoucherClients(req: Request, res: Response, next: NextFunction) {
+        this.voucherService.getVoucherClients(req, res, next);
+    }
 
 }
 

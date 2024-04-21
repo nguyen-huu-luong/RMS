@@ -17,7 +17,6 @@ module.exports = {
         end_date: faker.date.future(),
         createdAt: new Date(),
         updatedAt: new Date(),
-        categoryId: faker.random.number({ min: 1, max: 7 }),
       };
     });
     await queryInterface.bulkInsert("Vouchers", vouchers);

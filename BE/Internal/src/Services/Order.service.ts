@@ -168,7 +168,6 @@ export class OrderService {
             } else if (req.action == "create:any") {
                 const { products, ...orderData } = req.body;
                 const order = await this.orderRepository.create(orderData);
-                console.log(products, orderData);
                 await Promise.all(
                     products.map(async (item: any) => {
                         let product = await this.productRepository.findById(

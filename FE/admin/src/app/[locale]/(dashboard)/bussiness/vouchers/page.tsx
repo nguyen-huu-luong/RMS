@@ -31,6 +31,8 @@ import { createStyles } from "antd-style";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
 import { VoucherActionBar } from "@/components/Voucher/VoucherActionBar";
+import { EditVoucherForm } from "@/components/Voucher/EditVoucherForm";
+import { AssignVoucherForm } from "@/components/Voucher/AssignVoucher";
 
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
@@ -88,6 +90,7 @@ const Voucher: React.FC = () => {
     const [selectedVouchers, setSelectedVouchers] = useState<DataType[]>();
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState<any>([]);
+    const [voucher, setVoucher] = useState<number>(0);
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -106,43 +109,6 @@ const Voucher: React.FC = () => {
         title: "",
     });
 
-    const item_columns = [
-        {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-        },
-        {
-            title: "Quantity",
-            dataIndex: "OrderItem",
-            key: "quantity",
-            render: (record: any) => <span>{record.quantity}</span>,
-        },
-        {
-            title: "Price",
-            dataIndex: "price",
-            key: "price",
-            render: (record: any) => <span>{record}</span>,
-        },
-        {
-            title: "Amount",
-            dataIndex: "OrderItem",
-            key: "amount",
-            render: (record: any) => <span>{record.amount}</span>,
-        },
-    ];
-
-    const router = useRouter();
-    const [modalData, setModalData] = useState<any>({
-        id: "",
-        amount: "",
-        fullname: "",
-        descriptions: "",
-        discountAmount: "",
-        paymentMethod: "",
-        status: "",
-        createdAt: "",
-    });
     const { styles } = useStyle();
 
     const fetchData = async () => {
@@ -248,6 +214,11 @@ const Voucher: React.FC = () => {
         confirm();
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
+    };
+
+    const handleUpdate = async (id: number) => {
+        setVoucher(id);
+        setOpen(true);
     };
 
     const handleReset = (clearFilters: () => void) => {
@@ -367,11 +338,21 @@ const Voucher: React.FC = () => {
         }),
     };
 
+    const handleAssignModal = (id: number) => {
+        setVoucher(id);
+        setOpen(true);
+    }
+
     const columns: ColumnsType<DataType> = [
         {
             title: "ID",
             dataIndex: "id",
             key: "id",
+            render: (text, record) => (
+                <span className="text-blue-600 cursor-pointer" onClick={() => handleAssignModal(record.id)}>
+                    {text}
+                </span>
+            ),
         },
         {
             title: "Name",
@@ -432,6 +413,20 @@ const Voucher: React.FC = () => {
                 return <>{moment(text).format("MMMM Do YYYY")}</>;
             },
             ...getColumnSearchProps("begin_date"),
+        },
+        {
+            title: "Action",
+            key: "action",
+            render: (text, record) => (
+                <span>
+                    {/* <Button onClick={() => handleUpdate(record.id)}>
+                        Update
+                    </Button> */}
+                    {/* <Button onClick={() => handleDelete(record.id)}>
+                        Delete
+                    </Button> */}
+                </span>
+            ),
         },
     ];
 
@@ -534,7 +529,7 @@ const Voucher: React.FC = () => {
             >
                 <div className='w-full flex flex-col justify-start gap-5'>
                     {/* <CustomerFilterBar /> */}
-                    <VoucherActionBar dataSelected={selectedVouchers}/>
+                    <VoucherActionBar dataSelected={selectedVouchers} />
                     {error.isError && (
                         <Alert
                             message={error.title}
@@ -610,6 +605,42 @@ const Voucher: React.FC = () => {
                     </div>
                 </div>
             </ConfigProvider>
+            {/* <Modal
+                classNames={classNames}
+                styles={modalStyles}
+                title='Edit voucher '
+                open={open}
+                onOk={handleOk}
+                okType='primary'
+                okButtonProps={{ className: "bg-primary" }}
+                cancelText='Cancel'
+                onCancel={handleCancel}
+                footer={null}
+            >
+                <EditVoucherForm
+                    voucherId={voucher}
+                    afterSubmit={handleOk}
+                    afterCancel={handleCancel}
+                />
+            </Modal> */}
+            <Modal
+                classNames={classNames}
+                styles={modalStyles}
+                title='Assign Voucher'
+                open={open}
+                onOk={handleOk}
+                okType='primary'
+                okButtonProps={{ className: "bg-primary" }}
+                cancelText='Cancel'
+                onCancel={handleCancel}
+                footer={null}
+            >
+                <AssignVoucherForm
+                    voucherId={voucher}
+                    afterSubmit={handleOk}
+                    afterCancel={handleCancel}
+                />
+            </Modal>
         </>
     );
 };

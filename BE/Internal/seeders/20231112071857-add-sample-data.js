@@ -70,7 +70,7 @@ module.exports = {
                 isRegistered: true,
                 isActive: true,
                 language: "vi",
-                profit: faker.random.number({ min: 200000, max: 500000,  precision: 10000  }),
+                profit: faker.random.number({ min: 300000, max: 3000000,  precision: 20000  }),
                 createdAt: new Date(),
                 updatedAt: new Date(),
             };

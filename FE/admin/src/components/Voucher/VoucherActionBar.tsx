@@ -95,7 +95,7 @@ export const VoucherActionBar: React.FC<VoucherActionBarProps> = (props) => {
         <Modal
             classNames={classNames}
             styles={modalStyles}
-            title="Add new lead"
+            title="Add new voucher"
             open={open}
             onOk={handleOk}
             okType="primary"

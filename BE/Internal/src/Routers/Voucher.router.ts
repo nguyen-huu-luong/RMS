@@ -16,11 +16,6 @@ class VoucherRouter {
             .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>
                 this.voucherController.getAll(req, res, next)
             )
-        // router
-        //     .route("/vouchers/admin/all")
-        //     .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>
-        //         this.voucherController.getAdminAll(req, res, next)
-        //     );
         router
             .route("/vouchers/:id")
             .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>
@@ -43,6 +38,11 @@ class VoucherRouter {
             .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.voucherController.createVoucher(req, res, next)
             );
+        router
+            .route("/vouchers/clients/:id")
+            .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>
+                this.voucherController.getVoucherClients(req, res, next)
+            )
     }
 }
 
