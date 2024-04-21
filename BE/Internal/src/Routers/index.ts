@@ -22,6 +22,8 @@ import TableRouter from "./Table.router";
 import FloorRouter from "./Floor.router";
 import TrackingRouter from "./Tracking.router";
 import NotificationRouter from "./Notification.router";
+import Pos_notification from "./Pos_notification.router";
+import Pos_notificationRouter from "./Pos_notification.router";
 import CampaignRouter from "./Campaign.router";
 import TargetListRouter from "./TargetList.router";
 import ClientHistoryRouter from "./ClientHistory.router";
@@ -48,6 +50,8 @@ class Routers {
 		const floorRouter = new FloorRouter()
 		const trackingRouter = new TrackingRouter()
 		const notificationRouter = new NotificationRouter();
+		const posNotificationRouter = new Pos_notificationRouter();
+
 		const campaignRouter = new CampaignRouter()
 		const targetListRouter = new TargetListRouter()
 		const clienthistoryRouter = new ClientHistoryRouter();
@@ -73,6 +77,7 @@ class Routers {
 		floorRouter.initialize(router)
 		trackingRouter.initialize(router)
 		notificationRouter.initialize(router)
+		posNotificationRouter.initialize(router)
 		campaignRouter.initialize(router)
 		targetListRouter.initialize(router)
 		clienthistoryRouter.initialize(router)

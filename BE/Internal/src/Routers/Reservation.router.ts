@@ -15,7 +15,7 @@ class ReservationRouter {
             .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.reservationController.viewAllReservationsPage(req, res, next))
             .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.reservationController.updateReservationDetail(req, res, next))
 
-        router.route('/reservations')
+        router.route('/reservations/detail')
             .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.reservationController.filterReservation(req, res, next))
             .put(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.reservationController.updateReservationStatus(req, res, next))
             .delete(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) => this.reservationController.deleteReservation(req, res, next))

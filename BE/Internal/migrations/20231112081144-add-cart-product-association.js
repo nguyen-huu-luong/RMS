@@ -37,7 +37,7 @@ module.exports = {
 			status: {
                 type: Sequelize.STRING,
                 allowNull: false,
-                defaultValue: "cooking",
+                defaultValue: "Preparing",
 				primaryKey: true,
             },
 			createdAt: {

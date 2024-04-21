@@ -5,6 +5,7 @@ import { BaseRepository } from "./BaseRepository";
 import { Client } from "../../Models";
 import Token from "../../Models/Token";
 import { REFRESH_TOKEN } from "../../Constants";
+import { Op } from "sequelize";
 
 @injectable()
 export class ClientRepository
@@ -26,5 +27,12 @@ export class ClientRepository
 		return await user.save();
 	}
 
-	
+	public async checkExist(phone: string, email: string) {
+		return await this._model.findAll({
+			where: {
+				phone: phone,
+				email: email
+			}
+		})
+	}
 }

@@ -37,7 +37,7 @@ CartItem.init(
 		},
 		status: {
 			type: DataTypes.STRING,
-			defaultValue: 'cooking',
+			defaultValue: 'Preparing',
 			primaryKey: true,
 		},
 		createdAt: {
