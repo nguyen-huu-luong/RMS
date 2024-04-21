@@ -15,7 +15,12 @@ class VoucherRouter {
             .route("/vouchers/all")
             .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>
                 this.voucherController.getAll(req, res, next)
-            );
+            )
+        // router
+        //     .route("/vouchers/admin/all")
+        //     .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>
+        //         this.voucherController.getAdminAll(req, res, next)
+        //     );
         router
             .route("/vouchers/:id")
             .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>

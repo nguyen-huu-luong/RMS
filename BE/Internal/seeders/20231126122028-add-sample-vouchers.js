@@ -8,7 +8,7 @@ module.exports = {
         name: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
         promo_code: faker.random.alphaNumeric(10),
-        type: faker.random.arrayElement(["percentage", "fixed"]), // Chọn loại voucher ngẫu nhiên
+        type: faker.random.arrayElement(["percentage", "fixed"]),
         amount: faker.random.number({ min: 10, max: 30,  precision: 5 }),
         maximum_reduce: faker.random.number({ min: 20000, max: 50000,  precision: 5000  }),
         minimum_paid: faker.random.number({ min: 70000, max: 100000,  precision: 5000  }),

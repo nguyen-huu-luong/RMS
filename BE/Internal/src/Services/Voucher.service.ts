@@ -4,7 +4,7 @@ import {HttpStatusCode} from '../Constants';
 import { container } from '../Configs';
 import statusMess from '../Constants/statusMess';
 import { IVoucherRepository } from '../Repositories/IVoucherRepository';
-import { TYPES } from "../Types/type";
+import { QueryOptions, TYPES } from "../Types/type";
 import { validationResult } from "express-validator";
 /// <reference path="./types/globle.d.ts" />
 import {
@@ -12,6 +12,7 @@ import {
     RecordNotFoundError
 } from "../Errors";
 import { IClientRepository } from '../Repositories';
+import { parseRequesQueries } from '../Helper/helper';
 
 export class VoucherService {
     constructor(
@@ -21,7 +22,6 @@ export class VoucherService {
 
     public async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log(req.action)
             const errors = validationResult(req);
             let data:any;
 			if (!errors.isEmpty()) {
@@ -32,7 +32,9 @@ export class VoucherService {
                 const client = await this.clientRepository.findById(req.userId);
                 data = await client.getVouchers();
             } else {
-                data = await this.voucherRepository.all();
+                const queries = { ...req.body, ...req.query };
+                const options: QueryOptions = parseRequesQueries(queries);
+                data = await this.voucherRepository.all(options);
             }
             Message.logMessage(req, status);
             return res.status(status).send(data);

@@ -38,12 +38,6 @@ module.exports = {
       end_date: {
         type: Sequelize.DATE
       },
-      created_at: {
-        type: Sequelize.DATE
-      },
-      updated_at: {
-        type: Sequelize.DATE
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
