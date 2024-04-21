@@ -8,7 +8,6 @@ import { Product, Client } from '../Models';
 import { CustomError, RecordNotFoundError } from '../Errors';
 import { Op, where } from 'sequelize';
 
-
 // export interface IClientService {
 //     getAll: (options?: QueryOptions) => Promise<Array<any>[]> ;
 //     getById: (id: number) => Promise<Client> ; 
@@ -43,13 +42,18 @@ export class ClientService {
         return {...customerInfo["dataValues"], orderInfo}
     } 
     public async create(data: any)  {
-        const {phone, email} = data;
+        const {phone, email, type} = data;
         const user = await this.clientRepository.findByEmail(email)
 
         if (user) {
             throw new CustomError(HttpStatusCode.Conflict, ErrorName.CONFLICT, "User exists")
         }
 
+        if (!type) {
+            data.type = "Lead"
+        } else if (type === "customer") {
+            data.type = "Customer"
+        }
         return await this.clientRepository.create(data)
     }
     
@@ -61,7 +65,6 @@ export class ClientService {
         return await this.clientRepository.update(id, data); 
     }
     
-
     public async delete(id: number) {
         const user = this.clientRepository.findById(id) ;
         if (!user) {
