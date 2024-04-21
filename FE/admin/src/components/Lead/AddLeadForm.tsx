@@ -29,12 +29,15 @@ export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
     const [form] = Form.useForm();
 
     const onFinish = async (values: any) => {
+        form.validateFields();
         try {
             const response = fetchClient({
                 url: "/customers",
-                body: {data :{ ...values, type: "lead" }},
+                body: { data: { ...values, type: "lead" } },
                 method: "POST",
+                data_return: true,
             });
+            console.log(response);
             message.success("Lead added successfully");
             form.resetFields();
             props.afterSubmit();
@@ -85,12 +88,32 @@ export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
             >
                 <div className='flex space-x-2'>
                     <div className='w-full'>
-                        <Form.Item label='Firstname' name='firstname' required>
+                        <Form.Item
+                            label='Firstname'
+                            name='firstname'
+                            required
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input user firstname!",
+                                },
+                            ]}
+                        >
                             <RMSInput placeholder='Firstname' />
                         </Form.Item>
                     </div>
                     <div className='w-full'>
-                        <Form.Item label='Lastname' name='lastname' required>
+                        <Form.Item
+                            label='Lastname'
+                            name='lastname'
+                            required
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input user lastname!",
+                                },
+                            ]}
+                        >
                             <RMSInput placeholder='Lastname' />
                         </Form.Item>
                     </div>
@@ -98,12 +121,42 @@ export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
 
                 <div className='flex space-x-2'>
                     <div className='w-full'>
-                        <Form.Item label='Phone' name='phone' required>
+                        <Form.Item
+                            label='Phone'
+                            name='phone'
+                            required
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input your phone number!",
+                                },
+                                {
+                                    pattern: /^(\+?\d{1,3}[- ]?)?\d{10}$/,
+                                    message:
+                                        "Please enter a valid phone number!",
+                                },
+                            ]}
+                        >
                             <RMSInput placeholder='Phone' />
                         </Form.Item>
                     </div>
                     <div className='w-full'>
-                        <Form.Item label='Email' name='email'>
+                        <Form.Item
+                            label='Email'
+                            name='email'
+                            required
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please input your email!",
+                                },
+                                {
+                                    type: "email",
+                                    message:
+                                        "Please enter a valid email address!",
+                                },
+                            ]}
+                        >
                             <RMSInput placeholder='Email' />
                         </Form.Item>
                     </div>
@@ -116,7 +169,17 @@ export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
                         </Form.Item>
                     </div>
                     <div className='w-full'>
-                        <Form.Item label='Source' name='source'>
+                        <Form.Item
+                            label='Source'
+                            name='source'
+                            required
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please choose a source!",
+                                },
+                            ]}
+                        >
                             <Select>
                                 <Select.Option value='At Restaurant'>
                                     At Restaurant
@@ -137,7 +200,7 @@ export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
                 <Form.Item>
                     <div className='flex justify-end space-x-2'>
                         <Button type='default' htmlType='reset'>
-                            Cancle
+                            Cancel
                         </Button>
                         <Button type='primary' htmlType='submit'>
                             Save
