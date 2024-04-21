@@ -414,20 +414,20 @@ const Voucher: React.FC = () => {
             },
             ...getColumnSearchProps("begin_date"),
         },
-        {
-            title: "Action",
-            key: "action",
-            render: (text, record) => (
-                <span>
-                    {/* <Button onClick={() => handleUpdate(record.id)}>
-                        Update
-                    </Button> */}
-                    {/* <Button onClick={() => handleDelete(record.id)}>
-                        Delete
-                    </Button> */}
-                </span>
-            ),
-        },
+        // {
+        //     title: "Action",
+        //     key: "action",
+        //     render: (text, record) => (
+        //         <span>
+        //             {/* <Button onClick={() => handleUpdate(record.id)}>
+        //                 Update
+        //             </Button> */}
+        //             {/* <Button onClick={() => handleDelete(record.id)}>
+        //                 Delete
+        //             </Button> */}
+        //         </span>
+        //     ),
+        // },
     ];
 
     const handleTableChange: TableProps["onChange"] = (
