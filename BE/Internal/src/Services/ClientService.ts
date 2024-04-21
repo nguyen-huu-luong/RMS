@@ -4,6 +4,7 @@ import { QueryOptions, TYPES } from '../Types/type';
 import { IClientRepository } from '../Repositories/IClientRepository';
 import { IOrderRepository } from "../Repositories/IOrderRepository";
 import { ICartRepository, IProductRepository } from '../Repositories';
+import { IGroupRepository } from '../Repositories';
 import { Product, Client } from '../Models';
 import { CustomError, RecordNotFoundError } from '../Errors';
 import { Op, where } from 'sequelize';
@@ -28,7 +29,8 @@ export class ClientService {
             TYPES.IOrderRepository
         ),
         private cartRepository = container.get<ICartRepository>(TYPES.ICartRepository),
-        private productRepository = container.get<IProductRepository>(TYPES.IProductRepository)
+        private productRepository = container.get<IProductRepository>(TYPES.IProductRepository),
+        private groupRepository = container.get<IGroupRepository>(TYPES.IGroupRepository),
 
     ) { }
 
@@ -40,9 +42,14 @@ export class ClientService {
     }
 
     public async getById(id: number) {
-        let customerInfo = await this.clientRepository.findById(id);
+        let customerInfo: any = await this.clientRepository.findById(id);
+       let group = await this.groupRepository.findByCond({
+        where: {
+            id: customerInfo.groupId
+        }
+       })
         let orderInfo = await await this.orderRepository.viewOrders(id);
-        return { ...customerInfo["dataValues"], orderInfo }
+        return { ...customerInfo["dataValues"], orderInfo, group: group }
     }
     public async create(data: any) {
         const { phone, email } = data;

@@ -13,4 +13,8 @@ export class GroupRepository
 		super(Group);
 	}
 
+	public async findByCond(cond: any) {
+		let group = await this._model.findAll(cond)
+		return group
+	}
 }
