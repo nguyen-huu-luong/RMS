@@ -7,5 +7,7 @@ export interface IClientRepository extends IBaseRepository<Client> {
     findByProfit(profit : number) : Promise<Client[] | null> ;
     removeToken(token: string, user: Client): Promise<Client> ;
     checkExist(phone: string, email:string): Promise<any> ;
+    findByCond(cond: any): Promise<any> ;
+    updateBaseCond(value: any, cond: any): Promise<any> ;
 }
 

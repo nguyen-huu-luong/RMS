@@ -40,7 +40,6 @@ const useStyle = createStyles(({ token }) => ({
     "my-modal-footer": {},
     "my-modal-content": {},
 }));
-const { confirm } = Modal;
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
     GetProp<TableProps, "pagination">,
@@ -76,6 +75,7 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const Order: React.FC = () => {
+    const [checker, setChecker] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInput = useRef<InputRef>(null);
@@ -175,7 +175,7 @@ const Order: React.FC = () => {
                 pagination: {
                     ...tableParams.pagination,
                     pageSize: results.pageSize,
-                    current: results.page,
+                    current: parseInt(results.page, 10),
                     total: results.totalCount,
                 },
             });
@@ -202,7 +202,7 @@ const Order: React.FC = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [JSON.stringify(tableParams)]);
 
     const showModal = async (id: any) => {
         const res = await fetchClient({
@@ -501,8 +501,7 @@ const Order: React.FC = () => {
                                             },
                                         },
                                         okText: "Reject",
-                                        onOk: () =>
-                                            handleRejectOrder(record),
+                                        onOk: () => handleRejectOrder(record),
                                         footer: (_, { OkBtn, CancelBtn }) => (
                                             <>
                                                 <CancelBtn />
@@ -583,8 +582,10 @@ const Order: React.FC = () => {
         sorter,
         extra
     ) => {
+        console.log(pagination, filters, sorter, extra);
         if (Array.isArray(sorter)) {
             const firstSorter = sorter[0];
+            console.log("Sorter is array");
             setTableParams((prev) => ({
                 ...prev,
                 pagination,
@@ -594,8 +595,9 @@ const Order: React.FC = () => {
                     order: firstSorter?.order || prev.sorter?.order,
                 },
             }));
-            fetchData()
         } else {
+            console.log("Sorter is not an array");
+
             setTableParams((prev) => ({
                 pagination,
                 filters,
@@ -604,15 +606,18 @@ const Order: React.FC = () => {
                     order: sorter?.order || prev.sorter?.order,
                 },
             }));
-            fetchData()
         }
+
+        setChecker((prevState) => !prevState);
     };
 
     const handleSortFieldChange = (key: string) => {
+        console.log(key, tableParams);
         setTableParams((prev) => ({
             ...prev,
             sorter: { ...prev.sorter, field: key },
         }));
+        setChecker((prevState) => !prevState);
         console.log(tableParams);
     };
 
@@ -624,11 +629,33 @@ const Order: React.FC = () => {
                 order: prev.sorter?.order === "ascend" ? "descend" : "ascend",
             },
         }));
+        setChecker((prevState) => !prevState);
     };
 
-    const handleClearFilter = () => {};
+    const handleClearFilter = () => {
+        setTableParams((prev: any) => ({
+            ...prev,
+            filters: {},
+        }));
+    };
 
-    const handleClearAll = () => {};
+    const handleClearAll = () => {
+        setTableParams((prev: any) => ({
+            ...prev,
+            pagination: {
+                current: 1,
+                pageSize: 10,
+                total: 0,
+            },
+            filters: {},
+            sorter: {
+                field: "id",
+                order: "ascend",
+            },
+        }));
+        setSearchText('');
+        setSearchedColumn('');
+    };
 
     const handleCloseError = () => {
         console.log(error);
@@ -648,7 +675,11 @@ const Order: React.FC = () => {
         });
         if (socket) {
             socket.emit("staff:order:prepare", order.id);
-            socket.emit("staff:notifications:prepare", order.clientId, order.id);
+            socket.emit(
+                "staff:notifications:prepare",
+                order.clientId,
+                order.id
+            );
         }
         fetchData();
     };
@@ -665,7 +696,11 @@ const Order: React.FC = () => {
             body: { status: false, orderStatus: `${order.id}-2` },
         });
         if (socket) {
-            socket.emit("staff:notifications:deliver", order.clientId, order.id);
+            socket.emit(
+                "staff:notifications:deliver",
+                order.clientId,
+                order.id
+            );
         }
         fetchData();
     };
@@ -729,23 +764,25 @@ const Order: React.FC = () => {
                         />
                     )}
                     <div className='border bg-white shadow p-3 w-full'>
-                        <div
-                            style={{ marginBottom: 16 }}
-                            className='flex items-center gap-2'
-                        >
+                        <div className='flex items-center gap-2'>
                             <p>Sort by: </p>
                             <Select
-                                // style={{ width: '20%' }}
                                 placeholder='Columns'
                                 value={
                                     tableParams.sorter?.field?.toString() ||
                                     "id"
                                 }
                                 onChange={handleSortFieldChange}
-                                options={columns.map((item) => ({
-                                    value: item.key,
-                                    label: item.title,
-                                }))}
+                                options={columns
+                                    .filter(
+                                        (item) =>
+                                            item.key !== "fullname" &&
+                                            item.key !== "action"
+                                    )
+                                    .map((item) => ({
+                                        value: item.key,
+                                        label: item.title,
+                                    }))}
                             />
 
                             <p>Order: </p>
