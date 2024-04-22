@@ -10,8 +10,7 @@ import { Op } from "sequelize";
 @injectable()
 export class ClientRepository
 	extends BaseRepository<Client>
-	implements IClientRepository
-{
+	implements IClientRepository {
 	constructor() {
 		super(Client, ["id", "firstname", "lastname", "phone", "email", "gender","type", "birthday", "source", "score", "createdAt", "updatedAt"]);
 	}
@@ -34,5 +33,13 @@ export class ClientRepository
 				email: email
 			}
 		})
+	}
+
+	public async findByCond(cond: any) {
+		return await this._model.findAll(cond)
+	}
+
+	public async updateBaseCond(value: any, cond:any){
+		return await this._model.update(value, cond)
 	}
 }

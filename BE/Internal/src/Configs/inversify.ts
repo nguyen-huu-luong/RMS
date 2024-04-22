@@ -23,9 +23,10 @@ import {
 	CartItemRepository,
 	INotificationRepository,
 	NotificationRepository,
-	ClientHistoryRepository
-,
-	Pos_notificationRepository
+	ClientHistoryRepository,
+	Pos_notificationRepository,
+	GroupRepository,
+	IGroupRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -107,6 +108,7 @@ class InversifyContainer {
 		this.container.bind<IClientHistoryRepository>(TYPES.IClientHistoryRepository).to(ClientHistoryRepository)
 		this.container.bind<ISubscriberRepository>(TYPES.ISubscriberRepository).to(SubscriberRepository)
 		this.container.bind<IPos_notificationRepository>(TYPES.IPos_notificationRepository).to(Pos_notificationRepository)
+		this.container.bind<IGroupRepository>(TYPES.IGroupRepository).to(GroupRepository)
 
 	}
 }
