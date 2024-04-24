@@ -1,9 +1,10 @@
 import fetchClient from "@/lib/fetch-client";
 import { jwt } from "@/lib/jwt";
 import axios, { Axios, AxiosError } from "axios";
-import type { AuthOptions, Awaitable, User } from "next-auth";
+import { getServerSession, type AuthOptions, type Awaitable, type User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getSession } from "next-auth/react";
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -24,7 +25,7 @@ export const authOptions: AuthOptions = {
                         },
                     });
 
-                    console.log(response.data)
+                    // console.log(response.data)
 
                     const data: { accessToken: string; user: User } = response.data;
 
@@ -56,7 +57,7 @@ export const authOptions: AuthOptions = {
             session.user.username = token.username || "";
             session.user.role = token.role || ""; 
 
-            console.log(session)
+            // console.log(session)
             return session;
         },
         async jwt({ token, user, trigger, session }) {
@@ -83,6 +84,16 @@ export const authOptions: AuthOptions = {
             return token;
 
         },
+        async redirect({baseUrl, url}) {
+            const token = await getServerSession();
+            console.log("redicredcfdsf f", baseUrl, url)
+            console.log((token?.user))
+            if (!(token?.user.role === "chef")) {
+                return baseUrl
+            } 
+            return "/chef"
+
+        }
        
     },
     pages: {

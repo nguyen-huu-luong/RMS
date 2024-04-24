@@ -35,7 +35,7 @@ export class Server {
 
     public initial() {
         this.app.use(express.json());
-		this.app.use(express.urlencoded({ extended: true }));
+		    this.app.use(express.urlencoded({ extended: true }));
         this.app.use(
             cors({
                 origin: "*",

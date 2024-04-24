@@ -1,4 +1,6 @@
+import fetchClient from "@/lib/fetch-client"
 import { ArrowRightOutlined, CalendarOutlined } from "@ant-design/icons"
+import { useEffect, useState } from "react"
 
 
 type CampaignStatisticData = {
@@ -9,10 +11,28 @@ type CampaignStatisticData = {
     totalOrder: number,
     revenue: number
 }
-interface ICampaignHistoryAndStatistic {
-    statisticInfo:  CampaignStatisticData 
+interface ICampaignHistoryAndStatisticProps {
+    statisticInfo:  CampaignStatisticData,
+    campaignId: number | string
 }
-export const CampaignHistoryAndStatistic: React.FC<ICampaignHistoryAndStatistic> = ({statisticInfo}) => {
+export const CampaignHistoryAndStatistic: React.FC<ICampaignHistoryAndStatisticProps> = ({campaignId, statisticInfo}) => {
+    const [statisticData, setStatictisData] = useState<any>()
+
+    const fetchData = async () => {
+        const result = await fetchClient({
+            url: `/campaigns/${campaignId}/statistic`,
+            data_return: true
+        })
+
+        setStatictisData(result)
+    }
+
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+    if (!statisticData) return ""
+    
     return (<div>
         <div className="bg-white pl-3 py-2">
             <p style={{ color: "#666666" }}>Created at</p>
@@ -32,7 +52,7 @@ export const CampaignHistoryAndStatistic: React.FC<ICampaignHistoryAndStatistic>
                     </div>
                     <div>
                         <p>Clicked</p>
-                        <p style={{ color: "#8DF185" }}>{statisticInfo.clicked}</p>
+                        <p style={{ color: "#8DF185" }}>{statisticData && statisticData.numClicks}</p>
                     </div>
 
                     <div>

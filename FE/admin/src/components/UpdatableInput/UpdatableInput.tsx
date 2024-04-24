@@ -21,8 +21,9 @@ interface IUpdatableInput {
 export const UpdatableInput: React.FC<IUpdatableInput> = (props) => {
     const [isEditItem, setIsEditItem] = useState(false)
 
-    const handleClickEditButton = () => {
-
+    const handleUpdate = () => {
+        props.onUpdate(props.name)
+        setIsEditItem(false)
     }
 
     const label = (<div className="flex justify-between w-full my-label" style={{ width: "100%" }}>
@@ -30,7 +31,7 @@ export const UpdatableInput: React.FC<IUpdatableInput> = (props) => {
         <div className="my-label-button">
             {!props.editmode && (
                 isEditItem ? <Space>
-                    <Button onClick={() => props.onUpdate(props.name)}>Update</Button>
+                    <Button onClick={handleUpdate}>Update</Button>
                     <Button onClick={() => setIsEditItem(false)}>Cancel</Button>
                 </Space> : <EditOutlined onClick={() => setIsEditItem(true)} className="editicon" />
             )}

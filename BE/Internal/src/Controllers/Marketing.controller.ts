@@ -128,7 +128,7 @@ class MarketingController {
 		} 
 
 		for (let email of receivers) {
-			console.log(email);
+			// console.log(email);
 			const result = await this.emailService.sendEmail({
 				from: sender,
 				to: email,
