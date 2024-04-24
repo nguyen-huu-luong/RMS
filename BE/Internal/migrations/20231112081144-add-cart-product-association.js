@@ -34,6 +34,12 @@ module.exports = {
                 allowNull: false,
                 defaultValue: 0
             },
+			status: {
+                type: Sequelize.STRING,
+                allowNull: false,
+                defaultValue: "Preparing",
+				primaryKey: true,
+            },
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,

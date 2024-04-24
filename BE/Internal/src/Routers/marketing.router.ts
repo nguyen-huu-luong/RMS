@@ -10,11 +10,18 @@ class MarketingRouter {
     } 
     
     public initialize(router: Router) {
-        const marketingRouter  = Router()
+        const marketingRouter = Router()
         marketingRouter.get("/all",this.marketingController.getAllTemplate.bind(this.marketingController));
-        marketingRouter.post("",this.marketingController.createMessageTempate.bind(this.marketingController));
+        marketingRouter.get("/:id",this.marketingController.getTemplateInfo.bind(this.marketingController));
+        marketingRouter.put("/:id",this.marketingController.updateMessageTemplate.bind(this.marketingController));
+        marketingRouter.post("/",this.marketingController.createMessageTempate.bind(this.marketingController));
+        marketingRouter.delete("/:id",this.marketingController.deleteEmailTemplate.bind(this.marketingController));
+        
+        
+        router.use("/message-templates", AuthMiddleware.initialize, Authorization.initialize, marketingRouter)
+        router.post("/send-email", AuthMiddleware.initialize, Authorization.initialize, this.marketingController.sendEmail.bind(this.marketingController))
+        
 
-        router.use("/message-templates", AuthMiddleware.initialize, Authorization.initialize, marketingRouter);
     }
 }
 

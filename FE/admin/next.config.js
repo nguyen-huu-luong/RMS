@@ -12,6 +12,9 @@ const nextConfig = {
       env: {
         BASE_URL:"http://localhost:3003/api"
     },
+    images: {
+      domains: ["res.cloudinary.com"],
+    },
 }
 
 const withNextIntl = require("next-intl/plugin")(

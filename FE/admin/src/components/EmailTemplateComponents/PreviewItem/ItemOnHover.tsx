@@ -3,6 +3,7 @@ import { CSSProperties } from "styled-components";
 import { BsTrash } from "react-icons/bs";
 import { Button } from "antd";
 import { variables } from "@/app";
+import { getTagName } from "@/lib/utils/get-mjml-tagname";
 
 interface IHoverInfo {
     section: any;
@@ -25,27 +26,7 @@ const defaultStyle: CSSProperties = {
     fontFamily: "Open Sans, sans-serif"
 };
 
-const getTagName = (tagName: string) => {
-    switch (tagName) {
-        case "mj-button":
-            return "Button";
 
-        case "mj-text":
-            return "Text";
-
-        case "mj-section":
-            return "Section";
-
-        case "mj-column":
-            return "Column";
-
-        case "mj-hero":
-            return "Hero";
-
-        default:
-            break;
-    }
-};
 
 const ItemOnHover = ({ section, path }: IHoverInfo) => {
     const { popTagElement, activeNode } = useEmailDataStore();

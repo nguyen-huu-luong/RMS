@@ -13,6 +13,8 @@ import { useSession } from "next-auth/react";
 import { addToCart } from "@/app/api/product/cart";
 import { useRouter } from "next-intl/client";
 import { useLocale, useTranslations } from "next-intl";
+import { useEffect } from "react";
+import fetchClient from "@/lib/fetch-client";
 
 const FoodDetail = ({
     food,
@@ -51,6 +53,7 @@ const FoodDetail = ({
     const decrease = () => {
         if (count > 1) setCount(count - 1);
     };
+
     return (
         <>
             <div
@@ -64,10 +67,11 @@ const FoodDetail = ({
                         <CloseCircleFilled style={{ fontSize: "1.4rem" }} />
                     </button>
                     <Image
-                        src={'/'}
+                        src={food.thumbnails}
                         alt={food.name}
                         width={300}
                         height={300}
+                        className="aspect-square"
                         unoptimized
                     />
                 </div>

@@ -7,7 +7,7 @@
         "discount": "Get MORE discount on every weekend.",
         "menu": "Menu Category",
         "all": "View all",
-        "trend": "Trending Orders",
+        "trend": "Recommendation",
         "Food_des": "Descriptions",
         "Price": "Price",
         "Add": "ADD TO CART",
@@ -19,6 +19,8 @@
         "News": "News",
         "Deals": "Deals",
         "About": "About us",
+        "Chat": "Chat",
+
         "Search-placeholder": "Search",
         "Profile": "Profile",
         "LogOut": "Log Out",

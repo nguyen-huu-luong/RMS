@@ -8,7 +8,6 @@ import { ReactNode } from "react";
 import { NextIntlClientProvider, useLocale, useMessages } from "next-intl";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { DynamicBreadcrumb } from "@/components";
 import { variables } from "@/app";
 import Provider from "@/components/SessionProvider/SessionProvider";
 
@@ -47,7 +46,7 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
                 <NextIntlClientProvider locale={locale} messages={messages}>
                     <Provider>
                         <div
-                            className='flex relative justify-center h-screen'
+                            className='flex relative justify-center min-h-screen'
                             style={{
                                 backgroundColor: Colors.defaultBackgroundColor,
                             }}

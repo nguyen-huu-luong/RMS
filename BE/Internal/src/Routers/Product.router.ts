@@ -16,6 +16,19 @@ class ProductRouter {
             .get((req: Request, res: Response, next: NextFunction) =>
                 this.productController.getAll(req, res, next)
             );
+
+        router
+            .route("/products/allFullInformation")
+            .get((req: Request, res: Response, next: NextFunction) =>
+                this.productController.getAllFullInformation(req, res, next)
+            );
+        
+        router
+            .route("/products/recomendation")
+            .get(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
+            this.productController.getRecommendItem(req, res, next)
+            );
+            
         router
             .route("/products/:id")
             .get((req: Request, res: Response, next: NextFunction) =>

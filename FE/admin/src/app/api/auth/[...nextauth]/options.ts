@@ -1,73 +1,126 @@
+import fetchClient from "@/lib/fetch-client";
+import { jwt } from "@/lib/jwt";
 import axios, { Axios, AxiosError } from "axios";
-import type { AuthOptions, Awaitable, User } from "next-auth";
+import { getServerSession, type AuthOptions, type Awaitable, type User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getSession } from "next-auth/react";
 
 export const authOptions: AuthOptions = {
     providers: [
-        // GoogleProvider({
-        //   clientId: process.env.GOOGLE_CLIENT_ID as string,
-        //   clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
-        // }),
         CredentialsProvider({
             name: "Credentials",
             credentials: {
                 username: { label: "Username", type: "text" },
                 password: { label: "Password", type: "password" },
             },
-            async authorize(credentials, req) {
+            async authorize(credentials) {
                 try {
-                    const response = await axios({
-                        url: "http://localhost:3003/api/users/admin/signin",
+                    const response = await fetchClient({
+                        url: `/users/admin/signin`,
                         method: "POST",
-                        data: {
+                        body: {
                             username: credentials?.username,
                             password: credentials?.password,
                         },
                     });
 
-                    const { accessToken: accessToken, user } = response.data;
-                    if (user) {
-                        return {
-                            ...user,
-                            accessToken,
-                        } as unknown as Awaitable<User>;
+                    // console.log(response.data)
+
+                    const data: { accessToken: string; user: User } = response.data;
+
+                    if (!data.accessToken || !data.user) {
+                        throw response;
                     }
+
+                    return {
+                        ...data.user,
+                        accessToken: data.accessToken,
+                    };
                 } catch (error: any) {
-                    console.log(error.response);
-                    throw new Error(
-                        JSON.stringify(error?.response?.data || error)
-                    );
+                    console.log("Something wrong!", error)
+                    if (error instanceof Response) {
+                        return null;
+                    }
+                    throw new Error(JSON.stringify(error?.response?.data || error));
                 }
-                return null;
             },
         }),
     ],
     session: { strategy: "jwt" },
     callbacks: {
         async session({ session, token }) {
-            const sanitizedToken = Object.keys(token).reduce((p, c) => {
-                // strip unnecessary properties
-                if (c !== "iat" && c !== "exp" && c !== "jti") {
-                    return { ...p, [c]: token[c] };
-                } else {
-                    return p;
-                }
-            }, {});
+            if (token.error) {
+                throw new Error("Refresh token has expired");
+            }
+            session.accessToken = token.accessToken;
+            session.user.username = token.username || "";
+            session.user.role = token.role || ""; 
 
-            return { ...session, user: sanitizedToken };
+            // console.log(session)
+            return session;
         },
-        async jwt({ token, user }) {
-            if (typeof user !== "undefined") {
-                // user has just signed in so the user object is populated
-                return user as unknown as JWT;
+        async jwt({ token, user, trigger, session }) {
+            if (trigger === "update") {
+                return { ...token, ...session };
             }
 
+            if (user) {
+                return { ...token, ...user };
+            }
+        
+            const { exp: accessTokenExpires } = jwt.decode(token.accessToken);
+    
+            if (!accessTokenExpires) {
+                return token;
+            }
+    
+            const currentUnixTimestamp = Math.floor(Date.now() / 1000);
+    
+            if (currentUnixTimestamp > accessTokenExpires) {
+                return await refreshAccessToken(token);
+            }
+        
             return token;
+
         },
+        async redirect({baseUrl, url}) {
+            const token = await getServerSession();
+            console.log("redicredcfdsf f", baseUrl, url)
+            console.log((token?.user))
+            if (!(token?.user.role === "chef")) {
+                return baseUrl
+            } 
+            return "/chef"
+
+        }
+       
     },
     pages: {
         signIn: "/signin",
     },
     secret: process.env.NEXTAUTH_SECRET,
 };
+
+async function refreshAccessToken(token: JWT) {
+    try {
+        const response = await axios({
+            url: `${process.env.NEXT_BACKEND_API_URL}/user/refresh`,
+            method: "POST",
+        });
+
+        const refreshedAccessToken: { accessToken: string } = response.data;
+        const { exp } = jwt.decode(refreshedAccessToken.accessToken);
+
+        return {
+            ...token,
+            accessToken: refreshedAccessToken.accessToken,
+            exp,
+        };
+    } catch (error) {
+        return {
+            ...token,
+            error: "RefreshAccessTokenError",
+        };
+    }
+}

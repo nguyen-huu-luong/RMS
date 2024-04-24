@@ -4,6 +4,7 @@
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
 		await queryInterface.addColumn("EmailCampaigns", "campaignId", {
+			primaryKey: true,
 			type: Sequelize.INTEGER,
 			references: {
 				model: "Campaigns",

@@ -10,6 +10,7 @@ module.exports = {
         model: 'Clients',
         key: 'id',
       },
+      allowNull: true,
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     });

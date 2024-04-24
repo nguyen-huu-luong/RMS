@@ -1,10 +1,30 @@
-import { QueryOptions, FilterCondition } from "../Types/type";
+import { Request } from "express";
+import { ForbiddenError, ValidationError } from "../Errors";
+import { QueryOptions } from "../Types/type";
+import { validationResult } from "express-validator";
+import { Op } from "sequelize";
+
+/*
+return object like:
+ueryOptions: QueryOptions = {
+        filter: {
+            key: string,
+            key: {
+                <cond>: value
+            }
+        },
+        sort: { by: "", order: "asc" },
+        paginate: { page: 1, pageSize: 10 },
+    };
+
+*/
 
 function parseRequesQueries(query: any): QueryOptions {
     const queryOptions: QueryOptions = {
         filter: {},
         sort: { by: "", order: "asc" },
-        paginate: { page: 1, pageSize: 10 } // Giá trị mặc định, thay đổi nếu cần
+        paginate: { page: 1, pageSize: 10 },
+        // type: "",
     };
 
     const { page, pageSize, sort, order, ...filterOptions } = query;
@@ -17,73 +37,86 @@ function parseRequesQueries(query: any): QueryOptions {
         queryOptions.paginate = { page, pageSize };
     }
 
-    console.log(filterOptions)
+    // if (type) {
+    //     queryOptions.type = type;
+    // }
+
+    console.log(filterOptions);
     for (const key in filterOptions) {
-        if (filterOptions[key] && typeof filterOptions[key] === "string") {
-            // Kiểm tra xem key có chứa điều kiện lọc không (ví dụ: price_gt, price_lt, ...)
-            const filterConditions = key.split("_");
-            if (filterConditions.length === 2 && ["gt", "lt", "gte", "lte"].includes(filterConditions[1])) {
-                const fieldName = filterConditions[0];
-                const conditionValue = filterOptions[key]
-
-                // Thêm điều kiện lọc vào queryOptions.filter
-                if (!queryOptions.filter[fieldName]) {
-                    queryOptions.filter[fieldName] = [];
-                }
-                const condition: FilterCondition = { value: conditionValue, op: filterConditions[1] };
-                const currentFilterValue = queryOptions.filter[fieldName];
-
-                if (Array.isArray(currentFilterValue)) {
-                    currentFilterValue.push(condition);
-                    queryOptions.filter[fieldName] = currentFilterValue;
+        console.log(key);
+        if (filterOptions[key]) {
+            if (typeof key === "string") {
+                const filterConditions = key.split("_");
+                const allowConds = [
+                    "gt",
+                    "lt",
+                    "gte",
+                    "lte",
+                    "neq",
+                    "like",
+                    "notLike",
+                    "startsWith",
+                    "endsWith",
+                    "contains",
+                    "in",
+                ];
+                // filterConditions format: [<field name>, <query cond>]
+                if (filterConditions.length === 2 ) {
+                    console.log(filterConditions,filterOptions[key])
+                    // Xử lý khi có thêm điều kiện query (format <field>_<query cond>= <value>)
+                    if (allowConds.includes(filterConditions[1])) { 
+                        if (!queryOptions.filter[filterConditions[0]]) {
+                            queryOptions.filter[filterConditions[0]] = {}
+                        }
+                        if (filterConditions[1] === "in") {
+                            queryOptions.filter[filterConditions[0]][filterConditions[1]] = filterOptions[key].split(";")
+                        } else {
+                            queryOptions.filter[filterConditions[0]][filterConditions[1]] = filterOptions[key]
+                        }
+                    }
                 } else {
-                    // Nếu giá trị không phải là mảng, bạn có thể tạo một mảng mới chứa giá trị hiện tại và condition
-                    queryOptions.filter[fieldName] = [condition];
+                    // Xử lý khi không có thêm điều kiện (tương ứng với filter <key>=<value>)
+                    queryOptions.filter[key] = filterOptions[key];
                 }
 
             } else {
-                // Đối với các cặp key-value thông thường, thêm chúng vào filter trực tiếp
-                queryOptions.filter[key] = filterOptions[key];
-            }
+              queryOptions.filter = {...queryOptions.filter, ...filterOptions.filter}   
+            }   
         }
     }
 
-    console.log(queryOptions);
+    console.log("Parse quẻy", queryOptions);
 
     return queryOptions;
 }
 
-/* 
-Input: query: {
-    price_gt: value,
-    price_lt: value,
-    price_lte: value,
-    price_gte: value,
+export function ensurePermissionIsValid(
+    inputAction: string,
+    expectedAction: string | string[]
+) {
+    const compare = (a: string, b: string) => a === b;
+    if (typeof expectedAction === "string") {
+        if (compare(inputAction, expectedAction)) {
+            return true;
+        }
+    } else {
+        for (let action of expectedAction) {
+            if (!compare(inputAction, action)) {
+                break;
+            }
+        }
 
-    key: value,
-    key: value,
-    key: value,
-    key: value,
+        return true;
+    }
+
+    throw new ForbiddenError();
 }
 
-Output: Option: {
-    filter: {
-        price: 10000,
-        price: {
-            value: 1000,
-            op: lt 
-        }
-    },
-    sort: {
-        by: "",
-        order: asc 
-    },
-    paginate: {
-        limit: number,
-        page: number
+export function ensureDataIsValidated(req: Request) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        throw new ValidationError(errors.array()[0].msg);
     }
 }
 
-*/
-
-export {parseRequesQueries}
+export { parseRequesQueries };

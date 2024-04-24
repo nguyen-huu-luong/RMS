@@ -17,7 +17,6 @@ const bgClasses: string[] = colors.map((color) => `bg-${color}-500`);
 function Column({
     name,
     items,
-    token,
     refetch,
     orders,
     doneItems,
@@ -27,7 +26,6 @@ function Column({
 }: {
     name: string;
     items: any;
-    token: any;
     refetch: any;
     orders: any;
     doneItems: any;
@@ -46,12 +44,11 @@ function Column({
             <div className='flex flex-col justify-start gap-2 p-7 pt-3 bg-white rounded-xl w-full overflow-y-auto h-full'>
                 {items.map((item: any) => (
                     <Item
-                        key={item.id + " " + item.OrderItem.orderId}
+                        key={item.id + " " + (item.OrderItem ? item.OrderItem.orderId : item.CartItem.cartId)}
                         item={item}
                         color={
-                            bgClasses[item.OrderItem.orderId % bgClasses.length]
+                            bgClasses[(item.OrderItem ? item.OrderItem.orderId : item.CartItem.cartId) % bgClasses.length]
                         }
-                        token={token}
                         refetch={refetch}
                         orders={orders}
                         doneItems={doneItems}

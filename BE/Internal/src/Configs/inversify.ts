@@ -18,7 +18,15 @@ import {
 	IFloorRepository,
 	ITableRepository,
 	ITableReservationRepository,
-	IReservationRepository
+	IReservationRepository,
+	ICartItemRepository,
+	CartItemRepository,
+	INotificationRepository,
+	NotificationRepository,
+	ClientHistoryRepository,
+	Pos_notificationRepository,
+	GroupRepository,
+	IGroupRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -27,11 +35,28 @@ import { ProductRepository } from "../Repositories";
 import { CartRepository } from "../Repositories";
 import { ICategoryRepository } from "../Repositories/ICategoryRepository";
 import { CategoryRepository } from "../Repositories/implementation/CategoryRepository";
-import { FloorRepository, TableRepository, TableReservationRepository, ReservationRepository } from "../Repositories";
+import { FloorRepository, TableRepository, TableReservationRepository, ReservationRepository, } from "../Repositories";
 // import { IClientService } from "../Services";
 import { TYPES } from "../Types/type";
 import { IChannelRepository } from "../Repositories/IChannelRepository";
 import { IMessageRepository } from "../Repositories/IMessageRepository";
+import { IOpenEventrRepository } from "../Repositories/IOpenEventRepository";
+import { OpenEventRepository } from "../Repositories/implementation/OpenEventRepository";
+import { IClickEventRepository } from "../Repositories/IClickEventRepository";
+import { ClickEventRepository } from "../Repositories/implementation/ClickEventRepository";
+import { ICamPaignRepository } from "../Repositories/ICampaignRepository";
+import { CampaignRepository } from "../Repositories/implementation/CampaignRepository";
+import { ITargetListRepository } from "../Repositories/ITargetListRepository";
+import { TargetListRepository } from "../Repositories/implementation/TargetListRepository";
+import { IClientHistoryRepository } from "../Repositories";
+import { ISubscriberRepository, SubscriberRepository } from "../Repositories";
+import { IOrderItemRepository, OrderItemRepository } from "../Repositories";
+import { IEmailCampaignRepository } from "../Repositories/IEmailCampaignRepository";
+import { EmailCampaignRepository } from "../Repositories/implementation/EmailCampaignRepository";
+import { ITrackUrlRepository } from "../Repositories/IITrackUrlRepository";
+import { TrackUrlRepository } from "../Repositories/implementation/TrackUrlRepository";
+
+import { IPos_notificationRepository } from "../Repositories/IPos_notificationRepository";
 class InversifyContainer {
 	private container;
 	static instance: InversifyContainer ;
@@ -57,6 +82,7 @@ class InversifyContainer {
 		// register repository here
 		this.container.bind<IClientRepository>(TYPES.IClientRepository).to(ClientRepository);
 		this.container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository);
+		this.container.bind<IOrderItemRepository>(TYPES.IOrderItemRepository).to(OrderItemRepository);
 		this.container.bind<IEmployeeRepository>(TYPES.IEmployeeRepository).to(EmployeeRepository);
 		this.container.bind<IPermissionRepository>(TYPES.IPermissionRepository).to(PermissionRepository);
 		this.container.bind<IProductRepository>(TYPES.IProductRepository).to(ProductRepository);
@@ -74,7 +100,21 @@ class InversifyContainer {
 		// this.container.bind<IClientController>(TYPES.IClientController).to(ClientController)
 		this.container.bind<IChannelRepository>(TYPES.IChannelRepository).to(ChannelRepository);
 		this.container.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepository);
+		this.container.bind<ICartItemRepository>(TYPES.ICartItemRepository).to(CartItemRepository);
 
+		this.container.bind<IOpenEventrRepository>(TYPES.IOpenEventRepository).to(OpenEventRepository);
+		this.container.bind<IClickEventRepository>(TYPES.IClickEventRepository).to(ClickEventRepository);
+		this.container.bind<INotificationRepository>(TYPES.INotificationRepository).to(NotificationRepository)
+
+
+		this.container.bind<ICamPaignRepository>(TYPES.ICampaignRepository).to(CampaignRepository);
+		this.container.bind<ITargetListRepository>(TYPES.ITargetListRepository).to(TargetListRepository);
+		this.container.bind<IClientHistoryRepository>(TYPES.IClientHistoryRepository).to(ClientHistoryRepository)
+		this.container.bind<ISubscriberRepository>(TYPES.ISubscriberRepository).to(SubscriberRepository)
+		this.container.bind<IEmailCampaignRepository>(TYPES.IEmailCampaignRepository).to(EmailCampaignRepository)
+		this.container.bind<ITrackUrlRepository>(TYPES.ITrackUrlRepository).to(TrackUrlRepository)
+		this.container.bind<IPos_notificationRepository>(TYPES.IPos_notificationRepository).to(Pos_notificationRepository)
+		this.container.bind<IGroupRepository>(TYPES.IGroupRepository).to(GroupRepository)
 	}
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import OrderForm from "@/components/order/orderForm";
 import SideBar from "@/components/order/sidebar";
@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { useCreateOrder } from "@/app/api/product/order";
 import { useRouter } from "next-intl/client";
 import Loading from "@/components/loading";
+import fetchClient from "@/lib/fetch-client";
 
 export default function Order() {
     const locale = useLocale();
@@ -46,16 +47,17 @@ export default function Order() {
                 discountAmount: amount,
                 voucherId: voucher,
             };
-            const data = await useCreateOrder(
-                session?.user.accessToken,
-                dataBody,
-                formValues.paymentMethod
-            );
-
+            const data = await fetchClient({
+                url: `/orders?method=${formValues.paymentMethod}`,
+                method: "POST",
+                body: dataBody,
+                data_return: true
+            });
             if (payMethod == "CASH") {
                 router.push("/payment?method=CASH");
             } else {
                 localStorage.setItem("orderInfo", "1");
+                console.log(data["payUrl"])
                 router.push(data["payUrl"]);
             }
         } catch (err) {

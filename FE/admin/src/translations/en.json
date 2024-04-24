@@ -19,6 +19,7 @@
 		"sale": "Sale",
 		"order": "Order",
 		"reservation": "Reservation",
+		"opportunity": "Opportunity",
 		"marketing": "Marketing",
 		"campaign": "Campaign",
 		"automated-message": "Automated message",

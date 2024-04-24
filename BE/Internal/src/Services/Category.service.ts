@@ -17,8 +17,25 @@ export class CategoryService {
 
     public async getAll(req: Request, res: Response, next: NextFunction) {
         try {
+
+            let sort_factor: any = req.query.sort_factor
+            let order: any = req.query.order
+
+            if (typeof sort_factor == 'undefined'){
+                sort_factor = 'id'
+            }
+
+            if (typeof order == 'undefined') {
+                order = 'ascend'
+            }
+            order = order === 'ascend' ? 'ASC' : 'DESC'
+
             const status: number = HttpStatusCode.Success;
-            const data = await this.categoryRepository.all();
+            const data = await this.categoryRepository.getByCond({
+                order: [
+                    [sort_factor, order]
+                ],
+            });
             res.status(status).send(data);
             Message.logMessage(req, status);
         }
@@ -73,6 +90,21 @@ export class CategoryService {
 			next(err);
         }
     }
+
+    public async updateCategory(req: Request, res: Response, next: NextFunction) {
+        try{
+            const status: number = HttpStatusCode.Success;
+            console.log(req.params.id)
+            const data = await this.categoryRepository.update(Number(req.params.id), req.body);
+            res.status(status).send(data);
+            Message.logMessage(req, status);
+        }
+        catch (err) {
+            console.log(err)
+			next(err);
+        }
+    }
+
 
     public async getProducts(req: Request, res: Response, next: NextFunction) {
         try {

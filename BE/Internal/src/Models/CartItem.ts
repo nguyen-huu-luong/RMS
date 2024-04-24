@@ -35,6 +35,11 @@ CartItem.init(
 			allowNull: false,
 			defaultValue: 0,
 		},
+		status: {
+			type: DataTypes.STRING,
+			defaultValue: 'Preparing',
+			primaryKey: true,
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,

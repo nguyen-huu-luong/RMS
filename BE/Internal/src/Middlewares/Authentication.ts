@@ -20,9 +20,9 @@ class AuthMiddleware extends BaseMiddleware {
 
 	private static async verifyToken(): Promise<any> {
 		try {
-			console.log({...this.request.header})
+			// console.log({...this.request.header})
 			const authHeader = this.request.header("Authorization") || this.request.header("authorization");;
-			console.log(authHeader)
+			// console.log(authHeader)
 			if (!authHeader?.startsWith("Bearer ")) {
 				throw new UnauthorizedError("You are unauthenticated!");
 			}
@@ -31,17 +31,17 @@ class AuthMiddleware extends BaseMiddleware {
 			this.request.userId = decoded.id;
 			this.request.token = token;
 			this.request.role = decoded.role;
-			console.log(
-				"Authentication successfully! ",
-				"id:",
-				decoded.id,
-				", role:",
-				decoded.role
-			);
+			// console.log(
+			// 	"Authentication successfully! ",
+			// 	"id:",
+			// 	decoded.id,
+			// 	", role:",
+			// 	decoded.role
+			// );
 			this.next();
 		} catch (error: any) {
 			if (error instanceof TokenExpiredError || JsonWebTokenError) {
-				this.next(new UnauthorizedError(error.message, error.stack));
+				this.next(new UnauthorizedError(error.message));
 			}
 			this.next(error);
 		}

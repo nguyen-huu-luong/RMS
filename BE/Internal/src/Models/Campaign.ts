@@ -8,13 +8,34 @@ import {
 	type HasOneGetAssociationMixin,
 	type HasOneSetAssociationMixin,
 	type HasOneCreateAssociationMixin,
+	BelongsToManySetAssociationsMixin,
+	BelongsToManyAddAssociationMixin,
+	BelongsToManyRemoveAssociationMixin,
+	BelongsToManyAddAssociationsMixin,
+	BelongsToManyRemoveAssociationsMixin,
+	HasManyCreateAssociationMixin,
+	HasManyRemoveAssociationMixin,
 } from "sequelize";
 import Loader from "../Loaders";
 import TargetList from "./Targetlist";
 import CampaignTargetList from "./CampaignTargetList";
 import EmailCampaign from "./EmailCampaign";
+import ClickEvent from "./ClickEvent";
+import OpenEvent from "./OpenEvent";
+import TrackUrl from "./TrackUrl";
 
 class Campaign extends Model {
+	declare setTargetLists: BelongsToManySetAssociationsMixin<TargetList, TargetList["id"]>;
+	declare addTargetList: BelongsToManyAddAssociationMixin<TargetList, TargetList["id"]> ;
+	declare addTargetLists: BelongsToManyAddAssociationsMixin<TargetList, TargetList["id"]> ;
+	declare removeTargetList: BelongsToManyRemoveAssociationMixin<TargetList, number> ;
+	declare removeTargetLists: BelongsToManyRemoveAssociationsMixin<TargetList, number> ;
+
+	declare setEmailCampaigns: HasManySetAssociationsMixin<EmailCampaign, EmailCampaign["id"]>;
+
+	declare createTrackUrl: HasManyCreateAssociationMixin<TrackUrl>
+	declare removeTrackUrl: HasManyRemoveAssociationMixin<TrackUrl, TrackUrl["id"]>
+
 	public static associate() {
 		Campaign.belongsToMany(TargetList, {
 			through: CampaignTargetList,
@@ -28,6 +49,27 @@ class Campaign extends Model {
                 allowNull: false
 			},
 		});
+
+		Campaign.hasMany(ClickEvent, {
+			foreignKey: {
+				name: "campaignId",
+                allowNull: false
+			},
+		});
+
+		Campaign.hasMany(OpenEvent, {
+			foreignKey: {
+				name: "campaignId",
+                allowNull: false
+			},
+		});
+
+		Campaign.hasMany(TrackUrl, {
+			foreignKey: {
+				name: "campaignId",
+			},
+			onDelete: "SET NULL"
+		})
 	}
 }
 

@@ -20,18 +20,25 @@ import Notification from "./notification/notification";
 const NavBar = () => {
     const locale = useLocale();
     const { data: session, status } = useSession();
-    const router = useRouter();
     const [click, setClick] = useState(false);
     const [search, setSearch] = useState(true);
 
     const t = useTranslations("NavBar");
-    const MENU_LISTS = [
-        { name: "Home", href: `` },
-        { name: "Menu", href: `menu` },
-        { name: "News", href: `news` },
-        { name: "About", href: `about` },
-    ];
-
+    const MENU_LISTS =
+        status === "authenticated"
+            ? [
+                  { name: "Home", href: `` },
+                  { name: "Menu", href: `menu` },
+                  { name: "News", href: `news` },
+                  { name: "About", href: `about` },
+              ]
+            : [
+                  { name: "Home", href: `` },
+                  { name: "Menu", href: `menu` },
+                  { name: "News", href: `news` },
+                  { name: "About", href: `about` },
+                  { name: "Chat", href: `chat` },
+              ];
     const items: MenuProps["items"] =
         status == "authenticated"
             ? [

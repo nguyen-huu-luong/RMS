@@ -18,11 +18,15 @@ class ClientRouter {
     public initialize(router: Router) {
         const clientRouter = Router();
         clientRouter.get("/all",this.clientController.getAllClient.bind(this.clientController));
-        clientRouter.get("/:id", this.clientController.getCustomerInfo.bind(this.clientController));
-        clientRouter.post("", this.clientController.createCustomer.bind(this.clientController));
-        clientRouter.put("/:id", this.clientController.updateCustomer.bind(this.clientController));
+        clientRouter.get("/:id", this.clientController.getClientInfo.bind(this.clientController));
+        clientRouter.post("", this.clientController.createClient.bind(this.clientController));
+        clientRouter.put("/:id", this.clientController.updateClient.bind(this.clientController));
         clientRouter.delete("/:id", this.clientController.delete.bind(this.clientController));
-
+        // clientRouter.put("", this.clientController.updateCustomer.bind(this.clientController));
+        // clientRouter.get("", this.clientController.getCustomerInfo.bind(this.clientController));
+        clientRouter.get("/opportunity/all", this.clientController.getOpporturnityCustomer.bind(this.clientController))
+        clientRouter.post("/segment", this.clientController.segmentCustomerAll.bind(this.clientController))
+        clientRouter.post("/segment/:id", this.clientController.segmentCustomer.bind(this.clientController))
         router.use("/customers", AuthMiddleware.initialize, Authorization.initialize, clientRouter);
     }
 }

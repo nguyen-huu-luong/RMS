@@ -1,18 +1,24 @@
 import {
 	Model,
 	DataTypes,
-	type HasManyAddAssociationMixin,
-	type HasManySetAssociationsMixin,
-	type HasManyGetAssociationsMixin,
-	type HasManyRemoveAssociationsMixin,
-	type HasOneGetAssociationMixin,
-	type HasOneSetAssociationMixin,
-	type HasOneCreateAssociationMixin,
+	
+	BelongsToManyAddAssociationMixin,
+	BelongsToManyAddAssociationsMixin,
+	BelongsToManySetAssociationsMixin,
+	BelongsToManyRemoveAssociationMixin,
+	BelongsToManyRemoveAssociationsMixin,
 } from "sequelize";
 import Loader from "../Loaders";
 import Client from "./Client";
-import { CampaignTargetList, Campaign, ClientTargetList } from ".";
+import { CampaignTargetList, Campaign, ClientTargetList, EmailCampaign } from ".";
+import EmailCampaignTargetList from "./EmailCampaignTargetlist";
 class TargetList extends Model {
+	declare setClients: BelongsToManySetAssociationsMixin<Client, Client["id"]>;
+	declare addClient:  BelongsToManyAddAssociationMixin<Client, Client["id"]> ;
+	declare addClients:   BelongsToManyAddAssociationsMixin<Client, Client["id"]> ;
+	declare removeClient: BelongsToManyRemoveAssociationMixin<Client, number> ;
+	declare removeClients: BelongsToManyRemoveAssociationsMixin<Client, number> ;
+	declare id: number
 	public static associate() {
 		TargetList.belongsToMany(Client, {
 			through: ClientTargetList,
@@ -25,6 +31,12 @@ class TargetList extends Model {
 			foreignKey: "targetListId",
 			otherKey: "campaignId",
 		});
+
+		TargetList.belongsToMany(EmailCampaign, {
+			through: EmailCampaignTargetList,
+			foreignKey: "targetListId",
+			otherKey: "emailId"
+		})
 	}
 }
 TargetList.init(
