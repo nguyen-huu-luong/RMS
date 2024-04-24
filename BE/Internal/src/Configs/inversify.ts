@@ -49,6 +49,10 @@ import { TargetListRepository } from "../Repositories/implementation/TargetListR
 import { IClientHistoryRepository } from "../Repositories";
 import { ISubscriberRepository, SubscriberRepository } from "../Repositories";
 import { IOrderItemRepository, OrderItemRepository } from "../Repositories";
+import { IEmailCampaignRepository } from "../Repositories/IEmailCampaignRepository";
+import { EmailCampaignRepository } from "../Repositories/implementation/EmailCampaignRepository";
+import { ITrackUrlRepository } from "../Repositories/IITrackUrlRepository";
+import { TrackUrlRepository } from "../Repositories/implementation/TrackUrlRepository";
 
 class InversifyContainer {
 	private container;
@@ -104,6 +108,8 @@ class InversifyContainer {
 		this.container.bind<ITargetListRepository>(TYPES.ITargetListRepository).to(TargetListRepository);
 		this.container.bind<IClientHistoryRepository>(TYPES.IClientHistoryRepository).to(ClientHistoryRepository)
 		this.container.bind<ISubscriberRepository>(TYPES.ISubscriberRepository).to(SubscriberRepository)
+		this.container.bind<IEmailCampaignRepository>(TYPES.IEmailCampaignRepository).to(EmailCampaignRepository)
+		this.container.bind<ITrackUrlRepository>(TYPES.ITrackUrlRepository).to(TrackUrlRepository)
 	}
 }
 

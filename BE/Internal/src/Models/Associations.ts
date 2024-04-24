@@ -21,6 +21,7 @@ import {
 	Notification
 } from ".";
 import ClickEvent from "./ClickEvent";
+import EmailCampaignTargetList from "./EmailCampaignTargetlist";
 import OpenEvent from "./OpenEvent";
 import Token from "./Token";
 
@@ -47,12 +48,21 @@ class Association {
 			OpenEvent.associate();
 			ClickEvent.associate();
 			Notification.associate();
+
+			EmailCampaign.create({
+				name: "stewkrfawk",
+				campaignId: 1
+			})
+
 		} catch (err) {
 			console.log("Initialize association failed!");
 			console.log(`Err: ${err}`);
 		} 
-
+		
 	}
 }
+
+
+
 
 export default Association;

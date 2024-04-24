@@ -30,7 +30,9 @@ const TYPES = {
 
     ICampaignRepository: Symbol.for("ICampaignReposittory"),
     ITargetListRepository: Symbol.for("ITargetListRepository"),
-    
+    IEmailCampaignRepository: Symbol.for("IEmailCampaignRepository"),
+    ITrackUrlRepository: Symbol.for("ITrackUrlRepository"),
+
 };
 
 

@@ -7,7 +7,7 @@ import { InternalServerError, ValidationError } from "../Errors";
 
 
 export type TargelistData = {
-    nane: string,
+    name: string,
     description: string,
     clients: {
         action: string,
@@ -42,7 +42,7 @@ export class TargetListService {
             // validate actions
             if (!["add", "remove", "replace"].includes(data.clients.action)) {
                 throw new ValidationError(
-                    "Invalid params clients.action. Allow action in ['add', 'remove', 'replace'"
+                    "Invalid params clients.action. Allow action in ['add', 'remove', 'replace']"
                 );
             }
         }
@@ -54,6 +54,15 @@ export class TargetListService {
     public async delete(id: number) {
         const result = await this.targetListRepository.delete(id);
         return result;
+    }
+
+    public async deleteMany(ids: number[]) {
+        for (let id of ids) {
+            console.log(id);
+            await this.delete(id);
+        }
+
+        return true;
     }
 
 

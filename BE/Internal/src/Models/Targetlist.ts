@@ -10,7 +10,8 @@ import {
 } from "sequelize";
 import Loader from "../Loaders";
 import Client from "./Client";
-import { CampaignTargetList, Campaign, ClientTargetList } from ".";
+import { CampaignTargetList, Campaign, ClientTargetList, EmailCampaign } from ".";
+import EmailCampaignTargetList from "./EmailCampaignTargetlist";
 class TargetList extends Model {
 	declare setClients: BelongsToManySetAssociationsMixin<Client, Client["id"]>;
 	declare addClient:  BelongsToManyAddAssociationMixin<Client, Client["id"]> ;
@@ -30,6 +31,12 @@ class TargetList extends Model {
 			foreignKey: "targetListId",
 			otherKey: "campaignId",
 		});
+
+		TargetList.belongsToMany(EmailCampaign, {
+			through: EmailCampaignTargetList,
+			foreignKey: "targetListId",
+			otherKey: "emailId"
+		})
 	}
 }
 TargetList.init(
