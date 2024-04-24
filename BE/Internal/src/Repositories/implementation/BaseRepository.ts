@@ -2,7 +2,7 @@ import { FindOptions, Model, ModelStatic, Op, Sequelize, where } from "sequelize
 import { IBaseRepository } from "../IBaseRepository";
 import { injectable, unmanaged } from "inversify";
 import { Filter, FilterObject, QueryOptions } from "../../Types/type";
-import { BadRequestError, RecordNotFoundError } from "../../Errors";
+import { RecordNotFoundError } from "../../Errors";
 
 @injectable()
 export abstract class BaseRepository<M extends Model>
@@ -26,27 +26,21 @@ export abstract class BaseRepository<M extends Model>
             const page = options.paginate?.page || 1;
             const limit = options.paginate?.pageSize || this.DEFAULT_PAGE_SIZE;
             const offset = (page - 1) * limit;
-            const type = options.type ? options.type : "";
+          
+            // const type = options.type ? options.type : "";
+            
             const findOptions: FindOptions = {
                 // attributes: ['*'],
                 limit,
                 offset,
+                order: [
+                    [
+                        options.sort?.by || "id",
+                        options.sort?.order.toLocaleUpperCase() || "ASC",
+                    ],
+                ],
             };
-            if (options.sort && options.sort.by) {
-              
-                    const allAttrs = this.attributes[0] === "*"  ? Object.keys(this._model.getAttributes())
-                                                                : this.attributes ;
-                    if (!allAttrs.includes(options.sort.by)) {
-                        throw new BadRequestError("Can not sort by field " + options.sort.by)
-                    }
 
-                    findOptions.order =  [
-                            [
-                                options.sort?.by || "id",
-                                options.sort?.order.toLocaleUpperCase() || "ASC",
-                            ],
-                        ]
-            }
             if (options.filter) {
                 const sequelizeFilterObject = this.mappingToSequelizeFilterOpject(options.filter)
                 if (sequelizeFilterObject) {
@@ -121,7 +115,7 @@ export abstract class BaseRepository<M extends Model>
         throw new Error();
     }
 
-    public async delete(id: number): Promise<boolean> {
+    public async delete(id: number,  cond?: any): Promise<boolean> {
         const resource = await this.findById(id);
 
         if (resource) {
@@ -139,26 +133,30 @@ export abstract class BaseRepository<M extends Model>
           console.log(filterName);
           if (filter.hasOwnProperty(filterName)) {
             const filterConditions = filter[filterName];
-            for (const operator in filterConditions) {
-              const value = (filterConditions as any)[operator];
-              console.log(operator, value);
-              switch (operator) {
-                    case "lt":
-                    case "gt":
-                    case "lte":
-                    case "gte":
-                    case "in":
-                    case "eq":
-                    case "between":
-                    case "notBetween":
-                    case "startsWith":
-                    case "endsWith":
-                        sequelizeFilter[filterName] = { ...sequelizeFilter[filterName], [Op[operator]]: value };
-                        break;
-                    case "contains":
-                        sequelizeFilter[filterName] = { ...sequelizeFilter[filterName], [Op["substring"]]: value };
-                // Handle other operators if needed
-              }
+            if (typeof filterConditions === "string") {
+                sequelizeFilter[filterName] = filterConditions
+            } else {
+                for (const operator in filterConditions) {
+                  const value = (filterConditions as any)[operator];
+                  console.log(operator, value);
+                  switch (operator) {
+                        case "lt":
+                        case "gt":
+                        case "lte":
+                        case "gte":
+                        case "in":
+                        case "eq":
+                        case "between":
+                        case "notBetween":
+                        case "startsWith":
+                        case "endsWith":
+                            sequelizeFilter[filterName] = { ...sequelizeFilter[filterName], [Op[operator]]: value };
+                            break;
+                        case "contains":
+                            sequelizeFilter[filterName] = { ...sequelizeFilter[filterName], [Op["substring"]]: value };
+                    // Handle other operators if needed
+                  }
+                }
             }
           }
         }

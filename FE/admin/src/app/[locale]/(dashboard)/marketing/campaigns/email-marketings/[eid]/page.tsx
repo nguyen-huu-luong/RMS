@@ -275,50 +275,6 @@ const TargetListDetail = () => {
 
                         </div>
                     </Form>
-
-                    <div className="w-full bg-white rounded-lg border py-3 px-4">
-                        <div>
-                            <div className="flex justify-between items-center">
-                                <h6>Customers</h6>
-                                <AddClientToTargetListModal type="customer" onOk={handleAddClientToTargetList} />
-                            </div>
-                            <div>
-                                <ClientTable<CustomerType>
-                                    columns={customerColumns}
-                                    dataSource={customers || []}
-                                    onSelected={
-                                        {
-                                            handle: (selecteds) => {
-                                                setSelected(prev => ({ ...prev, customers: selecteds }))
-                                            }
-                                        }
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="w-full bg-white rounded-lg border py-3 px-4">
-                        <div>
-                            <div className="flex justify-between items-center">
-                                <h6>Leads</h6>
-                                <AddClientToTargetListModal type="lead" onOk={handleAddClientToTargetList} />
-                            </div>
-                            <div>
-                                <ClientTable<LeadType>
-                                    columns={leadColumns}
-                                    dataSource={leads || []}
-                                    onSelected={
-                                        {
-                                            handle: (selecteds) => {
-                                                setSelected(prev => ({ ...prev, leads: selecteds }))
-                                            }
-                                        }
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </div>
                 </Space>
 
             </ConfigProvider >

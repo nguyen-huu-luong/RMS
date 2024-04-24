@@ -11,7 +11,6 @@ import { Op, where } from 'sequelize';
 import * as dotenv from 'dotenv';
 const axios = require('axios').default;
 
-
 // export interface IClientService {
 //     getAll: (options?: QueryOptions) => Promise<Array<any>[]> ;
 //     getById: (id: number) => Promise<Client> ; 
@@ -49,6 +48,7 @@ export class ClientService {
         }
        })
         let orderInfo = await await this.orderRepository.viewOrders(id);
+
         return { ...customerInfo["dataValues"], orderInfo, group: group }
     }
     public async create(data: any) {
@@ -59,6 +59,11 @@ export class ClientService {
             throw new CustomError(HttpStatusCode.Conflict, ErrorName.CONFLICT, "User exists")
         }
 
+        if (!type) {
+            data.type = "Lead"
+        } else if (type === "customer") {
+            data.type = "Customer"
+        }
         return await this.clientRepository.create(data)
     }
 
@@ -69,7 +74,6 @@ export class ClientService {
         }
         return await this.clientRepository.update(id, data);
     }
-
 
     public async delete(id: number) {
         const user = this.clientRepository.findById(id);

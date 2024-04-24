@@ -38,6 +38,7 @@ interface ITableRenderProps<T> {
     // data: readonly Record<string, any>[];
     columns: ColumnsType<T>;
     url: string,
+    queryStr?: string,
     formCreateElement: React.ReactNode
     onSelected?: {
         handle?: (selecteds: T[]) => void,
@@ -132,7 +133,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                     : "";
             const respone = await fetchClient({
                 url: `${url}/all?page=${tableParams.pagination?.current}
-				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}${filterQueriesStr}`
+				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}${filterQueriesStr}${props.queryStr ? `&${props.queryStr}`: ""}`
             })
 
             console.log(respone)

@@ -58,6 +58,7 @@ export const CustomModal: React.FC<ICustomModal> = (props) => {
         {...props}
         styles={{...modalStyles, ...props.styles}}
         classNames={{...classNames, ...props.classNames}}
+        maskClosable={false}
     >
         {props.children}
     </Modal>)

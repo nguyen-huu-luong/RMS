@@ -21,14 +21,13 @@ const authMiddleware = withAuth(
             secret: process.env.NEXTAUTH_SECRET,
         });
 
-
         if (!token) {
             const isAuthRoute = authRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
             if (isAuthRoute) {
                 const redirectUrl = new URL("/signin", request.url);
                 redirectUrl.searchParams.set("callbackUrl", request.nextUrl.href);
-                return NextResponse.redirect(redirectUrl);
+                // return NextResponse.redirect(redirectUrl);
             }
         } 
         
@@ -40,7 +39,7 @@ const authMiddleware = withAuth(
         callbacks: {
             authorized: (session) => {
                 console.log(session.token?.role)
-                return session.token?.role === "manager" ;
+                return session.token?.role === "manager" ||  session.token?.role === "employee" || session.token?.role === "chef";
             },
         },
         pages: {

@@ -8,7 +8,6 @@ import { ReactNode } from "react";
 import { NextIntlClientProvider, useLocale, useMessages } from "next-intl";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { DynamicBreadcrumb } from "@/components";
 import { variables } from "@/app";
 import Provider from "@/components/SessionProvider/SessionProvider";
 

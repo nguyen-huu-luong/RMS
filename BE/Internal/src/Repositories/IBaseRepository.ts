@@ -12,7 +12,7 @@ interface IBaseRepository<M extends Model> {
   
     update(id: number, data: any): Promise<M>;
   
-    delete(id: number): Promise<boolean>;
+    delete(id: number, cond?:any): Promise<boolean>;
   }
   
   export { IBaseRepository };
