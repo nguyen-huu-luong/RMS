@@ -52,7 +52,7 @@ export class ClientService {
         return { ...customerInfo["dataValues"], orderInfo, group: group }
     }
     public async create(data: any) {
-        const { phone, email } = data;
+        const { phone, email, type } = data;
         const user = await this.clientRepository.findByEmail(email)
 
         if (user) {

@@ -48,9 +48,9 @@ export abstract class BaseRepository<M extends Model>
                 }
             }
 
-            if (type) {
-                findOptions.where = { type: type };
-            }
+            // if (type) {
+            //     findOptions.where = { type: type };
+            // }
 
             if (this.attributes[0] != "*") {
                 findOptions.attributes = this.attributes;
