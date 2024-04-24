@@ -16,6 +16,7 @@ import { CampaignTrackUrl } from "@/components/CampaignComponents/CampaignTrackU
 import { CampaignHistoryAndStatistic } from "@/components/CampaignComponents/CampaignHistoryAndStatistic";
 import fetchClient from "@/lib/fetch-client";
 import PreviewMode from "@/components/EmailTemplateComponents/DropContainer/preview-mode";
+import { AxiosError } from "axios";
 
 
 type CampaignData = {
@@ -30,15 +31,14 @@ type CampaignData = {
     totalSent?: number,
     createdAt?: string,
     updatedAt?: string,
-    targetLists: [],
-    emailMarketings: [],
-    trackUrls: []
+    targetLists: Array<any>,
+    emailCampaigns: Array<any>,
+    trackUrls: Array<any>
 }
 const CampaignDetail = () => {
     const [editmode, setEditmode] = useState(false)
     const [loading, setLoading] = useState(false);
     const [campaignData, setCampaignData] = useState<CampaignData>()
-    const [tempData, setTempData] = useState<CampaignData>()
 
     const params = useParams<{ locale: string; pid: string }>()
 
@@ -51,47 +51,34 @@ const CampaignDetail = () => {
             })
 
             setCampaignData(data)
-            setTempData(data)
             setLoading(false)
-        } catch (error) {
+        } catch (error: AxiosError | any) {
             setLoading(false)
             message.error(error as any)
+            throw new Error(error.cause.response.data.message)
         }
     }
     useEffect(() => {
         fetchData()
     }, [])
 
-    // const compareArray = (arr1: number[], arr2: number[]) => {
-    //     if (arr1.length !== arr2.length) return false;
-    //     arr1.sort()
-    //     arr2.sort()
-    //     for (let i = 0; i < arr1.length; i++) {
-    //         if (arr1[i] !== arr2[i]) return false;
-    //     }
-    //     return true;
-    // }
-
-    // const getIds = (obj: Array<any>) => {
-    //     return obj.map((item) => item.id);
-    // }
-    if (!tempData) return ""
-
+    if (!campaignData) return ""
 
     const handleSaveChange = async (values: any) => {
-        console.log(tempData)
-        const { targetLists, emailMarketings, trackUrls, ...rest } = tempData;
         const dataUpdate = { ...values };
 
         try {
-            const updatedCampaign = await fetchClient({ url: `/campaigns/${params.pid}`, method: "PUT", body: { ...dataUpdate }, data_return: true })
+            const updatedCampaign = await fetchClient({
+                url: `/campaigns/${params.pid}`,
+                method: "PUT", body: { ...dataUpdate },
+                data_return: true
+            })
             setCampaignData(updatedCampaign);
-            setTempData(updatedCampaign)
             setEditmode(false)
         } catch (error: any) {
             message.error("Something wrong!", error?.message)
+            throw new Error(error)
         }
-
     }
 
     const handleCancelChange = () => {
@@ -102,7 +89,7 @@ const CampaignDetail = () => {
         try {
             const result = await fetchClient({
                 method: "PUT",
-                url: `/campaigns/${params.pid}}`,
+                url: `/campaigns/${params.pid}`,
                 body: {
                     targetlists: {
                         action,
@@ -111,22 +98,116 @@ const CampaignDetail = () => {
                 },
                 data_return: true
             })
-            console.log(result)
+            message.success(`${action === "add" ? "Add targetlist to campaign successfully" :
+                "Remove targetlist from campaign successfully"}`)
+            setCampaignData(result)
 
-        } catch (error) {
+        } catch (error: any) {
             console.log(error)
+            message.error("Add targetlist failds")
+            throw new Error(error.data.respone.message)
         }
     }
 
-    const { targetLists, emailMarketings, trackUrls, ...overview } = tempData
+    const handleCreateEmailCampaign = async (values: any) => {
+        console.log(values)
+        const {sendTo, ...createData} = values 
+        try {
+            const newEmail = await fetchClient({
+                method: "POST",
+                url: `/campaigns/${params.pid}/emails`,
+                body: {
+                    data: {
+                        ...createData,
+                        targetlistIds: sendTo
+                    }
+                },
+                data_return: true
+            })
+
+            if (campaignData) {
+                const newEmailCampaign = [...campaignData.emailCampaigns || [], newEmail]
+                setCampaignData(prev => (prev && { ...prev, emailCampaigns: newEmailCampaign }))
+            }
+
+
+
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
+    }
+
+    const handleDeleteEmailCampaign = async (id: number) => {
+        try {
+            const result = await fetchClient({
+                method: "DELETE",
+                url: `/campaigns/${params.pid}/emails/${id}`,
+                data_return: true
+            })
+
+            if (result) {
+                const newEmailCampaigns = campaignData.emailCampaigns.filter(item => item.id !== id)
+                setCampaignData(prev => (prev && { ...prev, emailCampaigns: newEmailCampaigns }))
+                message.success("Delete email campaign successfully")
+            }
+        } catch (error) {
+            message.error("Faild to delete email campaign")
+            console.log(error)
+            throw new Error(error as any)
+        }
+    }
+
+    const handleCreateTrackUrl = async (values:any) => {
+        try {
+            const newTrackUrl = await fetchClient({
+                method: "POST",
+                url: `/campaigns/${params.pid}/track-url`,
+                body: {
+                    data: {...values}
+                },
+                data_return:true
+            }) 
+
+            const newTrackUrls = [...campaignData.trackUrls || [], newTrackUrl]
+            setCampaignData(prev => (prev && { ...prev, trackUrls: newTrackUrls }))
+            message.success("create track url successfully")
+        } catch (error) {
+            message.error("Faild to create track url")
+            console.log(error)
+            throw new Error(error as any)
+        }
+    }
+    const handleDeleteTrackUrl = async (id:number) => {
+        try {
+            const result = await fetchClient({
+                method: "DELETE",
+                url: `/campaigns/${params.pid}/track-url/${id}`,
+                data_return: true
+            })
+
+            if (result) {
+                const newTrackUrls = campaignData.trackUrls.filter(item => item.id !== id)
+                setCampaignData(prev => (prev && { ...prev, trackUrls: newTrackUrls }))
+                message.success("Delete track url successfully")
+            }
+        } catch (error) {
+            message.error("Faild to delete track url")
+            console.log(error)
+            throw new Error(error as any)
+        }
+    }
+
+    const { targetLists, emailCampaigns, trackUrls, ...overview } = campaignData
     let statisticInfo: any = { send: 0, clicked: 0, lead_created: 0, lead_converted: 0, total_order: 0, revenue: "+ $124" }
+
     return (
         <ConfigProvider
             theme={{
                 components: {
                     Form: {
-                        itemMarginBottom: 8,
-                        verticalLabelPadding: "0 0 4"
+                        itemMarginBottom: 12,
+                        verticalLabelPadding: "0 0 6"
                     }
                 }
             }}
@@ -171,11 +252,29 @@ const CampaignDetail = () => {
                     <div className="mt-3 grid grid-cols-3 gap-4">
                         <div className="col-span-2">
                             <CampaignOverview isEditmode={editmode} campaignInfo={overview} />
-                            <CampaignTargetList isEditmode={editmode} targetLists={targetLists || []} campaignId={params.pid} />
-                            <CampaignMarketing isEditmode={editmode} emails={emailMarketings || []} />
-                            <CampaignTrackUrl isEditmode={editmode} trackUrls={trackUrls || []} />
+                            <CampaignTargetList
+                                isEditmode={editmode}
+                                targetLists={targetLists || []}
+                                campaignId={params.pid}
+                                handleUpdateTargetlist={handleUpdateTargetlist}
+                            />
+                            <CampaignMarketing
+                                isEditmode={editmode}
+                                emails={emailCampaigns || []}
+                                // targitlists={targetLists || []}
+                                targetlists={targetLists}
+                                campaignId={params.pid}
+                                handleCreate={handleCreateEmailCampaign}
+                                handleDelete={handleDeleteEmailCampaign}
+
+                            />
+                            <CampaignTrackUrl 
+                                handleCreate = {handleCreateTrackUrl}
+                                handleDelete = {handleDeleteTrackUrl}
+                                isEditmode={editmode} 
+                                trackUrls={trackUrls || []} />
                         </div>
-                        <CampaignHistoryAndStatistic statisticInfo={statisticInfo} />
+                        <CampaignHistoryAndStatistic campaignId={params.pid} statisticInfo={statisticInfo} />
                     </div>
                 </div>
             </Form>

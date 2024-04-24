@@ -1,15 +1,20 @@
-import { ExpandAltOutlined } from "@ant-design/icons"
-import { Button, Form, Input, Modal, Space } from "antd"
-import { createStyles } from "antd-style";
+import { ExpandAltOutlined, PlusCircleFilled, PlusOutlined } from "@ant-design/icons"
+import { Button, Form, Input, Modal, Select, Space } from "antd"
 import { useState } from "react";
 import { CustomModal } from "./MyCustomModal";
 import TextArea from "antd/es/input/TextArea";
+import { CSSProperties } from "styled-components";
+import { ChooseTemplateModal } from "./ChooseTemplateModal";
+import { useForm } from "antd/es/form/Form";
 
-interface ICreateTargetListModel {
+interface ICreateTrackUrlModalProps {
     onOk: (values: any) => Promise<void>,
+    triggerBtnClasseNames?: string
+    className?: string,
+    style?: CSSProperties
 
 }
-export const CreateTargetListModel: React.FC<ICreateTargetListModel> = ({ onOk }) => {
+export const CreateTrackUrlModal: React.FC<ICreateTrackUrlModalProps> = ({ onOk, ...props }) => {
     const [open, setOpen] = useState(false);
     const showModal = () => {
         setOpen(true);
@@ -22,16 +27,17 @@ export const CreateTargetListModel: React.FC<ICreateTargetListModel> = ({ onOk }
 
     const handleCancel = () => {
         setOpen(false);
-    };
+    }
 
-    return <main className="bg-white w-full py-2 px-3 rounded-md border relative">
-        <Button icon={<ExpandAltOutlined />} onClick={showModal}>New</Button>
+    return <main style={props.style} className={props.className}>
+        <Button className={props.triggerBtnClasseNames} icon={<PlusOutlined />} onClick={showModal} />
         <CustomModal
             open={open}
+            title={"Create track url"}
             okButtonProps={{ className: "bg-primary" }}
             footer={null}
             width={600}
-            
+            onCancel={handleCancel}
         >
             <Form
                 name="form_group"
@@ -40,12 +46,20 @@ export const CreateTargetListModel: React.FC<ICreateTargetListModel> = ({ onOk }
                 style={{ maxWidth: 1000 }}
                 onFinish={handleOk}
             >
-                <Form.Item label="Name" name="name" required rules={[{ required: true, message: 'Please input the group name !' }]}>
+                <Form.Item label="Name" name="name" required rules={[{ required: true, message: 'Please input the name of track url !' }]}>
                     <Input placeholder='Group name' />
                 </Form.Item>
-                <Form.Item label="Description" name="description" required rules={[{ required: true, message: 'Please input the group description !' }]}>
-                    <TextArea placeholder='Group description' />
+
+                <Form.Item 
+                    label="Redirect Url" 
+                    name="redirectUrl" required 
+                    rules={[
+                        { required: true, message: 'Please input the url!', validateTrigger: ["onBlur"]  },
+                        { type: "url", message: 'Please input the valid url!' },
+                    ]}>
+                    <Input placeholder='Redirect url' />
                 </Form.Item>
+
                 <Form.Item>
                     <Space align="end">
                         <Button type="default" htmlType="reset" onClick={handleCancel}>

@@ -26,7 +26,9 @@ export const CreateModal: React.FC<ICreateModal> = ({ afterCreated, formElement,
             const result = await fetchClient({
                 method: "POST",
                 url: createUrl,
-                body: { ...values, startDate: values["start_date"], endDate: values["end_date"] }
+                body: {
+                    data: { ...values }
+                }
             })
 
             setOpen(false)
