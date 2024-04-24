@@ -59,7 +59,7 @@ export default function Page({ params }: { params: { id: string } }) {
                 <span>{moneyFormatter(record.amount)}</span>
             ),
         },
-    ];
+    ]; 
     if (orderErrors) return <div>Failed to load</div>;
     if (orderLoading) return <Loading />;
     if (!order) return <Loading />;

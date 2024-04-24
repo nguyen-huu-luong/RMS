@@ -37,9 +37,11 @@ export class OrderService {
             TYPES.IPos_notificationRepository
         ),
         private cartItemRepository = container.get<ICartItemRepository>(
-            TYPES.ICartItemRepository),
+            TYPES.ICartItemRepository
+        ),
         private clientHistoryRepository = container.get<IClientHistoryRepository>(
-            TYPES.IClientHistoryRepository)
+            TYPES.IClientHistoryRepository
+        )
     ) {}
 
     public async viewOrderItems(
@@ -127,13 +129,21 @@ export class OrderService {
                     action: "order",
                     clientId: req.userId,
                     orderId: order.id,
-                    updatedAt:  new Date(),
-                    createdAt: new Date()
-                })
+                    updatedAt: new Date(),
+                    createdAt: new Date(),
+                });
                 if (voucherId != 0 && voucherId != null) {
                     const voucher = await this.voucherRepository.findById(
                         voucherId
                     );
+                    const client = await this.clientRepository.findById(
+                        req.userId
+                    );
+                    voucher.addClient(client, {
+                        through: {
+                            status: true,
+                        },
+                    });
                     await order.setVoucher(voucher);
                 }
 
@@ -159,7 +169,8 @@ export class OrderService {
                     })
                 );
                 const client = await this.clientRepository.findById(req.userId);
-                if (client.getDataValue('type') == "lead") await client.update({type:"customer"})
+                if (client.getDataValue("type") == "lead")
+                    await client.update({ type: "customer" });
                 await cart.setProducts([]);
                 await this.cartRepository.update(cart?.getDataValue("id"), {
                     total: 0,
@@ -168,7 +179,6 @@ export class OrderService {
             } else if (req.action == "create:any") {
                 const { products, ...orderData } = req.body;
                 const order = await this.orderRepository.create(orderData);
-                console.log(products, orderData);
                 await Promise.all(
                     products.map(async (item: any) => {
                         let product = await this.productRepository.findById(
@@ -242,7 +252,21 @@ export class OrderService {
             const http_status: number = HttpStatusCode.Success;
             const data: any = req.body;
             if (req.action === "update:own") {
+                const order = await this.orderRepository.findById(data.orderId);
                 await this.orderRepository.updateStatus(data);
+                if (order.getDataValue("voucherId") != null) {
+                    const voucher = await this.voucherRepository.findById(
+                        order.getDataValue("voucherId")
+                    );
+                    const client = await this.clientRepository.findById(
+                        req.userId
+                    );
+                    await voucher.addClient(client, {
+                        through: {
+                            status: false,
+                        },
+                    });
+                }
             } else if (req.action === "update:any") {
                 const { orderId, ...status } = data;
                 if (status.status == "Done") {
@@ -264,6 +288,21 @@ export class OrderService {
                                 order.getDataValue("num_items")),
                     });
                     await client.save();
+                } else if (status.status == "Cancel") {
+                    const order = await this.orderRepository.findById(orderId);
+                    const client = await this.clientRepository.findById(
+                        order.getDataValue("clientId")
+                    );
+                    if (order.getDataValue("voucherId") != null) {
+                        const voucher = await this.voucherRepository.findById(
+                            order.getDataValue("voucherId")
+                        );
+                        await voucher.addClient(client, {
+                            through: {
+                                status: false,
+                            },
+                        });
+                    }
                 }
                 await this.orderRepository.updateStatus(data);
             } else throw new UnauthorizedError();
@@ -331,7 +370,10 @@ export class OrderService {
                                 preCartItem[0].amount,
                         });
                         await preCartItem[0].destroy();
-                    } else if (readyItem.length != 0 && dish_status == "Ready") {
+                    } else if (
+                        readyItem.length != 0 &&
+                        dish_status == "Ready"
+                    ) {
                         readyItem[0].update({
                             quantity:
                                 readyItem[0].getDataValue("quantity") +
@@ -456,13 +498,11 @@ export class OrderService {
     }
 
     public async getByCond(cond: any) {
-        try{
-            const orders = await this.orderRepository.getByCond(cond)
-            return orders
-        }
-        catch (err) {
+        try {
+            const orders = await this.orderRepository.getByCond(cond);
+            return orders;
+        } catch (err) {
             console.log(err);
         }
     }
 }
-
