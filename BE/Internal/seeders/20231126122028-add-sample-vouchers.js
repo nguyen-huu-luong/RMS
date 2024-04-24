@@ -21,7 +21,27 @@ module.exports = {
         updatedAt: new Date(),
       };
     });
+    const clientVouchers = [];
+    for (let i = 1; i <= 10; i++) {
+      clientVouchers.push(
+        {
+          voucherId: 1,
+          clientId: i,
+          status: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          voucherId: 2, 
+          clientId: i,
+          status: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      );
+    }
     await queryInterface.bulkInsert("Vouchers", vouchers);
+    await queryInterface.bulkInsert("ClientVouchers", clientVouchers);
   },
 
   down: async (queryInterface, Sequelize) => {

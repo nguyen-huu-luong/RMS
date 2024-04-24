@@ -31,7 +31,7 @@ class VoucherRouter {
                 this.voucherController.updateVoucher(req, res, next)
             )
             .patch(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
-                this.voucherController.consumeVoucher(req, res, next)
+                this.voucherController.redeemVoucher(req, res, next)
             );
         router
             .route("/vouchers")

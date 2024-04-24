@@ -25,8 +25,7 @@ export default function MyOrder() {
     const handleRangeChange = (dates: any) => {
         setDateRange(dates);
     };
-    const { data: session, status } = useSession();
-    const router = useRouter();
+    const [orders, setOrders] = useState<any>(null);
 
     const columns = [
         {
@@ -73,13 +72,23 @@ export default function MyOrder() {
             ),
         },
     ];
-    const {
-        data: orders,
-        error: ordersErrors,
-        isLoading: ordersLoading,
-    } = useSWR(`/orders`, (url) =>
-        fetchClient({ url: url, data_return: true })
-    );
+
+    const fetchData = async () => {
+        try {
+            const orders = await fetchClient({
+                url: `/orders`,
+                data_return: true,
+            });
+            setOrders(orders);
+        } catch (error) {
+            console.error("Error fetching cart data:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     const handleDeleteOrder = async (record: any) => {
         await fetchClient({
             url: `/orders`,
@@ -89,12 +98,12 @@ export default function MyOrder() {
                 status: "Cancel",
             },
         });
+        fetchData();
     };
     useEffect(() => {
         if (!orders) return;
         setFilteredOrders(orders);
         if (!dateRange) return;
-        console.log(dateRange);
         const filteredOrders = orders.filter((order: any) => {
             const orderDate = moment(order.createdAt);
             return orderDate.isBetween(
@@ -106,8 +115,6 @@ export default function MyOrder() {
         });
         setFilteredOrders(filteredOrders);
     }, [dateRange, orders]);
-    if (ordersErrors) return <div>Failed to load</div>;
-    if (ordersLoading) return <Loading />;
     if (!orders) return <Loading />;
     if (!filterOrders) return <Loading />;
     return (

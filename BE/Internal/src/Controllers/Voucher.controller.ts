@@ -27,8 +27,8 @@ class VoucherController {
     public assignVouchers(req: Request, res: Response, next: NextFunction) {
         this.voucherService.assignVouchers(req, res, next);
     }
-    public consumeVoucher(req: Request, res: Response, next: NextFunction) {
-        this.voucherService.consumeVoucher(req, res, next);
+    public redeemVoucher(req: Request, res: Response, next: NextFunction) {
+        this.voucherService.redeemVoucher(req, res, next);
     }
     public getVoucherClients(req: Request, res: Response, next: NextFunction) {
         this.voucherService.getVoucherClients(req, res, next);

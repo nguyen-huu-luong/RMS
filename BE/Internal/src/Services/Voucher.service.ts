@@ -37,7 +37,11 @@ export class VoucherService {
             const status: number = HttpStatusCode.Success;
             if (req.action === "read:own") {
                 const client = await this.clientRepository.findById(req.userId);
-                data = await client.getVouchers();
+                data = await client.getVouchers({
+                    where: {
+                        "$ClientVoucher.status$": false,
+                    },
+                });
             } else {
                 const queries = { ...req.body, ...req.query };
                 const options: QueryOptions = parseRequesQueries(queries);
@@ -262,30 +266,36 @@ export class VoucherService {
         }
     }
 
-    public async consumeVoucher(
+    public async redeemVoucher(
         req: Request,
         res: Response,
         next: NextFunction
     ) {
         try {
+            console.log(req.params);
             const status: number = HttpStatusCode.Success;
-            const voucher = await this.voucherRepository.findById(
-                parseInt(req.params.id)
+            const voucher = await this.voucherRepository.findByCode(
+                req.params.id
             );
-            if (!voucher) {
-                throw new RecordNotFoundError("Voucher do not exist");
+            if (voucher.length == 0) {
+                Message.logMessage(req, status);
+                return res.status(status).send("Voucher does not exist");
             }
-            const client = await this.clientRepository.findById(
-                req.body.clientId
-            );
-            if (!client) {
-                throw new RecordNotFoundError("Client do not exist");
+            const client = await this.clientRepository.findById(req.userId);
+            if (voucher[0].getDataValue("can_redeem")) {
+                console.log(voucher[0]);
+                await voucher[0].addClient(client, {
+                    through: {
+                        status: false,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                });
+                Message.logMessage(req, status);
+                return res.status(status).send(statusMess.Success);
             }
-            await voucher.addVoucher(client, {
-                status: true,
-            });
             Message.logMessage(req, status);
-            return res.status(status).send(statusMess.Success);
+            return res.status(status).send("Can not be redeem");
         } catch (err) {
             console.log(err);
             next(err);
