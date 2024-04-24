@@ -109,16 +109,20 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                 <div className='flex space-x-2'>
                     <div className='w-full'>
                         <Form.Item
-                            label='Promo Code'
-                            name='promo_code'
+                            label='Can Redeem'
+                            name='can_redeem'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input the promo code!",
+                                    message:
+                                        "Please select whether it can be redeemed or not!",
                                 },
                             ]}
                         >
-                            <Input placeholder='Promo Code' />
+                            <Select placeholder='Select can redeem'>
+                                <Select.Option value={true}>Yes</Select.Option>
+                                <Select.Option value={false}>No</Select.Option>
+                            </Select>
                         </Form.Item>
                     </div>
 
@@ -234,7 +238,7 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                                             "Begin date must be before end date!"
                                         );
                                     },
-                                })
+                                }),
                             ]}
                         >
                             <DatePicker />
@@ -265,7 +269,7 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                                             "End date must be after begin date!"
                                         );
                                     },
-                                })
+                                }),
                             ]}
                         >
                             <DatePicker />

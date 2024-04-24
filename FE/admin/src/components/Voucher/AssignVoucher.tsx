@@ -1,12 +1,24 @@
+"use client";
 import React, { useEffect, useState } from "react";
-import { Button, Select, Empty, message } from "antd";
+import {
+    Button,
+    Select,
+    Empty,
+    message,
+    Table,
+    Tag,
+    Input,
+    FormInstance,
+    Modal,
+} from "antd";
 import fetchClient from "@/lib/fetch-client";
 import Loading from "../loading";
-
+import Link from "next-intl/link";
+import { useParams } from "next/navigation";
 interface AssignVoucherFormProps {
     voucherId: number;
-    afterSubmit: () => void;
-    afterCancel: () => void;
+    form: FormInstance;
+    updateInformation: any;
 }
 
 export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
@@ -14,30 +26,32 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
     const [voucherClients, setVoucherClients] = useState<any[]>([]);
     const [selectedClients, setSelectedClients] = useState<number[]>([]);
     const [selectedProfit, setSelectedProfit] = useState<number | null>(null);
+    const [customProfit, setCustomProfit] = useState<string>("");
+    const [showCustomInput, setShowCustomInput] = useState<boolean>(true);
     const { Option } = Select;
+    const params = useParams<{ locale: string }>();
 
     useEffect(() => {
-        fetchClientData();
         fetchVoucherClients();
     }, [props.voucherId]);
 
-    const fetchClientData = async () => {
-        try {
-            const response = await fetchClient({
-                url: `/customers/all`,
-                method: "GET",
-                data_return: true,
-            });
-            setClients(
-                response.data.map((client: any) => ({
-                    label: client.firstname + " " + client.lastname,
-                    value: client.id,
-                }))
-            );
-        } catch (error) {
-            console.error("Error fetching client data:", error);
-        }
-    };
+    const columns = [
+        {
+            title: "Full Name",
+            dataIndex: "fullname",
+            key: "fullname",
+            render: (text: any, record: any) => (
+                <Link locale={params.locale} href={`/customers/${record.id}`}>
+                    {text}
+                </Link>
+            ),
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+        },
+    ];
 
     const fetchVoucherClients = async () => {
         try {
@@ -52,32 +66,74 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
         }
     };
 
+    const handleAddMore = async (addedQuantity: number) => {
+        let fieldValues = await props.form.getFieldsValue();
+        const quantity = await props.form.getFieldValue("quantity");
+        await props.updateInformation({
+            ...fieldValues,
+            quantity: quantity + addedQuantity,
+        });
+        await handleAssign()
+    };
+
     const handleAssign = async () => {
         try {
-            let assignedClients = selectedClients;
-            if (selectedProfit !== null) {
+            if (selectedProfit !== null || customProfit !== null) {
                 const response = await fetchClient({
-                    url: `/vouchers/${props.voucherId}?profit=${selectedProfit}`,
+                    url: `/vouchers/${props.voucherId}?profit=${
+                        selectedProfit ? selectedProfit : customProfit
+                    }`,
                     method: "POST",
+                    data_return: true,
                 });
-                message.success("Assign voucher successfully");
-                assignedClients = [];
-            } else {
-                const response = await fetchClient({
-                    url: `/vouchers/${props.voucherId}`,
-                    method: "POST",
-                    body: { clientsIds: selectedClients },
-                });
-                message.success("Assign voucher successfully");
+                if (response === "Success") {
+                    message.success("Assign voucher successfully");
+                } else if (response === "Already assigned") {
+                    message.warning(
+                        "All chosen clients have already got this voucher"
+                    );
+                } else {
+                    Modal.confirm({
+                        title: `There is not enough vouchers, add ${response.more} vouchers?`,
+                        autoFocusButton: null,
+                        okButtonProps: {
+                            style: {
+                                backgroundColor: "#2b60ff",
+                            },
+                        },
+                        okText: "Finish",
+                        onOk: () => handleAddMore(response.more),
+                        footer: (_, { OkBtn, CancelBtn }) => (
+                            <>
+                                <CancelBtn />
+                                <OkBtn />
+                            </>
+                        ),
+                    });
+                }
             }
             await fetchVoucherClients();
+            props.form.resetFields();
         } catch (error) {
             console.error("Error assigning voucher:", error);
             message.error("Failed to assign voucher");
         }
     };
 
-    if (clients.length === 0) return <Loading />;
+    const handleCustomInputChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const { value } = e.target;
+        console.log(value);
+        setCustomProfit(value);
+    };
+
+    const handleSelectChange = (value: number) => {
+        setSelectedProfit(value);
+        setShowCustomInput(value === null);
+    };
+
+    if (!voucherClients) return <Loading />;
 
     return (
         <div className='flex flex-col justify-start gap-2'>
@@ -86,45 +142,49 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
                 <Select
                     style={{ width: "100%" }}
                     placeholder='Please select'
-                    defaultValue={null}
-                    onChange={(value) => setSelectedProfit(value)}
+                    value={selectedProfit}
+                    onChange={handleSelectChange}
+                    defaultValue={100000}
                 >
-                    <Option value={500000}> {">"} 500,000</Option>
+                    <Option value={100000}> {">"} 100,000</Option>
+                    <Option value={200000}> {">"} 200,000</Option>
+                    <Option value={300000}> {">"} 300,000</Option>
+                    <Option value={500000}>{">"} 500,000</Option>
                     <Option value={1000000}>{">"} 1,000,000</Option>
                     <Option value={2000000}>{">"} 2,000,000</Option>
-                    <Option value={3000000}>{">"} 3,000,000</Option>
                     <Option value={null}>Custom</Option>
                 </Select>
+                {showCustomInput && (
+                    <Input
+                        style={{ marginTop: "8px" }}
+                        placeholder='Enter custom profit'
+                        value={customProfit}
+                        onChange={handleCustomInputChange}
+                        type='number'
+                    />
+                )}
             </div>
-            {selectedProfit === null && (
-                <div>
-                    Select customer:
-                    <Select
-                        mode='multiple'
-                        allowClear
-                        style={{ width: "100%" }}
-                        placeholder='Please select'
-                        defaultValue={[]}
-                        onChange={(values) => setSelectedClients(values)}
-                    >
-                        {clients.map((client) => (
-                            <Option key={client.value} value={client.value}>
-                                {client.label}
-                            </Option>
-                        ))}
-                    </Select>
-                </div>
+            {selectedProfit || customProfit ? (
+                <Button onClick={handleAssign}>Assign</Button>
+            ) : (
+                ""
             )}
-            <Button onClick={handleAssign}>Assign</Button>
             <div>
                 {voucherClients.length === 0 ? (
                     <Empty description='No voucher clients yet' />
                 ) : (
-                    voucherClients.map((voucherClient) => (
-                        <div key={voucherClient.id}>
-                            {voucherClient.firstname} {voucherClient.lastname}
-                        </div>
-                    ))
+                    <Table
+                        columns={columns}
+                        dataSource={voucherClients.map((client) => ({
+                            key: client.id,
+                            id: client.id,
+                            fullname: `${client.firstname} ${client.lastname}`,
+                            status: client.ClientVoucher.status
+                                ? "Used"
+                                : "Available",
+                        }))}
+                        pagination={{ pageSize: 5 }}
+                    />
                 )}
             </div>
         </div>

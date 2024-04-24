@@ -68,7 +68,7 @@ export abstract class BaseRepository<M extends Model>
                 findOptions,
             );
 
-            return {
+            return { 
                 data: rows,
                 totalCount: count,
                 page: options.paginate?.page,

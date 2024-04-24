@@ -6,6 +6,9 @@ import statusMess from "../Constants/statusMess";
 import { IVoucherRepository } from "../Repositories/IVoucherRepository";
 import { QueryOptions, TYPES } from "../Types/type";
 import { validationResult } from "express-validator";
+// @ts-ignore
+import * as faker from "faker";
+
 /// <reference path="./types/globle.d.ts" />
 import {
     ValidationError,
@@ -14,7 +17,6 @@ import {
 } from "../Errors";
 import { IClientRepository } from "../Repositories";
 import { parseRequesQueries } from "../Helper/helper";
-
 export class VoucherService {
     constructor(
         private voucherRepository = container.get<IVoucherRepository>(
@@ -48,6 +50,7 @@ export class VoucherService {
             next(err);
         }
     }
+
     public async updateVoucher(
         req: Request,
         res: Response,
@@ -76,11 +79,17 @@ export class VoucherService {
     ) {
         try {
             const status: number = HttpStatusCode.Success;
-            console.log(req.body);
-            const data = await this.voucherRepository.create(req.body.data);
-            if (!data) {
-                throw new RecordNotFoundError("Voucher do not exist");
+            let promo_code = faker.random.alphaNumeric(10);
+            let voucher = await this.voucherRepository.findByCode(promo_code);
+            let data: any;
+            while (voucher.length != 0) {
+                promo_code = faker.random.alphaNumeric(10);
+                voucher = await this.voucherRepository.findByCode(promo_code);
             }
+            data = await this.voucherRepository.create({
+                ...req.body.data,
+                promo_code: promo_code,
+            });
             Message.logMessage(req, status);
             return res.status(status).send(statusMess.Success);
         } catch (err) {
@@ -88,6 +97,7 @@ export class VoucherService {
             next(err);
         }
     }
+
     public async deleteVoucher(
         req: Request,
         res: Response,
@@ -126,13 +136,17 @@ export class VoucherService {
         }
     }
 
-    public async getVoucherClients(req: Request, res: Response, next: NextFunction) {
+    public async getVoucherClients(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
         try {
             const status: number = HttpStatusCode.Success;
             const data = await this.voucherRepository.findById(
                 parseInt(req.params.id)
             );
-            const clients = await data.getClients()
+            const clients = await data.getClients();
             if (!data) {
                 throw new RecordNotFoundError("Voucher do not exist");
             }
@@ -157,26 +171,43 @@ export class VoucherService {
             if (!voucher) {
                 throw new RecordNotFoundError("Voucher does not exist");
             }
-            if (req.query.profit || req.query.type) {
+            if (req.query.profit) {
                 const profit: number = req.query.profit
                     ? parseFloat(req.query.profit as string)
                     : 0;
-                const type: string = req.query.type
-                    ? (req.query.type as string)
-                    : "";
-
-                const clients = await this.clientRepository.findByProfit(profit);
-
-                if (clients) {
+                const clients = await this.clientRepository.findByProfit(
+                    profit,
+                    parseInt(req.params.id)
+                );
+                if (clients.length > 0) {
+                    if (
+                        clients.length >
+                        voucher.getDataValue("quantity") -
+                            voucher.getDataValue("redeemedNumber")
+                    ) {
+                        console.log(
+                            "AAA:",
+                            clients.length -
+                                (voucher.getDataValue("quantity") -
+                                    voucher.getDataValue("redeemedNumber"))
+                        );
+                        return res.status(HttpStatusCode.Success).send({
+                            message: "Not enough quantity",
+                            more:
+                                clients.length -
+                                (voucher.getDataValue("quantity") -
+                                    voucher.getDataValue("redeemedNumber")),
+                        });
+                    }
                     await Promise.all(
-                        clients.map(async (client) => {
+                        clients.map(async (client: any) => {
                             const clientVouchers = await voucher.getClients({
                                 where: { id: client.id },
                             });
                             if (clientVouchers.length === 0) {
                                 await voucher.addClient(client, {
                                     through: {
-                                        quantity: 1,
+                                        status: false,
                                         createdAt: new Date(),
                                         updatedAt: new Date(),
                                     },
@@ -184,9 +215,15 @@ export class VoucherService {
                             }
                         })
                     );
+                    const redeemedClient = await voucher.getClients();
+                    voucher.update({ redeemedNumber: redeemedClient.length });
+                    voucher.save();
+                } else {
+                    return res
+                        .status(HttpStatusCode.Success)
+                        .send("Already assigned");
                 }
             } else {
-                console.log(req.body.clientsIds)
                 const clientsIds: number[] = req.body.clientsIds;
                 if (!clientsIds || clientsIds.length === 0) {
                     throw new BadRequestError("No clients provided");
@@ -207,7 +244,7 @@ export class VoucherService {
                         if (clientVouchers.length === 0) {
                             await voucher.addClient(client, {
                                 through: {
-                                    quantity: 1,
+                                    status: false,
                                     createdAt: new Date(),
                                     updatedAt: new Date(),
                                 },
@@ -244,13 +281,9 @@ export class VoucherService {
             if (!client) {
                 throw new RecordNotFoundError("Client do not exist");
             }
-            if (req.body.quantity === 0) {
-                await voucher.removeClient(client);
-            } else {
-                await voucher.addVoucher(client, {
-                    quantity: req.body.quantity,
-                });
-            }
+            await voucher.addVoucher(client, {
+                status: true,
+            });
             Message.logMessage(req, status);
             return res.status(status).send(statusMess.Success);
         } catch (err) {

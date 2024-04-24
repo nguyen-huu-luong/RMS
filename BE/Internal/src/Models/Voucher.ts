@@ -38,6 +38,8 @@ Voucher.init(
         minimum_paid: DataTypes.INTEGER,
         begin_date: DataTypes.DATE,
         end_date: DataTypes.DATE,
+        can_redeem: DataTypes.BOOLEAN,
+        redeemedNumber: DataTypes.INTEGER
     },
     {
         sequelize: Loader.sequelize,

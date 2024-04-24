@@ -9,8 +9,6 @@ import {
     Space,
     Select,
     Alert,
-    Descriptions,
-    Tag,
 } from "antd";
 import { TableProps, GetProp, TableColumnType } from "antd";
 import { variables } from "@/app";
@@ -25,7 +23,6 @@ import type {
     Key,
     SortOrder,
 } from "antd/es/table/interface";
-import { Modal } from "antd";
 import { useRouter } from "next-intl/client";
 import { createStyles } from "antd-style";
 import moment from "moment";
@@ -59,6 +56,8 @@ interface DataType {
     minimum_paid: number;
     begin_date: Date;
     end_date: Date;
+    can_redeem: boolean;
+    redeemedNumber: number;
 }
 
 type ErrorType = {
@@ -81,6 +80,7 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const Voucher: React.FC = () => {
+    const router = useRouter()
     const [checker, setChecker] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
@@ -132,6 +132,7 @@ const Voucher: React.FC = () => {
             &pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
                 data_return: true,
             });
+            console.log(results.data)
             const data = results.data.map((item: any) => ({
                 ...item,
                 key: item.id,
@@ -160,51 +161,6 @@ const Voucher: React.FC = () => {
     useEffect(() => {
         fetchData();
     }, [JSON.stringify(tableParams)]);
-
-    const showModal = async (id: any) => {
-        const res = await fetchClient({
-            url: `/orders/${id}`,
-            data_return: true,
-        });
-        console.log(res);
-        if (res) setItems(res.items);
-        setOpen(true);
-    };
-
-    const handleOk = () => {
-        setOpen(false);
-    };
-
-    const handleCancel = () => {
-        setOpen(false);
-    };
-
-    const classNames = {
-        body: styles["my-modal-body"],
-        mask: styles["my-modal-mask"],
-        header: styles["my-modal-header"],
-        footer: styles["my-modal-footer"],
-        content: styles["my-modal-content"],
-    };
-
-    const modalStyles = {
-        header: {
-            borderRadius: 0,
-            borderBottom: "1px solid #ccc",
-            paddingBottom: 4,
-            marginBottom: 24,
-        },
-        body: {
-            borderRadius: 5,
-        },
-        footer: {
-            borderTop: "1px solid #ccc",
-            paddingTop: 16,
-        },
-        content: {
-            padding: 20,
-        },
-    };
 
     const handleSearch = (
         selectedKeys: string[],
@@ -349,7 +305,7 @@ const Voucher: React.FC = () => {
             dataIndex: "id",
             key: "id",
             render: (text, record) => (
-                <span className="text-blue-600 cursor-pointer" onClick={() => handleAssignModal(record.id)}>
+                <span className="text-blue-600 cursor-pointer" onClick={() => router.push(`vouchers/${record.id.toString()}`)}>
                     {text}
                 </span>
             ),
@@ -388,6 +344,11 @@ const Voucher: React.FC = () => {
             title: "Quantity",
             dataIndex: "quantity",
             key: "quantity",
+            render: (text, record) => (
+                <span>
+                    {record.redeemedNumber}/{text}
+                </span>
+            ),
             ...getColumnSearchProps("quantity"),
         },
         {
@@ -414,20 +375,6 @@ const Voucher: React.FC = () => {
             },
             ...getColumnSearchProps("begin_date"),
         },
-        // {
-        //     title: "Action",
-        //     key: "action",
-        //     render: (text, record) => (
-        //         <span>
-        //             {/* <Button onClick={() => handleUpdate(record.id)}>
-        //                 Update
-        //             </Button> */}
-        //             {/* <Button onClick={() => handleDelete(record.id)}>
-        //                 Delete
-        //             </Button> */}
-        //         </span>
-        //     ),
-        // },
     ];
 
     const handleTableChange: TableProps["onChange"] = (
@@ -605,42 +552,6 @@ const Voucher: React.FC = () => {
                     </div>
                 </div>
             </ConfigProvider>
-            {/* <Modal
-                classNames={classNames}
-                styles={modalStyles}
-                title='Edit voucher '
-                open={open}
-                onOk={handleOk}
-                okType='primary'
-                okButtonProps={{ className: "bg-primary" }}
-                cancelText='Cancel'
-                onCancel={handleCancel}
-                footer={null}
-            >
-                <EditVoucherForm
-                    voucherId={voucher}
-                    afterSubmit={handleOk}
-                    afterCancel={handleCancel}
-                />
-            </Modal> */}
-            <Modal
-                classNames={classNames}
-                styles={modalStyles}
-                title='Assign Voucher'
-                open={open}
-                onOk={handleOk}
-                okType='primary'
-                okButtonProps={{ className: "bg-primary" }}
-                cancelText='Cancel'
-                onCancel={handleCancel}
-                footer={null}
-            >
-                <AssignVoucherForm
-                    voucherId={voucher}
-                    afterSubmit={handleOk}
-                    afterCancel={handleCancel}
-                />
-            </Modal>
         </>
     );
 };

@@ -3,7 +3,7 @@ const faker = require("faker");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const vouchers = Array.from({ length: 50 }, () => {
+    const vouchers = Array.from({ length: 10 }, () => {
       return {
         name: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
@@ -15,6 +15,8 @@ module.exports = {
         quantity: faker.random.number({ min: 1, max: 10 }),
         begin_date: new Date(),
         end_date: faker.date.future(),
+        can_redeem: true,
+        redeemedNumber:  0,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
