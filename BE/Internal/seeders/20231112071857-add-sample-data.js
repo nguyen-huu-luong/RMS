@@ -20,7 +20,7 @@ const sources = [
 ]
 
 const types = [
-    "Lead", "Customer"
+    "lead", "customer"
 ]
 
 const newData = [
@@ -76,6 +76,7 @@ module.exports = {
             };
             clients.push(client);
         }
+
         const admins = [
             {
                 username: "manager",

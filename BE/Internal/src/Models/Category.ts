@@ -17,7 +17,7 @@ Category.init(
   {
       name: DataTypes.STRING,
       description: DataTypes.STRING,
-      thumnails: DataTypes.BLOB,
+      thumnails: DataTypes.STRING,
   },
   {
       sequelize: Loader.sequelize,

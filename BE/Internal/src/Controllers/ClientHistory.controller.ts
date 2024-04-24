@@ -13,6 +13,9 @@ class ClientHistoryController {
         this.clientHistoryService.create(req, res, next)
     }
 
+    public getById(req: Request, res: Response, next: NextFunction) {
+        this.clientHistoryService.getById(req, res, next)
+    }
 }
 
 export default ClientHistoryController;

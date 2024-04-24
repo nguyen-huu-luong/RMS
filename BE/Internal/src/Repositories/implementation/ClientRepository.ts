@@ -5,18 +5,17 @@ import { BaseRepository } from "./BaseRepository";
 import { Client } from "../../Models";
 import Token from "../../Models/Token";
 import { REFRESH_TOKEN } from "../../Constants";
+import { Op } from "sequelize";
 
 @injectable()
 export class ClientRepository
 	extends BaseRepository<Client>
-	implements IClientRepository
-{
+	implements IClientRepository {
 	constructor() {
-		super(Client, ["id", "firstname", "lastname", "phone", "email", "gender","type", "birthday", "score", "createdAt", "updatedAt"]);
+		super(Client, ["id", "firstname", "lastname", "phone", "email", "gender","type", "birthday", "source", "score", "createdAt", "updatedAt"]);
 	}
 
 	public async findByEmail(email: string): Promise<Client | null> {
-		console.log("fadsfdsa")
 		return await this._model.findOne({ where: { email: email } });
 	}
 
@@ -27,5 +26,20 @@ export class ClientRepository
 		return await user.save();
 	}
 
-	
+	public async checkExist(phone: string, email: string) {
+		return await this._model.findAll({
+			where: {
+				phone: phone,
+				email: email
+			}
+		})
+	}
+
+	public async findByCond(cond: any) {
+		return await this._model.findAll(cond)
+	}
+
+	public async updateBaseCond(value: any, cond:any){
+		return await this._model.update(value, cond)
+	}
 }

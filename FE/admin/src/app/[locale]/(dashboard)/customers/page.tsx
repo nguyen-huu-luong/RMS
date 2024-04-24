@@ -17,13 +17,18 @@ interface DataType {
 	createdAt: string;
 	birthday: string;
 	source: string;
-	group: string[];
 	score: number;
 	age: number;
 	address: string;
 	// updatedAt: Date ;
 }
 
+const getAge = (birthday: string) => {
+	let currentDate = new Date()
+	let currentYear = Number(currentDate.getFullYear())
+	let birthdayYear = Number(birthday.split('-')[0])
+	return Math.abs(currentYear - birthdayYear)
+}
 
 const CustomerListPages: React.FC = () => {
 	const [selectedRows, setSelectedRows] = useState<DataType[]>([])
@@ -60,6 +65,7 @@ const CustomerListPages: React.FC = () => {
 			title: "Birthday",
 			dataIndex: "birthday",
 			key: "birthday",
+			render: (text, _) => <span>{text.split('T')[0]}</span>   
 		},
 		{
 			title: "Score",
@@ -67,14 +73,10 @@ const CustomerListPages: React.FC = () => {
 			key: "score",
 		},
 		{
-			title: "Group",
-			dataIndex: "group",
-			key: "group",
-		},
-		{
 			title: "Age",
 			dataIndex: "age",
 			key: "age",
+			render: (text, row) => <span>{getAge(row.birthday)}</span>
 		},
 		{
 			title: "CreatedAt",

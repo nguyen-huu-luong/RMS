@@ -18,7 +18,8 @@ import {
 	Voucher,
 	Channel,
 	Message,
-	Notification
+	Notification,
+	Pos_notification
 } from ".";
 import ClickEvent from "./ClickEvent";
 import EmailCampaignTargetList from "./EmailCampaignTargetlist";

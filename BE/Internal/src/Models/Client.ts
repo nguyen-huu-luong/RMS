@@ -32,6 +32,7 @@ import Channel from "./Channel";
 import Message from "./Message";
 import Notification from "./Notification";
 import ClientHistory from "./ClientHistory";
+import Group from "./Group";
 
 class Client extends Person {
 	declare getOrders: HasManyGetAssociationsMixin<Order>;
@@ -90,6 +91,13 @@ class Client extends Person {
 			foreignKey: "clientId",
 			otherKey: "targetListId",
 		});
+
+		Client.belongsTo(Group, {
+            foreignKey: {
+              name: "groupId",
+              allowNull: true,
+            }
+          })
 
 		// Client.hasMany(Reservation, {
 		// 	foreignKey: {
@@ -226,6 +234,10 @@ Client.init(
 		},
 		total_items: {
 			type: DataTypes.INTEGER,
+			defaultValue: 0,
+		},
+		convertDate: {
+			type: DataTypes.DATE,
 			defaultValue: 0,
 		},
 	},

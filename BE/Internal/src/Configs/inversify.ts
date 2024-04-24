@@ -23,8 +23,10 @@ import {
 	CartItemRepository,
 	INotificationRepository,
 	NotificationRepository,
-	ClientHistoryRepository
-
+	ClientHistoryRepository,
+	Pos_notificationRepository,
+	GroupRepository,
+	IGroupRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -54,6 +56,7 @@ import { EmailCampaignRepository } from "../Repositories/implementation/EmailCam
 import { ITrackUrlRepository } from "../Repositories/IITrackUrlRepository";
 import { TrackUrlRepository } from "../Repositories/implementation/TrackUrlRepository";
 
+import { IPos_notificationRepository } from "../Repositories/IPos_notificationRepository";
 class InversifyContainer {
 	private container;
 	static instance: InversifyContainer ;
@@ -110,6 +113,8 @@ class InversifyContainer {
 		this.container.bind<ISubscriberRepository>(TYPES.ISubscriberRepository).to(SubscriberRepository)
 		this.container.bind<IEmailCampaignRepository>(TYPES.IEmailCampaignRepository).to(EmailCampaignRepository)
 		this.container.bind<ITrackUrlRepository>(TYPES.ITrackUrlRepository).to(TrackUrlRepository)
+		this.container.bind<IPos_notificationRepository>(TYPES.IPos_notificationRepository).to(Pos_notificationRepository)
+		this.container.bind<IGroupRepository>(TYPES.IGroupRepository).to(GroupRepository)
 	}
 }
 
