@@ -1,12 +1,16 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { EditOutlined, EllipsisOutlined, CalendarOutlined, ArrowRightOutlined, UserOutlined, CloseCircleFilled } from '@ant-design/icons';
-import { Space, Table, Tag } from 'antd';
+import { Space, Table, Tag, Upload, message, Tooltip } from 'antd';
+import type { UploadProps } from "antd";
+import { UploadOutlined } from '@ant-design/icons';
+import { uploadImage } from '@/app/api/upload';
 import type { TableProps } from 'antd';
-import useSWR from "swr";
+import Loading from "@/components/loading";
 import fetchClient from "@/lib/fetch-client";
 import { useParams } from 'next/navigation'
 import { useSession } from "next-auth/react";
+
 
 const CustomerProfile = () => {
     const editStyle = { outline: "0", backgroundColor: "#F6FAFD", border: "1px solid #DADAD9", paddingLeft: "5px" }
@@ -23,21 +27,39 @@ const CustomerProfile = () => {
     const [editFlag, setFlag] = useState(true)
     const [style, setStyle] = useState(normalStyle)
     const [user, setUser] = useState(null)
-
+    const [imageUrl, setImageUrl] = useState('')
     const [checker, setChecker] = useState(0)
+    const [customerInfo, setCustomerInfo] = useState<any>()
+    const [isLoading, setIsLoading] = useState(true)
+    const [customerHistory, setCustomerHistory] = useState()
+    const historyTitle: any = {
+        "add_to_cart": { "title": "Add To Cart", "color": "geekblue", "link": "../bussiness/products/dishes", "reference": "Product ID:" },
+        "view_item": { "title": "View Item", "color": "green", "link": "../bussiness/products/dishes", "reference": "Product ID:" },
+        "order": { "title": "Make An Order", "color": "volcano", "link": "../sale/orders", "reference": "Order ID:" }
+    }
 
-    const {
-        data: customerInfo,
-        error: customerInfoError,
-        isLoading: customerInfoLoading
-    } = useSWR( [params.cid], ([customerId]) => fetchClient({url: `/customers/${customerId}`, data_return: true}));
+    const fetchData = async () => {
+        setIsLoading(true)
+        const data = await fetchClient({ url: `/customers/${params.cid}`, data_return: true })
+        const histories = await fetchClient({ url: `/clienthistories/${params.cid}`, data_return: true })
+        console.log(histories)
+        setCustomerInfo(data)
+        setCustomerHistory(histories)
+        setImageUrl(data.avatar)
+        setIsLoading(false)
+
+    }
+
+    useEffect(() => {
+        fetchData()
+    }, [])
 
     let userInfo: any
 
-    if (customerInfoLoading) {
+    if (isLoading) {
         return (
             <>
-                <p>Loading</p>
+                <Loading />
             </>
         )
     }
@@ -50,6 +72,32 @@ const CustomerProfile = () => {
             }
         }
     }
+
+    const handleUpload = async ({
+        file,
+        onSuccess,
+    }: {
+        file?: any;
+        onSuccess?: any;
+    }) => {
+        const data = await uploadImage(file, "Dish");
+        if (data.url) {
+            setImageUrl(data.url)
+        }
+        onSuccess("ok");
+    };
+
+    const props: UploadProps = {
+        name: "image",
+        customRequest: handleUpload,
+        onChange(info) {
+            if (info.file.status === "done") {
+                message.success(`Upload avatar successfully`);
+            } else if (info.file.status === "error") {
+                message.error(`Change avatar failed.`);
+            }
+        },
+    };
 
     const handelTabClick = (num: number) => {
         setTab(num)
@@ -75,6 +123,7 @@ const CustomerProfile = () => {
             event.target.email.value = userInfo.email ? userInfo.email : "None"
             event.target.phone.value = userInfo.phone ? userInfo.phone : "None"
             event.target.address.value = userInfo.address ? userInfo.address : "None"
+            setImageUrl(customerInfo.avatar)
         }
         else {
             let name = event.target.username.value.split(" ");
@@ -89,9 +138,10 @@ const CustomerProfile = () => {
                 "source": event.target.source.value == "none" ? userInfo.source : event.target.source.value,
                 "birthday": event.target.birthday.value == "" ? userInfo.birthday : event.target.birthday.value,
                 "firstname": first_name,
-                "lastname": last_name.trim()
+                "lastname": last_name.trim(),
+                "avatar": imageUrl
             }
-            await fetchClient({method: "PUT",url: `/customers/${params.cid}`, body: data,data_return: true})
+            await fetchClient({ method: "PUT", url: `/customers/${params.cid}`, body: data, data_return: true })
 
         }
         setFlag(true)
@@ -112,6 +162,15 @@ const CustomerProfile = () => {
         name: string;
         types: string[];
         date: string;
+    }
+
+    interface CustomerHistoryDataType {
+        key: string;
+        action: string;
+        reference: string[];
+        createdAt: string;
+        orderId: string;
+        productId: string
     }
 
     const columns_activity: TableProps<ActivityDataType>['columns'] = [
@@ -150,12 +209,36 @@ const CustomerProfile = () => {
     ];
 
 
+    const users_activity: TableProps<CustomerHistoryDataType>['columns'] = [
+        {
+            title: 'Action',
+            dataIndex: 'action',
+            key: 'action',
+            render: (text) =>
+                <Tag color={historyTitle[text].color}>
+                    {historyTitle[text].title.toUpperCase()}
+                </Tag>
+        },
+        {
+            title: 'Reference',
+            key: 'reference',
+            render: (_, record) => <a style={{ color: "#4A58EC" }} href={historyTitle[record.action].link}>{historyTitle[record.action].reference} {record.orderId ? record.orderId : record.productId}</a>,
+        },
+        {
+            title: 'Date',
+            dataIndex: 'date',
+            key: 'date',
+            render: (_, record) => <a><CalendarOutlined style={{ color: "#4A58EC" }} /> {record.createdAt}</a>,
+        }
+    ];
+
+
     const columns_order: TableProps<OrderDataType>['columns'] = [
         {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
-            render: (text) => <a>{text}</a>,
+            render: (text) => <a style={{ color: "#4A58EC" }} href="../sale/orders">{text}</a>,
         },
         {
             title: 'Status',
@@ -178,15 +261,16 @@ const CustomerProfile = () => {
             ),
         },
         {
+            title: 'Amount',
+            dataIndex: 'amount',
+            key: 'amount',
+            render: (text) => <p>{text} VND</p>
+        },
+        {
             title: 'Created at',
             dataIndex: 'create_at',
             key: 'create_at',
             render: (text) => <><CalendarOutlined style={{ color: "#4A58EC" }} /> {text}</>,
-        },
-        {
-            title: 'Amount',
-            dataIndex: 'amount',
-            key: 'amount',
         }
     ];
 
@@ -207,15 +291,6 @@ const CustomerProfile = () => {
             key: '1',
             name: 'Send “Happy birthday” automated email',
             types: ['Automation'],
-            date: '2011-09-29',
-        },
-    ];
-
-    const userData: ActivityDataType[] = [
-        {
-            key: '1',
-            name: 'Request an order',
-            types: ['Order'],
             date: '2011-09-29',
         },
     ];
@@ -245,8 +320,19 @@ const CustomerProfile = () => {
                                 <div className="bg-white pl-3 py-2">
                                     <h1 className="font-bold">Overview</h1>
                                     <div className="mt-3 grid grid-cols-5 gap-4">
-                                        <div style={{ width: "120px", height: "120px" }}>
-                                            <img src="https://ps.w.org/user-avatar-reloaded/assets/icon-256x256.png?rev=2540745" />
+                                        <div className='relative' style={{ width: "120px", height: "120px" }}>
+                                            <div style={{ width: "120px", height: "120px" }}>
+                                                <img style={{ width: "120px", height: "120px" }} src={imageUrl} className="rounded" />
+                                            </div>
+                                            <div >
+                                                <Upload
+                                                    {...props}
+                                                    showUploadList={false}
+                                                    listType="picture"
+                                                    maxCount={1}>
+                                                    {!editFlag && <button type="button" className='absolute' style={{ top: "80%", left: "50%", transform: "translateX(-50%)" }}><UploadOutlined style={{ fontWeight: "20px", fontSize: "20px", color: "gray" }} /></button>}
+                                                </Upload>
+                                            </div>
                                         </div>
                                         <div>
                                             <p className="font-bold">Name</p>
@@ -270,10 +356,10 @@ const CustomerProfile = () => {
                                         <div>
                                             <p className="font-bold ">Source</p>
                                             <select className="rounded-md py-1.5" defaultValue={userInfo.source ? userInfo.source : "none"} style={style} disabled={editFlag} name="source">
-                                                <option value={"website 1"}>Website 1</option>
-                                                <option value={"website 2"}>Website 2</option>
-                                                <option value={"website 3"}>Website 3</option>
-                                                <option value={"website 4"}>Website 4</option>
+                                                <option value={"Tiktok"}>Tiktok</option>
+                                                <option value={"Facebook"}>Facebook</option>
+                                                <option value={"Website"}>Website</option>
+                                                <option value={"At Restaurant"}>At Restaurant</option>
                                                 <option value={"none"}>None</option>
                                             </select>
                                         </div>
@@ -304,10 +390,23 @@ const CustomerProfile = () => {
                                     <div className="mt-3">
                                         <p className="font-bold mb-1">Group</p>
                                         <div>
-                                            <span className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-gray-600 " style={{ backgroundColor: "#E7E9FD", color: "#4A58EC", borderRadius: "30px" }}>
-                                                <UserOutlined /> &nbsp;  Group1 &nbsp; <button>  <CloseCircleFilled style={{ color: "black" }} /> </button>
-                                            </span>
-                                            {!editFlag && <button type="button" className="ml-2 text-xs font-medium me-2 px-1.5 py-0.5 rounded dark:text-gray-400 border border-gray-500" style={{ backgroundColor: "#F9FAFB" }}>Add +</button>}
+                                            {
+                                                customerInfo.group.length > 0 ? (
+                                                    <Tooltip placement="top" title={customerInfo.group[0].description} >
+                                                        <button className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-gray-600 " style={{ backgroundColor: "#E7E9FD", color: "#4A58EC", borderRadius: "30px" }}>
+                                                            {/* <UserOutlined /> &nbsp;  Group1 &nbsp; <button>  <CloseCircleFilled style={{ color: "black" }} /> </button> */}
+                                                            <UserOutlined /> &nbsp;  {customerInfo.group[0].name} &nbsp;
+                                                        </button>
+                                                    </Tooltip>
+                                                )
+                                                    : (
+                                                        (<span className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-gray-600 " style={{ backgroundColor: "#E7E9FD", color: "#4A58EC", borderRadius: "30px" }}>
+                                                            {/* <UserOutlined /> &nbsp;  Group1 &nbsp; <button>  <CloseCircleFilled style={{ color: "black" }} /> </button> */}
+                                                            <UserOutlined /> &nbsp;  None &nbsp;
+                                                        </span>)
+                                                    )
+                                            }
+                                            {/* {!editFlag && <button type="button" className="ml-2 text-xs font-medium me-2 px-1.5 py-0.5 rounded dark:text-gray-400 border border-gray-500" style={{ backgroundColor: "#F9FAFB" }}>Add +</button>} */}
                                         </div>
                                     </div>
 
@@ -320,7 +419,7 @@ const CustomerProfile = () => {
 
                                         <div>
                                             <p className="font-bold">Paid</p>
-                                            <p style={{ color: "#54B435" }}>{totalCost} vnđ</p>
+                                            <p style={{ color: "#54B435" }}>{totalCost} VND</p>
                                         </div>
                                         <div>
                                             <p className="font-bold">Score</p>
@@ -352,11 +451,17 @@ const CustomerProfile = () => {
                                             tab == 0 ? <div> <Table columns={columns_order} dataSource={orderData} /></div>
                                                 : <div>
                                                     <div>
-                                                        <h3 className="mb-2">Business activities</h3>
-                                                        <Table columns={columns_activity} dataSource={businessData} /></div>
-                                                    <div>
                                                         <h3 className="mb-2">User activities</h3>
-                                                        <Table columns={columns_activity} dataSource={userData} /></div>
+                                                        <Table columns={users_activity} dataSource={customerHistory}
+                                                            pagination={{
+                                                                pageSize: 3,
+                                                            }} /></div>
+                                                    <div>
+                                                        <h3 className="mb-2">Business activities</h3>
+                                                        <Table columns={columns_activity} dataSource={businessData}
+                                                            pagination={{
+                                                                pageSize: 3,
+                                                            }} /></div>
                                                 </div>
                                         }
                                     </div>

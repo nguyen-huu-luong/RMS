@@ -15,4 +15,8 @@ export class ProductRepository
 		super(Product);
 	}
 
+	public async findByCond(cond: any) {
+		return await this._model.findAll(cond)
+	}
+
 }

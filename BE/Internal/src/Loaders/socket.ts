@@ -211,6 +211,14 @@ class SocketConnection {
                 io.to("Kitchen").emit("order:prepare:fromStaff", orderId);
             });
 
+            // Table service
+            socket.on("staff:table:prepare", (tableId: string) => {
+                io.to("Kitchen").emit("table:prepare:fromStaff", tableId);
+            });
+            socket.on("chef:tableItem:finish", (tableId: string, name: string) => {
+                io.to("Kitchen").emit("tableItem:finish:fromChef", tableId, name);
+            });
+
             //Notification service
             socket.on(
                 "staff:notifications:prepare",

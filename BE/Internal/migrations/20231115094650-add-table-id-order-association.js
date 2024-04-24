@@ -10,7 +10,7 @@ module.exports = {
       },
       allowNull: true,
       onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+      onDelete: 'SET NULL',
     });
   },
 

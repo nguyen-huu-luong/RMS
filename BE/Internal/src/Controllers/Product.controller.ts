@@ -12,6 +12,11 @@ class ProductController {
     public getAll(req: Request, res: Response, next: NextFunction) {
         this.productService.getAll(req, res, next);
     }
+
+    public  getAllFullInformation(req: Request, res: Response, next: NextFunction){
+        this.productService.getAllFullInformation(req, res, next);
+    }
+
     public updateProduct(req: Request, res: Response, next: NextFunction) {
         this.productService.updateProduct(req, res, next);
     }
@@ -25,7 +30,9 @@ class ProductController {
         this.productService.getProduct(req, res, next);
     }
 
-
+    public async getRecommendItem(req: Request, res: Response, next: NextFunction) {
+        this.productService.getRecommendItem(req, res, next)
+    }
 }
 
 export default ProductController;

@@ -23,13 +23,14 @@ export function LogRequests(target: any) {
 				const url: string = req.url;
 				const method: string = req.method;
 				const host: string = req.headers.host as string;
+				const ip: string = req.ip as string;
 				const currentDate: Date = new Date()
 				let currentTime: string = currentDate.toTimeString()
 				const pos: number = currentTime.indexOf('GMT')
 
 				currentTime = currentTime.substring(0, pos - 1);
 				
-				console.log(`${currentTime} | ${method} ${url} ${host}`);
+				console.log(`${currentTime} | ${method} ${url} ${host} ${ip}`);
 				// Execute the original method
 				const result = await originalMethod.apply(this, [req, res, next]);
 
@@ -66,6 +67,7 @@ export function AddTryCatchBlock(target: any) {
 					const result = await originalMethod.apply(this, [req, res, next]);
 					return result;
 				} catch (error) {
+					console.log(error)
 					next(error)
 				}
 			};

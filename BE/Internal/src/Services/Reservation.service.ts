@@ -42,22 +42,20 @@ export class ReservationService {
                 let dicFloors: Dictionary<any> = {}
                 let dicReservations: Dictionary<any> = {}
 
-                await Promise.all(
-                    floors.map(async (item: any) => {
-                        let tables_ = await this.tableRepository.viewTables(item.id)
-                        let index = item.name
-                        dicFloors[index] = tables_
-                    })
-                );
+                for (let idx in floors) {
+                    const item: any = floors[idx]
+                    let tables_ = await this.tableRepository.viewTables(item.id)
+                    let index = item.name
+                    dicFloors[index] = tables_
+                }
 
 
-                await Promise.all(
-                    dates.map(async (item: any) => {
-                        let ress = await this.reservationRepository.viewRes(item.dateTo)
-                        let index = item.dateTo
-                        dicReservations[index] = ress
-                    })
-                );
+                for (let idx in dates) {
+                    const item: any = dates[idx]
+                    let ress = await this.reservationRepository.viewRes(item.dateTo)
+                    let index = item.dateTo
+                    dicReservations[index] = ress
+                }
 
                 let table_reservations_info: Dictionary<string> = {}
 
@@ -108,15 +106,14 @@ export class ReservationService {
                     valid_reservations_array.push(item.reservationId)
                 })
 
-                await Promise.all(
-                    dates.map(async (item: any) => {
-                        let ress = await this.reservationRepository.getFilterReservation(valid_reservations_array, item.dateTo, status_)
-                        if (ress.length > 0) {
-                            let index = item.dateTo
-                            dicReservations[index] = ress
-                        }
-                    })
-                );
+                for (let idx in dates) {
+                    const item = dates[idx]
+                    let ress = await this.reservationRepository.getFilterReservation(valid_reservations_array, item.dateTo, status_)
+                    if (ress.length > 0) {
+                        let index = item.dateTo
+                        dicReservations[index] = ress
+                    }
+                }
 
                 res.send({ "reservarions": dicReservations })
             }
@@ -188,6 +185,7 @@ export class ReservationService {
                     }
                     else {
                         res.send({ "message": "These tables are occupied in this time" })
+                        return 
                     }
                 }
                 const new_res: any = await this.reservationRepository.create({

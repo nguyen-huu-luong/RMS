@@ -383,4 +383,22 @@ export class ClientRepository
             message.queryError(err);
         }
     }
+
+    public async checkExist(phone: string, email: string) {
+		return await this._model.findAll({
+			where: {
+				phone: phone,
+				email: email
+			}
+		})
+	}
+
+	public async findByCond(cond: any) {
+		return await this._model.findAll(cond)
+	}
+
+	public async updateBaseCond(value: any, cond:any){
+		return await this._model.update(value, cond)
+	}
+    
 }

@@ -10,6 +10,7 @@ import FoodDetail from "@/components/menu/foodDetail";
 import useSWR from "swr";
 import Loading from "@/components/loading";
 import publicFetcher from "@/lib/public-fetcher";
+import fetchClient from "@/lib/fetch-client";
 
 export default function Menu() {
     const searchParams = useSearchParams();
@@ -48,7 +49,13 @@ export default function Menu() {
         price: 0,
         categoryId: "",
     });
-    const openModal = (item: typeof detail) => {
+    const openModal = async (item: typeof detail) => {
+        await fetchClient({method: "POST", url: `/clienthistories`, body: {
+            action: "view_item",
+            productId: item.id,
+            updatedAt:  new Date(),
+            createdAt: new Date()
+        }})
         setDetail(item)
         setModal(true);
     };

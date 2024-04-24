@@ -48,6 +48,13 @@ const phone = [
     "0582 568 184",
     "0838 060 168"
 ]
+
+const group = [1,2,3,4,5,6]
+
+function randomDate(start, end) {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
+  }
+
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         const clientPassword = await bcrypt.hash("client", 10) ;
@@ -67,7 +74,9 @@ module.exports = {
                 score: 0,
                 address: address,
                 source: sources[Math.floor(Math.random() * sources.length)],
+                groupId: group[Math.floor(Math.random()* group.length)],
                 type: types[Math.floor(Math.random() * types.length)],
+                convertDate: randomDate(new Date(2012, 0, 1), new Date()),
                 hashedPassword: clientPassword,
                 isRegistered: true,
                 isActive: true,
@@ -95,6 +104,8 @@ module.exports = {
                 birthday: new Date(),
                 avatar: avatar[i % 10],
                 score: 0,
+                groupId: group[Math.floor(Math.random()* group.length)],
+                convertDate: randomDate(new Date(2012, 0, 1), new Date()),
                 address: "Address",
                 source: sources[Math.floor(Math.random() * sources.length)],
                 type: types[Math.floor(Math.random() * types.length)],

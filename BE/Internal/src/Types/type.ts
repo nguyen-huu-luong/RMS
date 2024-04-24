@@ -1,10 +1,11 @@
 const TYPES = {
     // IClientController: Symbol.for("IClientController"),
     // IClientService: Symbol.for("IClientService"),
-    
+
     IBaseRepository: Symbol.for("IBaseRepository"),
     IClientRepository: Symbol.for("IClientRepository"),
     IOrderRepository: Symbol.for("IOrderRepository"),
+    IOrderItemRepository: Symbol.for("IOrderItemRepository"),
     IEmployeeRepository: Symbol.for("EmployeeRepository"),
     IPermissionRepository: Symbol.for("IPermissionRepository"),
     IProductRepository: Symbol.for("IProductRepository"),
@@ -24,19 +25,21 @@ const TYPES = {
     IClickEventRepository: Symbol.for("IClickEventREpository"),
     IOpenEventRepository: Symbol.for("IOpenEventRepository"),
     INotificationRepository: Symbol.for("INotificationRepository"),
+    IPos_notificationRepository: Symbol.for("IPos_notificationRepository"),
+    IClientHistoryRepository: Symbol.for("IClientHistoryRepository"),
+    ISubscriberRepository: Symbol.for("ISubscriberRepository"),
+
+    ICampaignRepository: Symbol.for("ICampaignReposittory"),
+    ITargetListRepository: Symbol.for("ITargetListRepository"),
+    IGroupRepository: Symbol.for("IGroupRepository")
 };
 
 type FilterCondition = {
     value: string | number;  // hoặc có thể sử dụng union type nếu giá trị có thể là nhiều kiểu khác nhau
-    op: string | "gt"| "lt"| "gte" | "lte";
+    op: string | "gt" | "lt" | "gte" | "lte";
 };
 
 type RegularFilter = Record<string, string>;
-
-type Filter = {
-    [key: string]: FilterCondition[] | string;
-};
-
 
 type QueryOptions = {
     filter: Filter,
@@ -56,5 +59,36 @@ type ChartQueryOptions = {
     beginDate?: Date,
     endDate?: Date
 }
+
+
+type Filter = {
+    [key: string]: FilterObject;
+};
+
+export interface FilterObject {
+    [filterName: string]: {
+        eq?: any;
+        neq?: any;
+        not?: any;
+        gt?: any;
+        gte?: any;
+        lt?: any;
+        lte?: any;
+        between?: [any, any];
+        notBetween?: [any, any];
+        in?: any[];
+        notIn?: any[];
+
+        like?: any[];
+        notLike?: any[];
+        startsWith?: any[];
+        endsWith?: any[];
+        substring?: any[];
+        iLike?: any[];
+        notILike?: any[];
+    };
+}
+
+
 
 export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter, ChartQueryOptions };

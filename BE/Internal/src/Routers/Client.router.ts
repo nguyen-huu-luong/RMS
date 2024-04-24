@@ -24,7 +24,9 @@ class ClientRouter {
         clientRouter.delete("/:id", this.clientController.delete.bind(this.clientController));
         clientRouter.put("", this.clientController.updateCustomer.bind(this.clientController));
         clientRouter.get("", this.clientController.getCustomerInfo.bind(this.clientController));
-
+        clientRouter.get("/opportunity/all", this.clientController.getOpporturnityCustomer.bind(this.clientController))
+        clientRouter.post("/segment", this.clientController.segmentCustomerAll.bind(this.clientController))
+        clientRouter.post("/segment/:id", this.clientController.segmentCustomer.bind(this.clientController))
         router.use("/customers", AuthMiddleware.initialize, Authorization.initialize, clientRouter);
     }
 }

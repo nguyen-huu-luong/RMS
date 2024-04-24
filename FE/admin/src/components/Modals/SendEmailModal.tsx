@@ -28,9 +28,7 @@ export const SendEmailModal: React.FC<ISendEmailModal> = ({ emailLists }) => {
     };
 
 
-
-
-    return <main className="bg-white w-full py-2 px-3 rounded-md border relative">
+    return <main>
         <Button icon={<PlusCircleOutlined />} onClick={showModal}>
             Send Email
         </Button>

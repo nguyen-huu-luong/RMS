@@ -131,7 +131,7 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
             sender: values["senderEmail"],
             receivers: customerEmailLists,
             subject: values["subject"],
-            emailCampaignName: values["emailCampaign"],
+            campaignName: values["emailCampaign"],
             html: emailTemplateData.template.content || content,
             type: emailTemplateData.template.content ? "mjml" : "html"
         }

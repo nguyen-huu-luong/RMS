@@ -95,7 +95,7 @@ export class AuthService {
 			if (!errors.isEmpty()) {
 				throw new ValidationError(errors.array()[0].msg);
 			}
-			const { firstname, lastname, email, password } = req.body;
+			const { firstname, lastname, email, password, birthday } = req.body;
 			let user = await this.clientRepository.findByEmail(email);
 			if (user) {
 				if (user.isRegistered) {
@@ -114,6 +114,7 @@ export class AuthService {
 					firstname,
 					lastname,
 					hashedPassword,
+					birthday,
 					isRegistered: true,
 					type: ClientType.LEAD,
 				});
@@ -123,6 +124,7 @@ export class AuthService {
 					clientId: user.getDataValue('id')
 				})
 				await user.createChannel()
+				
 				this.sendToken(res, user);
 			}
 		} catch (err) {

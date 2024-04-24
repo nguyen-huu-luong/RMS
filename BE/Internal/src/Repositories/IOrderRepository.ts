@@ -13,4 +13,5 @@ export interface IOrderRepository extends IBaseRepository<Order> {
     getMonthlyTopProduct(): Promise<any>;
     getCustomTopProduct(beginDate?: Date, endDate?: Date): Promise<any>;
     getChart(beginDate?: Date, endDate?: Date): Promise<any>;
+    getByCond(cond: any): Promise<any>;
 } 

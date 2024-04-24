@@ -12,7 +12,7 @@ abstract class BaseError {
 				code: this.code,
 				name: this.name,
 				message: this.message,
-				stackTrace: this.stackTrace,
+				// stackTrace: this.stackTrace,
 			};
 		}
 

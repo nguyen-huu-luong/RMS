@@ -32,6 +32,8 @@ class ReservationController {
     public updateReservationDetail(req: Request, res: Response, next: NextFunction) {
         this.reservationService.updateReservationDetail(req, res, next)
     }
+
+    
 }
 
 export default ReservationController;
