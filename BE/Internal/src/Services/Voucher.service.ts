@@ -180,21 +180,16 @@ export class VoucherService {
                     ? parseFloat(req.query.profit as string)
                     : 0;
                 const clients = await this.clientRepository.findByProfit(
-                    profit,
+                    profit, 
                     parseInt(req.params.id)
                 );
+
                 if (clients.length > 0) {
                     if (
                         clients.length >
                         voucher.getDataValue("quantity") -
                             voucher.getDataValue("redeemedNumber")
                     ) {
-                        console.log(
-                            "AAA:",
-                            clients.length -
-                                (voucher.getDataValue("quantity") -
-                                    voucher.getDataValue("redeemedNumber"))
-                        );
                         return res.status(HttpStatusCode.Success).send({
                             message: "Not enough quantity",
                             more:
@@ -283,7 +278,6 @@ export class VoucherService {
             }
             const client = await this.clientRepository.findById(req.userId);
             if (voucher[0].getDataValue("can_redeem")) {
-                console.log(voucher[0]);
                 await voucher[0].addClient(client, {
                     through: {
                         status: false,
