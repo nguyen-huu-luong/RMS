@@ -180,7 +180,7 @@ export class VoucherService {
                     ? parseFloat(req.query.profit as string)
                     : 0;
                 const clients = await this.clientRepository.findByProfit(
-                    profit, 
+                    profit,
                     parseInt(req.params.id)
                 );
 
@@ -278,6 +278,26 @@ export class VoucherService {
             }
             const client = await this.clientRepository.findById(req.userId);
             if (voucher[0].getDataValue("can_redeem")) {
+                const clientVoucher = await client.getVouchers({
+                    where: {
+                        '$ClientVoucher.voucherId$': voucher[0].getDataValue('id')
+                    },
+                });
+                if (clientVoucher.length > 0) {
+                    Message.logMessage(req, status);
+                    return res
+                        .status(status)
+                        .send("You have already redeemed this voucher");
+                }
+                if (
+                    voucher[0].getDataValue("quantity") ==
+                    voucher[0].getDataValue("redeemedNumber")
+                ) {
+                    Message.logMessage(req, status);
+                    return res
+                        .status(status)
+                        .send("The vouchers have been taken all");
+                }
                 await voucher[0].addClient(client, {
                     through: {
                         status: false,
@@ -285,6 +305,11 @@ export class VoucherService {
                         updatedAt: new Date(),
                     },
                 });
+                await voucher[0].update({
+                    redeemedNumber:
+                        voucher[0].getDataValue("redeemedNumber") + 1,
+                });
+                await voucher[0].save();
                 Message.logMessage(req, status);
                 return res.status(status).send(statusMess.Success);
             }
