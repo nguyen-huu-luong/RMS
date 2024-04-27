@@ -87,35 +87,11 @@ type ChartQueryOptions = {
     endDate?: Date
 }
 
-
-type Filter = {
-    [key: string]: FilterObject;
+type FilterCondition = {
+  value: string | number;  // hoặc có thể sử dụng union type nếu giá trị có thể là nhiều kiểu khác nhau
+  op: string | "gt" | "lt" | "gte" | "lte";
 };
 
-export interface FilterObject {
-    [filterName: string]: {
-        eq?: any;
-        neq?: any;
-        not?: any;
-        gt?: any;
-        gte?: any;
-        lt?: any;
-        lte?: any;
-        between?: [any, any];
-        notBetween?: [any, any];
-        in?: any[];
-        notIn?: any[];
-
-        like?: any[];
-        notLike?: any[];
-        startsWith?: any[];
-        endsWith?: any[];
-        substring?: any[];
-        iLike?: any[];
-        notILike?: any[];
-    };
-}
-
-
+type RegularFilter = Record<string, string>;
 
 export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter, ChartQueryOptions };

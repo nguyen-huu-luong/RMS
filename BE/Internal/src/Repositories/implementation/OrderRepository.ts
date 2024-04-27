@@ -409,12 +409,4 @@ export class OrderRepository
         }
     }
 
-    public async getByCond(cond: any){
-        try{
-            return await this._model.findAll(cond)
-        }
-        catch (err){
-            message.queryError(err);
-        }
-    }
 }

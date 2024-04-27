@@ -240,10 +240,6 @@ Client.init(
 			type: DataTypes.INTEGER,
 			defaultValue: 0,
 		},
-		convertDate: {
-			type: DataTypes.DATE,
-			defaultValue: 0,
-		},
 	},
 	{ sequelize: Loader.sequelize }
 );

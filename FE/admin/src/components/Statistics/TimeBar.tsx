@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { DatePicker } from "antd";
+import { DatePicker, Flex } from "antd";
 const { RangePicker } = DatePicker;
 import { Radio } from "antd";
 type Option = {
@@ -12,11 +12,11 @@ const TimeBar = ({ option, setOption, setComponent }: { option: Option; setOptio
     const [type, setType] = useState<string>("MONTHLY")
     const options = [
         {
-            label: "Monthly",
+            label: "This month",
             value: "MONTHLY",
         },
         {
-            label: "Yearly",
+            label: "This year",
             value: "YEARLY",
         },
         {
@@ -53,13 +53,16 @@ const TimeBar = ({ option, setOption, setComponent }: { option: Option; setOptio
     return (
         <div className='w-full h-auto flex flex-row p-2 shadow-md rounded-xl bg-white text-black justify-center gap-4'>
             <div className='w-60'>
+              <Flex vertical gap="middle">
                 <Radio.Group
+                    style={{width: "500px"}}
                     options={options}
                     onChange={onChangeType}
                     value={type}
                     optionType='button'
                     buttonStyle='solid'
                 />
+            </Flex>
             </div>
             {type === "CUSTOM" ? (
                 <RangePicker  onChange={handleRangeChange} />
