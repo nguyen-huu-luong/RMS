@@ -79,8 +79,8 @@ function Overview() {
                 </>)
                     : (
                         <>
-                            {<SegmentationOverview  customerLoading={customerLoading} setCustomerLoading={setCustomerLoading} />}
-                            {<SegmentationChart  customerLoading={customerLoading} setCustomerLoading={setCustomerLoading} />}
+                            {<SegmentationOverview  />}
+                            {<SegmentationChart   />}
                         </>
                     )
             }

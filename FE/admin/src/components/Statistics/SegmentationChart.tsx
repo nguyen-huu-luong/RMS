@@ -33,7 +33,7 @@ ChartJS.register(
     BarController
 );
 
-const SegmentationChart = ({customerLoading, setCustomerLoading}: {customerLoading: any, setCustomerLoading: any}) => {
+const SegmentationChart = () => {
 
     const dateFormat = "YYYY-MM-DD";
 
