@@ -372,6 +372,11 @@ export class TableService {
                         });
                     })
                 );
+                
+                await this.clientRepository.update(new_client.id, {
+                    profit: new_client.profit +  parseInt(cart?.getDataValue("amount")) + parseInt(order.getDataValue("shippingCost")),
+                    total_items: new_client.total_items + cart?.getDataValue("total")
+                })
 
                 await cart.setProducts([]);
                 await this.cartRepository.update(cart?.getDataValue("id"), {
@@ -381,6 +386,7 @@ export class TableService {
 
                 res.send({ status: "Success" })
                 Message.logMessage(req, HttpStatusCode.Success);
+                return new_client.id
             }
             else {
                 throw new UnauthorizedError()
@@ -393,7 +399,7 @@ export class TableService {
     }
 
     public async makePaymentMoMO(req: Request, res: Response, next: NextFunction) {
-        await this.makePayment(req, res, next)
+        return await this.makePayment(req, res, next)
     }
 
 }

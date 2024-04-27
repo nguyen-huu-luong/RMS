@@ -8,7 +8,7 @@ import { Pagination, ConfigProvider, Drawer } from "antd";
 import type { PaginationProps } from "antd";
 import PriceItem from "@/components/Product/price_item";
 import { Modal } from "antd";
-import { Radio, Form, Input, Button } from "antd";
+import { Radio, Form, Input, Button, DatePicker } from "antd";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
@@ -31,6 +31,7 @@ function Home() {
     const { data: session, status } = useSession();
     const [checker, setChecker] = useState(true);
     const [item_status, updateItemStaus] = useState(true);
+    const dateFormat = "YYYY-MM-DD";
     const router = useRouter();
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [notifications, setNotifications] = useState<any>();
@@ -45,6 +46,7 @@ function Home() {
     const [category, setCategory] = useState<string>(
         currentCategory !== null ? currentCategory : "Pizza"
     );
+    const dishColor: any = { "Preparing": "text-yellow-500", "Cooking": "text-green-500", "Ready": "text-blue-500" }
 
     const socket = useSocket();
 
@@ -58,7 +60,8 @@ function Home() {
 
     const showModal = () => {
         const current_items = cart_items.items
-        if (current_items.some((e: any) => e.status != "Done")) {
+        console.log(current_items)
+        if (current_items.some((e: any) => e.status != "Ready")) {
             api_notification.warning({
                 message: 'Order Warning',
                 description:
@@ -142,7 +145,10 @@ function Home() {
                 lastname: values.last_name,
                 pay_method: values.paymentMethod,
                 phone: values.phone_number,
-            };
+                birthday: values.birthday.format("YYYY-MM-DD"),
+                type: "customer"
+            };  
+            
             const data_return = await fetchClient({
                 method: "POST",
                 url: `/tables/order/${params.tid}`,
@@ -161,6 +167,7 @@ function Home() {
                     `/sale/reservations/payment?method=CASH?tid=${params.tid}`
                 );
             } else {
+                localStorage.setItem('orderInfo', "1")
                 router.push(data_return.payUrl);
             }
             setChecker((current_value) => !current_value);
@@ -332,64 +339,98 @@ function Home() {
                     onCancel={() => setOpen(false)}
                 >
                     <Form form={form} layout='vertical' onFinish={handleOrder}>
-                        <Form.Item
-                            name='first_name'
-                            label={
-                                <span className='whitespace-nowrap font-bold text-md'>
-                                    First Name
-                                </span>
-                            }
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input customer's name!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                placeholder='Name'
-                                style={{ marginTop: 8 }}
-                            />
-                        </Form.Item>
-                        <Form.Item
-                            name='last_name'
-                            label={
-                                <span className='whitespace-nowrap font-bold text-md'>
-                                    Last Name
-                                </span>
-                            }
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input customer's name!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                placeholder='Name'
-                                style={{ marginTop: 8 }}
-                            />
-                        </Form.Item>
-                        <Form.Item
-                            name='phone_number'
-                            label={
-                                <span className='whitespace-nowrap font-bold text-md'>
-                                    Phone number
-                                </span>
-                            }
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Please input customer's phone number!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                placeholder='Phone number'
-                                style={{ marginTop: 8 }}
-                            />
-                        </Form.Item>
+                        <div className="flex justify-between">
+                            <div style={{ width: "49%" }}>
+                                <Form.Item
+                                    name='first_name'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            First Name
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "Please input customer's name!",
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        placeholder='First Name'
+                                        style={{ marginTop: 8 }}
+                                    />
+                                </Form.Item>
+                            </div>
+                            <div style={{ width: "49%" }}>
+                                <Form.Item
+                                    name='last_name'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            Last Name
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "Please input customer's name!",
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        placeholder='Last Name'
+                                        style={{ marginTop: 8 }}
+                                    />
+                                </Form.Item>
+                            </div>
+                        </div>
+                        <div className="flex justify-between">
+                            <div style={{ width: "49%" }}>
+                                <Form.Item
+                                    name='birthday'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            Birthday
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Please input customer's birthday!",
+                                        },
+                                    ]}
+                                >
+                                    <DatePicker
+                                        style={{ marginTop: 8, width: "100%" }}
+                                        format={
+                                            dateFormat
+                                        }
+                                    />
+                                </Form.Item>
+                            </div>
+                            <div style={{ width: "49%" }}>
+                                <Form.Item
+                                    name='phone_number'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            Phone number
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Please input customer's phone number!",
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        placeholder='Phone number'
+                                        style={{ marginTop: 8 }}
+                                    />
+                                </Form.Item>
+                            </div>
+                        </div>
 
                         <Form.Item
                             name='email'
@@ -501,68 +542,37 @@ function Home() {
                                         {cart_items.items.map((item: any) => {
                                             return (
                                                 <>
-                                                    {item.status ==
-                                                        "Preparing" ? (
-                                                        <div
-                                                            key={
-                                                                cart_items
-                                                                    .products[
-                                                                    item
-                                                                        .productId
-                                                                ].name
-                                                            }
-                                                            className='duration-300 transition-all ease-in-out w-auto  text-yellow-500'
-                                                        >
-                                                            <PriceItem
-                                                                params={{
-                                                                    food: {
-                                                                        name: cart_items
-                                                                            .products[
-                                                                            item
-                                                                                .productId
-                                                                        ].name,
-                                                                        price: cart_items
-                                                                            .products[
-                                                                            item
-                                                                                .productId
-                                                                        ].price,
-                                                                        quantity:
-                                                                            item.quantity,
-                                                                    },
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <div
-                                                            key={
-                                                                cart_items
-                                                                    .products[
-                                                                    item
-                                                                        .productId
-                                                                ].name
-                                                            }
-                                                            className='duration-300 transition-all ease-in-out w-auto text-blue-500'
-                                                        >
-                                                            <PriceItem
-                                                                params={{
-                                                                    food: {
-                                                                        name: cart_items
-                                                                            .products[
-                                                                            item
-                                                                                .productId
-                                                                        ].name,
-                                                                        price: cart_items
-                                                                            .products[
-                                                                            item
-                                                                                .productId
-                                                                        ].price,
-                                                                        quantity:
-                                                                            item.quantity,
-                                                                    },
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )}
+
+                                                    <div
+                                                        key={
+                                                            cart_items
+                                                                .products[
+                                                                item
+                                                                    .productId
+                                                            ].name
+                                                        }
+                                                        className={`duration-300 transition-all ease-in-out w-auto ${dishColor[item.status]}`}
+                                                    >
+                                                        <PriceItem
+                                                            params={{
+                                                                food: {
+                                                                    name: cart_items
+                                                                        .products[
+                                                                        item
+                                                                            .productId
+                                                                    ].name,
+                                                                    price: cart_items
+                                                                        .products[
+                                                                        item
+                                                                            .productId
+                                                                    ].price,
+                                                                    quantity:
+                                                                        item.quantity,
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+
                                                 </>
                                             );
                                         })}
