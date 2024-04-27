@@ -1,28 +1,47 @@
 import { container } from "../Configs";
 import { QueryOptions, TYPES } from "../Types/type";
-import { ISubscriberRepository } from "../Repositories";
+import { IClientRepository } from "../Repositories";
 import { Request, Response, NextFunction } from "express";
-import { where } from "sequelize";
+import { Op, where } from "sequelize";
 
 export class SubscriberService {
   constructor(
-    private subsriberRepository = container.get<ISubscriberRepository>(
-      TYPES.ISubscriberRepository
-    )
+    private clientRepository = container.get<IClientRepository>(
+        TYPES.IClientRepository
+      )
   ) {}
     
     public async createSubscriber(req: Request, res: Response, next: NextFunction){
         try{
-            const subscribers = await this.subsriberRepository.findByCond({
-                where: {
-                    email: req.body.email
-                }
-            })
-            if (subscribers.length > 0) {
-                return {status: "Failed", message: "This email existed"}
+            const fullnames = req.body.name.split(' ')
+            let firstname:string
+            let lastname: string
+
+            if (fullnames.length > 1) {
+                firstname = fullnames[0]
+                lastname = fullnames.slice(1).join(' ')
+            }
+            else {
+                firstname = fullnames[0]
+                lastname = " "
             }
 
-            await this.subsriberRepository.create(req.body)
+            const subscribers = await this.clientRepository.findByCond({
+                where: {
+                    [Op.or]: {
+                        email: req.body.email,
+                        phone: req.body.phone
+                    }
+                }
+            })
+
+            if (subscribers.length > 0) {
+                return {status: "Failed", message: "This email or phone existed"}
+            }
+
+            const {name, ...customInfo} = req.body
+
+            await this.clientRepository.create({...customInfo, firstname: firstname, lastname: lastname})
             return {status: "Success"}
         }
         catch(err){

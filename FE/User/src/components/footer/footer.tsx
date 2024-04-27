@@ -16,10 +16,12 @@ const Footer = () => {
     const [notiSub, setNotiSub] = useState('')
     const handleCreateSubscriber = async (event: any) => {
         event.preventDefault()
+        
         const data_body = {
             name: event.target.name.value,
             email: event.target.email.value,
-            phone: event.target.phone.value
+            phone: event.target.phone.value,
+            type: "lead"
         } 
         const data = await fetchGeneral({method: "POST", url: '/subscribers', body: data_body, data_return: true})
         if (data.status == 'Success') {

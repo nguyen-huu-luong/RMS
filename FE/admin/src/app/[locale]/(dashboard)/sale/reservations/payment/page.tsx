@@ -36,7 +36,6 @@ const TablePayment = () => {
         }
     }, [])
  
-    console.log(payMethod)
     if (payMethod == "MOMO") {
         if (resultCode == "0") {}
         else {

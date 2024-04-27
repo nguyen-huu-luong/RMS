@@ -220,7 +220,7 @@ export class ClientService {
         }
     }
 
-    public segmentProcess = async (customers: any, update_convert_time = false) => {
+    public segmentProcess = async (customers: any, update_convert_time = true) => {
         const res = await axios.post(`http://${process.env.FLASK_HOST}:${process.env.FLASK_PORT}/api/segment`, customers);
         await this.updateCustomerGroup(res.data, update_convert_time)
     }
