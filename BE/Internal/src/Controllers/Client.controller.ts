@@ -24,9 +24,9 @@ class ClientController {
 		const queries = { ...req.body["filter"], ...req.query };
 
 		if (!req.query["type"] || req.query["type"] === "customer") {
-			queries.type = "Customer"
+			queries.type = "customer"
 		} else if (req.query["type"] === "lead") {
-			queries.type = "Lead"
+			queries.type = "lead"
 		}
 		const options: QueryOptions = parseRequesQueries(queries);
 		const data = await this.clientService.getAll(options);
