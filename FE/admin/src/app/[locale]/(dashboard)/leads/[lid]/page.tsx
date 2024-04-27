@@ -4,9 +4,10 @@ import { EditOutlined, EllipsisOutlined, CalendarOutlined, ArrowRightOutlined, U
 import { Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import useSWR from "swr";
-import { leadFetcher, updateLeadInfo } from "@/app/api/lead";
 import { useParams } from 'next/navigation'
 import { useSession } from "next-auth/react";
+import fetchClient from "@/lib/fetch-client";
+import Loading from "@/components/loading";
 
 const LeadProfile = () => {
     const editStyle = { outline: "0", backgroundColor: "#F6FAFD", border: "1px solid #DADAD9", paddingLeft: "5px" }
@@ -14,7 +15,6 @@ const LeadProfile = () => {
     const tabStyle_ = ["inline-block p-4 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500",
         "inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
     ]
-    const { data: session, status } = useSession();
     const params = useParams<{ locale: string; lid: string }>()
 
     const [tabStyle, setTabStyle] = useState(tabStyle_)
@@ -31,20 +31,19 @@ const LeadProfile = () => {
         error: leadInfoError,
         isLoading: leadInfoLoading
     } = useSWR(
-        session ? [params.lid, session.user.accessToken] : null, ([leadId, token]) => leadFetcher(leadId, token));
+        params.lid, (lid) => fetchClient({url: `/customers/${lid}`, data_return: true}));
 
     let userInfo: any
 
     if (leadInfoLoading) {
         return (
             <>
-                <p>Loading</p>
+                <Loading/>
             </>
         )
     }
     else {
         if (leadInfo) {
-            console.log(leadInfo)
             userInfo = {
                 "name": leadInfo.firstname + " " + leadInfo.lastname, "address": leadInfo.address,
                 "source": leadInfo.source, "score": leadInfo.score, "gender": String(leadInfo.gender),
@@ -93,8 +92,7 @@ const LeadProfile = () => {
                 "firstname": first_name,
                 "lastname": last_name.trim()
             }
-            await updateLeadInfo(data, params.lid, session?.user.accessToken)
-
+            await fetchClient({url: `/customers/${params.lid}`, method: "PUT", body: data})
         }
         setFlag(true)
         setStyle(normalStyle)

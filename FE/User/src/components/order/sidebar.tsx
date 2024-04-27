@@ -2,10 +2,7 @@
 import Link from "next-intl/link";
 import { useLocale, useTranslations } from "next-intl";
 import VoucherPicker from "@/components/order/voucherPicker";
-import { voucherFetcher } from "@/app/api/product/voucher";
 import { useState, useEffect } from "react";
-import moneyFormatter from "../function/moneyFormatter";
-import { cartFetcher } from "@/app/api/product/cart";
 import Loading from "@/components/loading";
 import fetchClient from "@/lib/fetch-client";
 const SideBar = ({
@@ -14,15 +11,25 @@ const SideBar = ({
     setVoucherId,
     fee,
     token,
+    voucherId,
 }: {
     onPayOrder: () => void;
     setAmount: any;
     setVoucherId: any;
     fee: any;
     token: any;
+    voucherId: any;
 }) => {
     const t = useTranslations("Order");
     const locale = useLocale();
+    const [modal, setModal] = useState<boolean>(false);
+    const openModal = () => {
+        setModal(true);
+    };
+    const closeModal = () => {
+        setModal(false);
+    };
+    const [voucher, setVoucher] = useState<any>(null);
     const [currentCart, setCurrentCart] = useState<any>(null);
     useEffect(() => {
         const fetchData = async () => {
@@ -38,14 +45,26 @@ const SideBar = ({
         };
         fetchData();
     }, [token]);
-    const [modal, setModal] = useState<boolean>(false);
-    const openModal = () => {
-        setModal(true);
-    };
-    const closeModal = () => {
-        setModal(false);
-    };
-    const [voucher, setVoucher] = useState<any>(null);
+
+    useEffect(() => {
+        if (!currentCart) return;
+        setAmount(
+            currentCart.cart.amount -
+                (voucher
+                    ? voucher.type === "fixed"
+                        ? voucher.amount > voucher.maximum_reduce
+                            ? voucher.maximum_reduce
+                            : voucher.amount
+                        : (voucher.amount * currentCart.cart.amount) / 100 >
+                          voucher.maximum_reduce
+                        ? voucher.maximum_reduce
+                        : (voucher.amount * currentCart.cart.amount) / 100
+                    : 0) +
+                fee
+        );
+        setVoucherId(voucher ? voucher.id : null);
+    }, [voucher]);
+
     if (!currentCart) return <Loading />;
     return (
         <div className='w-auto h-auto p-10 rounded-3xl bg-primary-white flex flex-col gap-5 justify-start items-center font-extrabold'>
@@ -53,24 +72,26 @@ const SideBar = ({
                 <span className='w-auto whitespace-nowrap'>
                     {t("Discount")}
                 </span>
-                <span className='relative w-auto whitespace-nowrap '>
-                    <span
-                        className='w-full cursor-pointer text-primary'
-                        onClick={openModal}
-                    >
-                        {t("Choose")}
+                {currentCart && (
+                    <span className='relative w-auto whitespace-nowrap '>
+                        <span
+                            className='w-full cursor-pointer text-primary'
+                            onClick={openModal}
+                        >
+                            {t("Choose")}
+                        </span>
+                        {modal && (
+                            <VoucherPicker
+                                params={{
+                                    amount: currentCart.cart.amount,
+                                    closeModal: closeModal,
+                                    setVoucher: setVoucher,
+                                    voucherId: voucherId,
+                                }}
+                            />
+                        )}
                     </span>
-                    {/* {modal && (
-                        <VoucherPicker
-                            params={{
-                                vouchers: vouchers,
-                                amount: currentCart.cart.amount,
-                                closeModal: closeModal,
-                                setVoucher: setVoucher,
-                            }}
-                        />
-                    )} */}
-                </span>
+                )}
             </div>
             {!voucher && (
                 <span className='font-normal'>{t("No_discount")}</span>
@@ -122,46 +143,12 @@ const SideBar = ({
                 <span className='w-auto whitespace-nowrap'> {t("Total")}</span>
                 <span className='relative w-auto whitespace-nowrap '>
                     <span className='w-full cursor-pointer text-primary'>
-                        {currentCart.cart.amount -
-                            (voucher
-                                ? voucher.type === "fixed"
-                                    ? voucher.amount > voucher.maximum_reduce
-                                        ? voucher.maximum_reduce
-                                        : voucher.amount
-                                    : (voucher.amount *
-                                          currentCart.cart.amount) /
-                                          100 >
-                                      voucher.maximum_reduce
-                                    ? voucher.maximum_reduce
-                                    : (voucher.amount *
-                                          currentCart.cart.amount) /
-                                      100
-                                : 0) +
-                            fee}
+                        {currentCart.cart.amount}
                     </span>
                 </span>
             </div>
             <button
                 onClick={() => {
-                    setAmount(
-                        currentCart.cart.amount -
-                            (voucher
-                                ? voucher.type === "fixed"
-                                    ? voucher.amount > voucher.maximum_reduce
-                                        ? voucher.maximum_reduce
-                                        : voucher.amount
-                                    : (voucher.amount *
-                                          currentCart.cart.amount) /
-                                          100 >
-                                      voucher.maximum_reduce
-                                    ? voucher.maximum_reduce
-                                    : (voucher.amount *
-                                          currentCart.cart.amount) /
-                                      100
-                                : 0) +
-                            fee
-                    );
-                    setVoucherId(voucher ? voucher.id : null);
                     onPayOrder();
                 }}
                 className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-primary hover:bg-primary-400 text-item-white transition-all duration-300  flex justify-center'

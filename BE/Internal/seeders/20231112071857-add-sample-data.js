@@ -113,7 +113,8 @@ module.exports = {
                 isRegistered: true,
                 isActive: true,
                 language: "vi",
-                profit: 0,
+                profit: faker.random.number({ min: 300000, max: 3000000,  precision: 20000  }),
+                createdAt: new Date(),
                 updatedAt: new Date(),
             };
             if (client.type === "customer") {
@@ -126,6 +127,7 @@ module.exports = {
             }
             clients.push(client);
         }
+
         const admins = [
             {
                 username: "manager",

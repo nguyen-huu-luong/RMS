@@ -187,6 +187,10 @@ const CustomerListPages: React.FC = () => {
 						</div>
 					</div>
 
+					<Form.Item name="type" initialValue="Customer" hidden>
+						
+					</Form.Item>
+
 					<div className="flex space-x-2">
 						<div className='w-full'>
 							<Form.Item label="Phone" name="phone" required>
@@ -199,7 +203,7 @@ const CustomerListPages: React.FC = () => {
 							</Form.Item>
 						</div>
 					</div>
-
+{/* 
 					<div className="flex space-x-2">
 						<div className='w-full'>
 							<Form.Item label="Birthday">
@@ -213,10 +217,10 @@ const CustomerListPages: React.FC = () => {
 								</Select>
 							</Form.Item>
 						</div>
-					</div>
+					</div> */}
 
 					<div className="flex space-x-2">
-						<div className='w-full'>
+						{/* <div className='w-full'>
 							<Form.Item label="Source">
 								<Select>
 									<Select.Option value="demo">Demo</Select.Option>
@@ -236,7 +240,7 @@ const CustomerListPages: React.FC = () => {
 									<Select.Option value="demo">Demo</Select.Option>
 								</Select>
 							</Form.Item>
-						</div>
+						</div> */}
 					</div>
 				</>
 			}

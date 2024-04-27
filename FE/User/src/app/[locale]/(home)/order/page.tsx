@@ -32,6 +32,7 @@ export default function Order() {
         try {
             await form.validateFields();
             const formValues = form.getFieldsValue();
+
             const payMethod = formValues.paymentMethod;
             const dataBody = {
                 status: "Pending",
@@ -77,6 +78,7 @@ export default function Order() {
                 onPayOrder={handlePayOrder}
                 setAmount={setAmount}
                 setVoucherId={setVoucher}
+                voucherId={voucher}
                 fee={fee}
                 token={session?.user.accessToken}
             />

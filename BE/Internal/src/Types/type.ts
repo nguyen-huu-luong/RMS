@@ -31,28 +31,55 @@ const TYPES = {
 
     ICampaignRepository: Symbol.for("ICampaignReposittory"),
     ITargetListRepository: Symbol.for("ITargetListRepository"),
+  
+    IEmailCampaignRepository: Symbol.for("IEmailCampaignRepository"),
+    ITrackUrlRepository: Symbol.for("ITrackUrlRepository"),
     IGroupRepository: Symbol.for("IGroupRepository")
+
+};
+    
+
+
+type Filter = {
+  [key: string]: FilterObject;
 };
 
-type FilterCondition = {
-    value: string | number;  // hoặc có thể sử dụng union type nếu giá trị có thể là nhiều kiểu khác nhau
-    op: string | "gt" | "lt" | "gte" | "lte";
-};
+export interface FilterObject {
+  [filterName: string]: {
+    eq?: any;
+    neq?: any;
+    not?: any;
+    gt?: any;
+    gte?: any;
+    lt?: any;
+    lte?: any;
+    between?: [any, any];
+    notBetween?: [any, any];
+    in?: any[];
+    notIn?: any[];
 
-type RegularFilter = Record<string, string>;
+    like?: any[];
+    notLike?: any[];
+    startsWith?: any[];
+    endsWith?: any[];
+    substring?: any[];
+    iLike?: any[];
+    notILike?: any[];
+  };
+}
 
 type QueryOptions = {
-    filter: Filter,
-    sort?: {
-        order: "asc" | "desc",
-        by: string
-    },
-    paginate?: {
-        page: number,
-        pageSize: number
-    }
-    type?: string
-}
+  filter: Filter;
+  sort?: {
+    order: "asc" | "desc";
+    by: string;
+  };
+  paginate?: {
+    page: number;
+    pageSize: number;
+  };
+  type?: string;
+};
 
 type ChartQueryOptions = {
     type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM",

@@ -22,13 +22,19 @@ class ClientController {
 	public async getAllClient(req: Request, res: Response, next: NextFunction) {
 		ensurePermissionIsValid(req.action, "read:any");
 		const queries = { ...req.body["filter"], ...req.query };
+
+		if (!req.query["type"] || req.query["type"] === "customer") {
+			queries.type = "customer"
+		} else if (req.query["type"] === "lead") {
+			queries.type = "lead"
+		}
 		const options: QueryOptions = parseRequesQueries(queries);
 		const data = await this.clientService.getAll(options);
 
 		res.send(data);
 	}
 
-	public async getCustomerInfo(req: Request, res: Response, next: NextFunction) {
+	public async getClientInfo(req: Request, res: Response, next: NextFunction) {
 		if (req.action === "read:any") {
 			const id = req.params["id"]
 			const data = await this.clientService.getById(Number(id));
@@ -39,10 +45,9 @@ class ClientController {
 		} else {
 			throw new ForbiddenError();
 		}
-
 	}
 
-	public async createCustomer(req: Request, res: Response, next: NextFunction) {
+	public async createClient(req: Request, res: Response, next: NextFunction) {
 		if (req.action === "create:any") {
 			const customerInfo = req.body["data"];
 			const data = await this.clientService.create(customerInfo);
@@ -80,7 +85,7 @@ class ClientController {
 	}
 
 
-	public async updateCustomer(req: Request, res: Response, next: NextFunction) {
+	public async updateClient(req: Request, res: Response, next: NextFunction) {
 		if (req.action === "update:any") {
 			const id = req.params["id"];
 			const customerInfo = req.body

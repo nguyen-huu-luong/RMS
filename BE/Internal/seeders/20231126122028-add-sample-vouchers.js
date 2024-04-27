@@ -3,7 +3,7 @@ const faker = require("faker");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const vouchers = Array.from({ length: 50 }, () => {
+    const vouchers = Array.from({ length: 10 }, () => {
       return {
         name: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
@@ -15,12 +15,33 @@ module.exports = {
         quantity: faker.datatype.number({ min: 1, max: 10 }),
         begin_date: new Date(),
         end_date: faker.date.future(),
+        can_redeem: true,
+        redeemedNumber:  0,
         createdAt: new Date(),
         updatedAt: new Date(),
-        categoryId: faker.datatype.number({ min: 1, max: 7 }),
       };
     });
+    const clientVouchers = [];
+    for (let i = 1; i <= 10; i++) {
+      clientVouchers.push(
+        {
+          voucherId: 1,
+          clientId: i,
+          status: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          voucherId: 2, 
+          clientId: i,
+          status: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      );
+    }
     await queryInterface.bulkInsert("Vouchers", vouchers);
+    await queryInterface.bulkInsert("ClientVouchers", clientVouchers);
   },
 
   down: async (queryInterface, Sequelize) => {

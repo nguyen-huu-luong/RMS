@@ -1,4 +1,5 @@
 "use client"
+import { AddClientToTargetListModal } from "@/components/Modals/AddClientToTargetListModal"
 import { ClientTable } from "@/components/TargetListPageComponents/ClientTable"
 import TimeFormatter from "@/components/TimeFormatter"
 import { UpdatableInput } from "@/components/UpdatableInput/UpdatableInput"
@@ -83,24 +84,7 @@ const TargetListDetail = () => {
     }
 
     const handleSaveChange = async (values: any) => {
-        setLoading(true);
-        try {
-            const newTargetlist = await fetchClient({
-                method: "PUT",
-                url: `/targetlists/${params.tid}`,
-                body: {
-                    data: { ...values }
-                },
-                data_return: true
-            })
-            setData(newTargetlist)
-            setLoading(false)
-            setEditmode(false)
-            message.success("Update target list succesfully")
-        } catch (error) {
-            setLoading(false);
-            message.error(error as string)
-        }
+        await handleUpdateTargetlistInfo(values)
     }
 
     const [form] = useForm()
@@ -127,17 +111,6 @@ const TargetListDetail = () => {
             dataIndex: "email",
             key: "email",
         },
-        {
-            title: "Source",
-            dataIndex: "source",
-            key: "source",
-        },
-        {
-            title: "Birthday",
-            dataIndex: "birthday",
-            key: "birthday",
-        },
-
         {
             title: "CreatedAt",
             dataIndex: "createdAt",
@@ -168,6 +141,53 @@ const TargetListDetail = () => {
             key: "email",
         },
     ];
+
+    const handleUpdateTargetlistInfo = async (values: any) => {
+        setLoading(true);
+        try {
+            const newTargetlist = await fetchClient({
+                method: "PUT",
+                url: `/targetlists/${params.tid}`,
+                body: {
+                    data: { ...values }
+                },
+                data_return: true
+            })
+            setData(newTargetlist)
+            setLoading(false)
+            setEditmode(false)
+            message.success("Update target list succesfully")
+        } catch (error) {
+            setLoading(false);
+            message.error(error as string)
+        }
+    }
+
+    const handleAddClientToTargetList = async (rows: CustomerType[] | LeadType[]) => {
+        const ids = rows.map(item => item.id);
+
+        const result = await fetchClient({
+            method: "PUT",
+            url: `/targetlists/${params.tid}`,
+            body: {
+                data: {
+                    clients: {
+                        action: "add",
+                        ids
+                    }
+                }
+            }
+        }) 
+
+        setData(prev => result.data)
+    }
+
+    const handleUpdateField = (fieldname: string) => {
+        const values : {[key: string]: string} = {} 
+        values[fieldname] = form.getFieldValue(fieldname)
+
+        handleUpdateTargetlistInfo(values)
+    }
     const customers = data && data.customers.map((item, index) => ({ ...item, key: index, fullname: `${item.firstname} ${item.lastname}`, }))
     const leads = data && data.leads.map((item, index) => ({ ...item, key: index, fullname: `${item.firstname} ${item.lastname}`, }))
 
@@ -230,7 +250,7 @@ const TargetListDetail = () => {
                                 type="input"
                                 defaultValue={data.name}
                                 editmode={editmode} label={"Name"}
-                                onUpdate={(name) => { console.log(name, form.getFieldValue('name')) }}
+                                onUpdate={handleUpdateField}
                             />
 
                             <div>
@@ -243,7 +263,7 @@ const TargetListDetail = () => {
                                 type="textarea"
                                 defaultValue={data.description}
                                 editmode={editmode} label={"Description"}
-                                onUpdate={(name) => { console.log(name) }}
+                                onUpdate={handleUpdateField}
                             />
 
 
@@ -258,14 +278,17 @@ const TargetListDetail = () => {
 
                     <div className="w-full bg-white rounded-lg border py-3 px-4">
                         <div>
-                            <h6>Customers</h6>
+                            <div className="flex justify-between items-center">
+                                <h6>Customers</h6>
+                                <AddClientToTargetListModal type="customer" onOk={handleAddClientToTargetList} />
+                            </div>
                             <div>
                                 <ClientTable<CustomerType>
                                     columns={customerColumns}
                                     dataSource={customers || []}
                                     onSelected={
                                         {
-                                            handle: (selecteds: CustomerType[]) => {
+                                            handle: (selecteds) => {
                                                 setSelected(prev => ({ ...prev, customers: selecteds }))
                                             }
                                         }
@@ -277,7 +300,10 @@ const TargetListDetail = () => {
 
                     <div className="w-full bg-white rounded-lg border py-3 px-4">
                         <div>
-                            <h6>Leads</h6>
+                            <div className="flex justify-between items-center">
+                                <h6>Leads</h6>
+                                <AddClientToTargetListModal type="lead" onOk={handleAddClientToTargetList} />
+                            </div>
                             <div>
                                 <ClientTable<LeadType>
                                     columns={leadColumns}

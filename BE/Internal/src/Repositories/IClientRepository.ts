@@ -3,6 +3,8 @@ import { IBaseRepository } from "./IBaseRepository";
 
 export interface IClientRepository extends IBaseRepository<Client> {
     findByEmail(email : string) : Promise<Client | null> ;
+    findByType(type : string) : Promise<Client[] | null> ;
+    findByProfit(profit : number, voucherId: number) : Promise<any> ;
     removeToken(token: string, user: Client): Promise<Client> ;
     getMonthlyTopCustomer(): Promise<any> ;
     getYearlyTopCustomer(): Promise<any> ;
