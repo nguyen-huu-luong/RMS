@@ -247,7 +247,7 @@ const Lead: React.FC = () => {
                     {text}
                 </a>
             ),
-            ...getColumnSearchProps("fullname"),
+            // ...getColumnSearchProps("fullname"),
         },
         {
             title: "Phone number",
@@ -420,88 +420,93 @@ const Lead: React.FC = () => {
     };
 
     return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    Table: {
-                        headerBg: variables.backgroundSecondaryColor,
-                        footerBg: "#fff",
+        <div className='w-full h-auto'>
+            <ConfigProvider
+                theme={{
+                    components: {
+                        Table: {
+                            headerBg: variables.backgroundSecondaryColor,
+                            footerBg: "#fff",
+                        },
                     },
-                },
-            }}
-        >
-            <Space direction='vertical'>
-                <LeadActionBar dataSelected={selectedCustomers} />
-                {error.isError && (
-                    <Alert
-                        message={error.title}
-                        description={error.message}
-                        type='error'
-                        showIcon
-                        onClose={handleCloseError}
-                        closeIcon
-                    />
-                )}
-                <div className='border bg-white shadow p-3'>
-                    <div className='flex items-center gap-2'>
-                        <p>Sort by: </p>
-                        <Select
-                            placeholder='Columns'
-                            value={
-                                tableParams.sorter?.field?.toString() || "id"
-                            }
-                            onChange={handleSortFieldChange}
-                            options={columns.map((item) => ({
-                                value:
-                                    item.key === "fullname"
-                                        ? "firstname"
-                                        : item.key,
-                                label: item.title,
-                            }))}
+                }}
+            >
+                <div className="flex flex-col justify-start items-center w-full h-auto gap-2">
+                    <LeadActionBar dataSelected={selectedCustomers} />
+                    {error.isError && (
+                        <Alert
+                            message={error.title}
+                            description={error.message}
+                            type='error'
+                            showIcon
+                            onClose={handleCloseError}
+                            closeIcon
                         />
+                    )}
+                    <div className='border bg-white shadow p-3 w-full'>
+                        <div className='flex items-center gap-2'>
+                            <p>Sort by: </p>
+                            <Select
+                                placeholder='Columns'
+                                value={
+                                    tableParams.sorter?.field?.toString() ||
+                                    "id"
+                                }
+                                onChange={handleSortFieldChange}
+                                options={columns.map((item) => ({
+                                    value:
+                                        item.key === "fullname"
+                                            ? "firstname"
+                                            : item.key,
+                                    label: item.title,
+                                }))}
+                            />
 
-                        <p>Order: </p>
+                            <p>Order: </p>
 
-                        <Button
-                            onClick={handleToggleSorter}
-                            icon={
-                                tableParams.sorter?.order === "ascend" ? (
-                                    <SortAscendingOutlined />
-                                ) : (
-                                    <SortDescendingOutlined />
-                                )
-                            }
-                        />
+                            <Button
+                                onClick={handleToggleSorter}
+                                icon={
+                                    tableParams.sorter?.order === "ascend" ? (
+                                        <SortAscendingOutlined />
+                                    ) : (
+                                        <SortDescendingOutlined />
+                                    )
+                                }
+                            />
 
-                        <Button onClick={handleClearFilter}>
-                            Clear filters
-                        </Button>
-                        <Button onClick={handleClearAll}>
-                            Clear filters and sorters
-                        </Button>
+                            <Button onClick={handleClearFilter}>
+                                Clear filters
+                            </Button>
+                            <Button onClick={handleClearAll}>
+                                Clear filters and sorters
+                            </Button>
+                        </div>
                     </div>
-                </div>
 
-                <Table
-                    rowSelection={{
-                        ...rowSelection,
-                    }}
-                    columns={columns}
-                    pagination={{
-                        className: "bg-white rounded px-4 py-2",
-                        showTotal: (total: number) => `Total ${total} items`,
-                        position: ["bottomCenter", "bottomRight"],
-                        showSizeChanger: true,
-                        showQuickJumper: true,
-                        total: tableParams.pagination?.total,
-                        pageSize: tableParams.pagination?.pageSize,
-                    }}
-                    loading={loading}
-                    dataSource={data}
-                    onChange={handleTableChange}
-                />
-            </Space>
-        </ConfigProvider>
+                    <Table
+                        rowSelection={{
+                            ...rowSelection,
+                        }}
+                        columns={columns}
+                        pagination={{
+                            className: "bg-white rounded px-4 py-2",
+                            showTotal: (total: number) =>
+                                `Total ${total} items`,
+                            position: ["bottomCenter", "bottomRight"],
+                            showSizeChanger: true,
+                            showQuickJumper: true,
+                            total: tableParams.pagination?.total,
+                            pageSize: tableParams.pagination?.pageSize,
+                        }}
+                        loading={loading}
+                        dataSource={data}
+                        style={{width: "100%"}}
+                        onChange={handleTableChange}
+                    />
+                </div>
+            </ConfigProvider>
+        </div>
     );
 };
 
