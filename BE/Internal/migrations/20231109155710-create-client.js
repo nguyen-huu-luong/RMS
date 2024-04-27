@@ -41,6 +41,10 @@ module.exports = {
       type: {
         type: Sequelize.STRING
       },
+      convertDate: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
       hashedPassword: {
         type: Sequelize.STRING
       },

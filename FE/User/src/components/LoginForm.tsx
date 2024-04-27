@@ -81,6 +81,7 @@ export const LoginForm: React.FC = () => {
                                 required: true,
                                 message: "Please input your email!",
                             },
+                            
                         ]}
                         className='shadow-none py-2'
                     >

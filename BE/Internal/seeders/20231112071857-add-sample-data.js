@@ -48,9 +48,18 @@ const phone = [
     "0582 568 184",
     "0838 060 168"
 ]
+
+const group = [1,2,3,4,5,6]
+
+function randomDate(start, end) {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
+  }
+
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         const clientPassword = await bcrypt.hash("client", 10) ;
+        const currentDate = new Date();
+        const twoYearsAgo = new Date(currentDate.getFullYear() - 3, currentDate.getMonth(), currentDate.getDate());
         const clients = [];
         for (let i = 0; i < newData.length; i++) {
             const [firstName, middleName, lastName, birthday, address, email] = newData[i];
@@ -59,11 +68,45 @@ module.exports = {
                 phone: phone[i],
                 firstname: firstName,
                 lastname: lastName,
-                gender: faker.random.boolean(),
+                gender: faker.datatype.boolean(),
                 birthday: new Date(birthday),
                 avatar: avatar[i],
                 score: 0,
                 address: address,
+                source: sources[Math.floor(Math.random() * sources.length)],
+                groupId: group[Math.floor(Math.random()* group.length)],
+                type: types[Math.floor(Math.random() * types.length)],
+                convertDate: randomDate(new Date(2012, 0, 1), new Date()),
+                hashedPassword: clientPassword,
+                isRegistered: true,
+                isActive: true,
+                language: "vi",
+                profit: 0,
+                updatedAt: new Date(),
+            };
+            if (client.type === "customer") {
+                client.convertDate = faker.date.between(twoYearsAgo, currentDate);
+                let date = new Date(client.convertDate)
+                date.setMonth(date.getMonth() - Math.floor(Math.random() * 5) + 1)
+                client.createdAt = date
+            } else {
+                client.createdAt = faker.date.between(twoYearsAgo, currentDate);
+            }
+            clients.push(client);
+        }
+        for (let i = 0; i < 490; i++) {
+            const client = {
+                email: faker.internet.email(),
+                phone: "0822 740 644",
+                firstname: "User " + i.toString(),
+                lastname: "User " + i.toString(),
+                gender: faker.datatype.boolean(),
+                birthday: new Date(),
+                avatar: avatar[i % 10],
+                score: 0,
+                groupId: group[Math.floor(Math.random()* group.length)],
+                convertDate: randomDate(new Date(2012, 0, 1), new Date()),
+                address: "Address",
                 source: sources[Math.floor(Math.random() * sources.length)],
                 type: types[Math.floor(Math.random() * types.length)],
                 hashedPassword: clientPassword,
@@ -74,6 +117,14 @@ module.exports = {
                 createdAt: new Date(),
                 updatedAt: new Date(),
             };
+            if (client.type === "customer") {
+                client.convertDate = faker.date.between(twoYearsAgo, currentDate);
+                let date = new Date(client.convertDate)
+                date.setMonth(date.getMonth() - Math.floor(Math.random() * 5) + 1)
+                client.createdAt = date
+            } else {
+                client.createdAt = faker.date.between(twoYearsAgo, currentDate);
+            }
             clients.push(client);
         }
 
@@ -85,7 +136,7 @@ module.exports = {
                 firstname: "Manager",
                 lastname: 'Manager',
                 role: "manager",
-                gender: faker.random.boolean(),
+                gender: faker.datatype.boolean(),
                 birthday: faker.date.past(),
                 hashedPassword: await bcrypt.hash("manager", 10),
                 isActive: true,
@@ -100,7 +151,7 @@ module.exports = {
                 firstname: "Staff",
                 lastname: 'Staff',
                 role: 'employee',
-                gender: faker.random.boolean(),
+                gender: faker.datatype.boolean(),
                 birthday: faker.date.past(),
                 hashedPassword: await bcrypt.hash("staff", 10),
                 isActive: true,
@@ -115,7 +166,7 @@ module.exports = {
                 firstname: "Chef",
                 lastname: 'Chef',
                 role: 'chef',
-                gender: faker.random.boolean(),
+                gender: faker.datatype.boolean(),
                 birthday: faker.date.past(),
                 hashedPassword: await bcrypt.hash("chef", 10),
                 isActive: true,

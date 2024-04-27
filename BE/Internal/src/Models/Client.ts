@@ -206,6 +206,10 @@ Client.init(
 			type: DataTypes.STRING,
 			values: [],
 		},
+		convertDate: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
 		hashedPassword: {
 			type: DataTypes.STRING,
 		},
@@ -234,10 +238,6 @@ Client.init(
 		},
 		total_items: {
 			type: DataTypes.INTEGER,
-			defaultValue: 0,
-		},
-		convertDate: {
-			type: DataTypes.DATE,
 			defaultValue: 0,
 		},
 	},

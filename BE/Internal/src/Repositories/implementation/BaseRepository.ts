@@ -2,7 +2,7 @@ import { FindOptions, Model, ModelStatic, Op, Sequelize, where } from "sequelize
 import { IBaseRepository } from "../IBaseRepository";
 import { injectable, unmanaged } from "inversify";
 import { Filter, FilterObject, QueryOptions } from "../../Types/type";
-import { RecordNotFoundError } from "../../Errors";
+import { BadRequestError, RecordNotFoundError } from "../../Errors";
 
 @injectable()
 export abstract class BaseRepository<M extends Model>
