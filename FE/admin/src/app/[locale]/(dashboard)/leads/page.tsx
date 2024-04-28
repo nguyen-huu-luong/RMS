@@ -82,6 +82,12 @@ const Lead: React.FC = () => {
     const [data, setData] = useState<DataType[]>();
     const [loading, setLoading] = useState(false);
     const [selectedCustomers, setSelectedCustomers] = useState<DataType[]>();
+    const getAge = (birthday: string) => {
+        let currentDate = new Date()
+        let currentYear = Number(currentDate.getFullYear())
+        let birthdayYear = Number(birthday.split('-')[0])
+        return Math.abs(currentYear - birthdayYear)
+    }
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -271,7 +277,7 @@ const Lead: React.FC = () => {
             title: "Birthday",
             dataIndex: "birthday",
             key: "birthday",
-            ...getColumnSearchProps("birthday"),
+            render: (text, _) => <span>{text.split('T')[0]}</span>  
         },
         {
             title: "Score",
@@ -279,6 +285,12 @@ const Lead: React.FC = () => {
             key: "score",
             ...getColumnSearchProps("score"),
         },
+        {
+			title: "Age",
+			dataIndex: "age",
+			key: "age",
+			render: (text, row) => <span>{getAge(row.birthday)}</span>
+		},
         {
             title: "CreatedAt",
             dataIndex: "createdAt",

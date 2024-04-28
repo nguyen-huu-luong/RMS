@@ -77,46 +77,76 @@ function Home() {
     };
 
     const handleUpdateTable = async () => {
-        let table_status: string;
-        if (table.status == "Free") {
-            table_status = "Occupied";
-        } else {
-            table_status = "Free";
-        }
-        setTable({ ...table, status: table_status })
+        try {
+            let table_status: string;
+            if (table.status == "Free") {
+                table_status = "Occupied";
+            } else {
+                table_status = "Free";
+            }
+            setTable({ ...table, status: table_status })
 
-        await fetchClient({
-            method: "PUT",
-            url: `/tables/detail?id=${table.id}`,
-            body: { status: table_status },
-        });
-        setChecker((current_value) => !current_value);
+            await fetchClient({
+                method: "PUT",
+                url: `/tables/detail?id=${table.id}`,
+                body: { status: table_status },
+            });
+            setChecker((current_value) => !current_value);
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     const fetchFood = async () => {
-        const data = await fetchClient({ url: `/products/all`, data_return: true })
-        setFood(data)
+        try {
+            const data = await fetchClient({ url: `/products/all`, data_return: true })
+            setFood(data)
+        }
+        catch (err) {
+            console.log(err)
+        }
     }
 
     const fetchTable = async () => {
-        const data = await fetchClient({ url: `/tables/detail?id=${params.tid}`, data_return: true })
-        setTable(data)
+        try {
+            const data = await fetchClient({ url: `/tables/detail?id=${params.tid}`, data_return: true })
+            setTable(data)
+        }
+        catch (err) {
+            console.log(err)
+        }
     }
 
     const fetchCartItems = async () => {
-        const data = await fetchClient({ url: `/tables/cart/${params.tid}`, data_return: true })
-        console.log(data)
-        setCart_Items(data)
+        try {
+            const data = await fetchClient({ url: `/tables/cart/${params.tid}`, data_return: true })
+            console.log(data)
+            setCart_Items(data)
+        }
+        catch (err) {
+            console.log(err)
+        }
     }
 
     const fetchCategory = async () => {
-        const data = await fetchClient({ url: `/categories/all`, data_return: true })
-        setCategories(data)
+        try {
+            const data = await fetchClient({ url: `/categories/all`, data_return: true })
+            setCategories(data)
+        }
+        catch (err) {
+            console.log(err)
+        }
     }
 
     const fetchNotification = async () => {
-        const data = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
-        setNotifications(data)
+        try {
+            const data = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
+            setNotifications(data)
+        }
+        catch (err) {
+            console.log(err)
+        }
     }
 
     const onChange: PaginationProps["onChange"] = (page) => {
@@ -147,8 +177,8 @@ function Home() {
                 phone: values.phone_number,
                 birthday: values.birthday.format("YYYY-MM-DD"),
                 type: "customer"
-            };  
-            
+            };
+
             const data_return = await fetchClient({
                 method: "POST",
                 url: `/tables/order/${params.tid}`,
@@ -206,17 +236,22 @@ function Home() {
     };
 
     useEffect(() => {
-        if (!socket) return;
-        socket.on(
-            "tableItem:finish:fromChef",
-            (tableId: string, name: string) => {
-                message.info(`Finish ${name} for table ${tableId}`);
-                fetchCartItems()
-            }
-        );
-        return () => {
-            socket.off("tableItem:finish:fromChef");
-        };
+        try {
+            if (!socket) return;
+            socket.on(
+                "tableItem:finish:fromChef",
+                (tableId: string, name: string) => {
+                    message.info(`Finish ${name} for table ${tableId}`);
+                    fetchCartItems()
+                }
+            );
+            return () => {
+                socket.off("tableItem:finish:fromChef");
+            };
+        }
+        catch (err) {
+            console.log(err)
+        }
     }, [socket]);
 
     useEffect(() => {

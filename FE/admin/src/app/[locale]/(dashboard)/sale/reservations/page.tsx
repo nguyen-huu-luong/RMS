@@ -111,12 +111,17 @@ function Home() {
         let end_date = event.target.end_date.value;
         let table_id = event.target.table_id.value;
         let status = "";
-        let data = await fetchClient({
-            url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
-            data_return: true,
-        });
-        setResInfo({ ...resInfo, reservarions: data.reservarions })
-        setChecker((current_value) => !current_value);
+        try {
+            let data = await fetchClient({
+                url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
+                data_return: true,
+            });
+            setResInfo({ ...resInfo, reservarions: data.reservarions })
+            setChecker((current_value) => !current_value);
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     const handelFilterShortCut = async (table_id_: any) => {
@@ -124,72 +129,93 @@ function Home() {
         let end_date = "";
         let table_id = table_id_;
         let status = "Waiting";
-        let data = await fetchClient({
-            url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
-            data_return: true,
-        });
-        setResInfo({ ...resInfo, reservarions: data.reservarions })
-        setChecker((current_value) => !current_value);
+        try {
+            let data = await fetchClient({
+                url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
+                data_return: true,
+            });
+            setResInfo({ ...resInfo, reservarions: data.reservarions })
+            setChecker((current_value) => !current_value);
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     const handelCreateFloor: FormProps<FieldType>["onFinish"] = async (
         values
     ) => {
-        setMessError("");
-        let floor_name_ = values.floor_name;
-        let data = await fetchClient({
-            method: "POST",
-            url: "/floors/all",
-            body: { floor_name: floor_name_ },
-            data_return: true,
-        });
-        if (data.status) {
-            setResInfo({ ...resInfo, floors: data.floors })
-            form_floor.resetFields()
-            setIsModalFloorOpen(false);
-            setChecker((current_value) => !current_value);
-        } else {
-            setMessError(data.message);
+        try {
+            setMessError("");
+            let floor_name_ = values.floor_name;
+            let data = await fetchClient({
+                method: "POST",
+                url: "/floors/all",
+                body: { floor_name: floor_name_ },
+                data_return: true,
+            });
+            if (data.status) {
+                setResInfo({ ...resInfo, floors: data.floors })
+                form_floor.resetFields()
+                setIsModalFloorOpen(false);
+                setChecker((current_value) => !current_value);
+            } else {
+                setMessError(data.message);
+            }
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 
     const handelCreateTable: FormProps<FieldType>["onFinish"] = async (
         values
     ) => {
-        let table_name_ = values.table_name;
-        let floor_name_ = values.floor_name_temp;
-        setMessError("");
-        let data = await fetchClient({
-            method: "POST",
-            url: "/tables/detail",
-            body: {
-                floor_name: floor_name_,
-                table_name: table_name_,
-            },
-            data_return: true,
-        });
-        if (data.status) {
-            resInfo.floors = data.floors;
-            resInfo.tables = data.tables;
-            form_table.resetFields()
-            setIsModalTableOpen(false);
-            setChecker((current_value) => !current_value);
-        } else {
-            setMessError(data.message);
+        try {
+            let table_name_ = values.table_name;
+            let floor_name_ = values.floor_name_temp;
+            setMessError("");
+            let data = await fetchClient({
+                method: "POST",
+                url: "/tables/detail",
+                body: {
+                    floor_name: floor_name_,
+                    table_name: table_name_,
+                },
+                data_return: true,
+            });
+            if (data.status) {
+                resInfo.floors = data.floors;
+                resInfo.tables = data.tables;
+                form_table.resetFields()
+                setIsModalTableOpen(false);
+                setChecker((current_value) => !current_value);
+            } else {
+                setMessError(data.message);
+            }
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 
     const handleUpdateReservationStatus = async (status: any, id: any) => {
-        const data = await fetchClient({
-            method: "PUT",
-            url: `/reservations/detail?id=${id}`,
-            body: { status: status },
-            data_return: true,
-        });
-        resInfo.floors = data.floors;
-        resInfo.tables = data.tables;
-        resInfo.reservarions = data.reservarions;
-        setChecker((current_value) => !current_value);
+        try {
+            const data = await fetchClient({
+                method: "PUT",
+                url: `/reservations/detail?id=${id}`,
+                body: { status: status },
+                data_return: true,
+            });
+            resInfo.floors = data.floors;
+            resInfo.tables = data.tables;
+            resInfo.reservarions = data.reservarions;
+            setChecker((current_value) => !current_value);
+        }
+        catch (err) {
+            console.log(err)
+        }
+
     };
     const [isModalTableOpen, setIsModalTableOpen] = useState(false);
 
@@ -218,28 +244,35 @@ function Home() {
 
     const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
     const handleDeleteItem = async (values: any) => {
-        let item_names = values.item_name;
-        let item_type = values.item_type;
-        var data: any;
-        if (item_type == "floor") {
-            data = await fetchClient({
-                method: "DELETE",
-                url: `/floors/all`,
-                body: { floor_names: item_names },
-                data_return: true,
-            });
-        } else {
-            data = await fetchClient({
-                method: "DELETE",
-                url: `/tables/detail`,
-                body: { table_names: item_names },
-                data_return: true,
-            });
-        }
+        try {
 
-        setResInfo(data)
-        setChecker((current_value) => !current_value);
-        setIsModalDeleteOpen(false);
+
+            let item_names = values.item_name;
+            let item_type = values.item_type;
+            var data: any;
+            if (item_type == "floor") {
+                data = await fetchClient({
+                    method: "DELETE",
+                    url: `/floors/all`,
+                    body: { floor_names: item_names },
+                    data_return: true,
+                });
+            } else {
+                data = await fetchClient({
+                    method: "DELETE",
+                    url: `/tables/detail`,
+                    body: { table_names: item_names },
+                    data_return: true,
+                });
+            }
+
+            setResInfo(data)
+            setChecker((current_value) => !current_value);
+            setIsModalDeleteOpen(false);
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     const showModalDetete = () => {
@@ -281,38 +314,45 @@ function Home() {
     };
 
     const handleCreateReservation = async (values: any) => {
-        const start_time: any = values.start_time.format("HH:mm");
-        const end_time: any = values.end_time.format("HH:mm");
+        try {
 
-        if (start_time > end_time) {
-            setMessError("Start time must be less than end time");
-        } else {
-            const request_body: any = {
-                customerCount: values.quantity,
-                customerName: values.customer_name,
-                customerPhone: values.phone_number,
-                status: "Waiting",
-                dateTo: values.date_reserve.format("YYYY-MM-DD"),
-                timeTo: values.start_time.format("HH:mm"),
-                timeEnd: values.end_time.format("HH:mm"),
-                table_ids: values.table_reservation,
-                description: values.note,
-            };
-            const data = await fetchClient({
-                method: "POST",
-                url: `/reservations/detail`,
-                body: request_body,
-                data_return: true,
-            });
 
-            if (data.hasOwnProperty("message")) {
-                setMessError(data["message"]);
+            const start_time: any = values.start_time.format("HH:mm");
+            const end_time: any = values.end_time.format("HH:mm");
+
+            if (start_time > end_time) {
+                setMessError("Start time must be less than end time");
             } else {
-                setResInfo(data)
-                form_reservation_detail.resetFields()
-                setChecker((current_value) => !current_value);
-                setIsModalReservationOpen(false);
+                const request_body: any = {
+                    customerCount: values.quantity,
+                    customerName: values.customer_name,
+                    customerPhone: values.phone_number,
+                    status: "Waiting",
+                    dateTo: values.date_reserve.format("YYYY-MM-DD"),
+                    timeTo: values.start_time.format("HH:mm"),
+                    timeEnd: values.end_time.format("HH:mm"),
+                    table_ids: values.table_reservation,
+                    description: values.note,
+                };
+                const data = await fetchClient({
+                    method: "POST",
+                    url: `/reservations/detail`,
+                    body: request_body,
+                    data_return: true,
+                });
+
+                if (data.hasOwnProperty("message")) {
+                    setMessError(data["message"]);
+                } else {
+                    setResInfo(data)
+                    form_reservation_detail.resetFields()
+                    setChecker((current_value) => !current_value);
+                    setIsModalReservationOpen(false);
+                }
             }
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 
@@ -357,51 +397,61 @@ function Home() {
     };
 
     const handleReservationDetail = async (values: any) => {
-        const start_time: any = values.start_time.format("HH:mm");
-        const end_time: any = values.end_time.format("HH:mm");
+        try {
+            const start_time: any = values.start_time.format("HH:mm");
+            const end_time: any = values.end_time.format("HH:mm");
 
-        if (start_time > end_time) {
-            setMessError("Start time must be less than end time");
-        } else {
-            const request_body: any = {
-                res_id: values.res_id,
-                customerCount: values.quantity,
-                customerName: values.customer_name,
-                customerPhone: values.phone_number,
-                status: values.status,
-                dateTo: values.date_reserve.format("YYYY-MM-DD"),
-                timeTo: values.start_time.format("HH:mm"),
-                timeEnd: values.end_time.format("HH:mm"),
-                table_ids: values.table_reservation,
-                description: values.note,
-            };
-            const data = await fetchClient({
-                method: "PUT",
-                url: `/reservations/all`,
-                body: request_body,
-                data_return: true,
-            });
-
-            if (data.hasOwnProperty("message")) {
-                setMessError(data["message"]);
+            if (start_time > end_time) {
+                setMessError("Start time must be less than end time");
             } else {
-                setResInfo(resInfo)
-                setChecker((current_value) => !current_value);
-                setIsModalReservationDetailOpen(false);
+                const request_body: any = {
+                    res_id: values.res_id,
+                    customerCount: values.quantity,
+                    customerName: values.customer_name,
+                    customerPhone: values.phone_number,
+                    status: values.status,
+                    dateTo: values.date_reserve.format("YYYY-MM-DD"),
+                    timeTo: values.start_time.format("HH:mm"),
+                    timeEnd: values.end_time.format("HH:mm"),
+                    table_ids: values.table_reservation,
+                    description: values.note,
+                };
+                const data = await fetchClient({
+                    method: "PUT",
+                    url: `/reservations/all`,
+                    body: request_body,
+                    data_return: true,
+                });
+
+                if (data.hasOwnProperty("message")) {
+                    setMessError(data["message"]);
+                } else {
+                    setResInfo(resInfo)
+                    setChecker((current_value) => !current_value);
+                    setIsModalReservationDetailOpen(false);
+                }
             }
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 
     const handelDeleteReservation = async () => {
-        let res_id = form_reservation_detail.getFieldValue("res_id");
-        let data = await fetchClient({
-            method: "DELETE",
-            url: `/reservations/detail?id=${res_id}`,
-            data_return: true,
-        });
-        setResInfo(data)
-        setChecker((current_value) => !current_value);
-        setIsModalReservationDetailOpen(false);
+        try {
+            let res_id = form_reservation_detail.getFieldValue("res_id");
+            let data = await fetchClient({
+                method: "DELETE",
+                url: `/reservations/detail?id=${res_id}`,
+                data_return: true,
+            });
+            setResInfo(data)
+            setChecker((current_value) => !current_value);
+            setIsModalReservationDetailOpen(false);
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     type FieldType = {

@@ -46,11 +46,11 @@ export class ClientService {
 
     public async getById(id: number) {
         let customerInfo: any = await this.clientRepository.findById(id);
-       let group = await this.groupRepository.findByCond({
-        where: {
-            id: customerInfo.groupId
-        }
-       })
+        let group = await this.groupRepository.findByCond({
+            where: {
+                id: customerInfo.groupId
+            }
+        })
         let orderInfo = await await this.orderRepository.viewOrders(id);
 
         return { ...customerInfo["dataValues"], orderInfo, group: group }
@@ -307,7 +307,7 @@ export class ClientService {
                 const sequelizeObj = sequelize.getSequelize()
                 let start_date = data.start_date
                 let end_date = data.end_date
- 
+
                 const [group_temp, metadata_group_temp] = await sequelizeObj.query(`SELECT "convertDate",
                                                                                             SUM(CASE WHEN "groupId" = 1 THEN 1 ELSE 0 END) AS "Group 0",
                                                                                             SUM(CASE WHEN "groupId" = 2 THEN 1 ELSE 0 END) AS "Group 1",
@@ -411,6 +411,48 @@ export class ClientService {
             console.log(err)
             return "Error"
         }
+    }
+
+    public getCustomerPerGroup = async (groupIds: any = []) => {
+        let customers: any
+        if (groupIds.length == 0) {
+            customers = await this.clientRepository.findByCond({
+                include: [{
+                    model: Group, as: "Group", attributes: ['name', "description"]
+                }],
+                where: {
+                    type: "customer",
+                    groupId: {
+                        [Op.ne]: null
+                    }
+                },
+                order: [
+                    ['groupId', 'ASC']
+                ]
+
+            })
+        }
+        else {
+            customers = await this.clientRepository.findByCond({
+                include: [{
+                    model: Group, as: "Group", attributes: ['name', "description"], where: {
+                        id: {
+                            [Op.in]: groupIds
+                        }
+                    }
+                }],
+                where: {
+                    type: "customer",
+                    groupId: {
+                        [Op.ne]: null
+                    }
+                },
+                order: [
+                    ['groupId', 'ASC']
+                ],
+            })
+        }
+        return customers
     }
 
 }

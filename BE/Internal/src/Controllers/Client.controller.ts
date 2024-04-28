@@ -170,6 +170,28 @@ class ClientController {
 			console.log(err)
 		}
 	}
+
+	public async getCustomerPerGroup(req: Request, res: Response, next: NextFunction) {
+		try {
+
+			let groupIds: any = req.query.groupIds
+			let array_ids: any = []
+			if (typeof groupIds == 'undefined') {}
+			else {
+				groupIds = groupIds.substring(1, groupIds.length - 1)
+				const array_str_ids = groupIds.split(',')
+				array_ids = array_str_ids.map((item: any) => {
+					return Number(item)
+				})
+			}
+			const data = await this.clientService.getCustomerPerGroup(array_ids)
+			res.send(data)
+
+		}
+		catch (err) {
+			console.log(err)
+		}
+	}
 }
 
 export default ClientController;
