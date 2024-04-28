@@ -31,7 +31,8 @@ const CustomerProfile = () => {
     const [checker, setChecker] = useState(0)
     const [customerInfo, setCustomerInfo] = useState<any>()
     const [isLoading, setIsLoading] = useState(true)
-    const [customerHistory, setCustomerHistory] = useState()
+    const [customerHistory, setCustomerHistory] = useState([])
+    const [recentHistory, setRecentHistory] = useState([])
     const historyTitle: any = {
         "add_to_cart": { "title": "Add To Cart", "color": "geekblue", "link": "../bussiness/products/dishes", "reference": "Product ID:" },
         "view_item": { "title": "View Item", "color": "green", "link": "../bussiness/products/dishes", "reference": "Product ID:" },
@@ -42,9 +43,9 @@ const CustomerProfile = () => {
         setIsLoading(true)
         const data = await fetchClient({ url: `/customers/${params.cid}`, data_return: true })
         const histories = await fetchClient({ url: `/clienthistories/${params.cid}`, data_return: true })
-        console.log(histories)
         setCustomerInfo(data)
         setCustomerHistory(histories)
+        setRecentHistory(histories.slice(0,5))
         setImageUrl(data.avatar)
         setIsLoading(false)
 
@@ -295,6 +296,8 @@ const CustomerProfile = () => {
         },
     ];
 
+    console.log(recentHistory)
+
     return (
         <>
             {
@@ -451,14 +454,8 @@ const CustomerProfile = () => {
                                             tab == 0 ? <div> <Table columns={columns_order} dataSource={orderData} /></div>
                                                 : <div>
                                                     <div>
-                                                        <h3 className="mb-2">User activities</h3>
+                                                       
                                                         <Table columns={users_activity} dataSource={customerHistory}
-                                                            pagination={{
-                                                                pageSize: 3,
-                                                            }} /></div>
-                                                    <div>
-                                                        <h3 className="mb-2">Business activities</h3>
-                                                        <Table columns={columns_activity} dataSource={businessData}
                                                             pagination={{
                                                                 pageSize: 3,
                                                             }} /></div>
@@ -473,12 +470,32 @@ const CustomerProfile = () => {
                                     <p><CalendarOutlined style={{ color: "#4A58EC" }} /> December 13, 2022 by <span style={{ color: "#4A58EC" }}>Minh Vuong</span></p>
                                     <p className="mt-1" style={{ color: "#666666" }}>Last modified</p>
                                     <p><CalendarOutlined style={{ color: "#4A58EC" }} /> December 16, 2024  by <span style={{ color: "#4A58EC" }}>Minh Vuong</span></p>
-                                    <p className="ml-5 mt-2" style={{ color: "#666666" }}><button><ArrowRightOutlined /> View all history </button></p>
                                 </div>
 
                                 <div className="bg-white pl-3 py-2 mt-3">
                                     <h2 className="font-bold">Recent Activities</h2>
-                                    <div className="mt-4">
+                                    {
+                                        recentHistory.length <= 0 ? (<>
+                                        <p className="text-center">No data</p>
+                                        </>):
+                                        (
+                                            <>
+                                                {
+                                                    recentHistory.map((item: any) => {
+                                                        return(
+                                                            <div className="flex mt-1">
+                                                        <p className="flex-1" style={{ color: "#4A58EC" }} >{historyTitle[item.action].title.toUpperCase()}</p>
+                                                        <p style={{ color: "#4A58EC" }} className="flex-1"><CalendarOutlined />{item.createdAt.split('T')[0]}</p>
+                                                        </div>
+                                                        )
+                                                    })
+                                                }
+                                                 <p className="text-center mt-4" style={{ color: "#666666" }}><button type="button" onClick={() => handelTabClick(1)}>Show more......</button></p>
+                                            </>
+
+                                        )
+                                    }
+                                    {/* <div className="mt-4">
                                         <div className="flex justify-between">
                                             <div>
                                                 <p style={{ color: "#4A58EC" }} className="mb-1"><CalendarOutlined /> Automated send email</p>
@@ -492,7 +509,7 @@ const CustomerProfile = () => {
                                             </div>
                                         </div>
                                         <p className="text-center mt-5" style={{ color: "#666666" }}><button type="button" onClick={() => handelTabClick(1)}>Show more......</button></p>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
 

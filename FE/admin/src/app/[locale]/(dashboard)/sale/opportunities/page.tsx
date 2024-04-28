@@ -101,6 +101,7 @@ const Opportunities: React.FC = () => {
         message: "",
         title: "",
     });
+    const link_ref: any = {"customer": "../customers", "lead": "../leads"}
 
     const rowSelection = {
         // onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
@@ -116,12 +117,13 @@ const Opportunities: React.FC = () => {
         {
             title: "ID",
             dataIndex: "id",
-            key: "id",
+            key: "id"
         },
         {
             title: "Fullname",
             dataIndex: "fullname",
             key: "fullname",
+            render: (text, row) => <a style={{ color: "#4A58EC" }} href={`${link_ref[row.type]}/${row.id}`}>{text}</a>
         },
         {
             title: "Amount",
@@ -138,7 +140,7 @@ const Opportunities: React.FC = () => {
             title: "Action",
             dataIndex: "action",
             key: "action",
-            render: (text, row) => <Button color="primary" onClick={() => handleOpenModalCart(row.id - 1, row.fullname, row.amount)}>View cart</Button>
+            render: (text, row, index) => <Button color="primary" onClick={() => handleOpenModalCart(index, row.fullname, row.amount)}>View cart</Button>
         }];
 
 
@@ -248,8 +250,6 @@ const Opportunities: React.FC = () => {
                 url = "/customers/opportunity/all"
             }
 
-            console.log(url)
-
             const response = await fetchClient({
                 url: url, data_return: true
             })
@@ -259,7 +259,7 @@ const Opportunities: React.FC = () => {
             const results = response
             const data = results.map((item: any, index: any) => ({
                 key: index,
-                id: index + 1,
+                id: item.clientId,
                 amount: item.amount,
                 type: item.Client.type,
                 fullname: `${item.Client.firstname} ${item.Client.lastname}`,

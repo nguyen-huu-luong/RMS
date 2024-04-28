@@ -31,14 +31,14 @@ const LeadProfile = () => {
         error: leadInfoError,
         isLoading: leadInfoLoading
     } = useSWR(
-        params.lid, (lid) => fetchClient({url: `/customers/${lid}`, data_return: true}));
+        params.lid, (lid) => fetchClient({ url: `/customers/${lid}`, data_return: true }));
 
     let userInfo: any
 
     if (leadInfoLoading) {
         return (
             <>
-                <Loading/>
+                <Loading />
             </>
         )
     }
@@ -92,7 +92,7 @@ const LeadProfile = () => {
                 "firstname": first_name,
                 "lastname": last_name.trim()
             }
-            await fetchClient({url: `/customers/${params.lid}`, method: "PUT", body: data})
+            await fetchClient({ url: `/customers/${params.lid}`, method: "PUT", body: data })
         }
         setFlag(true)
         setStyle(normalStyle)
@@ -208,10 +208,10 @@ const LeadProfile = () => {
                                         <div>
                                             <p className="font-bold ">Source</p>
                                             <select className="rounded-md py-1.5" defaultValue={userInfo.source ? userInfo.source : "none"} style={style} disabled={editFlag} name="source">
-                                                <option value={"website 1"}>Website 1</option>
-                                                <option value={"website 2"}>Website 2</option>
-                                                <option value={"website 3"}>Website 3</option>
-                                                <option value={"website 4"}>Website 4</option>
+                                                <option value={"Tiktok"}>Tiktok</option>
+                                                <option value={"Facebook"}>Facebook</option>
+                                                <option value={"Website"}>Website</option>
+                                                <option value={"At Restaurant"}>At Restaurant</option>
                                                 <option value={"none"}>None</option>
                                             </select>
                                         </div>
@@ -284,14 +284,14 @@ const LeadProfile = () => {
                                     </div>
                                     <div className="pl-3 mt-3 pr-3">
                                         {
-                                                 <div>
-                                                    <div>
-                                                        <h3 className="mb-2">Business activities</h3>
-                                                        <Table columns={columns_activity} dataSource={businessData} /></div>
-                                                    <div>
-                                                        <h3 className="mb-2">User activities</h3>
-                                                        <Table columns={columns_activity} dataSource={userData} /></div>
-                                                </div>
+                                            <div>
+                                                <div>
+                                                    <h3 className="mb-2">Business activities</h3>
+                                                    <Table columns={columns_activity} dataSource={businessData} /></div>
+                                                <div>
+                                                    <h3 className="mb-2">User activities</h3>
+                                                    <Table columns={columns_activity} dataSource={userData} /></div>
+                                            </div>
                                         }
                                     </div>
                                 </div>

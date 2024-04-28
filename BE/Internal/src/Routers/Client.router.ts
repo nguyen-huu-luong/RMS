@@ -25,6 +25,7 @@ class ClientRouter {
         clientRouter.get("/opportunity/all", this.clientController.getOpporturnityCustomer.bind(this.clientController))
         clientRouter.post("/segment", this.clientController.segmentCustomerAll.bind(this.clientController))
         clientRouter.post("/segment/:id", this.clientController.segmentCustomer.bind(this.clientController))
+        clientRouter.get("/group/all", this.clientController.getCustomerPerGroup.bind(this.clientController))
         router.use("/customers", AuthMiddleware.initialize, Authorization.initialize, clientRouter);
     }
 }
