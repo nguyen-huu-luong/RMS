@@ -315,8 +315,6 @@ function Home() {
 
     const handleCreateReservation = async (values: any) => {
         try {
-
-
             const start_time: any = values.start_time.format("HH:mm");
             const end_time: any = values.end_time.format("HH:mm");
 
@@ -426,7 +424,7 @@ function Home() {
                 if (data.hasOwnProperty("message")) {
                     setMessError(data["message"]);
                 } else {
-                    setResInfo(resInfo)
+                    setResInfo(data)
                     setChecker((current_value) => !current_value);
                     setIsModalReservationDetailOpen(false);
                 }
