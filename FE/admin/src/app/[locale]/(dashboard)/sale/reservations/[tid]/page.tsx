@@ -235,6 +235,19 @@ function Home() {
         setItems([]);
     };
 
+    const getCustomerInfo = async () => {
+        const email = form.getFieldValue('email')
+        if (email == "") {}
+        else {
+            const data: any = await  fetchClient({url: `/customers/all?email=${email}`, data_return: true})
+            if (data.data.length != 0) {
+                const customer: any = data.data[0]
+                console.log(customer)
+                form.setFieldsValue({"first_name": customer.firstname, "last_name": customer.lastname, "phone_number": customer.phone, "birthday": moment(customer.birthday)})
+            }
+        }
+    }
+
     useEffect(() => {
         try {
             if (!socket) return;
@@ -466,27 +479,40 @@ function Home() {
                                 </Form.Item>
                             </div>
                         </div>
+                        <div className="flex justify-between">
+                        <div style={{width: "85%"}}>
+                                <Form.Item
+                                    name='email'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            Email
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "Please input customer's email!",
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        placeholder='Email'
+                                        style={{ marginTop: 8 }}
+                                    />
+                                </Form.Item>
+                        </div>
 
-                        <Form.Item
-                            name='email'
-                            label={
-                                <span className='whitespace-nowrap font-bold text-md'>
-                                    Email
-                                </span>
-                            }
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input customer's email!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                placeholder='Phone number'
-                                style={{ marginTop: 8 }}
-                            />
-                        </Form.Item>
-
+                        <div >
+                                <Form.Item>
+                                    <p style={{visibility: "hidden", marginTop: "16px"}}>Check</p>
+                                <Button  style={{
+                                        color: "white",
+                                        backgroundColor: "#EA6A12",
+                                        
+                                    }} className="flex-auto"  htmlType='button' onClick={getCustomerInfo}>Check</Button>
+                                </Form.Item>   
+                                </div>
+                                </div>
                         <Form.Item
                             name='paymentMethod'
                             label={
