@@ -27,7 +27,7 @@ export class MoMoService {
         var orderInfo = `MOMO thanh toan ho cho khach hang ${fullname}`;
         var partnerCode = 'MOMO';
         var partnerName = "Home Cuisine"
-        var redirectUrl = 'http://localhost:3000/en/payment?method=MOMO';
+        var redirectUrl = 'http://localhost:3001/en/payment?method=MOMO';
         var ipnUrl = 'http://localhost:3003/api/order/momo';
         var requestType = "payWithMethod";
         var amount = cart.amount + req.body["shippingCost"] - req.body["discountAmount"];
