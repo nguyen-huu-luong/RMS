@@ -716,6 +716,11 @@ const Order: React.FC = () => {
             method: "POSt",
             body: { status: false, orderStatus: `${order.id}-3` },
         });
+        await fetchClient({
+            url: `/customers/segment/${order.clientId}`,
+            method: "POST",
+            body: {},
+        }); 
         if (socket) {
             socket.emit("staff:notifications:done", order.clientId, order.id);
         }
