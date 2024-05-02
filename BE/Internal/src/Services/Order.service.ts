@@ -152,7 +152,8 @@ export class OrderService {
                     num_items: cart?.getDataValue("total"),
                     amount:
                         parseInt(cart?.getDataValue("amount")) +
-                        parseInt(order.getDataValue("shippingCost")) - parseInt(order.getDataValue("discountAmount")),
+                        parseInt(order.getDataValue("shippingCost")) -
+                        parseInt(order.getDataValue("discountAmount")),
                 });
                 const cartItems = await cart.getProducts();
                 await Promise.all(
@@ -169,8 +170,6 @@ export class OrderService {
                     })
                 );
                 const client = await this.clientRepository.findById(req.userId);
-                if (client.getDataValue("type") == "lead")
-                    await client.update({ type: "customer" });
                 await cart.setProducts([]);
                 await this.cartRepository.update(cart?.getDataValue("id"), {
                     total: 0,
@@ -274,6 +273,13 @@ export class OrderService {
                     const client = await this.clientRepository.findById(
                         order.getDataValue("clientId")
                     );
+                    console.log(
+                        Math.trunc(
+                            order.getDataValue("amount") /
+                                (client.getDataValue("total_items") +
+                                    order.getDataValue("num_items"))
+                        )
+                    );
                     await client.update({
                         total_items:
                             client.getDataValue("total_items") +
@@ -281,12 +287,17 @@ export class OrderService {
                         profit:
                             client.getDataValue("profit") +
                             order.getDataValue("amount"),
-                        average:
+                        average: Math.trunc(
                             (client.getDataValue("profit") +
                                 order.getDataValue("amount")) /
-                            (client.getDataValue("total_items") +
-                                order.getDataValue("num_items")),
+                                (client.getDataValue("total_items") +
+                                    order.getDataValue("num_items"))
+                        ),
                     });
+                    if (client.getDataValue("type") == "lead") {
+                        await client.update({ type: "customer" });
+                        await client.update({ convertDate: new Date() });
+                    }
                     await client.save();
                 } else if (status.status == "Cancel") {
                     const order = await this.orderRepository.findById(orderId);
