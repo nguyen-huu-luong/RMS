@@ -152,7 +152,7 @@ export class OrderService {
                     num_items: cart?.getDataValue("total"),
                     amount:
                         parseInt(cart?.getDataValue("amount")) +
-                        parseInt(order.getDataValue("shippingCost")),
+                        parseInt(order.getDataValue("shippingCost")) - parseInt(order.getDataValue("discountAmount")),
                 });
                 const cartItems = await cart.getProducts();
                 await Promise.all(
