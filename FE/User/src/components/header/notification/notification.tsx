@@ -14,6 +14,7 @@ import useOutsideClick from "@/hooks/clickOutside";
 const Notification = () => {
     const socket = useSocket();
     const [child, setChild] = useState<boolean>(false);
+    const [waited, setWaited] = useState<boolean>(false);
     const hide = () => {
         setOpen(false);
     };
@@ -35,13 +36,20 @@ const Notification = () => {
     }, [ref, child]);
 
     const [open, setOpen] = useState(false);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setWaited(true);
+        }, 3000);
+        return () => clearTimeout(timer);
+    }, []);
     const {
         data: notifications,
         error: notificationsError,
         isLoading: notificationsLoading,
         mutate,
-    } = useSWR(`/notifications/all`, (url) =>
-        fetchClient({ url: url, data_return: true })
+    } = useSWR(
+        waited ? `/notifications/all` : null,
+        waited ? (url) => fetchClient({ url: url, data_return: true }) : null
     );
 
     useEffect(() => {
