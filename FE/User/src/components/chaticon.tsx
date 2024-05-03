@@ -2,39 +2,57 @@
 import { MessageOutlined } from "@ant-design/icons";
 import ChatBox from "./chat/chatbox";
 import { useState } from "react";
-import { messageFetcher } from "@/app/api/chat/message";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import useSocket from "@/socket";
+import fetchClient from "@/lib/fetch-client";
 
 const ChatIcon = () => {
     const [popup, showPopup] = useState(false);
-    const {data: session, status} = useSession()
+    const [unread, setUnread] = useState<number>(0);
+    const socket = useSocket();
+    const { data: session, status } = useSession();
+    const fetchData = async () => {
+        try {
+            if (status == "authenticated") {
+                const data = await fetchClient({
+                    url: `/channels/notseen`,
+                    data_return: true,
+                });
+                setUnread(data.notSeenMessages);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        setTimeout(async () => {
+            await fetchData();
+        }, 1000);
+    }, []);
+    useEffect(() => {
+        if (!socket) return;
+        const handleNewMessage = async (
+            channelId: string,
+            message: string,
+            employeeId: string
+        ) => {
+            setUnread((prev) => prev + 1);
+        };
+        socket.on("message:send:fromStaff", handleNewMessage);
+        socket.on("connect_error", (error: any) => {
+            console.log(error);
+        });
+        return () => {
+            socket.off("message:send:fromStaff", handleNewMessage);
+        };
+    }, [socket]);
     if (status === "loading" || status === "unauthenticated") return;
-    // const [unreadMessages, setUnreadMessages] = useState(0);
-    // const calculateUnreadMessages = (messages: any) => {
-    //     let lastNotSeenIndex = -1;
-    //     for (let i = messages.length - 1; i >= 0; i--) {
-    //         if (messages[i].clientId !== null) {
-    //             lastNotSeenIndex = i;
-    //             break;
-    //         }
-    //     }
-    //     for (let i = messages.length - 1; i >= lastNotSeenIndex; i--) {
-    //         if (messages[i].status !== "Not seen") {
-    //             lastNotSeenIndex = i;
-    //             break;
-    //         }
-    //     }
-    //     if (lastNotSeenIndex !== -1) {
-    //         setUnreadMessages(messages.length - lastNotSeenIndex - 1);
-    //     } else {
-    //         setUnreadMessages(0);
-    //     }
-    // };
     return (
         <>
             {popup ? (
-                <ChatBox params={{ show: popup, setShow: showPopup }}></ChatBox>
+                <ChatBox params={{ show: popup, setShow: showPopup, setUnread: setUnread }}></ChatBox>
             ) : (
                 <></>
             )}
@@ -47,6 +65,11 @@ const ChatIcon = () => {
                     <MessageOutlined style={{ fontSize: "1.4rem" }} />
                 </span>
             </button>
+            {!popup && (
+                <div className='z-50 absolute bottom-5 right-5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-extralight text-xs'>
+                    {unread}
+                </div>
+            )}
         </>
     );
 };

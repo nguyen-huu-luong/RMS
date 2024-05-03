@@ -187,7 +187,7 @@ function User({
             className={`px-2 w-full ${
                 params.latestMessage.status == "Not seen" &&
                 params.latestMessage.clientId
-                    ? "bg-slate-100 hover:bg-slate-200"
+                    ? "bg-slate-100 hover:bg-slate-200 text-black"
                     : "hover:bg-slate-50"
             } h-20 hover:cursor-pointer transition-all duration-300 flex flex-row items-center justify-between gap-2 font-normal`}
         >

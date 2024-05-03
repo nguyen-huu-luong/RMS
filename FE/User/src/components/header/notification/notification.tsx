@@ -83,7 +83,7 @@ const Notification = () => {
                     style={{
                         fontSize: "1.6rem",
                     }}
-                />
+                /> 
                 <div className='z-50 absolute bottom-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-extralight text-xs'>
                     {
                         notifications.res.filter(

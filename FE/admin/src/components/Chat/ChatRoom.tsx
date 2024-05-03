@@ -48,6 +48,7 @@ const ChatBox = ({
                 }`,
                 data_return: true,
             });
+            console.log(fetchedData);
             if (index == 1) {
                 setData(fetchedData);
             } else {
@@ -70,17 +71,16 @@ const ChatBox = ({
     }, [index, channel]);
 
     useEffect(() => {
-        setLoading(false)
-        setIsAllLoaded(false)
-        setInitial(false)
-        setValue("")
-        
-        setTimeout(() => scrollToBottom(), 1000)
+        setLoading(false);
+        setIsAllLoaded(false);
+        setInitial(false);
+        setValue("");
+
+        setTimeout(() => scrollToBottom(), 1000);
     }, [channel]);
 
     useEffect(() => {
-        
-        setTimeout(() => scrollToBottom(), 1000)
+        setTimeout(() => scrollToBottom(), 1000);
     }, [channel]);
     useEffect(() => {
         const handleNewMessage = (
@@ -189,14 +189,14 @@ const ChatBox = ({
 
     // HANDLE SCROLL FOR LOADING MORE
     const loadMore = () => {
-        console.log("Load more1")
+        console.log("Load more1");
         if (loading || isAllLoaded) return;
         setLoading(true);
         setIndex((prevIndex: number) => prevIndex + 1);
     };
 
     const handleScroll = () => {
-        console.log("Load more2")
+        console.log("Load more2");
         const container = messageContainerRef.current;
         if (container) {
             if (container.scrollTop === 0) {
@@ -225,13 +225,13 @@ const ChatBox = ({
     }, [loading, isAllLoaded, initial]);
 
     if (channel === -1) return "Choose customer to chat";
-    if (!data) return <Loading/>;
+    if (!data) return <Loading />;
     return (
         <div
             className={` bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full bottom-5 right-5 z-50`}
         >
             <div className='header h-10 w-full text-white bg-primary items-center flex flex-row justify-between p-2 font-bold border-b-white border-b-2'>
-                <span>Chat</span>
+                <span>{data.client}</span>
             </div>
             <div
                 ref={messageContainerRef}

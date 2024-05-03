@@ -10,7 +10,7 @@ export default function useSocket() {
 
     useEffect(() => {
         if (status == "unauthenticated") {
-            router.push("/signin");
+            return;
         } else if (status == "loading") return;
 
         const newSocket = io(`http://localhost:3003`, {

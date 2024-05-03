@@ -90,7 +90,7 @@ class SocketConnection {
             }
         });
         io.on("connection", (socket: any) => {
-            socket.to("Employee").emit("initial:channels", this.channels);
+            io.to("Employee").emit("initial:channels", this.channels);
 
             // Chat service
             socket.on(
