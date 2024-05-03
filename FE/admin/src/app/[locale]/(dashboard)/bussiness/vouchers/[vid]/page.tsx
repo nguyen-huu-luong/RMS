@@ -29,13 +29,10 @@ type FieldType = {
     gender: boolean;
 };
 const Voucher = () => {
-    const router = useRouter();
-    const { data: session, status } = useSession();
     const [edit, setEdit] = useState<boolean>(true);
     const [form] = Form.useForm();
     const [loading, setLoading] = useState<boolean>(false);
     const params = useParams<{ locale: string; vid: string }>();
-
     const {
         data: voucher,
         error: voucherError,
@@ -44,14 +41,16 @@ const Voucher = () => {
     } = useSWR(`/vouchers/${params.vid}`, (url) =>
         fetchClient({ url: url, data_return: true })
     );
-
     const updateInformation = async (data: any) => {
         await fetchClient({
             url: `/vouchers/${params.vid}`,
             method: "PUT",
             body: data,
         });
-        mutate();
+        setTimeout(async () => {
+            await mutate();
+            form.resetFields();
+        }, 2000);
     };
 
     const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
@@ -66,8 +65,6 @@ const Voucher = () => {
         setLoading(false);
         console.log("Failed:", errorInfo);
     };
-    if (status === "loading") return <Loading />;
-    if (status === "unauthenticated") router.push("/signin");
     if (voucherError) return <div>Failed to load</div>;
     if (voucherLoading) return <Loading />;
     if (!voucher) return <Loading />;
@@ -233,11 +230,25 @@ const Voucher = () => {
                                     name='maximum_reduce'
                                     initialValue={voucher.maximum_reduce}
                                     rules={[
-                                        {
-                                            required: true,
-                                            message:
-                                                "Please input the maximum reduce!",
-                                        },
+                                        ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                                const type =
+                                                    getFieldValue("type");
+                                                if (type === "fixed") {
+                                                    return Promise.resolve();
+                                                } else if (value <= 0) {
+                                                    return Promise.reject(
+                                                        "Please input a positive number!"
+                                                    );
+                                                }
+                                                if (value) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(
+                                                    "Please input the maximum reduce!"
+                                                );
+                                            },
+                                        }),
                                     ]}
                                 >
                                     <Input
@@ -260,6 +271,16 @@ const Voucher = () => {
                                             message:
                                                 "Please input the quantity!",
                                         },
+                                        ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                                if (value > 0) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(
+                                                    "Please input a positive number!"
+                                                );
+                                            },
+                                        }),
                                     ]}
                                 >
                                     <Input
@@ -299,6 +320,16 @@ const Voucher = () => {
                                             message:
                                                 "Please input the minimum paid!",
                                         },
+                                        ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                                if (value > 0) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(
+                                                    "Please input a positive number!"
+                                                );
+                                            },
+                                        }),
                                     ]}
                                 >
                                     <Input

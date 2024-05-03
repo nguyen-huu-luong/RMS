@@ -9,7 +9,7 @@ class Pos_notification extends Model {
 Pos_notification.init(
     {
         content: DataTypes.STRING,
-        table: DataTypes.INTEGER
+        table: DataTypes.STRING
     },
     {
         sequelize: Loader.sequelize,

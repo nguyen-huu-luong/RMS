@@ -21,6 +21,9 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
 
     const onFinish = async (values: any) => {
         try {
+            if (values.type === "fixed") {
+                values.maximum_reduce = values.amount;
+            }
             const response = fetchClient({
                 url: "/vouchers",
                 body: { data: { ...values } },
@@ -35,16 +38,6 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
         }
     };
 
-    const onFinishFailed = (errorInfo: any) => {
-        console.error("Failed:", errorInfo);
-    };
-    const normFile = (e: any) => {
-        console.log("Upload event:", e);
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e?.fileList;
-    };
     return (
         <ConfigProvider
             theme={{
@@ -159,6 +152,24 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                                     required: true,
                                     message: "Please input the amount!",
                                 },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        const type = getFieldValue("type");
+                                        if (value > 0) {
+                                            if (type === "percentage") {
+                                                if (value > 100) {
+                                                    return Promise.reject(
+                                                        "Amount for percentage can not be over 100%!"
+                                                    );
+                                                }
+                                            }
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(
+                                            "Please input a positive number!"
+                                        );
+                                    },
+                                }),
                             ]}
                         >
                             <Input type='number' placeholder='Amount' />
@@ -170,10 +181,24 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                             label='Maximum Reduce'
                             name='maximum_reduce'
                             rules={[
-                                {
-                                    required: true,
-                                    message: "Please input the maximum reduce!",
-                                },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        const type = getFieldValue("type");
+                                        if (type === "fixed") {
+                                            return Promise.resolve();
+                                        } else if (value <= 0) {
+                                            return Promise.reject(
+                                                "Please input a positive number!"
+                                            );
+                                        }
+                                        if (value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(
+                                            "Please input the maximum reduce!"
+                                        );
+                                    },
+                                }),
                             ]}
                         >
                             <Input type='number' placeholder='Maximum Reduce' />
@@ -191,6 +216,16 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                                     required: true,
                                     message: "Please input the quantity!",
                                 },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (value > 0) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(
+                                            "Please input a positive number!"
+                                        );
+                                    },
+                                }),
                             ]}
                         >
                             <Input type='number' placeholder='Quantity' />
@@ -206,6 +241,16 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                                     required: true,
                                     message: "Please input the minimum paid!",
                                 },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (value > 0) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(
+                                            "Please input a positive number!"
+                                        );
+                                    },
+                                }),
                             ]}
                         >
                             <Input type='number' placeholder='Minimum Paid' />
@@ -279,7 +324,7 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                 <Form.Item>
                     <div className='flex justify-end space-x-2'>
                         <Button type='default' htmlType='reset'>
-                            Cancle
+                            Cancel
                         </Button>
                         <Button type='primary' htmlType='submit'>
                             Save

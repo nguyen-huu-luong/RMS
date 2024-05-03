@@ -486,6 +486,7 @@ function Home() {
 
     useEffect(() => {
         fetchAllData()
+        fetchNotification()
     }, [])
 
     if (isLoading) return <Loading />;

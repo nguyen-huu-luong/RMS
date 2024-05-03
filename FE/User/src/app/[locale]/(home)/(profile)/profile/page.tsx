@@ -23,7 +23,6 @@ import type { UploadProps } from "antd";
 import useSWR from "swr";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
-
 type FieldType = {
     firstname?: string;
     lastname?: string;
@@ -38,13 +37,12 @@ const Profile = () => {
     const [edit, setEdit] = useState<boolean>(true);
     const [form] = Form.useForm();
     const [loading, setLoading] = useState<boolean>(false);
-
     const {
         data: profile,
         error: profileError,
         isLoading: profileLoading,
         mutate,
-    } = useSWR(`/customers`, (url) =>
+    } = useSWR(`/customers/${session?.user.id}`, (url) =>
         fetchClient({ url: url, data_return: true })
     );
 
@@ -115,7 +113,7 @@ const Profile = () => {
                 User Profile
             </div>
             <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl py-2 px-3 flex flex-col gap-2 items-center'>
-                <div className='relative w-auto h-auto rounded-full overflow-hidden'>
+                <div className='relative w-auto h-auto rounded-full overflow-hidden aspect-square'>
                     <Image
                         src={
                             !profile.avatar
@@ -129,7 +127,7 @@ const Profile = () => {
                         unoptimized
                     />
                     <Upload {...props} maxCount={1} showUploadList={false}>
-                        <button className='absolute top-1/2 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-medium text-black backdrop-blur-sm rounded-md cursor-pointer'>
+                        <button className='absolute top-1/2 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-medium text-white backdrop-blur-sm rounded-md cursor-pointer'>
                             Change
                         </button>
                     </Upload>

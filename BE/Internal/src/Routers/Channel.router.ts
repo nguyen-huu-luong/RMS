@@ -41,6 +41,15 @@ class ChannelRouter {
             );
 
         router
+            .route("/channels/notseen")
+            .get(
+                AuthMiddleware.initialize,
+                Authorization.initialize,
+                (req: Request, res: Response, next: NextFunction) =>
+                    this.channelController.getNotSeenMessages(req, res, next)
+            );
+
+        router
             .route("/channels/admin")
             .get(
                 AuthMiddleware.initialize,

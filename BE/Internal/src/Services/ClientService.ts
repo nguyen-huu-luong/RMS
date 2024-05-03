@@ -179,7 +179,6 @@ export class ClientService {
     }
 
     public updateCustomerGroup = async (group_info: any, update_convert_time: boolean) => {
-        console.log("Update")
         if (update_convert_time) {
             await Promise.all(
                 group_info.map(async (item: any) => {
@@ -198,7 +197,7 @@ export class ClientService {
                                 },
                                 {
                                     groupId: {
-                                        [Op.ne]: item.groupId
+                                        [Op.ne]: item.groupId + 1
                                     }
                                 },
                             ]
