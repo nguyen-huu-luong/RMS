@@ -197,7 +197,7 @@ export class ClientService {
                                 },
                                 {
                                     groupId: {
-                                        [Op.ne]: item.groupId
+                                        [Op.ne]: item.groupId + 1
                                     }
                                 },
                             ]

@@ -29,8 +29,8 @@ export const EditVoucherForm: React.FC<EditVoucherFormProps> = (props) => {
 
     useEffect(() => {
         if (voucherData){
-            console.log(voucherData)
             form.setFieldsValue(voucherData)
+            console.log(voucherData)
         }
     }, [voucherData])
 
@@ -66,13 +66,6 @@ export const EditVoucherForm: React.FC<EditVoucherFormProps> = (props) => {
     const onFinishFailed = (errorInfo: any) => {
         console.error("Failed:", errorInfo);
     };
-    const normFile = (e: any) => {
-        console.log("Upload event:", e);
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e?.fileList;
-    };
     if (!voucherData) return <Loading />;
     return (
         <ConfigProvider
@@ -105,7 +98,6 @@ export const EditVoucherForm: React.FC<EditVoucherFormProps> = (props) => {
                 onReset={props.afterCancel}
                 initialValues={voucherData}
             >
-                {JSON.stringify(voucherData)}
                 <div className='flex space-x-2'>
                     <div className='w-full'>
                         <Form.Item

@@ -93,6 +93,7 @@ export class VoucherService {
             data = await this.voucherRepository.create({
                 ...req.body.data,
                 promo_code: promo_code,
+                redeemedNumber: 0,
             });
             Message.logMessage(req, status);
             return res.status(status).send(statusMess.Success);
@@ -215,9 +216,14 @@ export class VoucherService {
                         })
                     );
                     const redeemedClient = await voucher.getClients();
-                    voucher.update({ redeemedNumber: redeemedClient.length });
-                    voucher.save();
+                    await voucher.update({
+                        redeemedNumber: redeemedClient.length,
+                    });
+                    await voucher.save();
+                    Message.logMessage(req, status);
+                    return res.status(status).send(statusMess.Success);
                 } else {
+                    Message.logMessage(req, status);
                     return res
                         .status(HttpStatusCode.Success)
                         .send("Already assigned");
@@ -280,7 +286,8 @@ export class VoucherService {
             if (voucher[0].getDataValue("can_redeem")) {
                 const clientVoucher = await client.getVouchers({
                     where: {
-                        '$ClientVoucher.voucherId$': voucher[0].getDataValue('id')
+                        "$ClientVoucher.voucherId$":
+                            voucher[0].getDataValue("id"),
                     },
                 });
                 if (clientVoucher.length > 0) {
