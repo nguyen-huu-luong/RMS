@@ -11,7 +11,7 @@ import { Space } from "antd";
 const defaultStyle: CSSProperties = {
     position: "relative",
     width: "100%",
-    maxWidth: 600,
+    // maxWidth: 600,
     minHeight: "200px",
     height: "auto",
 };
@@ -143,7 +143,7 @@ const SectionPreview = ({ section, index, path }: ISectionPreview) => {
                 onClick={handleClick}
                 className="border border-dashed"
             >
-                <div className="flex space-x-1">
+                <div className="flex">
                     {hasChildren.length > 0 &&
                         hasChildren.map((tsection: any, tindex: number) => {
                             return loadHtmlElements(tsection, tindex);

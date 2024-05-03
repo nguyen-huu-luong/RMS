@@ -2,12 +2,13 @@ import { Collapse, CollapseProps } from "antd";
 
 import useEmailDataStore from "@/store/email";
 import { useEffect, useState } from "react";
+import Setting from "./Setting";
 
 const items: CollapseProps['items'] = [
     {
         key: '1',
         label: 'Setting',
-        children: <></>,
+        children: <Setting />,
     },
     {
         key: '2',
@@ -31,7 +32,7 @@ const ColumnAttributes = () => {
         setContent((activeNode && activeNode.section.content) || "")
     }, [])
 
-    if (!activeNode || (activeNode && activeNode.section.tagName !== "mj-image"))
+    if (!activeNode || (activeNode && activeNode.section.tagName !== "mj-column"))
         return <></>;
 
     return <Collapse  items={items} />

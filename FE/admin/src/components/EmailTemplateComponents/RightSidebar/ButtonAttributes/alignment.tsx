@@ -1,13 +1,14 @@
 import useEmailDataStore from "@/store/email";
 import { Button, Col, Flex, Row, Space } from "antd";
 import { MdOutlineMargin } from "react-icons/md";
-import InputNumber from "./InputNumber";
+import InputNumber from "../../shared/InputNumber";
+import { useState } from "react";
 
 const Alignment = () => {
-    const { activeNode, updateAttributes, updateContent } = useEmailDataStore();
+    const { activeNode, updateAttributes, updateContent,updateActiveNodeAttributes } = useEmailDataStore();
     const { section } = activeNode;
     const attributes = section.attributes;
-
+    
     const handleChangePosition = (position: string) => {
         const newAttributes = {
             ...attributes,
@@ -15,7 +16,9 @@ const Alignment = () => {
         }
 
         updateAttributes(newAttributes, activeNode.path)
+        updateActiveNodeAttributes("attributes",newAttributes)
     }
+
 
 
     const handleUpdateBoxSizing = (cssProperty: string, value: number) => {
@@ -24,7 +27,8 @@ const Alignment = () => {
             [cssProperty]: `${value}px`
         }
 
-        updateAttributes(newAttributes, activeNode.path)
+        updateAttributes(newAttributes, activeNode.path)        
+        updateActiveNodeAttributes("attributes",newAttributes)
     }
 
     return (
@@ -36,7 +40,10 @@ const Alignment = () => {
                 <Button type="primary" className="bg-primary" onClick={() => handleChangePosition("right")}>Right</Button>
             </Space>
 
-            <span><b>Padding</b></span>
+    
+
+
+            <span><b>Margin</b></span>
 
             <Row gutter={[8, 8]}>
                 <InputNumber
@@ -49,54 +56,21 @@ const Alignment = () => {
                     leftAddon="Right"
                     cssProperty="padding-right"
                     onChange={handleUpdateBoxSizing}
-                    value={Number(attributes["padding-left"].split("px")[0])}
+                    value={Number(attributes["padding-right"].split("px")[0])}
                 />
                 <InputNumber 
                     leftAddon="Top"
                     cssProperty="padding-top"
                     onChange={handleUpdateBoxSizing}
-                    value={Number(attributes["padding-left"].split("px")[0])}
+                    value={Number(attributes["padding-top"].split("px")[0])}
                 />
                 <InputNumber 
                     leftAddon="Bottom"
                     cssProperty="padding-bottom"
                     onChange={handleUpdateBoxSizing}
-                    value={Number(attributes["padding-left"].split("px")[0])}
+                    value={Number(attributes["padding-bottom"].split("px")[0])}
                 />
-            </Row>
-
-
-            <span><b>Margin</b></span>
-
-            <Row gutter={[8, 8]}>
-                <InputNumber
-                    leftAddon="Left"
-                    cssProperty="margin-left" 
-                    onChange={handleUpdateBoxSizing}
-                    value={Number(attributes["margin-left"].split("px")[0])}
-                />
-                <InputNumber 
-                    leftAddon="Right"
-                    cssProperty="margin-right"
-                    onChange={handleUpdateBoxSizing}
-                    value={Number(attributes["margin-right"].split("px")[0])}
-                />
-                <InputNumber 
-                    leftAddon="Top"
-                    cssProperty="margin-top"
-                    onChange={handleUpdateBoxSizing}
-                    value={Number(attributes["margin-top"].split("px")[0])}
-                />
-                <InputNumber 
-                    leftAddon="Bottom"
-                    cssProperty="margin-bottom"
-                    onChange={handleUpdateBoxSizing}
-                    value={Number(attributes["margin-bottom"].split("px")[0])}
-                />
-            </Row>
-            <div className="flex flex-wrap space-x-2" >
-            </div>
-
+            </Row> 
         </Space>
     )
 }

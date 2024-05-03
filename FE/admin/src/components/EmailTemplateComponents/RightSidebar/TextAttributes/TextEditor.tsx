@@ -9,11 +9,13 @@ const ReactQuill = typeof window === 'object' ?
 : () => false
 import 'node_modules/react-quill/dist/quill.snow.css'
 import './style.scss'
+import { Content } from 'next/font/google';
 
 
 const TextEditor = () => {
-    const { activeNode, updateContent } = useEmailDataStore()
+    const { activeNode, updateContent,  } = useEmailDataStore()
     const [content, setContent] = useState((activeNode && activeNode.section.content) || "")
+    const [tempContent, setTempContent] = useState((activeNode && activeNode.section.content) || "")
     const quillRef = useRef<typeof ReactQuill>(null);
     
     const Quill = ReactQuill.Quill;
@@ -67,13 +69,25 @@ const TextEditor = () => {
         'code-block',
     ];
 
+    useEffect(() => {
+        console.log("Change actiove node", activeNode)
+        handleBlurEditor()
+    }, [activeNode])
+
 
     const handleEditorChange = (newContent: any) => {
+        console.log(activeNode)
         setContent(newContent);
+        updateContent(newContent, activeNode.path)
     };
 
     const handleApplyChange = () => {
-        updateContent(content, activeNode.path)
+       setTempContent(content)
+    }
+
+    const handleBlurEditor = () => {
+        console.log("Blur without save")
+        updateContent(tempContent, activeNode.path)
     }
 
     
@@ -83,7 +97,7 @@ const TextEditor = () => {
                 <ReactQuill
                     ref={(el:any) => { quillRef.current = el }}
                     value={content}
-                    onChange={handleEditorChange}
+                    onChange={handleEditorChange}            
                     modules={quillModules}
                     formats={quillFormats}
                     className="w-full h-full mt-10 bg-white"

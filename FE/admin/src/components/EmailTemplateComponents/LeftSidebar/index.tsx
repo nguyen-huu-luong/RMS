@@ -11,7 +11,7 @@ const item: CollapseProps['items'] = [
 
     },
     {
-        key: 1,
+        key: 2,
         label: "Layout items",
         children: <LayoutItems />
     }
