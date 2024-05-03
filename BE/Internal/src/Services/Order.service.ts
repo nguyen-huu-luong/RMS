@@ -4,7 +4,7 @@ import { HttpStatusCode } from "../Constants";
 import statusMess from "../Constants/statusMess";
 import { container } from "../Configs";
 import { IOrderRepository } from "../Repositories/IOrderRepository";
-import { IClientHistoryRepository } from "../Repositories";
+import { IClientHistoryRepository, ITableRepository } from "../Repositories";
 import {
     ICartItemRepository,
     ICartRepository,
@@ -41,7 +41,10 @@ export class OrderService {
         ),
         private clientHistoryRepository = container.get<IClientHistoryRepository>(
             TYPES.IClientHistoryRepository
-        )
+        ),
+        private tableRepository = container.get<ITableRepository>(
+            TYPES.ITableRepository
+        ),
     ) {}
 
     public async viewOrderItems(
@@ -152,7 +155,8 @@ export class OrderService {
                     num_items: cart?.getDataValue("total"),
                     amount:
                         parseInt(cart?.getDataValue("amount")) +
-                        parseInt(order.getDataValue("shippingCost")),
+                        parseInt(order.getDataValue("shippingCost")) -
+                        parseInt(order.getDataValue("discountAmount")),
                 });
                 const cartItems = await cart.getProducts();
                 await Promise.all(
@@ -169,8 +173,6 @@ export class OrderService {
                     })
                 );
                 const client = await this.clientRepository.findById(req.userId);
-                if (client.getDataValue("type") == "lead")
-                    await client.update({ type: "customer" });
                 await cart.setProducts([]);
                 await this.cartRepository.update(cart?.getDataValue("id"), {
                     total: 0,
@@ -274,6 +276,13 @@ export class OrderService {
                     const client = await this.clientRepository.findById(
                         order.getDataValue("clientId")
                     );
+                    console.log(
+                        Math.trunc(
+                            order.getDataValue("amount") /
+                                (client.getDataValue("total_items") +
+                                    order.getDataValue("num_items"))
+                        )
+                    );
                     await client.update({
                         total_items:
                             client.getDataValue("total_items") +
@@ -281,12 +290,17 @@ export class OrderService {
                         profit:
                             client.getDataValue("profit") +
                             order.getDataValue("amount"),
-                        average:
+                        average: Math.trunc(
                             (client.getDataValue("profit") +
                                 order.getDataValue("amount")) /
-                            (client.getDataValue("total_items") +
-                                order.getDataValue("num_items")),
+                                (client.getDataValue("total_items") +
+                                    order.getDataValue("num_items"))
+                        ),
                     });
+                    if (client.getDataValue("type") == "lead") {
+                        await client.update({ type: "customer" });
+                        await client.update({ convertDate: new Date() });
+                    }
                     await client.save();
                 } else if (status.status == "Cancel") {
                     const order = await this.orderRepository.findById(orderId);
@@ -394,8 +408,9 @@ export class OrderService {
                         await preCartItem[0].destroy();
                     }
                     if (dish_status == "Ready") {
+                        const table = await this.tableRepository.findById(cart.getDataValue("tableId"))
                         await this.posRepository.create({
-                            table: cart.getDataValue("id"),
+                            table: table.getDataValue('name'),
                             content: `${product.getDataValue("name")} is done!`,
                         });
                     }

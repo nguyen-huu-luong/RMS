@@ -6,14 +6,12 @@ import { useState, useEffect, useRef } from "react";
 import { BellOutlined } from "@ant-design/icons";
 import Item from "@/components/header/notification/item";
 import useSocket from "@/socket";
-import { useSession } from "next-auth/react";
 import fetchClient from "@/lib/fetch-client";
 import useSWR from "swr";
-import moment from "moment";
-import useOutsideClick from "@/hooks/clickOutside";
 const Notification = () => {
     const socket = useSocket();
     const [child, setChild] = useState<boolean>(false);
+    const [waited, setWaited] = useState<boolean>(false);
     const hide = () => {
         setOpen(false);
     };
@@ -35,19 +33,26 @@ const Notification = () => {
     }, [ref, child]);
 
     const [open, setOpen] = useState(false);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setWaited(true);
+        }, 3000);
+        return () => clearTimeout(timer);
+    }, []);
     const {
         data: notifications,
         error: notificationsError,
         isLoading: notificationsLoading,
         mutate,
-    } = useSWR(`/notifications/all`, (url) =>
-        fetchClient({ url: url, data_return: true })
+    } = useSWR(
+        waited ? `/notifications/all` : null,
+        waited ? (url) => fetchClient({ url: url, data_return: true }) : null
     );
 
     useEffect(() => {
         if (!socket) return;
-        const handleGetNotification = (orderId: any) => {
-            mutate();
+        const handleGetNotification = async (orderId: any) => {
+            await mutate();
         };
 
         socket.on("notification:prepare:fromStaff", handleGetNotification);
@@ -78,7 +83,7 @@ const Notification = () => {
                     style={{
                         fontSize: "1.6rem",
                     }}
-                />
+                /> 
                 <div className='z-50 absolute bottom-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-extralight text-xs'>
                     {
                         notifications.res.filter(
@@ -103,6 +108,7 @@ const Notification = () => {
                                                 key={`${item.orderStatus}`}
                                                 params={item}
                                                 setChild={setChild}
+                                                mutate={mutate}
                                             ></Item>
                                         );
                                 })}

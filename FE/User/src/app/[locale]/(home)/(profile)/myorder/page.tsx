@@ -3,18 +3,14 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next-intl/client";
-import useSWR from "swr";
-import { ordersFetcher } from "@/app/api/general/order";
 import Image from "next/image";
 import { Space, Table, DatePicker } from "antd";
 import moment, { Moment } from "moment";
 import { FileSearchOutlined, CloseSquareOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import { cancelOrder } from "@/app/api/product/order";
 import Loading from "@/components/loading";
 import fetchClient from "@/lib/fetch-client";
+import useSocket from "@/socket";
 const { RangePicker } = DatePicker;
 
 export default function MyOrder() {
@@ -25,6 +21,30 @@ export default function MyOrder() {
     const handleRangeChange = (dates: any) => {
         setDateRange(dates);
     };
+    const socket = useSocket();
+    useEffect(() => {
+        if (!socket) return;
+        const handleGetNotification = (orderId: any) => {
+            setTimeout(()=>{
+                fetchData()
+            }, 500)
+        };
+
+        socket.on("notification:prepare:fromStaff", handleGetNotification);
+        socket.on("notification:deliver:fromStaff", handleGetNotification);
+        socket.on("notification:done:fromStaff", handleGetNotification);
+        socket.on("notification:reject:fromStaff", handleGetNotification);
+
+        socket.on("connect_error", (error: any) => {
+            console.log(error);
+        });
+        return () => {
+            socket.off("notification:prepare:fromStaff", handleGetNotification);
+            socket.off("notification:deliver:fromStaff", handleGetNotification);
+            socket.off("notification:done:fromStaff", handleGetNotification);
+            socket.off("notification:reject:fromStaff", handleGetNotification);
+        };
+    }, [socket]);
     const [orders, setOrders] = useState<any>(null);
 
     const columns = [
@@ -34,7 +54,7 @@ export default function MyOrder() {
             key: "id",
         },
         {
-            title: t("Date"),
+            title: t("Date"), 
             dataIndex: "createdAt",
             key: "createdAt",
             render: (text: any) => <span>{moment(text).format("L")}</span>,
@@ -56,7 +76,7 @@ export default function MyOrder() {
                             style={{ fontSize: "24px", color: "#08c" }}
                         />
                     </Link>
-                    {record.status == "Pending" ? (
+                    {record.status == "Pending" && record.paymentMethod != "MOMO" ? (
                         <div
                             className='cursor-pointer'
                             onClick={() => handleDeleteOrder(record)}
@@ -98,7 +118,8 @@ export default function MyOrder() {
                 status: "Cancel",
             },
         });
-        fetchData();
+        await fetchData();
+        await socket.emit("client:cancelOrder", record.id)
     };
     useEffect(() => {
         if (!orders) return;

@@ -5,8 +5,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { message } from "antd";
 import useSocket from "@/socket";
-
-function Chat() {
+function Chat(props: any) {
     const [channel, setChannel] = useState(-1);
     const [index, setIndex] = useState<number>(1);
     const { data: session, status } = useSession();
@@ -32,10 +31,9 @@ function Chat() {
                                 setChannel={setChannel}
                                 index={index}
                                 setIndex={setIndex}
-
                             />
                         ) : (
-                        ""
+                            ""
                         )}
                     </div>
                 </div>

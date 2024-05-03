@@ -91,6 +91,7 @@ const Voucher: React.FC = () => {
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState<any>([]);
     const [voucher, setVoucher] = useState<number>(0);
+    const [refetch, setRefetch] = useState<number>(1);
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -132,7 +133,6 @@ const Voucher: React.FC = () => {
             &pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
                 data_return: true,
             });
-            console.log(results.data)
             const data = results.data.map((item: any) => ({
                 ...item,
                 key: item.id,
@@ -398,7 +398,6 @@ const Voucher: React.FC = () => {
             }));
         } else {
             console.log("Sorter is not an array");
-
             setTableParams((prev) => ({
                 pagination,
                 filters,
@@ -413,13 +412,11 @@ const Voucher: React.FC = () => {
     };
 
     const handleSortFieldChange = (key: string) => {
-        console.log(key, tableParams);
         setTableParams((prev) => ({
             ...prev,
             sorter: { ...prev.sorter, field: key },
         }));
         setChecker((prevState) => !prevState);
-        console.log(tableParams);
     };
 
     const handleToggleSorter = () => {
@@ -475,8 +472,7 @@ const Voucher: React.FC = () => {
                 }}
             >
                 <div className='w-full flex flex-col justify-start gap-5'>
-                    {/* <CustomerFilterBar /> */}
-                    <VoucherActionBar dataSelected={selectedVouchers} />
+                    <VoucherActionBar dataSelected={selectedVouchers} fetchData={fetchData}/>
                     {error.isError && (
                         <Alert
                             message={error.title}

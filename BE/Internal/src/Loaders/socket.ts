@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import { Channel, Client, Message } from "../Models";
+import { Cart, Channel, Client, Message, Table } from "../Models";
 import { TokenUtil } from "../Utils";
 import type { Socket } from "socket.io";
 class SocketConnection {
@@ -79,6 +79,7 @@ class SocketConnection {
                         });
                         socket.join("Kitchen");
                         socket.join("Employee");
+                        socket.join("Order");
                         this.employee.push(socket);
                     }
                 }
@@ -89,7 +90,7 @@ class SocketConnection {
             }
         });
         io.on("connection", (socket: any) => {
-            socket.to("Employee").emit("initial:channels", this.channels);
+            io.to("Employee").emit("initial:channels", this.channels);
 
             // Chat service
             socket.on(
@@ -212,24 +213,39 @@ class SocketConnection {
             });
 
             // Table service
-            socket.on("staff:table:prepare", (tableId: string) => {
-                io.to("Kitchen").emit("table:prepare:fromStaff", tableId);
+            socket.on("staff:table:prepare", async (tableId: string) => {
+                const table = await Table.findByPk(tableId);
+                io.to("Kitchen").emit(
+                    "table:prepare:fromStaff",
+                    table?.getDataValue("name")
+                );
             });
-            socket.on("chef:tableItem:finish", (tableId: string, name: string) => {
-                io.to("Kitchen").emit("tableItem:finish:fromChef", tableId, name);
-            });
+            socket.on(
+                "chef:tableItem:finish",
+                async (tableId: string, name: string) => {
+                    const cart = await Cart.findByPk(tableId);
+                    const table = await Table.findByPk(
+                        cart?.getDataValue("tableId")
+                    );
+                    io.to("Kitchen").emit(
+                        "tableItem:finish:fromChef",
+                        table?.getDataValue("name"),
+                        name
+                    );
+                }
+            );
 
             //Notification service
             socket.on(
                 "staff:notifications:prepare",
                 (clientId: string, orderId: string) => {
-                    console.log("Channel_" + clientId);
                     io.to("PrivateChannel_" + clientId).emit(
                         "notification:prepare:fromStaff",
                         orderId
                     );
                 }
             );
+
             socket.on(
                 "staff:notifications:deliver",
                 (clientId: string, orderId: string) => {
@@ -239,6 +255,7 @@ class SocketConnection {
                     );
                 }
             );
+
             socket.on(
                 "staff:notifications:done",
                 (clientId: string, orderId: string) => {
@@ -257,6 +274,14 @@ class SocketConnection {
                     );
                 }
             );
+
+            // New order from clients or cancel orders from clients
+            socket.on("client:newOrder", (name: any) => {
+                io.to("Order").emit("newOrder:fromClient", name);
+            });
+            socket.on("client:cancelOrder", (orderId: any) => {
+                io.to("Order").emit("cancelOrder:fromClient", orderId);
+            });
 
             // Disconnect
             socket.on("disconnect", () => {

@@ -53,6 +53,7 @@ interface DataType {
     createdAt: string;
     amount: number;
     clientId: number;
+    paymentMethod: string;
 }
 
 type ErrorType = {
@@ -191,9 +192,17 @@ const Order: React.FC = () => {
 
     useEffect(() => {
         if (!socket) return;
-        socket.on("order:finish:fromChef", (orderId: any) => {
+        socket.on("order:finish:fromChef", async (orderId: any) => {
             message.success(`Finish order #${orderId}! Ready to deliver!`);
-            fetchData();
+            await fetchData();
+        });
+        socket.on("cancelOrder:fromClient", async (orderId: any) => {
+            message.warning(`Order #${orderId} is cancel by client!`);
+            await fetchData();
+        });
+        socket.on("newOrder:fromClient", async (name: any) => {
+            message.success(`New order from client ${name}!`);
+            await fetchData();
         });
         return () => {
             socket.off("order:finish:fromChef");
@@ -436,11 +445,11 @@ const Order: React.FC = () => {
                 }
                 return (
                     <Space size='small'>
-                        <Tag color={color}>{record.status.toUpperCase()}</Tag>;
+                        <Tag color={color}>{record.status.toUpperCase()}</Tag>
                     </Space>
                 );
             },
-            ...getColumnSearchProps("status"),
+            // ...getColumnSearchProps("status"),
         },
         {
             title: "Amount",
@@ -490,30 +499,36 @@ const Order: React.FC = () => {
                             >
                                 Accept
                             </a>
-                            <a
-                                onClick={() => {
-                                    Modal.confirm({
-                                        title: "Reject this order",
-                                        autoFocusButton: null,
-                                        okButtonProps: {
-                                            style: {
-                                                backgroundColor: "#f7454e",
+                            {record.paymentMethod != "MOMO" && (
+                                <a
+                                    onClick={() => {
+                                        Modal.confirm({
+                                            title: "Reject this order",
+                                            autoFocusButton: null,
+                                            okButtonProps: {
+                                                style: {
+                                                    backgroundColor: "#f7454e",
+                                                },
                                             },
-                                        },
-                                        okText: "Reject",
-                                        onOk: () => handleRejectOrder(record),
-                                        footer: (_, { OkBtn, CancelBtn }) => (
-                                            <>
-                                                <CancelBtn />
-                                                <OkBtn />
-                                            </>
-                                        ),
-                                    });
-                                }}
-                                className='text-red-700 hover:text-red-600'
-                            >
-                                Reject
-                            </a>
+                                            okText: "Reject",
+                                            onOk: () =>
+                                                handleRejectOrder(record),
+                                            footer: (
+                                                _,
+                                                { OkBtn, CancelBtn }
+                                            ) => (
+                                                <>
+                                                    <CancelBtn />
+                                                    <OkBtn />
+                                                </>
+                                            ),
+                                        });
+                                    }}
+                                    className='text-red-700 hover:text-red-600'
+                                >
+                                    Reject
+                                </a>
+                            )}
                         </>
                     ) : (
                         ""
@@ -653,8 +668,8 @@ const Order: React.FC = () => {
                 order: "ascend",
             },
         }));
-        setSearchText('');
-        setSearchedColumn('');
+        setSearchText("");
+        setSearchedColumn("");
     };
 
     const handleCloseError = () => {
@@ -674,14 +689,14 @@ const Order: React.FC = () => {
             body: { status: false, orderStatus: `${order.id}-1` },
         });
         if (socket) {
-            socket.emit("staff:order:prepare", order.id);
-            socket.emit(
+            await socket.emit("staff:order:prepare", order.id);
+            await socket.emit(
                 "staff:notifications:prepare",
                 order.clientId,
                 order.id
             );
         }
-        fetchData();
+        await fetchData();
     };
 
     const handleDeliverOrder = async (order: any) => {
@@ -696,13 +711,13 @@ const Order: React.FC = () => {
             body: { status: false, orderStatus: `${order.id}-2` },
         });
         if (socket) {
-            socket.emit(
+            await socket.emit(
                 "staff:notifications:deliver",
                 order.clientId,
                 order.id
             );
         }
-        fetchData();
+        await fetchData();
     };
 
     const handleDoneOrder = async (order: any) => {
@@ -716,10 +731,19 @@ const Order: React.FC = () => {
             method: "POSt",
             body: { status: false, orderStatus: `${order.id}-3` },
         });
+        await fetchClient({
+            url: `/customers/segment/${order.clientId}`,
+            method: "POST",
+            body: {},
+        });
         if (socket) {
-            socket.emit("staff:notifications:done", order.clientId, order.id);
+            await socket.emit(
+                "staff:notifications:done",
+                order.clientId,
+                order.id
+            );
         }
-        fetchData();
+        await fetchData();
     };
 
     const handleRejectOrder = async (order: any) => {
@@ -734,9 +758,13 @@ const Order: React.FC = () => {
             body: { status: false, orderStatus: `${order.id}-0` },
         });
         if (socket) {
-            socket.emit("staff:notifications:reject", order.clientId, order.id);
+            await socket.emit(
+                "staff:notifications:reject",
+                order.clientId,
+                order.id
+            );
         }
-        fetchData();
+        await fetchData();
     };
 
     return (
