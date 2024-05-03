@@ -409,4 +409,12 @@ export class OrderRepository
         }
     }
 
+
+    public async getNewestOrder(customerId: number |  string) {
+        return await  this._model.findOne({
+            where: {clientId: customerId},
+            order: [ [ 'createdAt', 'DESC' ]],
+        });
+    }
+
 }

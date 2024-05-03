@@ -108,7 +108,7 @@ const EmailTemplate: React.FC = () => {
                 <Link href={`templates/${record.id}/`}>{text}</Link>
             )
         },
-        { title: "type", dataIndex: "type", key: "type" },
+        { title: "Description", dataIndex: "description", key: "description" },
         {
             title: "CreatedAt", dataIndex: "createdAt", key: "createdAt", render: (text) => (
                 <TimeFormatter time={text} />
