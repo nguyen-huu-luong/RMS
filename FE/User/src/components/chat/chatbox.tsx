@@ -205,7 +205,7 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
                         },
                     ],
                 }));
-                socket.emit(
+                await socket.emit(
                     "client:message:send",
                     data.channel,
                     value,
@@ -221,7 +221,7 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
     // VIEW MESSAGE
     const viewMessage = async () => {
         await fetchClient({ url: `/channels`, method: "put", body: {} });
-        socket.emit("client:message:read", data.channel);
+        await socket.emit("client:message:read", data.channel);
         setValue("");
         scrollToBottom();
     };

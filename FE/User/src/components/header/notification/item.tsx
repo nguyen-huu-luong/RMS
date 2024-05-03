@@ -15,6 +15,7 @@ import fetchClient from "@/lib/fetch-client";
 const Item = ({
     params,
     setChild,
+    mutate
 }: {
     params: {
         id: number;
@@ -24,13 +25,17 @@ const Item = ({
         createdAt: string;
     };
     setChild: any;
+    mutate: any
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const showModal = () => {
+    const showModal = async () => {
         setChild(true);
         setIsModalOpen(true);
-        fetchClient({url: `/notifications/${params.id}`, method: "PUT"});
+        await fetchClient({url: `/notifications/${params.id}`, method: "PUT"});
+        setTimeout(async () =>{
+            await mutate()
+        }, 1000)
     };
 
     const handleOk = () => {

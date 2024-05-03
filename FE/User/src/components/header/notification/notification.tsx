@@ -6,11 +6,8 @@ import { useState, useEffect, useRef } from "react";
 import { BellOutlined } from "@ant-design/icons";
 import Item from "@/components/header/notification/item";
 import useSocket from "@/socket";
-import { useSession } from "next-auth/react";
 import fetchClient from "@/lib/fetch-client";
 import useSWR from "swr";
-import moment from "moment";
-import useOutsideClick from "@/hooks/clickOutside";
 const Notification = () => {
     const socket = useSocket();
     const [child, setChild] = useState<boolean>(false);
@@ -54,8 +51,8 @@ const Notification = () => {
 
     useEffect(() => {
         if (!socket) return;
-        const handleGetNotification = (orderId: any) => {
-            mutate();
+        const handleGetNotification = async (orderId: any) => {
+            await mutate();
         };
 
         socket.on("notification:prepare:fromStaff", handleGetNotification);
@@ -111,6 +108,7 @@ const Notification = () => {
                                                 key={`${item.orderStatus}`}
                                                 params={item}
                                                 setChild={setChild}
+                                                mutate={mutate}
                                             ></Item>
                                         );
                                 })}

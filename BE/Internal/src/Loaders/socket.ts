@@ -79,6 +79,7 @@ class SocketConnection {
                         });
                         socket.join("Kitchen");
                         socket.join("Employee");
+                        socket.join("Order");
                         this.employee.push(socket);
                     }
                 }
@@ -223,7 +224,9 @@ class SocketConnection {
                 "chef:tableItem:finish",
                 async (tableId: string, name: string) => {
                     const cart = await Cart.findByPk(tableId);
-                    const table = await Table.findByPk(cart?.getDataValue('tableId'))
+                    const table = await Table.findByPk(
+                        cart?.getDataValue("tableId")
+                    );
                     io.to("Kitchen").emit(
                         "tableItem:finish:fromChef",
                         table?.getDataValue("name"),
@@ -242,6 +245,7 @@ class SocketConnection {
                     );
                 }
             );
+
             socket.on(
                 "staff:notifications:deliver",
                 (clientId: string, orderId: string) => {
@@ -251,6 +255,7 @@ class SocketConnection {
                     );
                 }
             );
+
             socket.on(
                 "staff:notifications:done",
                 (clientId: string, orderId: string) => {
@@ -269,6 +274,14 @@ class SocketConnection {
                     );
                 }
             );
+
+            // New order from clients or cancel orders from clients
+            socket.on("client:newOrder", (name: any) => {
+                io.to("Order").emit("newOrder:fromClient", name);
+            });
+            socket.on("client:cancelOrder", (orderId: any) => {
+                io.to("Order").emit("cancelOrder:fromClient", orderId);
+            });
 
             // Disconnect
             socket.on("disconnect", () => {

@@ -161,7 +161,7 @@ const ChatBox = ({
                     },
                 ],
             }));
-            socket.emit("staff:message:send", data.channel, value, value);
+            await socket.emit("staff:message:send", data.channel, value, value);
             setAction("Scroll");
         } catch (error) {
             console.error("Error sending message:", error);
@@ -174,7 +174,7 @@ const ChatBox = ({
             method: "PUT",
             body: { id: channel },
         });
-        socket.emit("staff:message:read", data.channel);
+        await socket.emit("staff:message:read", data.channel);
         setValue("");
         scrollToBottom();
     };

@@ -138,7 +138,7 @@ function User({
             method: "PUT",
             body: { id: params.channel.id },
         });
-        socket.emit("staff:message:read", params.channel.id);
+        await socket.emit("staff:message:read", params.channel.id);
         setChannels((prevChannels: any) => {
             if (!prevChannels) return prevChannels;
             const updatedChannels = prevChannels.channel.map((channel: any) => {

@@ -225,7 +225,7 @@ function Home() {
             setCart_Items({ ...cart_items, items: data.items, products: data.products })
             setItems([]);
             setChecker((current_value) => !current_value);
-            socket.emit("staff:table:prepare", params.tid);
+            await socket.emit("staff:table:prepare", params.tid);
         } catch (err) {
             console.log(err);
         }
