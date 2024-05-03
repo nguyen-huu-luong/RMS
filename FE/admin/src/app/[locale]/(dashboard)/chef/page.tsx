@@ -14,20 +14,20 @@ function Chef() {
     const [preparingItems, setPreparingItems] = useState<any>(null);
     const [cookingItems, setCookingItems] = useState<any>(null);
     const [doneItems, setDoneItems] = useState<any>(null);
-    const [refetch, setRefetch] = useState<any>(null);
+    const [refetch, setRefetch] = useState<number>(0);
     const { data: session, status } = useSession();
     const socket = useSocket();
     useEffect(() => {
         if (!socket) return;
         socket.on("order:prepare:fromStaff", (orderId: any) => {
             message.info(`New order #${orderId}`);
-            setRefetch((pre: any) => `${(Math.random() + 1).toString(36).substring(7)}`);
+            setRefetch((pre: any) => pre + 1);
 
         });
 
         socket.on("table:prepare:fromStaff", (tableId: any) => {
             message.info(`New order from table #${tableId}`);
-            setRefetch((pre: any) => `${(Math.random() + 1).toString(36).substring(7)}`);
+            setRefetch((pre: any) => pre + 1);
         });
 
         return () => {

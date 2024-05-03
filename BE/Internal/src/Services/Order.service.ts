@@ -4,7 +4,7 @@ import { HttpStatusCode } from "../Constants";
 import statusMess from "../Constants/statusMess";
 import { container } from "../Configs";
 import { IOrderRepository } from "../Repositories/IOrderRepository";
-import { IClientHistoryRepository } from "../Repositories";
+import { IClientHistoryRepository, ITableRepository } from "../Repositories";
 import {
     ICartItemRepository,
     ICartRepository,
@@ -41,7 +41,10 @@ export class OrderService {
         ),
         private clientHistoryRepository = container.get<IClientHistoryRepository>(
             TYPES.IClientHistoryRepository
-        )
+        ),
+        private tableRepository = container.get<ITableRepository>(
+            TYPES.ITableRepository
+        ),
     ) {}
 
     public async viewOrderItems(
@@ -405,8 +408,9 @@ export class OrderService {
                         await preCartItem[0].destroy();
                     }
                     if (dish_status == "Ready") {
+                        const table = await this.tableRepository.findById(cart.getDataValue("tableId"))
                         await this.posRepository.create({
-                            table: cart.getDataValue("id"),
+                            table: table.getDataValue('name'),
                             content: `${product.getDataValue("name")} is done!`,
                         });
                     }

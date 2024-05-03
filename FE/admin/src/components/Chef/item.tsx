@@ -85,12 +85,8 @@ function Item({
                 POS: item.OrderItem ? false : true,
             },
         });
-        refetch(
-            (item.OrderItem ? item.OrderItem.orderId : item.CartItem.cartId) +
-                " " +
-                (item.OrderItem ? item.OrderItem.productId : item.CartItem.productId) +
-                ((item.OrderItem ? item.OrderItem.status : item.CartItem.status) === "Preparing" ? "Cooking" : "Ready")
-        );
+        refetch((pre: any) => pre + 1);
+
         if (item.CartItem && item.CartItem.status == "Cooking") socket.emit("chef:tableItem:finish", item.CartItem.cartId, item.name);
         if (res.data == "Update Order") {
             message.success(`Finish order #${item.OrderItem.orderId}`);

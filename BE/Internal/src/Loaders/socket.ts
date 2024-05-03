@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import { Channel, Client, Message } from "../Models";
+import { Cart, Channel, Client, Message, Table } from "../Models";
 import { TokenUtil } from "../Utils";
 import type { Socket } from "socket.io";
 class SocketConnection {
@@ -212,18 +212,30 @@ class SocketConnection {
             });
 
             // Table service
-            socket.on("staff:table:prepare", (tableId: string) => {
-                io.to("Kitchen").emit("table:prepare:fromStaff", tableId);
+            socket.on("staff:table:prepare", async (tableId: string) => {
+                const table = await Table.findByPk(tableId);
+                io.to("Kitchen").emit(
+                    "table:prepare:fromStaff",
+                    table?.getDataValue("name")
+                );
             });
-            socket.on("chef:tableItem:finish", (tableId: string, name: string) => {
-                io.to("Kitchen").emit("tableItem:finish:fromChef", tableId, name);
-            });
+            socket.on(
+                "chef:tableItem:finish",
+                async (tableId: string, name: string) => {
+                    const cart = await Cart.findByPk(tableId);
+                    const table = await Table.findByPk(cart?.getDataValue('tableId'))
+                    io.to("Kitchen").emit(
+                        "tableItem:finish:fromChef",
+                        table?.getDataValue("name"),
+                        name
+                    );
+                }
+            );
 
             //Notification service
             socket.on(
                 "staff:notifications:prepare",
                 (clientId: string, orderId: string) => {
-                    console.log("Channel_" + clientId);
                     io.to("PrivateChannel_" + clientId).emit(
                         "notification:prepare:fromStaff",
                         orderId
