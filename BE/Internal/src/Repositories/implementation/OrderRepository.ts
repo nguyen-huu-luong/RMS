@@ -18,11 +18,14 @@ export class OrderRepository
     }
     public async viewOrders(userId: number) {
         try {
-            console.log(this._model);
             const allOrders = await this._model.findAll({
                 where: {
                     clientId: userId,
                 },
+
+                order: [
+                    ["createdAt", "DESC"],
+                ],
             });
             return allOrders;
         } catch (err) {
@@ -174,7 +177,10 @@ export class OrderRepository
                     attributes: [
                         [Sequelize.literal(`DATE("createdAt")`), "date"],
                         [Sequelize.literal(`COUNT(*)`), "count"],
-                        [Sequelize.fn('sum', Sequelize.col('amount')), 'total_amount']
+                        [
+                            Sequelize.fn("sum", Sequelize.col("amount")),
+                            "total_amount",
+                        ],
                     ],
                     group: ["date"],
                 }),
@@ -184,7 +190,6 @@ export class OrderRepository
             message.queryError(err);
         }
     }
-
 
     public async getYearlyOrder() {
         try {
@@ -400,11 +405,10 @@ export class OrderRepository
         }
     }
 
-    public async getByCond(cond: any){
-        try{
-            return await this._model.findAll(cond)
-        }
-        catch (err){
+    public async getByCond(cond: any) {
+        try {
+            return await this._model.findAll(cond);
+        } catch (err) {
             message.queryError(err);
         }
     }
@@ -416,5 +420,4 @@ export class OrderRepository
             order: [ [ 'createdAt', 'DESC' ]],
         });
     }
-
 }

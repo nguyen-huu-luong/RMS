@@ -319,13 +319,13 @@ export class TableService {
             if (req.action = "create:any") {
                 const data = req.body
                 const table_id = Number(req.params.id);
-                const client = await this.clientRepository.checkExist(data.phone, data.email)
+                const client = await this.clientRepository.checkExist(data.email)
                 var table_cart = await this.cartRepository.getCartTable(Number(table_id))
                 var new_client: any
                 const { pay_method, ...client_data } = data
                 var cart: any;
                 if (client.length == 0) {
-                    new_client = await this.clientRepository.create({ ...client_data, createAt: new Date(), updateAt: new Date() })
+                    new_client = await this.clientRepository.create({ ...client_data, createAt: new Date(), updateAt: new Date(), convertDate: new Date() })
                     await this.cartRepository.update(table_cart.id, { clientId: new_client.id, tableId: null })
                     await this.cartRepository.create({
                         tableId: table_id,
@@ -336,6 +336,7 @@ export class TableService {
                 }
                 else {
                     new_client = client[0]
+                    await this.clientRepository.update(new_client.id, {...client_data})
                     cart = table_cart
                 }
 
@@ -375,7 +376,8 @@ export class TableService {
                 
                 await this.clientRepository.update(new_client.id, {
                     profit: new_client.profit +  parseInt(cart?.getDataValue("amount")) + parseInt(order.getDataValue("shippingCost")),
-                    total_items: new_client.total_items + cart?.getDataValue("total")
+                    total_items: new_client.total_items + cart?.getDataValue("total"),
+                    lastPurchase: new Date()
                 })
 
                 await cart.setProducts([]);

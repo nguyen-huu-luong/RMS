@@ -12,7 +12,7 @@ import useSocket from "@/socket";
 import fetchClient from "@/lib/fetch-client";
 import { Spin } from "antd";
 
-const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
+const ChatBox = ({ params }: { params: { show: boolean; setShow: any; setUnread: any } }) => {
     const socket = useSocket();
     const [inputFocused, setInputFocused] = useState(false);
     const [data, setData] = useState<any>({
@@ -205,7 +205,7 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
                         },
                     ],
                 }));
-                socket.emit(
+                await socket.emit(
                     "client:message:send",
                     data.channel,
                     value,
@@ -221,8 +221,9 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
     // VIEW MESSAGE
     const viewMessage = async () => {
         await fetchClient({ url: `/channels`, method: "put", body: {} });
-        socket.emit("client:message:read", data.channel);
+        await socket.emit("client:message:read", data.channel);
         setValue("");
+        params.setUnread(0);
         scrollToBottom();
     };
 

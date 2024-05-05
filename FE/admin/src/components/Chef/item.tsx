@@ -85,16 +85,12 @@ function Item({
                 POS: item.OrderItem ? false : true,
             },
         });
-        refetch(
-            (item.OrderItem ? item.OrderItem.orderId : item.CartItem.cartId) +
-                " " +
-                (item.OrderItem ? item.OrderItem.productId : item.CartItem.productId) +
-                ((item.OrderItem ? item.OrderItem.status : item.CartItem.status) === "Preparing" ? "Cooking" : "Ready")
-        );
-        if (item.CartItem && item.CartItem.status == "Cooking") socket.emit("chef:tableItem:finish", item.CartItem.cartId, item.name);
+        refetch((pre: any) => pre + 1);
+
+        if (item.CartItem && item.CartItem.status == "Cooking") await socket.emit("chef:tableItem:finish", item.CartItem.cartId, item.name);
         if (res.data == "Update Order") {
             message.success(`Finish order #${item.OrderItem.orderId}`);
-            socket.emit("chef:order:finish", item.OrderItem.orderId);
+            await socket.emit("chef:order:finish", item.OrderItem.orderId);
         }
     };
 

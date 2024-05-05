@@ -34,6 +34,7 @@ const ChatList = ({
 
     useEffect(() => {
         socket.on("initial:channels", (initialChannels: any) => {
+            console.log("INITIAL", initialChannels)
             setChannelStatus(initialChannels);
         });
         socket.on("channel:status:update", (updatedChannels: any) => {
@@ -115,7 +116,7 @@ const ChatList = ({
                     })
                     .map((item: any, index: any) => {
                         return (
-                            <User
+                            <User 
                                 key={index}
                                 params={item}
                                 setChannel={setChannel}

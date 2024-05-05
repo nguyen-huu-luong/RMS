@@ -408,10 +408,9 @@ export class ClientRepository
         }
     }
 
-    public async checkExist(phone: string, email: string) {
+    public async checkExist(email: string) {
 		return await this._model.findAll({
 			where: {
-				phone: phone,
 				email: email
 			}
 		})

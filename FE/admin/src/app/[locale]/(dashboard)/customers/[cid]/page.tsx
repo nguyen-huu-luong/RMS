@@ -1,8 +1,8 @@
 "use client"
 import { useEffect, useState } from "react"
 import { EditOutlined, EllipsisOutlined, CalendarOutlined, ArrowRightOutlined, UserOutlined, CloseCircleFilled } from '@ant-design/icons';
-import { Space, Table, Tag, Upload, message, Tooltip } from 'antd';
-import type { UploadProps } from "antd";
+import { Space, Table, Tag, Upload, message, Tooltip, Pagination, Empty } from 'antd';
+import type { PaginationProps, UploadProps } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadImage } from '@/app/api/upload';
 import type { TableProps } from 'antd';
@@ -10,7 +10,8 @@ import Loading from "@/components/loading";
 import fetchClient from "@/lib/fetch-client";
 import { useParams } from 'next/navigation'
 import { useSession } from "next-auth/react";
-
+import moment from "moment";
+import Link from 'next-intl/link'
 
 const CustomerProfile = () => {
     const editStyle = { outline: "0", backgroundColor: "#F6FAFD", border: "1px solid #DADAD9", paddingLeft: "5px" }
@@ -31,21 +32,38 @@ const CustomerProfile = () => {
     const [checker, setChecker] = useState(0)
     const [customerInfo, setCustomerInfo] = useState<any>()
     const [isLoading, setIsLoading] = useState(true)
-    const [customerHistory, setCustomerHistory] = useState([])
+    const [customerHistory, setCustomerHistory] = useState<any>([])
     const [recentHistory, setRecentHistory] = useState([])
     const historyTitle: any = {
         "add_to_cart": { "title": "Add To Cart", "color": "geekblue", "link": "../bussiness/products/dishes", "reference": "Product ID:" },
         "view_item": { "title": "View Item", "color": "green", "link": "../bussiness/products/dishes", "reference": "Product ID:" },
         "order": { "title": "Make An Order", "color": "volcano", "link": "../sale/orders", "reference": "Order ID:" }
     }
+    const [historyPage, setHistoryPage] = useState(1);
+    const onChange: PaginationProps["onChange"] = (page) => {
+        setHistoryPage(page);
+    }
 
     const fetchData = async () => {
         setIsLoading(true)
         const data = await fetchClient({ url: `/customers/${params.cid}`, data_return: true })
         const histories = await fetchClient({ url: `/clienthistories/${params.cid}`, data_return: true })
+        const newResponse = await Promise.all(
+            histories.map(async (item: any) => {
+                if (item.productId) {
+                    const response = await fetchClient({
+                        url: `/products/${item.productId}`,
+                        data_return: true,
+                    });
+                    item.name = response.name;
+                    return item;
+                }
+                item.name = "";
+                return item;
+            })
+        );
         setCustomerInfo(data)
-        setCustomerHistory(histories)
-        setRecentHistory(histories.slice(0,5))
+        setCustomerHistory(newResponse)
         setImageUrl(data.avatar)
         setIsLoading(false)
 
@@ -284,7 +302,14 @@ const CustomerProfile = () => {
             amount: String(order.amount),
         }
     })
-    const costs = customerInfo?.orderInfo.map((order: any) => { return order.amount })
+    const costs = customerInfo?.orderInfo.map((order: any) => {
+        if (order.status == 'Done') {
+            return order.amount
+        }
+        else {
+            return 0
+        }
+    })
     const totalCost = costs?.reduce((cost: any, initial: any) => cost + initial, 0)
 
     const businessData: ActivityDataType[] = [
@@ -330,6 +355,7 @@ const CustomerProfile = () => {
                                             <div >
                                                 <Upload
                                                     {...props}
+                                                    accept="image/*"
                                                     showUploadList={false}
                                                     listType="picture"
                                                     maxCount={1}>
@@ -454,7 +480,7 @@ const CustomerProfile = () => {
                                             tab == 0 ? <div> <Table columns={columns_order} dataSource={orderData} /></div>
                                                 : <div>
                                                     <div>
-                                                       
+
                                                         <Table columns={users_activity} dataSource={customerHistory}
                                                             pagination={{
                                                                 pageSize: 3,
@@ -465,51 +491,131 @@ const CustomerProfile = () => {
                                 </div>
                             </div>
                             <div>
-                                <div className="bg-white pl-3 py-2">
-                                    <p style={{ color: "#666666" }}>Created at</p>
-                                    <p><CalendarOutlined style={{ color: "#4A58EC" }} /> December 13, 2022 by <span style={{ color: "#4A58EC" }}>Minh Vuong</span></p>
-                                    <p className="mt-1" style={{ color: "#666666" }}>Last modified</p>
-                                    <p><CalendarOutlined style={{ color: "#4A58EC" }} /> December 16, 2024  by <span style={{ color: "#4A58EC" }}>Minh Vuong</span></p>
+                                <div className='bg-white pl-3 py-2'>
+                                    <p style={{ color: "#666666" }}>
+                                        Created at
+                                    </p>
+                                    <p>
+                                        <CalendarOutlined
+                                            style={{ color: "#4A58EC" }}
+                                        />{" "}
+                                        {moment(userInfo.createdAt).format(
+                                            "MMMM D, YYYY"
+                                        )}{" "}
+                                        by{" "}
+                                        <span style={{ color: "#4A58EC" }}>
+                                            {userInfo.creatorId
+                                                ? "Staff"
+                                                : userInfo.name}
+                                        </span>
+                                    </p>
+                                    <p
+                                        className='mt-1'
+                                        style={{ color: "#666666" }}
+                                    >
+                                        Last modified
+                                    </p>
+                                    <p>
+                                        <CalendarOutlined
+                                            style={{ color: "#4A58EC" }}
+                                        />{" "}
+                                        {moment(userInfo.updatedAt).format(
+                                            "MMMM D, YYYY"
+                                        )}{" "}
+                                    </p>
                                 </div>
 
-                                <div className="bg-white pl-3 py-2 mt-3">
-                                    <h2 className="font-bold">Recent Activities</h2>
-                                    {
-                                        recentHistory.length <= 0 ? (<>
-                                        <p className="text-center">No data</p>
-                                        </>):
-                                        (
-                                            <>
-                                                {
-                                                    recentHistory.map((item: any) => {
-                                                        return(
-                                                            <div className="flex mt-1">
-                                                        <p className="flex-1" style={{ color: "#4A58EC" }} >{historyTitle[item.action].title.toUpperCase()}</p>
-                                                        <p style={{ color: "#4A58EC" }} className="flex-1"><CalendarOutlined />{item.createdAt.split('T')[0]}</p>
-                                                        </div>
+                                <div className='bg-white px-3 py-2 mt-3 '>
+                                    <h2 className='font-bold'>
+                                        Recent Activities
+                                    </h2>
+                                    <div className='mt-4'>
+                                        <div className='flex flex-col justify-between gap-2'>
+                                            {customerHistory.length === 0 ? (
+                                                <Empty />
+                                            ) : (
+                                                <>
+                                                    {customerHistory
+                                                        .slice(
+                                                            (historyPage - 1) *
+                                                            8,
+                                                            historyPage * 8
                                                         )
-                                                    })
-                                                }
-                                                 <p className="text-center mt-4" style={{ color: "#666666" }}><button type="button" onClick={() => handelTabClick(1)}>Show more......</button></p>
-                                            </>
-
-                                        )
-                                    }
-                                    {/* <div className="mt-4">
-                                        <div className="flex justify-between">
-                                            <div>
-                                                <p style={{ color: "#4A58EC" }} className="mb-1"><CalendarOutlined /> Automated send email</p>
-                                                <p style={{ color: "#4A58EC" }} className="mb-1"><CalendarOutlined /> Cancel order</p>
-                                                <p style={{ color: "#4A58EC" }} className="mb-1"><CalendarOutlined /> Request an order</p>
-                                            </div>
-                                            <div className="pr-2">
-                                                <p className="mb-1">December 13, 2022</p>
-                                                <p className="mb-1">December 13, 2022</p>
-                                                <p className="mb-1">December 13, 2022</p>
-                                            </div>
+                                                        .map((item: any) => {
+                                                            return (
+                                                                <div
+                                                                    key={
+                                                                        item.id
+                                                                    }
+                                                                    className='flex flex-row justify-between items-center text-black'
+                                                                >
+                                                                    <p>
+                                                                        <CalendarOutlined />{" "}
+                                                                        {item.action ===
+                                                                            "view_item" ? (
+                                                                            <>
+                                                                                View{" "}
+                                                                                <Link
+                                                                                    style={{
+                                                                                        color: "#4A58EC",
+                                                                                    }}
+                                                                                    href={`/bussiness/products/dishes`}
+                                                                                >
+                                                                                    {
+                                                                                        item.name
+                                                                                    }
+                                                                                </Link>
+                                                                            </>
+                                                                        ) : item.action ===
+                                                                            "add_to_cart" ? (
+                                                                            <>
+                                                                                Add{" "}
+                                                                                <Link
+                                                                                    style={{
+                                                                                        color: "#4A58EC",
+                                                                                    }}
+                                                                                    href={`/bussiness/products/dishes`}
+                                                                                >
+                                                                                    {
+                                                                                        item.name
+                                                                                    }
+                                                                                </Link>{" "}
+                                                                                to
+                                                                                cart
+                                                                            </>
+                                                                        ) : item.action ===
+                                                                            "order" ? (
+                                                                            "Order food"
+                                                                        ) : (
+                                                                            ""
+                                                                        )}
+                                                                    </p>
+                                                                    <p>
+                                                                        {moment(
+                                                                            item.createddAt
+                                                                        ).format(
+                                                                            "MMMM D, YYYY"
+                                                                        )}
+                                                                    </p>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    <div className='w-full h-auto flex justify-center'>
+                                                        <Pagination
+                                                            current={
+                                                                historyPage
+                                                            }
+                                                            onChange={onChange}
+                                                            total={
+                                                                customerHistory.length
+                                                            }
+                                                            pageSize={8}
+                                                        />
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
-                                        <p className="text-center mt-5" style={{ color: "#666666" }}><button type="button" onClick={() => handelTabClick(1)}>Show more......</button></p>
-                                    </div> */}
+                                    </div>
                                 </div>
                             </div>
 

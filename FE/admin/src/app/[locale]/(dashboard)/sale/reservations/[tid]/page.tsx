@@ -225,7 +225,7 @@ function Home() {
             setCart_Items({ ...cart_items, items: data.items, products: data.products })
             setItems([]);
             setChecker((current_value) => !current_value);
-            socket.emit("staff:table:prepare", params.tid);
+            await socket.emit("staff:table:prepare", params.tid);
         } catch (err) {
             console.log(err);
         }
@@ -253,9 +253,10 @@ function Home() {
             if (!socket) return;
             socket.on(
                 "tableItem:finish:fromChef",
-                (tableId: string, name: string) => {
+                async (tableId: string, name: string) => {
+                    await fetchCartItems()
+                    await fetchNotification()
                     message.info(`Finish ${name} for table ${tableId}`);
-                    fetchCartItems()
                 }
             );
             return () => {
@@ -272,8 +273,8 @@ function Home() {
         fetchTable()
         fetchCategory()
         fetchFood()
-        fetchNotification()
         fetchCartItems()
+        fetchNotification()
         setIsLoading(false)
     }, [])
 

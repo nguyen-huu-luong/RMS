@@ -27,10 +27,13 @@ export class MoMoService {
         var orderInfo = `MOMO thanh toan ho cho khach hang ${fullname}`;
         var partnerCode = 'MOMO';
         var partnerName = "Home Cuisine"
-        var redirectUrl = 'http://localhost:3000/en/payment?method=MOMO';
+        var redirectUrl = 'http://localhost:3001/en/payment?method=MOMO';
         var ipnUrl = 'http://localhost:3003/api/order/momo';
         var requestType = "payWithMethod";
-        var amount = cart.amount + req.body["shippingCost"] - req.body["discountAmount"];
+        var amount = req.body["discountAmount"];
+        if (amount == 0) {
+            amount = cart.amount + req.body["shippingCost"]
+        }
         var orderId = partnerCode + req.userId  + new Date().getTime();
         var requestId = orderId;
         var extraData = Buffer.from(data).toString('base64');
@@ -76,6 +79,14 @@ export class MoMoService {
                 'Content-Length': Buffer.byteLength(requestBody)
             }
         }
+
+        if (amount == 0) {
+            res.send({
+                "payUrl": `http://localhost:3001/en/payment?method=MOMO&resultCode=0&extraData=${extraData}`
+            })
+            return 
+        }
+
         //Send the request and get the response
         const req_payment = https.request(options, (res_payment:any) => {
             res_payment.setEncoding('utf8');

@@ -19,10 +19,13 @@ import { useRouter } from "next-intl/client";
 import Notification from "./notification/notification";
 const NavBar = () => {
     const locale = useLocale();
+    const router = useRouter();
     const { data: session, status } = useSession();
     const [click, setClick] = useState(false);
     const [search, setSearch] = useState(true);
+    const handleSearchItem = (text: string) => {
 
+    };
     const t = useTranslations("NavBar");
     const MENU_LISTS =
         status === "authenticated"
@@ -199,6 +202,11 @@ const NavBar = () => {
                                         '
                                         onBlur={toggleSearch}
                                         autoFocus
+                                        onKeyDown={(e: any) =>
+                                            e.key == "Enter"
+                                                ? handleSearchItem(e.target.value)
+                                                : {}
+                                        }
                                     />
                                 </div>
                             )}

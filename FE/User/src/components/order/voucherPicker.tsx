@@ -45,7 +45,7 @@ const VoucherPicker = ({
             });
             if (response == "Success") {
                 message.success("Added voucher successfully");
-                mutate()
+                mutate();
             } else {
                 message.warning(response);
             }
@@ -90,6 +90,24 @@ const VoucherPicker = ({
                             .sort((a: any, b: any) => {
                                 return a.minimum_paid - b.minimum_paid;
                             })
+                            .sort((a: any, b: any) => {
+                                if (
+                                    moment(a.end_date).isBefore(moment()) &&
+                                    !moment(b.end_date).isBefore(moment())
+                                ) {
+                                    return 1;
+                                } else if (
+                                    !moment(a.end_date).isBefore(moment()) &&
+                                    moment(b.end_date).isBefore(moment())
+                                ) {
+                                    return -1; 
+                                } else {
+                                    return (
+                                        new Date(a.end_date).getTime() -
+                                        new Date(b.end_date).getTime()
+                                    );
+                                }
+                            })
                             .map((item: any) => (
                                 <div
                                     key={item.promo_code}
@@ -132,7 +150,12 @@ const VoucherPicker = ({
                                             <input
                                                 disabled={
                                                     item.minimum_paid >
-                                                    params.amount
+                                                        params.amount ||
+                                                    moment(
+                                                        item.end_date
+                                                    ).isBefore(
+                                                        moment(new Date())
+                                                    )
                                                 }
                                                 className={`appearance-none flex-none rounded-full h-3 w-3 border border-gray-500 outline-none transition duration-150 ease-in-out
                                     checked:bg-primary checked:border-orange-500 checked:outline-orange-500 cursor-pointer
@@ -145,17 +168,27 @@ const VoucherPicker = ({
                                             />
                                         </div>
                                         {/* Condition here */}
-                                        {item.minimum_paid > params.amount && (
+                                        {(item.minimum_paid > params.amount ||
+                                            moment(item.end_date).isBefore(
+                                                moment(new Date())
+                                            )) && (
                                             <div className='absolute w-full h-full top-0 left-0 bg-gray-50 opacity-25'></div>
                                         )}
                                     </label>
                                     {/* Condition here */}
-                                    {item.minimum_paid > params.amount && (
+                                    {(item.minimum_paid > params.amount ||
+                                        moment(item.end_date).isBefore(
+                                            moment(new Date())
+                                        )) && (
                                         <div className='w-full text-xs flex flex-row justify-start items-center gap-2 bg-red-100 text-red-500 p-2 shadow-md'>
                                             <InfoCircleOutlined />
                                             <span>
-                                                Your order has not met the
-                                                voucher’s requirements
+                                                {moment(item.end_date).isBefore(
+                                                    moment(new Date())
+                                                )
+                                                    ? `The voucher has expired`
+                                                    : `Your order has not met the
+                                                voucher requirements`}
                                             </span>
                                         </div>
                                     )}

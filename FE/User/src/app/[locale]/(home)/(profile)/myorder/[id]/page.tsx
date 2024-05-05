@@ -15,11 +15,13 @@ import { Descriptions, Space, Table } from "antd";
 import moneyFormatter from "@/components/function/moneyFormatter";
 import Loading from "@/components/loading";
 import fetchClient from "@/lib/fetch-client";
+import useSocket from "@/socket";
 export default function Page({ params }: { params: { id: string } }) {
+    const t = useTranslations("Profile");
+    const socket = useSocket();
     const locale = useLocale();
     const { data: session, status } = useSession();
     const router = useRouter();
-    const t = useTranslations("Profile");
     useEffect(() => {
         if (status === "loading") return;
         if (status === "unauthenticated") {
@@ -30,9 +32,33 @@ export default function Page({ params }: { params: { id: string } }) {
         data: order,
         error: orderErrors,
         isLoading: orderLoading,
+        mutate
     } = useSWR(`/orders/${params.id}`, (url) =>
         fetchClient({ url: url, data_return: true })
     );
+    useEffect(() => {
+        if (!socket) return;
+        const handleGetNotification = (orderId: any) => {
+            setTimeout(async ()=>{
+                await mutate()
+            }, 500)
+        };
+
+        socket.on("notification:prepare:fromStaff", handleGetNotification);
+        socket.on("notification:deliver:fromStaff", handleGetNotification);
+        socket.on("notification:done:fromStaff", handleGetNotification);
+        socket.on("notification:reject:fromStaff", handleGetNotification);
+
+        socket.on("connect_error", (error: any) => {
+            console.log(error);
+        });
+        return () => {
+            socket.off("notification:prepare:fromStaff", handleGetNotification);
+            socket.off("notification:deliver:fromStaff", handleGetNotification);
+            socket.off("notification:done:fromStaff", handleGetNotification);
+            socket.off("notification:reject:fromStaff", handleGetNotification);
+        };
+    }, [socket]);
     const columns = [
         {
             title: t("Name"),

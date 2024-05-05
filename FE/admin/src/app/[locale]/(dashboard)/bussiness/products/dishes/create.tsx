@@ -120,6 +120,7 @@ const CreateProduct = ({ isCreate, setIsCreate, setIsReFetch, data, category }: 
                                 <Form.Item name="upload">
                                     <Upload
                                         {...props}
+                                        accept="image/*"
                                         listType="picture"
                                         maxCount={1}
                                         onRemove={handleRemove}
