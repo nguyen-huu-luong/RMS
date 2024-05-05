@@ -77,6 +77,7 @@ module.exports = {
                 groupId: group[Math.floor(Math.random()* group.length)],
                 type: types[Math.floor(Math.random() * types.length)],
                 convertDate: randomDate(new Date(2012, 0, 1), new Date()),
+                segmentDate: randomDate(new Date(2012, 0, 1), new Date()),
                 hashedPassword: clientPassword,
                 isRegistered: true,
                 isActive: true,
@@ -86,6 +87,7 @@ module.exports = {
             };
             if (client.type === "customer") {
                 client.convertDate = faker.date.between(twoYearsAgo, currentDate);
+                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
                 let date = new Date(client.convertDate)
                 date.setMonth(date.getMonth() - Math.floor(Math.random() * 5) + 1)
                 client.createdAt = date
@@ -106,6 +108,7 @@ module.exports = {
                 score: 0,
                 groupId: group[Math.floor(Math.random()* group.length)],
                 convertDate: randomDate(new Date(2012, 0, 1), new Date()),
+                segmentDate: randomDate(new Date(2012, 0, 1), new Date()),
                 address: "Address",
                 source: sources[Math.floor(Math.random() * sources.length)],
                 type: types[Math.floor(Math.random() * types.length)],
@@ -119,6 +122,7 @@ module.exports = {
             };
             if (client.type === "customer") {
                 client.convertDate = faker.date.between(twoYearsAgo, currentDate);
+                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
                 let date = new Date(client.convertDate)
                 date.setMonth(date.getMonth() - Math.floor(Math.random() * 5) + 1)
                 client.createdAt = date
