@@ -8,6 +8,7 @@ import { EllipsisOutlined } from "@ant-design/icons"
 import { Button, ConfigProvider, Form, Input, Popconfirm, Space, message } from "antd"
 import { useForm } from "antd/es/form/Form"
 import { TableProps } from "antd/es/table"
+import { AxiosError } from "axios"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -71,6 +72,9 @@ const TargetListDetail = () => {
         } catch (error) {
             setLoading(false)
             console.log(error)
+            if (error instanceof AxiosError) {
+                
+            }
             message.error(error as string)
         }
     }

@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { ClientService } from "../Services";
 import { EmailService } from '../Services/Email.service';
 import { QueryOptions, TYPES } from "../Types/type";
-import { ensurePermissionIsValid, parseRequesQueries } from "../Helper/helper";
+import { ensureDataIsValidated, ensurePermissionIsValid, parseRequesQueries } from "../Helper/helper";
 import { ForbiddenError, ValidationError } from "../Errors";
 import { validationResult } from "express-validator";
 import { AddTryCatchBlock, LogRequests } from "../Utils/decorators";
@@ -21,14 +21,20 @@ class ClientController {
 	// "/customers/all?type=lead&firstname=fafda&age=31&page=2&pageSize=10&sort_by=asc(number)"
 	public async getAllClient(req: Request, res: Response, next: NextFunction) {
 		ensurePermissionIsValid(req.action, "read:any");
-		const queries = { ...req.body["filter"], ...req.query };
+		const queries = { ...req.query };
 
-		if (!req.query["type"] || req.query["type"] === "customer") {
-			queries.type = "customer"
-		} else if (req.query["type"] === "lead") {
-			queries.type = "lead"
+		// if (!req.query["type"] || req.query["type"] === "customer") {
+		// 	queries.type = "customer"
+		// } else if (req.query["type"] === "lead") {
+		// 	queries.type = "lead"
+		// }
+		if (queries["sort"] && queries["sort"] === "fullname") {
+			queries["sort"] = ["firstname", "lastname"];
 		}
+
 		const options: QueryOptions = parseRequesQueries(queries);
+
+
 		const data = await this.clientService.getAll(options);
 
 		res.send(data);
@@ -48,6 +54,7 @@ class ClientController {
 	}
 
 	public async createClient(req: Request, res: Response, next: NextFunction) {
+		ensureDataIsValidated(req)
 		if (req.action === "create:any") {
 			const customerInfo = req.body["data"];
 			const data = await this.clientService.create(customerInfo);
@@ -111,7 +118,15 @@ class ClientController {
 		} else {
 			throw new ForbiddenError();
 		}
+	}
 
+	public async deleteMany(req:Request, res: Response, next: NextFunction) {
+		ensureDataIsValidated(req)
+		ensurePermissionIsValid(req.action,  "delete:any")
+		const ids = req.body["ids"]
+		const result = await this.clientService.deleteMany(ids)
+
+		res.send({message: `${result} deleted`})
 	}
 
 	public async getOpporturnityCustomer(req: Request, res: Response, next: NextFunction) {

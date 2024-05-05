@@ -12,6 +12,7 @@
     "@ant-design/icons": "^5.2.6",
     "@emotion/cache": "^11.11.0",
     "@mui/material-nextjs": "^5.15.6",
+    "@syncfusion/ej2-react-richtexteditor": "^25.1.42",
     "antd": "^5.14.2",
     "antd-style": "^3.6.1",
     "axios": "^1.6.7",

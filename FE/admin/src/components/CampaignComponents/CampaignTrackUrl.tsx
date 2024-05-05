@@ -87,6 +87,6 @@ export const CampaignTrackUrl: React.FC<ICampaignTrackUrlProps> = ({ trackUrls, 
                 />
 
             </div>
-            <Table dataSource={dataSource} columns={columns} size="small" pagination={false} />
+            {dataSource.length > 0 && <Table dataSource={dataSource} columns={columns} size="small" pagination={false} />}
         </div>)
 }

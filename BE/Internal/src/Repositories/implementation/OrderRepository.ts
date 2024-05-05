@@ -412,4 +412,12 @@ export class OrderRepository
             message.queryError(err);
         }
     }
+
+
+    public async getNewestOrder(customerId: number |  string) {
+        return await  this._model.findOne({
+            where: {clientId: customerId},
+            order: [ [ 'createdAt', 'DESC' ]],
+        });
+    }
 }

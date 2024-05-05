@@ -17,5 +17,6 @@ export interface IClientRepository extends IBaseRepository<Client> {
     checkExist(email:string): Promise<any> ;
     findByCond(cond: any): Promise<any> ;
     updateBaseCond(value: any, cond: any): Promise<any> ;
+    deleteManyClients(ids: number[]): Promise<any>
 }
 

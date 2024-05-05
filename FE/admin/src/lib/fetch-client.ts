@@ -1,5 +1,6 @@
-import axios from "axios";
+import axios, { Axios, AxiosError } from "axios";
 import { getSession, signOut } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 interface fetchClientProps {
   method?: string;
@@ -13,6 +14,10 @@ async function fetchClient({ method = "GET", url, body = "", token, data_return 
   try {
     const session = await getSession();
     const accessToken = token || session?.accessToken;
+
+    if (!accessToken) {
+      
+    }
 
     // console.log("Fetch client" , url, session, accessToken, process.env.NEXT_BACKEND_API_URL )
     const response = await axios(process.env.NEXT_PUBLIC_BACKEND_URL + url, {
@@ -35,9 +40,11 @@ async function fetchClient({ method = "GET", url, body = "", token, data_return 
     if (error instanceof Response) {
       if (error.status === 401) {
         signOut();
+        redirect("/signin")
       }
-
-      throw error;
+      // throw error;
+    } else if (error instanceof AxiosError) {
+      throw error
     }
 
     throw new Error("Failed to fetch data", { cause: error });

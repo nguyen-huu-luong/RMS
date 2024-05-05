@@ -15,6 +15,7 @@ export const TimeFormatter: React.FC<ITimeFormatter> = ({ time, className, style
     const dateTime = new Date(time);
 
     // Renders "Nov 20, 2020"
+    if (!time) return "Unknown"
     return <>
         <span className={`me-2 ${className}`} style={{...style}}> 
             {format.dateTime(dateTime, {

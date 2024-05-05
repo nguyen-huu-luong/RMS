@@ -6,17 +6,13 @@ export const getDefaultTags = (tagName: string) => {
       return {
         tagName,
         attributes: {
-          width: "200px",
-          height: "200px",
+          "width": "200px",
+          "height": "auto",
           src: "https://static.wixstatic.com/media/5cb24728abef45dabebe7edc1d97ddd2.jpg",
           "padding-left": "0px",
           "padding-right": "0px",
-          "padding-top": "0px",
           "padding-bottom": "0px",
-          "margin-left": "0px",
-          "margin-right": "0px",
-          "margin-top": "0px",
-          "margin-bottom": "0px",
+          "padding-top": "0px",
           align: "center",
         },
         children: [],
@@ -30,6 +26,8 @@ export const getDefaultTags = (tagName: string) => {
         attributes: {
           display: "flex",
           "flex-direction": "column",
+          "justify-content": "center"
+          // padding: "8px"
         },
         children: [],
         id: uuidv4(),
@@ -60,10 +58,11 @@ export const getDefaultTags = (tagName: string) => {
           "font-family": "Helvetica",
           position: "relative",
           // align: "center",
-          "font-size": "20px",
-          "line-height": "20px",
+          "font-size": "16px",
+          "line-height": "16px",
           "font-style": "normal",
-          "container-background-color": "white",
+          // "container-background-color": "white",
+          padding: 0
         },
         content: `Text`,
         id: uuidv4(),
@@ -74,7 +73,8 @@ export const getDefaultTags = (tagName: string) => {
       return {
         tagName,
         attributes: {
-          "min-height": "200px",
+          padding: "8px",
+          width: "100%",
         },
         children: [],
         id: uuidv4(),
@@ -87,80 +87,23 @@ export const getDefaultTags = (tagName: string) => {
         attributes: {
           href: "https://mjml.io/",
           align: "center",
+          "vertical-align": "middle",
           "background-color": "#008000",
           color: "#ffffff",
           "border-radius": "20px",
           "max-width": "100%",
           "min-width": "50px",
-          "padding-left": "16px",
-          "padding-right": "16px",
           "padding-top": "8px",
+          "padding-right": "16px",
           "padding-bottom": "8px",
-          "margin-left": "8px",
-          "margin-right": "8px",
-          "margin-top": "8px",
-          "margin-bottom": "8px",
+          "padding-left": "16px",
+          width: "auto",
+          height: "auto"
         },
         content: "Button text",
         id: uuidv4(),
       };
     }
-
-    case "mj-hero": {
-      return {
-        tagName,
-        attributes: {
-          mode: "fixed-height",
-          height: "400px",
-          "background-height": "400px",
-          "background-width": "600px",
-          "background-url":
-            "https://cloud.githubusercontent.com/assets/1830348/15354890/1442159a-1cf0-11e6-92b1-b861dadf1750.jpg",
-          "background-color": "#2a3448",
-          padding: "100px 0px 100px 0px",
-          "border-radius": "0px",
-        },
-        children: [
-          {
-            tagName: "mj-text",
-            attributes: {
-              "padding-top": "20px",
-              "padding-right": "20px",
-              "padding-bottom": "20px",
-              "padding-left": "20px",
-              height: "50px",
-              color: "#ffffff",
-              "font-family": "Helvetica",
-              "font-weight": "bold",
-              align: "center",
-              "font-size": "45px",
-              "font-style": "normal",
-              "line-height": "45px",
-              "letter-spacing": "none",
-              "text-decoration": "none",
-              "container-background-color": "black",
-            },
-            content: "GO TO SPACE",
-            children: [],
-            id: uuidv4(),
-          },
-          {
-            tagName: "mj-button",
-            attributes: {
-              href: "https://mjml.io/",
-              align: "center",
-              "background-color": "#008000",
-              color: "#ffffff",
-              "border-radius": "20px",
-            },
-            content: "ORDER YOUR TICKET NOW",
-            id: uuidv4(),
-          },
-        ],
-        id: uuidv4(),
-      };
-    }
-
     case "mj-carousel": {
       return {
         tagName: "mj-section",

@@ -4,11 +4,11 @@ import { useState } from "react";
 
 
 const options = [
-    { value: 'customer', label: 'Customer' },
-    { value: 'order', label: 'Order' },
-    { value: 'dish', label: 'Dish' },
-    { value: 'voucher', label: 'Voucher' },
-    { value: 'campaign', label: 'Campaign' },
+    { value: 'Person', label: 'Person' },
+    { value: 'RestaurentInfo', label: 'Restaurent Information' },
+    { value: 'Dish', label: 'Dish' },
+    { value: 'Voucher', label: 'Voucher' },
+    { value: 'Order', label: 'Order' },
 ]
 
 const tagColor = [
@@ -30,7 +30,7 @@ interface IMergeFieldText  {
 }
 
 const MergeFieldText: React.FC<IMergeFieldText> = ({onSelectField}) => {
-    const [value, setValue] = useState<string>("customer")
+    const [value, setValue] = useState<string>("")
     const handleChange = (value: string) => {
         console.log(`selected ${value}`);
         setValue(value)
@@ -49,7 +49,6 @@ const MergeFieldText: React.FC<IMergeFieldText> = ({onSelectField}) => {
     return <div className="my-2 flex flex-col space-y-2">
         <p>Merge fields</p>
         <Select
-            defaultValue="customer"
             style={{ width: 120 }}
             onChange={handleChange}
             options={options}

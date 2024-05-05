@@ -11,7 +11,7 @@ const EmailTemplateEditor: React.FC<IEmailTemplateEditorProps> = ({mode}) => {
     
     return (
     <DndProvider backend={HTML5Backend}>
-        <div className="flex justify-end max-h-screen h-screen overflow-auto relative">
+        <div className="flex justify-end relative" style={{maxHeight: "calc(100vh - 100px)"}}>
             <LeftSidebar />
             <DropContainer view={mode}/>
             <RightSisebar />

@@ -73,7 +73,7 @@ export const CampaignTargetList: React.FC<ICampaignTargetlistProps> = ({ targetL
                 <h1 className="font-bold">Target lists</h1>
 
                 <AddTargetlistToCampaignModal
-                    onOk={(values: DataType[]) => { handleAddTargetlists(values) }}
+                    onOk={(values: any[]) => { handleAddTargetlists(values) }}
                     excludeIds={ targetLists.map(item => item.id)}
                 />
 

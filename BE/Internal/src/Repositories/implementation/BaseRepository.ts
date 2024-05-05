@@ -3,6 +3,7 @@ import { IBaseRepository } from "../IBaseRepository";
 import { injectable, unmanaged } from "inversify";
 import { Filter, FilterObject, QueryOptions } from "../../Types/type";
 import { BadRequestError, RecordNotFoundError } from "../../Errors";
+import { sequelize } from "../../Configs";
 
 @injectable()
 export abstract class BaseRepository<M extends Model>
@@ -26,8 +27,24 @@ export abstract class BaseRepository<M extends Model>
             const page = options.paginate?.page || 1;
             const limit = options.paginate?.pageSize || this.DEFAULT_PAGE_SIZE;
             const offset = (page - 1) * limit;
+            let allowedAttributes = this.attributes ;
+
+            if (this.attributes[0] === '*') {
+                allowedAttributes = Object.keys(this._model.getAttributes());
+            }
           
             // const type = options.type ? options.type : "";
+
+
+            let orderFields = ["id"] ; // default sort by id
+
+            // sort by 1 field
+            if (options.sort && typeof options.sort.by === "string") {
+                orderFields = [(allowedAttributes.includes(options.sort.by) && options.sort.by) || "id"] ;
+            } else if (options.sort && typeof options.sort.by === "object") { 
+            // Multiple sort 
+                orderFields = options.sort.by
+            }
             
             const findOptions: FindOptions = {
                 // attributes: ['*'],
@@ -35,11 +52,13 @@ export abstract class BaseRepository<M extends Model>
                 offset,
                 order: [
                     [
-                        options.sort?.by || "id",
+                       orderFields.join(","),
                         options.sort?.order.toLocaleUpperCase() || "ASC",
                     ],
                 ],
             };
+
+            console.log(findOptions.order)
 
             if (options.filter) {
                 const sequelizeFilterObject = this.mappingToSequelizeFilterOpject(options.filter)
@@ -74,7 +93,6 @@ export abstract class BaseRepository<M extends Model>
                 return this._model.findAll({ order: [["id", "ASC"]] });
             }
 
-           
             const op = "[Op.in]"
             return this._model.findAll({
                 attributes: this.attributes,
@@ -131,7 +149,14 @@ export abstract class BaseRepository<M extends Model>
         
         for (const filterName in filter) {
           console.log(filterName);
-          if (filter.hasOwnProperty(filterName)) {
+          let allowAttributes = this.attributes
+          if (this.attributes[0] === "*") {
+            console.log("Allow all attributes")
+            allowAttributes = Object.keys(this._model.getAttributes())
+          }
+
+          console.log("Allow attributes", allowAttributes, this._model.getAttributes())
+          if (filter.hasOwnProperty(filterName) && allowAttributes.includes(filterName)) {
             const filterConditions = filter[filterName];
             if (typeof filterConditions === "string") {
                 sequelizeFilter[filterName] = filterConditions

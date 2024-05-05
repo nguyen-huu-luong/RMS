@@ -12,6 +12,7 @@ interface IButtonPreview {
     section: any;
     index: number;
     path: string;
+    buttonIndex: number;
 }
 
 const hoverStyle = {
@@ -42,21 +43,23 @@ const defaultStyle: CSSProperties = {
     backgroundPosition: "center center",
 };
 
-const ButtonPreview = ({ section, index, path }: IButtonPreview) => {
+const ButtonPreview = ({ section, index, buttonIndex, path }: IButtonPreview) => {
     const [isHovered, setIsHovered] = useState(false);
     const { setActiveNode, activeNode } = useEmailDataStore();
     const objectCss = objectToCSS(getCamelCasedAttributes(section.attributes));
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
 
-        setActiveNode({
+        const activeNode = {
             section,
             path,
+            buttonIndex,
             sectionIndex: index
-        });
+        }
+        setActiveNode(activeNode);
     };
 
-    console.log("objectCss", objectCss)
+    // console.log("objectCss", objectCss)
 
     const activeSectionId = activeNode && activeNode["section"]?.id;
     const currentSectionId = section.id;
@@ -74,19 +77,31 @@ const ButtonPreview = ({ section, index, path }: IButtonPreview) => {
         return { ...hoverStyle };
     };
 
+    // Hanlde padding  as offset  is mjml  different  from padding css when  button rendered
+    const newObjCss = Object.keys(objectCss).reduce((acc: { [key: string]: string }, key: string) => {
+        // console.log(key)
+        const newKey = ["paddingLeft", "paddingRight", "paddingTop", "paddindBottom"].includes(key) ?
+                                key.replace("padding", "margin") : key;
+        acc[newKey] = objectCss[key];
+        // console.log(newKey)
+        return acc;
+    }, {});
+
+    // console.log(newObjCss)
+
     const allStyle: CSSProperties = {
         ...getStyle(),
         ...defaultStyle,
-        ...objectCss,
+        ...newObjCss,
     };
 
-    console.log(allStyle)
+    // console.log(allStyle)
 
     return (
-       <div style={{textAlign: objectCss["textAlign"] as any}}>
+        <div style={{ textAlign: objectCss["textAlign"] as any }}>
             <div
-                style={{ ...allStyle, textAlign: "center" }}
-                className="relative text-center"
+                style={{ ...allStyle, display: "inline-flex" }}
+                className="relative inline-flex items-center"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={handleClick}
@@ -96,7 +111,7 @@ const ButtonPreview = ({ section, index, path }: IButtonPreview) => {
                     <ItemOnhover section={section} path={path} />
                 )}
             </div>
-       </div>
+        </div>
     );
 };
 export default ButtonPreview;

@@ -72,7 +72,7 @@ type QueryOptions = {
   filter: Filter;
   sort?: {
     order: "asc" | "desc";
-    by: string;
+    by: string | string [];
   };
   paginate?: {
     page: number;

@@ -64,9 +64,9 @@ export class ClientService {
         }
 
         if (!type) {
-            data.type = "Lead"
+            data.type = "lead"
         } else if (type === "customer") {
-            data.type = "Customer"
+            data.type = "customer"
         }
         return await this.clientRepository.create(data)
     }
@@ -80,20 +80,12 @@ export class ClientService {
     }
 
     public async delete(id: number) {
-        const user = this.clientRepository.findById(id);
-        if (!user) {
-            throw new RecordNotFoundError()
-        }
         return await this.clientRepository.delete(id);
-    }
+    } 
 
-    public async search(key: string, by: string) {
-        return []
-    }
-
-    public async sort(by: string) {
-        return []
-    }
+    public async deleteMany(ids: number[]) {
+        return await this.clientRepository.deleteManyClients(ids)
+    } 
 
     public getOpportunityCustomer = async (sort_factor: any, order: any) => {
         let carts: any

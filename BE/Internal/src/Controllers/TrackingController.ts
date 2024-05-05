@@ -21,18 +21,19 @@ class TrackingController {
         `User with email ${email} sent this email in campaign #${campaign}`
       );
 
-    if (!email || !campaign) {
-      throw new BadRequestError(
-        "Invalid tracking email request, missing necessary parameters"
-      );
-    }
+    // if (!email || !campaign) {
+    //   throw new BadRequestError(
+    //     "Invalid tracking email request, missing necessary parameters"
+    //   );
+    // }
 
-    const result = await this.trackingService.trackEmail(
-      email as string,
-      Number(campaign)
-    );
+    // const result = await this.trackingService.trackEmail(
+    //   email as string,
+    //   Number(campaign)
+    // );
 
-    res.send("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTUzn7-qinvq-jbUgQWNL-OfnXUFXfxbtwMs6-Utey3A&s")
+    // res.send("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTUzn7-qinvq-jbUgQWNL-OfnXUFXfxbtwMs6-Utey3A&s")
+    res.sendFile(__dirname + "/download.png")
   }
 
   public async trackUrl(req: Request, res: Response, next: NextFunction) {
