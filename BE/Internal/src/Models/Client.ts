@@ -54,6 +54,8 @@ class Client extends Person {
     declare createNotification: HasManyCreateAssociationMixin<Notification>;
 	declare setNotification: HasManySetAssociationsMixin<Notification, Notification>;
 
+	declare getOrder: HasManyGetAssociationsMixin<Order> ;
+
 	declare id: number;
 	declare firstname: string;
 	declare lastname: string;

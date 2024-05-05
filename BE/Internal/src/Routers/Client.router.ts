@@ -19,8 +19,9 @@ class ClientRouter {
         const clientRouter = Router();
         clientRouter.get("/all",this.clientController.getAllClient.bind(this.clientController));
         clientRouter.get("/:id", this.clientController.getClientInfo.bind(this.clientController));
-        clientRouter.post("", this.clientController.createClient.bind(this.clientController));
+        clientRouter.post("", ClientValidator.createOrUpdateValidator, this.clientController.createClient.bind(this.clientController));
         clientRouter.put("/:id", this.clientController.updateClient.bind(this.clientController));
+        clientRouter.delete("", this.clientController.deleteMany.bind(this.clientController));
         clientRouter.delete("/:id", this.clientController.delete.bind(this.clientController));
         clientRouter.get("/opportunity/all", this.clientController.getOpporturnityCustomer.bind(this.clientController))
         clientRouter.post("/segment", this.clientController.segmentCustomerAll.bind(this.clientController))
