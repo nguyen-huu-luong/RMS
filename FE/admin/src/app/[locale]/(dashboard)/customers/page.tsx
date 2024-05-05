@@ -1,11 +1,22 @@
 "use client";
 import React, { useState } from "react";
-import { type TableProps, type GetProp, Form, Upload, Button, Select } from "antd";
+import { type TableProps, type GetProp, Form, Upload, Button, Select, message, Flex, Space, Input } from "antd";
 import { CustomerActionBar } from "@/components";
-import { UploadOutlined } from "@ant-design/icons";
+import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
 import RMSInput from "@/components/inputs/RMSInput";
 import RMSDatePicker from "@/components/inputs/RMSDatePicker";
 import TableRender, { FilterItemType } from "@/components/TableComponents";
+import fetchClient from "@/lib/fetch-client";
+import { SendEmailModal } from "@/components/Modals/SendEmailModal";
+import { CreateTargetListModal } from "@/components/Modals/CreateTargetListModal";
+import { useRouter } from "next/navigation";
+import { CreateCustomerForm } from "@/components/CreateCustomerForm";
+import { useForm } from "antd/es/form/Form";
+import { CreateNewCustomerModal } from "@/components/Modals/CreateNewCustomerModal";
+import { AxiosError } from "axios";
+import TimeFormatter from "@/components/TimeFormatter";
+import moment from "moment";
+import Link from "next/link";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 interface DataType {
@@ -23,15 +34,26 @@ interface DataType {
 	// updatedAt: Date ;
 }
 
-const getAge = (birthday: string) => {
-	let currentDate = new Date()
-	let currentYear = Number(currentDate.getFullYear())
-	let birthdayYear = Number(birthday.split('-')[0])
-	return Math.abs(currentYear - birthdayYear)
+function getAge(birthDateString: string): number {
+    const birthDate = new Date(birthDateString);
+    const currentDate = new Date();
+    
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
+        age--;
+    }
+
+    return age;
 }
 
 const CustomerListPages: React.FC = () => {
 	const [selectedRows, setSelectedRows] = useState<DataType[]>([])
+	const [reload, setReload] = useState(false)
+	const router = useRouter()
+
+	const [form_create] = useForm()
 	const columns: ColumnsType<DataType> = [
 		{
 			title: "ID",
@@ -42,7 +64,7 @@ const CustomerListPages: React.FC = () => {
 			title: "Fullname",
 			dataIndex: "fullname",
 			key: "fullname",
-			render: (text, row) => <a style={{ color: "#4A58EC" }} href={`./customers/${row.id}`}>{text}</a>,
+			render: (text, row) => <Link style={{ color: "#4A58EC" }} href={`/${row.id}`}>{text}</Link>,
 			// ...getColumnSearchProps("fullname"),
 		},
 		{
@@ -65,7 +87,7 @@ const CustomerListPages: React.FC = () => {
 			title: "Birthday",
 			dataIndex: "birthday",
 			key: "birthday",
-			render: (text, _) => <span>{text.split('T')[0]}</span>   
+			render: (text, _) => moment(text).format("DD-MM-YYYY")
 		},
 		{
 			title: "Score",
@@ -82,6 +104,7 @@ const CustomerListPages: React.FC = () => {
 			title: "CreatedAt",
 			dataIndex: "createdAt",
 			key: "createdAt",
+			render: (text) => moment(text).format("HH:mm DD-MM-YYYY")
 		},
 	];
 
@@ -144,106 +167,112 @@ const CustomerListPages: React.FC = () => {
 		},
 	];
 
+	const handleCreateTargetlist = async (values: any) => {
+		console.log(values)
+		try {
+			const result = await fetchClient({
+				method: "POST",
+				url: "/targetlists",
+				body: {
+					...values,
+					clientIds: selectedRows.map(item => item.id)
+				}
+			})
+
+			message.success("Create new target list successfull")
+			console.log(result)
+			router.push(`marketing/targetlists/${result.data.id}`)
+		} catch (error) {
+			message.error("Faild to create new target list")
+			throw error;
+		}
+	}
+
 
 	const onSelectedRows = {
 		handle: (selecteds: DataType[]) => setSelectedRows(selecteds),
-		render: () => <CustomerActionBar dataSelected={selectedRows} />
+		render: () => (
+			<main className="bg-white w-full py-2 px-3 my-2 rounded-md border">
+				<Flex>
+					{(selectedRows && selectedRows.length > 0) ?
+						<Space>
+							<p>Selected {selectedRows.length} customer</p>
+							<CreateTargetListModal onOk={handleCreateTargetlist} triggerText="Create targetlist" />
+							<SendEmailModal emailLists={selectedRows.map((item) => item.email)} />
+							{/* <Button icon={<EllipsisOutlined />} /> */}
+							<Button danger onClick={handleDeleteCustomers}>Delete {selectedRows.length} customers</Button>
+						</Space>
+						:
+						<Space>
+							<Input
+								placeholder="Enter keywork to search...."
+								prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
+								className="flex items-center"
+							/>
+						</Space>
+					}
+				</Flex>
+			</main >
+		)
 	}
-	const normFile = (e: any) => {
-		console.log('Upload event:', e);
-		if (Array.isArray(e)) {
-			return e;
+
+	const handleDeleteCustomers = async () => {
+		try {
+			const result = await fetchClient({
+				url: "/customers",
+				method: "DELETE",
+				body: {
+					ids: selectedRows.map(item => item.id)
+				}
+			})
+
+			setReload(!reload)
+		} catch (error) {
+			message.error("Đã xảy ra lỗi")
+			throw error
 		}
-		return e?.fileList;
-	};
+	}
+
+	const handleCreateCustomer = async (values: any) => {
+		try {
+			const  result = await fetchClient({
+				method: "POST",
+				url: "/customers", 
+				body: {
+					data: {
+						...values
+					}
+				}
+			})
+			setReload(!reload) ;
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				if (error.response)  {
+					const {code, name, message} = error?.response.data
+					if (name  === "Conflict") {
+						form_create.setFields([{name: "email", errors: ["Email đã tồn tại"]}])
+					} else {
+						message.error("From Server: ", message)
+					}
+				}
+				throw error
+			} else {
+				message.error("Đã xãy ra lỗi")
+				throw error
+			}
+		}
+	}
+
+
+
 	return (
 		<TableRender<DataType>
 			columns={columns}
 			url="/customers"
+			createModalTitle="Add new customer"
+			reload={reload}
 			onSelected={onSelectedRows}
-			formCreateElement={
-				<>
-					<Form.Item
-						name="upload-avatar"
-						label="Avatar"
-						valuePropName="fileList"
-						getValueFromEvent={normFile}
-					>
-						<Upload name="avatar" action="/upload.do" listType="picture">
-							<Button icon={<UploadOutlined />} />
-						</Upload>
-					</Form.Item>
-
-					<div className="flex space-x-2">
-						<div className='w-full'>
-							<Form.Item label="Firstname" name="firstname" required>
-								<RMSInput placeholder='Firstname' />
-							</Form.Item>
-						</div>
-						<div className='w-full'>
-							<Form.Item label="Lastname" name="lastname" required>
-								<RMSInput placeholder='Lastname' />
-							</Form.Item>
-						</div>
-					</div>
-
-					<Form.Item name="type" initialValue="Customer" hidden>
-						
-					</Form.Item>
-
-					<div className="flex space-x-2">
-						<div className='w-full'>
-							<Form.Item label="Phone" name="phone" required>
-								<RMSInput placeholder='Phone' />
-							</Form.Item>
-						</div>
-						<div className='w-full'>
-							<Form.Item label="Email" name="email">
-								<RMSInput placeholder='Email' />
-							</Form.Item>
-						</div>
-					</div>
-{/* 
-					<div className="flex space-x-2">
-						<div className='w-full'>
-							<Form.Item label="Birthday">
-								<RMSDatePicker className='w-full' />
-							</Form.Item>
-						</div>
-						<div className='w-full'>
-							<Form.Item label="Source">
-								<Select>
-									<Select.Option value="demo">Demo</Select.Option>
-								</Select>
-							</Form.Item>
-						</div>
-					</div> */}
-
-					<div className="flex space-x-2">
-						{/* <div className='w-full'>
-							<Form.Item label="Source">
-								<Select>
-									<Select.Option value="demo">Demo</Select.Option>
-								</Select>
-							</Form.Item>
-						</div>
-
-							<Form.Item label="Source">
-								<Select>
-									<Select.Option value="demo">Demo</Select.Option>
-								</Select>
-							</Form.Item>
-
-						<div className='w-full'>
-							<Form.Item label="Source">
-								<Select>
-									<Select.Option value="demo">Demo</Select.Option>
-								</Select>
-							</Form.Item>
-						</div> */}
-					</div>
-				</>
-			}
+			createModal={<CreateNewCustomerModal formControl={form_create} onCreate={handleCreateCustomer} />}
 			filterItems={filterItems}
 		/>
 

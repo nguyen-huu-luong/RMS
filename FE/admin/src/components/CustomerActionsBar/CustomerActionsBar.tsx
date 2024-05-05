@@ -51,8 +51,6 @@ export const CustomerActionBar: React.FC<CustomerActionBarProps> = (props) => {
     const handleOk = () => {
         setOpen(false);
     };
-
-
     const handleCancel = () => {
         setOpen(false);
     };
@@ -69,16 +67,21 @@ export const CustomerActionBar: React.FC<CustomerActionBarProps> = (props) => {
         // setCreateGroup(false);
     };
 
+    const  handleDeleteCustomers =  () => {
+        
+    }
 
-    return <main className="bg-white w-full py-2 px-3 rounded-md border">
+
+    return <main className="bg-white w-full py-2 px-3 my-2 rounded-md border">
         <Flex>
             {
                 (props.dataSelected && props.dataSelected?.length > 0) ?
                     <Space>
                         <p>Selected {props.dataSelected?.length} customer</p>
-                        <Button onClick={showCreateGroup}>Create Group</Button>
+                        <Button className="bg-primary" type="primary" onClick={showCreateGroup}>Create Group</Button>
                         <SendEmailModal emailLists={props.dataSelected.map((item) => item.email)}/>
-                        <Button icon={<EllipsisOutlined />} />
+                        {/* <Button icon={<EllipsisOutlined />} /> */}
+                        <Button danger onClick={handleDeleteCustomers}>Delete {props.dataSelected.length} customers</Button>
                     </Space> :
                     <Space>
                         <Input
@@ -87,25 +90,8 @@ export const CustomerActionBar: React.FC<CustomerActionBarProps> = (props) => {
                             className="flex items-center"
                         />
                     </Space>
+
             }
         </Flex>
-
-        <CustomModal
-            title="Add new customer"
-            open={open}
-            onOk={handleOk}
-            okType="primary"
-            okButtonProps={{ className: "bg-primary" }}
-            cancelText="Cancel"
-            onCancel={handleCancel}
-            footer={null}
-        >
-            <AddCustomerForm afterSubmit={handleOk} afterCancel={handleCancel} />
-        </CustomModal>
-
-
-     
-
-
     </main >
 }
