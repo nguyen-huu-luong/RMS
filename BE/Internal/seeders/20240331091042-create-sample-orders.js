@@ -5,12 +5,23 @@ module.exports = {
     up: async (queryInterface, Sequelize) => {
         let orders = [];
         const currentDate = new Date();
-        const twoYearsAgo = new Date(currentDate.getFullYear() - 3, currentDate.getMonth(), currentDate.getDate());
-        
+        const twoYearsAgo = new Date(
+            currentDate.getFullYear() - 3,
+            currentDate.getMonth(),
+            currentDate.getDate()
+        );
+
+        let clientAmounts = [];
+        let clientItems = [];
         for (let i = 1; i <= 1000; i++) {
+            clientAmounts.push(0);
+            clientItems.push(0);
+        }
+
+        for (let i = 1; i <= 2000; i++) {
             orders.push({
-                clientId: faker.datatype.number({ min: 1, max: 30 }),
-                num_items: faker.datatype.number({ min: 1, max: 5 }),
+                clientId: faker.datatype.number({ min: 1, max: 1000 }),
+                num_items: faker.datatype.number({ min: 1, max: 12 }),
                 amount: 0,
                 status: "Done",
                 paymentMethod: "CASH",
@@ -20,7 +31,7 @@ module.exports = {
         }
 
         let orderItems = [];
-        for (let orderId = 0; orderId < 1000; orderId++) {
+        for (let orderId = 0; orderId < 2000; orderId++) {
             let preProducts = [];
             for (let j = 0; j < orders[orderId].num_items; j++) {
                 let randomProduct;
@@ -29,13 +40,19 @@ module.exports = {
                     randomProduct = Math.floor(Math.random() * 70) + 1;
                 } while (preProducts.includes(randomProduct));
                 preProducts.push(randomProduct);
-
+                const product = await queryInterface.sequelize.query(
+                    `
+                    SELECT price from public."Products" WHERE id = ${randomProduct};
+                    `,
+                    { type: queryInterface.sequelize.QueryTypes.SELECT }
+                );
                 quantity = faker.datatype.number({ min: 1, max: 5 });
+                clientItems[orders[orderId].clientId - 1] += quantity;
                 orderItems.push({
                     orderId: orderId + 1,
                     productId: randomProduct,
                     quantity: quantity,
-                    amount: quantity * faker.datatype.number({ min: 40000, max: 70000, precision: 5000 }),
+                    amount: quantity * product[0].price,
                     status: "Done",
                     createdAt: faker.date.past(),
                     updatedAt: new Date(),
@@ -49,25 +66,26 @@ module.exports = {
             orders[order.orderId - 1].num_items += order.quantity;
         }
 
-        let clientAmounts = []
-        for (let i = 1; i <= 500; i++) {
-            clientAmounts.push(0);
-        }
         let temp = 0;
         for (let order of orders) {
-            clientAmounts[temp] += order.amount;
-            temp = (temp + 1) % 500;
+            clientAmounts[order.clientId - 1] += order.amount;
+            // clientItems[order.clientId - 1] += order.num_items;
         }
+
         const promises = clientAmounts.map((profit, index) => {
             return queryInterface.sequelize.query(
                 `
               UPDATE public."Clients"
-              SET profit = :profit
+              SET profit = :profit,
+                  total_items = :num_items,
+                  average = :average
               WHERE id = :id
           `,
                 {
                     replacements: {
                         profit: profit,
+                        num_items: clientItems[index],
+                        average: profit == 0 ? 0 : profit / clientItems[index],
                         id: index + 1,
                     },
                 }
@@ -76,6 +94,13 @@ module.exports = {
         await queryInterface.bulkInsert("Orders", orders, {});
         await queryInterface.bulkInsert("OrderItems", orderItems, {});
         await Promise.all(promises);
+        await queryInterface.sequelize.query(
+            `
+            UPDATE public."Clients"
+                SET type = 'lead'
+            WHERE profit = 0
+            `
+        );
     },
 
     down: async (queryInterface, Sequelize) => {
