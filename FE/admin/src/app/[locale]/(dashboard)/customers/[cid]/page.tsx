@@ -302,7 +302,14 @@ const CustomerProfile = () => {
             amount: String(order.amount),
         }
     })
-    const costs = customerInfo?.orderInfo.map((order: any) => { return order.amount })
+    const costs = customerInfo?.orderInfo.map((order: any) => {
+        if (order.status == 'Done') {
+            return order.amount
+        }
+        else {
+            return 0
+        }
+    })
     const totalCost = costs?.reduce((cost: any, initial: any) => cost + initial, 0)
 
     const businessData: ActivityDataType[] = [
@@ -348,6 +355,7 @@ const CustomerProfile = () => {
                                             <div >
                                                 <Upload
                                                     {...props}
+                                                    accept="image/*"
                                                     showUploadList={false}
                                                     listType="picture"
                                                     maxCount={1}>
@@ -472,7 +480,7 @@ const CustomerProfile = () => {
                                             tab == 0 ? <div> <Table columns={columns_order} dataSource={orderData} /></div>
                                                 : <div>
                                                     <div>
-                                                       
+
                                                         <Table columns={users_activity} dataSource={customerHistory}
                                                             pagination={{
                                                                 pageSize: 3,
@@ -483,7 +491,7 @@ const CustomerProfile = () => {
                                 </div>
                             </div>
                             <div>
-                            <div className='bg-white pl-3 py-2'>
+                                <div className='bg-white pl-3 py-2'>
                                     <p style={{ color: "#666666" }}>
                                         Created at
                                     </p>
@@ -530,7 +538,7 @@ const CustomerProfile = () => {
                                                     {customerHistory
                                                         .slice(
                                                             (historyPage - 1) *
-                                                                8,
+                                                            8,
                                                             historyPage * 8
                                                         )
                                                         .map((item: any) => {
@@ -544,7 +552,7 @@ const CustomerProfile = () => {
                                                                     <p>
                                                                         <CalendarOutlined />{" "}
                                                                         {item.action ===
-                                                                        "view_item" ? (
+                                                                            "view_item" ? (
                                                                             <>
                                                                                 View{" "}
                                                                                 <Link
@@ -559,7 +567,7 @@ const CustomerProfile = () => {
                                                                                 </Link>
                                                                             </>
                                                                         ) : item.action ===
-                                                                          "add_to_cart" ? (
+                                                                            "add_to_cart" ? (
                                                                             <>
                                                                                 Add{" "}
                                                                                 <Link
@@ -576,7 +584,7 @@ const CustomerProfile = () => {
                                                                                 cart
                                                                             </>
                                                                         ) : item.action ===
-                                                                          "order" ? (
+                                                                            "order" ? (
                                                                             "Order food"
                                                                         ) : (
                                                                             ""

@@ -96,7 +96,7 @@ const SegmentationChart = () => {
             else if (type == "Custom") {
                 url = `/groups/filter?type=Customize&start_date=${dateFilter["start_date"]}&end_date=${dateFilter["end_date"]}`
                 idx_sub = 10
-                factor = "convertDate"
+                factor = "segmentDate"
                 fetcher = true
             }
     

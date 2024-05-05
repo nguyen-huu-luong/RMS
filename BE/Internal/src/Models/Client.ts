@@ -210,6 +210,14 @@ Client.init(
 			type: DataTypes.DATE,
 			allowNull: true
 		},
+		segmentDate: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
+		lastPurchase: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
 		hashedPassword: {
 			type: DataTypes.STRING,
 		},

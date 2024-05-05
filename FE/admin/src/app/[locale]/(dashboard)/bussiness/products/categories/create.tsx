@@ -100,6 +100,7 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
                             <Form.Item name="upload">
                                 <Upload
                                     {...props}
+                                    accept="image/*"
                                     listType="picture"
                                     maxCount={1}
                                     onRemove={handleRemove}
