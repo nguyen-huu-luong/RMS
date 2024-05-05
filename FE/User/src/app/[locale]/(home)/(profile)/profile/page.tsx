@@ -72,7 +72,7 @@ const Profile = () => {
 
     const updateImage = async (url: string) => {
         await fetchClient({
-            url: `/customers`,
+            url: `/customers/${session?.user.id}`,
             method: "PUT",
             body: {
                 avatar: url,
@@ -83,7 +83,7 @@ const Profile = () => {
 
     const updateInformation = async (data: any) => {
         await fetchClient({
-            url: `/customers`,
+            url: `/customers/${session?.user.id}`,
             method: "PUT",
             body: data,
         });
