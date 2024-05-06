@@ -314,7 +314,7 @@ export class OrderService {
                     });
                     if (client.getDataValue("type") == "lead") {
                         await client.update({ type: "customer" });
-                        await client.update({ convertDate: new Date() });
+                        await client.update({ convertDate: new Date(), lastPurchase: new Date() });
                         await this.emailService.sendEmail({
                             from: `${process.env.GMAIL_USER}`,
                             to: client.getDataValue("email"),

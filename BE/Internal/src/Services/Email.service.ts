@@ -7,6 +7,7 @@ import { CustomError, RecordNotFoundError } from "../Errors";
 import mjml2html from "mjml";
 import mustache from "mustache";
 import { ITrackUrlRepository } from "../Repositories/IITrackUrlRepository";
+import { IProductRepository } from "../Repositories";
 
 export interface IEmailMessage {
     from: string;
@@ -30,6 +31,16 @@ const jsonToXML = ({ tagName, attributes, children, content }: any) => {
         }${subNode}</${tagName}>`;
 };
 
+
+const restaurentInfo: {
+    [key: string]: string
+} = {
+    "restaurentInfo_name": "BkFood",
+    "restaurentInfo_address": "Thu Duc, Ho Chi Minh",
+    "restaurentInfo_phone": "09423484423",
+    "restaurentInfo_email": "homecruise.rms@gmail.com",
+}
+
 export class EmailService {
     constructor(
         private clientRepository = container.get<IClientRepository>(
@@ -38,19 +49,36 @@ export class EmailService {
         private orderRepository = container.get<IOrderRepository>(
             TYPES.IOrderRepository
         ),
-        private trackUrlRepository = container.get<ITrackUrlRepository>(TYPES.ITrackUrlRepository)
+        private trackUrlRepository = container.get<ITrackUrlRepository>(TYPES.ITrackUrlRepository),
+        private productRepository = container.get<IProductRepository>(TYPES.IProductRepository)
     ) { }
 
-    private getMergeField = (xmlEmail: string) => {
-        const regex = /\{\{([^{}]+)\}\}/g;
+    private getMergeField = (xmlEmail: string, type?: string) => {
+        let regex = /\{\{([^{}]+)\}\}/g;
         let match;
 
         // Mảng để lưu trữ các nội dung trong các ký hiệu `{{ }}`
         const matches = [];
 
-        // Lặp qua các kết quả khớp từ biểu thức chính quy
+        // Handle `{{ }}`
         while ((match = regex.exec(xmlEmail)) !== null) {
             // match[1] chứa nội dung nằm giữa cặp ký hiệu `{{` và `}}`
+            let text = match[1]  ;
+            matches.push(text.split(".")) // Lưu  dưới dang  array  với  arr[0] là tên record
+                                            // arr[1] là id cần tìm hoặc  trường cần tìm
+                                            // arr[2] nếu  có là tên trường  cần  tim
+                                            // merge  field   giả sử  chỉ có 3 pt là tối đa
+        }
+
+        return matches;
+    };
+
+    private getTrackUrls = (xmlEmail: string) => {
+        let regex = /\[\[([^{}]+)\]\]/g
+        let match;
+
+        const matches = [];
+        while ((match = regex.exec(xmlEmail)) !== null) {
             matches.push(match[1]);
         }
 
@@ -72,37 +100,108 @@ export class EmailService {
             let xmlEmail = jsonToXML(withHtml);
             
             // console.log(xmlEmail)
-            const client = await this.clientRepository.findByEmail(message.to);
-            if (!client) {
-                throw new RecordNotFoundError("Customer not found!");
-            }
+            // const client = await this.clientRepository.findByEmail(message.to);
+            // if (!client) {
+            //     throw new RecordNotFoundError("Customer not found!");
+            // }
             
-            const mergeFields: string[] = this.getMergeField(xmlEmail) 
+            const trackUrls: string[] = this.getTrackUrls(xmlEmail) 
+            const mergeFields: string[][] = this.getMergeField(xmlEmail) 
             const dataReplace: {[key:string]: string} = {}
-            for (let field of mergeFields) {
+
+            // handle trackurl
+            for (let field of trackUrls) {
                 const pareFields = field.split(":")
                 if (pareFields[0] === "trackUrl") {
                     const trackUrl = await this.trackUrlRepository.findByCode(pareFields[1])
                     console.log(trackUrl)
                     if (trackUrl) {
                         xmlEmail = xmlEmail.replace(`{{${field}}}`,`{{${trackUrl.codeToInsert}}}`) ;
-                        dataReplace[ trackUrl.codeToInsert] = 
+                        dataReplace[trackUrl.codeToInsert] = 
                             `${process.env.BACK_END_URL}/api/track/url?email=${message.to}&campaignId=${trackUrl.campaignId}&redirectUrl=${trackUrl.redirectUrl}`
+                    }
+                }
+            }
+
+            // handle  merge fields
+            let customerInstance  = await this.clientRepository.findByEmail(message.to) 
+            if (!customerInstance) return false
+
+            let orderInstances: {[key: string]: any} =  {}
+            let voucherInstances: {[key: string]: any} = {}
+            let dishInstances: {[key: string]: any} = {}
+            for (let arrayData of mergeFields) {
+                let oldField = arrayData.join(".")
+                let newField = arrayData.join("_")
+                if (arrayData.length === 2) {
+                    switch (arrayData[0]) {
+                        case "restaurentInfo":
+                            newField =  arrayData.join("_")
+                            xmlEmail = xmlEmail.replace(`{{${oldField}}}`,`{{${newField}}}`) ;
+                            dataReplace[newField]  = restaurentInfo[newField]
+                            break;
+                        case "Person":
+                            let personField = arrayData[1]
+                            xmlEmail = xmlEmail.replace(`{{${oldField}}}`,`{{${newField}}}`) ;
+                            dataReplace[newField] = customerInstance.getDataValue(personField)  || "Không xác định"
+                        default:
+                            break;
+                    }
+                } else if  (arrayData.length === 3) {
+                    switch (arrayData[0].toLocaleLowerCase()) {
+                        case "order":
+                            let orderId =  arrayData[1] ;
+                            if (!orderInstances[orderId]) {
+                                orderInstances[orderId] = orderId !== "newestOrder" ?  
+                                                await this.orderRepository.getOne(customerInstance.id, Number(orderId))
+                                                : await this.orderRepository.getNewestOrder(customerInstance.id)
+                                if (!orderInstances[orderId])  {
+                                    orderInstances[orderId] = "Unknown"
+                                }
+                            }
+                            if (orderInstances[orderId] && orderInstances[orderId] !== "Unknown") {
+                                xmlEmail = xmlEmail.replace(`{{${oldField}}}`,`{{${newField}}}`) ;
+                                dataReplace[newField] =  orderInstances[orderId].getDataValue(arrayData[2])  || "Không xác định"
+                            } else  {
+                                xmlEmail = xmlEmail.replace(`{{${oldField}}}`,`{{${newField}}}`) ;
+                                dataReplace[newField] = "Không xác định"
+                            }
+                            break;
+                        case "dish":
+                            let dishId =  arrayData[1] ;
+                            if (!dishInstances[dishId]) {
+                                dishInstances[dishId] = await this.productRepository.getOne(dishId) ;
+                                if (!dishInstances[dishId])  {
+                                    dishInstances[dishId] = "Unknown"
+                                }
+                            } 
+
+                            if (dishInstances[dishId]  && dishInstances[dishId] !== "Unknown")  {
+                                xmlEmail = xmlEmail.replace(`{{${oldField}}}`,`{{${newField}}}`) ;
+                                dataReplace[newField] =  dishInstances[dishId].getDataValue(arrayData[2])  || "Không xác định"
+                            } else {
+                                xmlEmail = xmlEmail.replace(`{{${oldField}}}`,`{{${newField}}}`) ;
+                                dataReplace[newField] = "Không xác định"
+                            }
+                            break;
+                        case "voucher":
+                            
+                            break;
+                    
+                        default:
+                            break;
                     }
                 }
             }
 
             console.log(dataReplace)
 
-
             const renderedMJML = mustache.render(xmlEmail, dataReplace);
 
-            const imgSrc = `http://localhost:3003/api/track/email?email=${encodeURIComponent(
+            const imgSrc = `http://localhost:3003/api/track/email/image.png?email=${encodeURIComponent(
                 message.to
             )}&campaign=${campaignId}`;
-            const script = `<script>function onLoad() { var xhr = new XMLHttpRequest(); xhr.open("GET", "${imgSrc}", true); xhr.onload = function () { if (xhr.status >= 200 && xhr.status < 300) { console.log("API call successful"); } else { console.error("API call failed with status code: " + xhr.status); } }; xhr.onerror = function () { console.error("API call failed"); }; xhr.send(); }</script>`;
-            const imgTag = `<img src="${imgSrc}" style="display:none;" onload="onLoad()">`;
-            const finalHtml = `${renderedMJML}\n${imgTag}`;
+            const imgTag = `<img src="${imgSrc}" style="display: none"/>`;
 
             return await mailler.sendEmail({
                 ...message,

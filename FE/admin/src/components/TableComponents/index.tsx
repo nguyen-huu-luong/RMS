@@ -1,33 +1,31 @@
 "use client"
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Alert,
     Button,
     ConfigProvider,
     Dropdown,
-    Flex,
     Form,
     Input,
     Select,
     Space,
     Table,
+    message,
 } from "antd";
-import type { TableProps, GetProp, SelectProps, MenuProps } from "antd";
+import type { TableProps, GetProp, SelectProps } from "antd";
 import { variables } from "@/app";
 import type {
     Key,
     SortOrder,
 } from "antd/es/table/interface";
-import { EllipsisOutlined, SearchOutlined, SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons";
+import {SearchOutlined, SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons";
 import fetchClient from "@/lib/fetch-client";
 import { AnyObject } from "antd/es/_util/type";
 import { CreateModal } from "./CreateModal";
-import { FaEllipsisH, FaEllipsisV } from "react-icons/fa";
-import { FilterStringInput } from "./FilterItems/FilterString";
-import { FilterDate } from "./FilterItems/FilterDate";
-import { FilterSelect } from "./FilterItems/FilterSelect";
 import { useFormatter } from "next-intl";
 import { FilterItem } from "./FilterItems";
+import { FaEllipsisV } from "react-icons/fa";
+import { AxiosError } from "axios";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -36,16 +34,20 @@ type TablePaginationConfig = Exclude<
 >;
 interface ITableRenderProps<T> {
     // data: readonly Record<string, any>[];
+    data?: T[],  
+    setData?: React.Dispatch<React.SetStateAction<T[]>>,
     columns: ColumnsType<T>;
     url: string,
     queryStr?: string,
-    formCreateElement: React.ReactNode
+    createModal?: React.ReactNode
     onSelected?: {
         handle?: (selecteds: T[]) => void,
         render?: () => React.ReactNode
     },
+    reload?: boolean,
     filterItems?: FilterItemType[]
-    excludeDataHasIds?: number[]
+    excludeDataHasIds?: number[],
+    createModalTitle? : string
 }
 
 
@@ -75,7 +77,7 @@ export type FilterItemType = {
     options?: SelectProps['options']
 }
 
-const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreateElement, ...props }: ITableRenderProps<T>) => {
+const TableRender = <T extends AnyObject,>({ columns, url, onSelected, ...props }: ITableRenderProps<T>) => {
     const [checker, setChecker] = useState(true);
     const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(false);
@@ -120,7 +122,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
 
     useEffect(() => {
         fetchData();
-    }, [JSON.stringify(tableParams)]);
+    }, [JSON.stringify(tableParams), props.reload]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -146,7 +148,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
             if (props.excludeDataHasIds) {
                 data = data.filter((item: any) => !props.excludeDataHasIds?.includes(item.id))
             }
-            setData(data);
+            props.setData ? props.setData(data) : setData(data);
             setLoading(false);
             setTableParams({
                 ...tableParams,
@@ -159,18 +161,20 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
             });
         } catch (error: any) {
             setLoading(false)
-            console.log(error);
-            setError({
-                isError: true,
-                title: error?.name || "Something went wrong!",
-                message: error?.message || "Unknown error",
-            });
+            if (error instanceof AxiosError && error.response) {
+                if(error.status === 404) {
+                    message.error("Vui lòng thao tác chậm lại!")
+                } else {
+                    console.log(error);
+                    setError({
+                        isError: true,
+                        title: (error.response && error.response.data.name) || error?.name || "Unknown error",
+                        message: (error.response && error.response.data.message) || error?.message || "Something went wrong!",
+                    });
+                }
+            }
         }
     };
-
-    useEffect(() => {
-        fetchData();
-    }, [JSON.stringify(tableParams)]);
 
     const handleTableChange: TableProps["onChange"] = (
         pagination,
@@ -246,7 +250,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
             } else if (["lastXDays"].includes(values[key].expr)) {
                 const timeQuery = timeConvert(values[key].expr, Number(values[key].value))
                 queryStr = values[key].value ? `${queryStr}&${key}_gt=${timeQuery}` : queryStr
-            } else if (["before", "after".includes(values[key].expr)]) {
+            } else if (["before", "after"].includes(values[key].expr)) {
                 queryStr = values[key].value ? `${queryStr}&${key}_gt=${values[key].value.toString()}` : queryStr
             } else if (values[key].expr === "in") {
                 let str = ""
@@ -313,16 +317,21 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
 
     const handleDeleteFilteritem = (key: string) => {
         if (props.filterItems) {
-            console.log(filterItems, key)
-            filterItems.filter(item => item.key !== key)
-            console.log(filterItems, key)
+            // console.log(filterItems, key)
+            // filterItems.filter(item => item.key !== key)
+            // console.log(filterItems, key)
+            const newFilterItems = filterItems.filter(item => item.key !== key)  ;
+            setFilterItems(prev => newFilterItems)
+            if (newFilterItems.length === 0) {
+                setTableParams(prev  => ({...prev, queryString: ""}))
+            }
 
-            setFilterItems(filterItems.filter(item => item.key !== key))
         }
     }
 
     const handleClearFilter = () => {
         setFilterItems([])
+        setTableParams(prev  => ({...prev, queryString: ""}))
     }
 
     const remainingFilterItems = props.filterItems ? props.filterItems.filter((item) => {
@@ -403,7 +412,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                                 </Dropdown>}
                         </div>
 
-                        <CreateModal afterCreated={() => fetchData()} createUrl={url} formElement={formCreateElement} />
+                        {props.createModal && props.createModal}
                     </div>
 
                 </div>
@@ -420,6 +429,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                                 value: item.key,
                                 label: item.title,
                             }))}
+                            style={{minWidth: 120}}
                         />
 
                         <p>Order: </p>
@@ -473,7 +483,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                             pageSize: tableParams.pagination?.pageSize,
                         }}
                         loading={loading}
-                        dataSource={data}
+                        dataSource={props.data ? props.data : data}
                         onChange={handleTableChange}
                     />
                 </div>

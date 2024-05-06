@@ -54,6 +54,8 @@ class Client extends Person {
     declare createNotification: HasManyCreateAssociationMixin<Notification>;
 	declare setNotification: HasManySetAssociationsMixin<Notification, Notification>;
 
+	declare getOrder: HasManyGetAssociationsMixin<Order> ;
+
 	declare id: number;
 	declare firstname: string;
 	declare lastname: string;
@@ -207,6 +209,14 @@ Client.init(
 			values: [],
 		},
 		convertDate: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
+		segmentDate: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
+		lastPurchase: {
 			type: DataTypes.DATE,
 			allowNull: true
 		},

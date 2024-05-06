@@ -6,15 +6,14 @@ import { CSSProperties } from "styled-components"
 import "./custom.css"
 import TextArea from "antd/es/input/TextArea"
 
-interface IUpdatableInput {
+interface IUpdatableInput extends FormItemInputProps {
     name: string
     label: React.ReactNode
     editmode: boolean
     type: "input" | "select" | "textarea"
     defaultValue: string,
     onUpdate: (fieldname: string) => void,
-    options?: string[]
-    className?: FormItemInputProps
+    options?: { value: string, label: string }[]
     style?: CSSProperties,
 }
 
@@ -49,10 +48,9 @@ export const UpdatableInput: React.FC<IUpdatableInput> = (props) => {
                 placeholder="Enter name of the campaign..."
                 defaultValue={props.defaultValue}
                 disabled={!props.editmode && !isEditItem}
-            />) || (props.type === "select" &&
-                <Select className="rounded-md" defaultValue={props.defaultValue} >
-                    {props.options && props.options.map((item) => (<Select.Option>{item}</Select.Option>))}
-                </Select>)
+            />) || (props.type === "select" && props.options &&
+                <Select className="rounded-md" defaultValue={props.defaultValue} options={props.options} />)
+
     return (
         <Form.Item label={label} name={props.name} labelCol={{ style: { width: "100%" } }}>
             {props.editmode || isEditItem ? InputComponent :

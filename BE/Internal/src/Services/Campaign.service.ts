@@ -104,7 +104,7 @@ export class CampaignService {
             // validate actions
             if (!["add", "remove", "replace"].includes(data.targetlists.action)) {
                 throw new ValidationError(
-                    "Invalid params targetlist.action. Allow action in ['add', 'remove', 'replace'"
+                    "Invalid params targetlist.action. Allow action in ['add', 'remove', 'replace']"
                 );
             }
             const allTargetListIds = await this.targetlistRepository.getIds();

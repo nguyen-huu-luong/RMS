@@ -6,6 +6,7 @@ from flask import Flask, url_for, request, jsonify
 from flask_cors import CORS
 import pandas as pd
 from csmodel import *
+from datetime import *
 import json
 
 ENV_FILE = find_dotenv()
@@ -24,10 +25,21 @@ def getAge(birthday):
 def getAverageItem(profit, total_items):
   return profit/total_items
 
+def getDaySinceLastPurchase(last_purchase):
+    print(last_purchase)
+    today = date.today()
+    last_purchase_day = last_purchase.split('T')[0]
+    last_purchase_day_obj = datetime.strptime(last_purchase_day, "%Y-%m-%d").date()
+    days = today - last_purchase_day_obj
+    return days.days
+    
+    
+
 def preProcessData(data):
     customers_dataframe= pd.DataFrame(data)
     customers_dataframe["Age"] = customers_dataframe.apply(lambda x: getAge(x["birthday"]),axis=1)
     customers_dataframe["Average Purchase Price"] = customers_dataframe.apply(lambda x: getAverageItem(x["profit"], x["total_items"]),axis=1)
+    customers_dataframe["Days Since Last Purchase"] = customers_dataframe.apply(lambda x: getDaySinceLastPurchase(x["lastPurchase"]),axis=1)
     customers_dataframe.rename(columns={'profit': 'Total Spend'}, inplace=True)
     
     return customers_dataframe
@@ -45,7 +57,7 @@ def segmentCustomer():
     try:
         request_data = request.get_json()
         customers_dataframe = preProcessData(request_data)
-        exacted_customers_dataframe = customers_dataframe[["Age", "Total Spend", "Average Purchase Price"]]
+        exacted_customers_dataframe = customers_dataframe[["Age", "Total Spend", "Average Purchase Price", "Days Since Last Purchase"]]
         groups = model.segmentCustomer(exacted_customers_dataframe)
         groups_result = posProcessData(customers_dataframe, groups)
         

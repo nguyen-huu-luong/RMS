@@ -1,6 +1,6 @@
 import { UploadImageModal } from "@/components/Modals/UploadImageModal";
 import useEmailDataStore from "@/store/email";
-import { Button, ColorPicker, ColorPickerProps, Flex, Input, Space } from "antd";
+import { Button, ColorPicker, ColorPickerProps, Flex, Image, Input, Space } from "antd";
 import { Color } from "antd/es/color-picker";
 import TextArea from "antd/es/input/TextArea";
 import { ChangeEventHandler, useEffect, useState } from "react";
@@ -16,6 +16,12 @@ const Setting = () => {
     const [formData, setFormData] = useState({
         src: attributes.src,
     });
+
+    useEffect(() => {
+        setFormData({
+            src: activeNode.section.attributes.src
+        })
+    }, [activeNode])
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -46,14 +52,24 @@ const Setting = () => {
 
     return <Space direction="vertical" className="w-full">
         <div>
-            <div
+            <div className="w-24 h-24">
+                <Image
+                    className="cursor-pointer"
+                    src={formData.src}
+                    height={"100%"}
+                    width={"100%"}
+                    // width={100}
+                    // height={100}
+                />
+            </div>
+            {/* <div
                 style={{
                     width: 100,
                     height: 100,
                     backgroundImage: `url("${formData.src}")`,
                     backgroundSize: "cover"
                 }}
-            ></div>
+            ></div> */}
             <UploadImageModal upload={(url:string) => handleChooseImage(url)}/>
         </div>
 

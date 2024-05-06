@@ -1,16 +1,13 @@
-import { Button, Form, Input, Modal, Space } from "antd"
+import { Button, Form, Input, Modal, Space, message } from "antd"
 import { useState } from "react";
 import { CustomModal } from "./MyCustomModal";
 import TextArea from "antd/es/input/TextArea";
 import Table, { ColumnsType } from "antd/es/table";
 import Link from "next/link";
 import TableRender from "../TableComponents";
+import { CreateTargetListModal } from "./CreateTargetListModal";
+import fetchClient from "@/lib/fetch-client";
 
-interface IAddTargetlistToCampaignModal {
-    excludeIds?: number[]
-    onOk?: (values: any) => void,
-    onCreate?: () => void,
-}
 
 interface DataType {
     key?: React.Key;
@@ -21,8 +18,15 @@ interface DataType {
     count: number;
 }
 
+interface IAddTargetlistToCampaignModal {
+    excludeIds?: number[]
+    onOk?: (values: DataType[]) => void,
+    onCreate?: () => void,
+    triggerText?: string
+}
 export const AddTargetlistToCampaignModal: React.FC<IAddTargetlistToCampaignModal> = (props) => {
     const [open, setOpen] = useState(false);
+    const [data, setData] = useState<DataType[]>([])
     const [selectedRows, setSelectedRows] = useState<DataType[]>([]);
 
     const showModal = () => {
@@ -72,8 +76,26 @@ export const AddTargetlistToCampaignModal: React.FC<IAddTargetlistToCampaignModa
         render: () => <p>Selected {selectedRows.length} targetList</p>
     }
 
+    const handleCreateTargetlist = async (values: any) => {
+        try {
+            const result = await fetchClient({
+                method: "POST",
+                url: "/targetlists",
+                body: {
+                    ...values
+                }
+            })
+            // setReload(!reload)
+        //    const  newData = [...data, result.data]
+           setData(prev => ([...prev, result.data]))
+        } catch (error) {
+            message.error("Đã xảy ra lỗi")
+            throw error
+        }
+    }
+
     return <>
-        <Button onClick={showModal}>Select</Button>
+        <Button onClick={showModal}>{props.triggerText || "New"}</Button>
         <CustomModal
             title="Add targetlist to campaign"
             open={open}
@@ -83,21 +105,17 @@ export const AddTargetlistToCampaignModal: React.FC<IAddTargetlistToCampaignModa
             onOk={handleOk}
             width={1200}
         >
-           {open && <TableRender<DataType>
+            {open && <TableRender<DataType>
+                data={data}
+                setData={setData}
                 columns={columns}
                 url="/targetlists"
                 onSelected={onSelectedRows}
                 excludeDataHasIds={props.excludeIds}
-                formCreateElement={
-                    <>
-                        <Form.Item label="Name" name="name" required rules={[{ required: true, message: 'Please input the group name !' }]}>
-                            <Input placeholder='Group name' />
-                        </Form.Item>
-                        <Form.Item label="Description" name="description" required rules={[{ required: true, message: 'Please input the group description !' }]}>
-                            <TextArea placeholder='Group description' />
-                        </Form.Item>
-                    </>
-                }
+                createModal={<CreateTargetListModal
+                    onOk={handleCreateTargetlist}
+                />}
+                createModalTitle="Create new targetlist"
             />}
         </CustomModal>
     </ >

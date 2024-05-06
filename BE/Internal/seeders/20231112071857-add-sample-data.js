@@ -151,6 +151,7 @@ module.exports = {
                 groupId: group[Math.floor(Math.random() * group.length)],
                 type: "customer",
                 convertDate: randomDate(new Date(2012, 0, 1), new Date()),
+                segmentDate: randomDate(new Date(2012, 0, 1), new Date()),
                 hashedPassword: clientPassword,
                 isRegistered: true,
                 isActive: true,
@@ -210,6 +211,7 @@ module.exports = {
                     twoYearsAgo,
                     currentDate
                 );
+                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
                 let date = new Date(client.convertDate);
                 date.setMonth(
                     date.getMonth() - Math.floor(Math.random() * 5) + 1
@@ -238,6 +240,7 @@ module.exports = {
                 score: 0,
                 groupId: group[Math.floor(Math.random() * group.length)],
                 convertDate: null,
+                segmentDate: randomDate(new Date(2012, 0, 1), new Date()),
                 address: faker.address.streetAddress(true),
                 source: sources[Math.floor(Math.random() * sources.length)],
                 type: "lead",
@@ -254,6 +257,7 @@ module.exports = {
                     twoYearsAgo,
                     currentDate
                 );
+                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
                 let date = new Date(client.convertDate);
                 date.setMonth(
                     date.getMonth() - Math.floor(Math.random() * 5) + 1

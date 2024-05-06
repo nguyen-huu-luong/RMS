@@ -131,6 +131,7 @@ const UpdateCategory = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data
                             <Form.Item name="upload">
                                 <Upload
                                     {...props}
+                                    accept="image/*"
                                     listType="picture"
                                     maxCount={1}
                                     onRemove={handleRemove}

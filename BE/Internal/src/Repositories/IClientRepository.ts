@@ -14,8 +14,9 @@ export interface IClientRepository extends IBaseRepository<Client> {
     getYearlyConversion(): Promise<any>;
     getConversionsByDate(beginDate?: Date, endDate?: Date): Promise<any>;
     getConversionChart(beginDate?: Date, endDate?: Date): Promise<any>;
-    checkExist(phone: string, email:string): Promise<any> ;
+    checkExist(email:string): Promise<any> ;
     findByCond(cond: any): Promise<any> ;
     updateBaseCond(value: any, cond: any): Promise<any> ;
+    deleteManyClients(ids: number[]): Promise<any>
 }
 

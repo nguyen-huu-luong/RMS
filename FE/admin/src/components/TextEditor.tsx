@@ -6,9 +6,12 @@ const ReactQuill = typeof window === 'object' ?
 : () => false
 import 'node_modules/react-quill/dist/quill.snow.css'
 
+interface ITextEditorProps {
+    content?: string
+}
 
-const TextEditor = () => {
-    const [content, setContent] = useState("")
+const TextEditor: React.FC<ITextEditorProps> = (props) => {
+    const [content, setContent] = useState(props.content || "")
     const quillRef = useRef<typeof ReactQuill>(null);
     
     const Quill = ReactQuill.Quill;

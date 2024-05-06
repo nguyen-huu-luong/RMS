@@ -408,10 +408,9 @@ export class ClientRepository
         }
     }
 
-    public async checkExist(phone: string, email: string) {
+    public async checkExist(email: string) {
 		return await this._model.findAll({
 			where: {
-				phone: phone,
 				email: email
 			}
 		})
@@ -421,8 +420,16 @@ export class ClientRepository
 		return await this._model.findAll(cond)
 	}
 
-	public async updateBaseCond(value: any, cond:any){
-		return await this._model.update(value, cond)
-	}
-    
+    public async updateBaseCond(value: any, cond: any) {
+        return await this._model.update(value, cond);
+    }
+
+    public async deleteManyClients(ids: number[]) {
+        const result = await this._model.destroy({where: {
+            id: ids
+        }})
+
+        console.log(result)
+        return result
+    }
 }

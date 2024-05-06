@@ -19,7 +19,9 @@ ueryOptions: QueryOptions = {
 
 */
 
-function parseRequesQueries(query: any): QueryOptions {
+function parseRequesQueries(
+    query: any,
+): QueryOptions {
     const queryOptions: QueryOptions = {
         filter: {},
         sort: { by: "", order: "asc" },
@@ -40,48 +42,45 @@ function parseRequesQueries(query: any): QueryOptions {
     // if (type) {
     //     queryOptions.type = type;
     // }
+    const allowConds = [
+        "gt",
+        "lt",
+        "gte",
+        "lte",
+        "neq",
+        "like",
+        "notLike",
+        "startsWith",
+        "endsWith",
+        "contains",
+        "in",
+    ];
 
     console.log(filterOptions);
     for (const key in filterOptions) {
         console.log(key);
         if (filterOptions[key]) {
-            if (typeof key === "string") {
-                const filterConditions = key.split("_");
-                const allowConds = [
-                    "gt",
-                    "lt",
-                    "gte",
-                    "lte",
-                    "neq",
-                    "like",
-                    "notLike",
-                    "startsWith",
-                    "endsWith",
-                    "contains",
-                    "in",
-                ];
-                // filterConditions format: [<field name>, <query cond>]
-                if (filterConditions.length === 2 ) {
-                    console.log(filterConditions,filterOptions[key])
-                    // Xử lý khi có thêm điều kiện query (format <field>_<query cond>= <value>)
-                    if (allowConds.includes(filterConditions[1])) { 
-                        if (!queryOptions.filter[filterConditions[0]]) {
-                            queryOptions.filter[filterConditions[0]] = {}
-                        }
-                        if (filterConditions[1] === "in") {
-                            queryOptions.filter[filterConditions[0]][filterConditions[1]] = filterOptions[key].split(";")
-                        } else {
-                            queryOptions.filter[filterConditions[0]][filterConditions[1]] = filterOptions[key]
-                        }
+            const filterConditions = key.split("_");
+            // filterConditions format: [<field name>, <query cond>]
+            if (filterConditions.length === 2) {
+                console.log(filterConditions, filterOptions[key]);
+                // Xử lý khi có thêm điều kiện query (format <field>_<query cond>= <value>)
+                if (allowConds.includes(filterConditions[1])) {
+                    if (!queryOptions.filter[filterConditions[0]]) {
+                        queryOptions.filter[filterConditions[0]] = {};
                     }
-                } else {
-                    // Xử lý khi không có thêm điều kiện (tương ứng với filter <key>=<value>)
-                    queryOptions.filter[key] = filterOptions[key];
+                    if (filterConditions[1] === "in") {
+                        queryOptions.filter[filterConditions[0]][filterConditions[1]] =
+                            filterOptions[key].split(";");
+                    } else {
+                        queryOptions.filter[filterConditions[0]][filterConditions[1]] =
+                            filterOptions[key];
+                    }
                 }
-
             } else {
-              queryOptions.filter = {...queryOptions.filter, ...filterOptions.filter}   
-            }   
+                // Xử lý khi không có thêm điều kiện (tương ứng với filter <key>=<value>)
+                queryOptions.filter[key] = filterOptions[key];
+            }
         }
     }
 

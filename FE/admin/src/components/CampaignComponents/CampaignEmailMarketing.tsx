@@ -100,6 +100,6 @@ export const CampaignMarketing: React.FC<ICampaignEmailMarketing> = ({ emails = 
                 </div>
 
             </div>
-            <Table dataSource={dataSource} columns={columns} size="small" pagination={false} />
+            {dataSource.length > 0  && <Table dataSource={dataSource} columns={columns} size="small" pagination={false} />}
         </div>)
 }

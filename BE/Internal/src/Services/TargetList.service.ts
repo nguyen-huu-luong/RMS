@@ -2,7 +2,6 @@ import { container } from "../Configs";
 import { QueryOptions, TYPES } from "../Types/type";
 import { IMessageTemplateRepository } from "../Repositories";
 import { ITargetListRepository } from "../Repositories/ITargetListRepository";
-import { TargetListData } from "./Campaign.service";
 import { InternalServerError, ValidationError } from "../Errors";
 
 
@@ -12,7 +11,8 @@ export type TargelistData = {
     clients: {
         action: string,
         ids: number[]
-    }
+    },
+    clientIds?: number[] 
 }
 export class TargetListService {
     constructor(
@@ -32,9 +32,10 @@ export class TargetListService {
         
     }
 
-    public async create(data: TargetListData) {
-        const result = this.targetListRepository.create(data);
-        return result;
+    public async create(data: TargelistData) {
+        const result = await this.targetListRepository.create(data);
+
+        return result ;
     }
 
     public async update(id: number, data: TargelistData) {

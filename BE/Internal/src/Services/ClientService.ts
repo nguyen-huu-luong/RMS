@@ -64,9 +64,9 @@ export class ClientService {
         }
 
         if (!type) {
-            data.type = "Lead"
+            data.type = "lead"
         } else if (type === "customer") {
-            data.type = "Customer"
+            data.type = "customer"
         }
         return await this.clientRepository.create(data)
     }
@@ -80,20 +80,12 @@ export class ClientService {
     }
 
     public async delete(id: number) {
-        const user = this.clientRepository.findById(id);
-        if (!user) {
-            throw new RecordNotFoundError()
-        }
         return await this.clientRepository.delete(id);
-    }
+    } 
 
-    public async search(key: string, by: string) {
-        return []
-    }
-
-    public async sort(by: string) {
-        return []
-    }
+    public async deleteMany(ids: number[]) {
+        return await this.clientRepository.deleteManyClients(ids)
+    } 
 
     public getOpportunityCustomer = async (sort_factor: any, order: any) => {
         let carts: any
@@ -184,8 +176,7 @@ export class ClientService {
                 group_info.map(async (item: any) => {
                     await this.clientRepository.updateBaseCond({
                         groupId: item.groupId + 1,
-                        type: "customer",
-                        convertDate: new Date()
+                        segmentDate: new Date()
                     }, {
                         where: {
                             id: item.id,
@@ -201,6 +192,13 @@ export class ClientService {
                                     }
                                 },
                             ]
+                        }
+                    })
+                    await this.clientRepository.updateBaseCond({
+                        lastPurchase: new Date()
+                    }, {
+                        where: {
+                            id: item.id
                         }
                     })
                 }
@@ -227,14 +225,14 @@ export class ClientService {
     public segmentCustomerAll = async () => {
         try {
             const customers = await this.clientRepository.findByCond({
-                attributes: ['id', 'birthday', 'profit', 'total_items'],
+                attributes: ['id', 'birthday', 'profit', 'total_items', 'lastPurchase'],
                 where: {
                     type: "customer"
                 }
             })
 
             if (customers.length > 0) {
-                await this.segmentProcess(customers)
+                await this.segmentProcess(customers, true)
             }
 
             return { "status": "success" }
@@ -247,8 +245,8 @@ export class ClientService {
 
     public segmentCustomer = async (id_: number) => {
         try {
-            const customer = await this.clientRepository.findByCond({
-                attributes: ['id', 'birthday', 'profit', 'total_items'],
+            let customer = await this.clientRepository.findByCond({
+                attributes: ['id', 'birthday', 'profit', 'total_items', 'lastPurchase'],
                 where: {
                     id: id_,
                 }
@@ -307,7 +305,7 @@ export class ClientService {
                 let start_date = data.start_date
                 let end_date = data.end_date
 
-                const [group_temp, metadata_group_temp] = await sequelizeObj.query(`SELECT "convertDate",
+                const [group_temp, metadata_group_temp] = await sequelizeObj.query(`SELECT "segmentDate",
                                                                                             SUM(CASE WHEN "groupId" = 1 THEN 1 ELSE 0 END) AS "Group 0",
                                                                                             SUM(CASE WHEN "groupId" = 2 THEN 1 ELSE 0 END) AS "Group 1",
                                                                                             SUM(CASE WHEN "groupId" = 3 THEN 1 ELSE 0 END) AS "Group 2",
@@ -315,15 +313,15 @@ export class ClientService {
                                                                                             SUM(CASE WHEN "groupId" = 5 THEN 1 ELSE 0 END) AS "Group 4",
                                                                                             SUM(CASE WHEN "groupId" = 6 THEN 1 ELSE 0 END) AS "Group 5"
                                                                                         FROM "Clients" JOIN "Groups" as groups ON "groupId" = groups.id
-                                                                                        WHERE "convertDate" >= '${start_date}' AND "convertDate" <= '${end_date}'
-                                                                                        GROUP BY "convertDate"
-                                                                                        ORDER BY "convertDate" ASC`);
+                                                                                        WHERE "segmentDate" >= '${start_date}' AND "segmentDate" <= '${end_date}'
+                                                                                        GROUP BY "segmentDate"
+                                                                                        ORDER BY "segmentDate" ASC`);
 
                 groups = group_temp
             }
             else if (type == "Year") {
                 const sequelizeObj = sequelize.getSequelize()
-                const [year_base, metadata_year_base] = await sequelizeObj.query(`SELECT date_trunc('year', "convertDate") AS year, 
+                const [year_base, metadata_year_base] = await sequelizeObj.query(`SELECT date_trunc('year', "segmentDate") AS year, 
                                                                             SUM(CASE WHEN "groupId" = 1 THEN 1 ELSE 0 END) AS "Group 0",
                                                                             SUM(CASE WHEN "groupId" = 2 THEN 1 ELSE 0 END) AS "Group 1",
                                                                             SUM(CASE WHEN "groupId" = 3 THEN 1 ELSE 0 END) AS "Group 2",
@@ -338,7 +336,7 @@ export class ClientService {
             }
             else if (type == "Month") {
                 const sequelizeObj = sequelize.getSequelize()
-                const [month_base, metadata_month_base] = await sequelizeObj.query(`SELECT date_trunc('month', "convertDate") AS month, date_trunc('year', "convertDate") AS year,
+                const [month_base, metadata_month_base] = await sequelizeObj.query(`SELECT date_trunc('month', "segmentDate") AS month, date_trunc('year', "segmentDate") AS year,
                                                                             SUM(CASE WHEN "groupId" = 1 THEN 1 ELSE 0 END) AS "Group 0",
                                                                             SUM(CASE WHEN "groupId" = 2 THEN 1 ELSE 0 END) AS "Group 1",
                                                                             SUM(CASE WHEN "groupId" = 3 THEN 1 ELSE 0 END) AS "Group 2",
@@ -380,7 +378,7 @@ export class ClientService {
                                                                     ORDER BY groups.name ASC
                                                                 `);
 
-                const [avg_convert_time, metadata_avg_convert_time] = await sequelizeObj.query(`SELECT groups.name, avg(DATE_PART('day', "Clients"."createdAt"::timestamp - "convertDate"::timestamp)) as avg_convert_date
+                const [avg_convert_time, metadata_avg_convert_time] = await sequelizeObj.query(`SELECT groups.name, avg(DATE_PART('day', "Clients"."createdAt"::timestamp - "segmentDate"::timestamp)) as avg_convert_date
                                                                     FROM "Clients" JOIN "Groups" as groups ON "groupId" = groups.id
                                                                     GROUP BY groups.name, groups.id
                                                                     ORDER BY groups.name ASC
@@ -403,7 +401,7 @@ export class ClientService {
                 }
                 groups = temp_groups
             }
-
+            
             return groups
         }
         catch (err) {
