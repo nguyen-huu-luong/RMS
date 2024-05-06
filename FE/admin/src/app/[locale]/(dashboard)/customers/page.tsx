@@ -64,7 +64,7 @@ const CustomerListPages: React.FC = () => {
 			title: "Fullname",
 			dataIndex: "fullname",
 			key: "fullname",
-			render: (text, row) => <Link style={{ color: "#4A58EC" }} href={`/${row.id}`}>{text}</Link>,
+			render: (text, row) => <Link style={{ color: "#4A58EC" }} href={`./customers/${row.id}`}>{text}</Link>,
 			// ...getColumnSearchProps("fullname"),
 		},
 		{
