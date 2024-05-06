@@ -56,7 +56,6 @@ export class ReservationService {
                     let index = item.dateTo
                     dicReservations[index] = ress
                 }
-
                 let table_reservations_info: Dictionary<string> = {}
 
                 await Promise.all(

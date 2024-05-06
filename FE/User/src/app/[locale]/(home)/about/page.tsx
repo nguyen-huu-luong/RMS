@@ -45,7 +45,7 @@ export default function About() {
                 <div className='w-full flex flex-col justify-start p-2'>
                     <div className='flex flex-row justify-between items-center'>
                         <span className='font-extrabold text-3xl text-black font-serif'>
-                            How we built the brand from zero?
+                            How did we build the brand?
                         </span>
                     </div>
                     <div className='font-normal text-xl font-serif break-all text-justify'>
