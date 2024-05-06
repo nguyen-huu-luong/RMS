@@ -11,23 +11,34 @@ module.exports = {
             currentDate.getDate()
         );
 
+        let clientConvertDate = [];
         let clientAmounts = [];
         let clientItems = [];
         for (let i = 1; i <= 1000; i++) {
             clientAmounts.push(0);
             clientItems.push(0);
+            clientConvertDate.push("");
         }
 
         for (let i = 1; i <= 2000; i++) {
+            let clientId = faker.datatype.number({ min: 1, max: 1000 });
+            let createdAt = faker.date.between(twoYearsAgo, currentDate);
             orders.push({
-                clientId: faker.datatype.number({ min: 1, max: 1000 }),
+                clientId: clientId,
                 num_items: faker.datatype.number({ min: 1, max: 12 }),
                 amount: 0,
                 status: "Done",
                 paymentMethod: "CASH",
-                createdAt: faker.date.between(twoYearsAgo, currentDate),
+                createdAt: createdAt,
                 updatedAt: new Date(),
             });
+            if (
+                clientConvertDate[clientId - 1] != "" &&
+                clientConvertDate[clientId - 1] > createdAt
+            ) {
+                clientConvertDate[clientId - 1] = createdAt;
+            } else if (clientConvertDate[clientId - 1] == "")
+                clientConvertDate[clientId - 1] = createdAt;
         }
 
         let orderItems = [];
@@ -69,27 +80,32 @@ module.exports = {
         let temp = 0;
         for (let order of orders) {
             clientAmounts[order.clientId - 1] += order.amount;
-            // clientItems[order.clientId - 1] += order.num_items;
         }
 
         const promises = clientAmounts.map((profit, index) => {
-            return queryInterface.sequelize.query(
-                `
-              UPDATE public."Clients"
-              SET profit = :profit,
-                  total_items = :num_items,
-                  average = :average
-              WHERE id = :id
-          `,
-                {
-                    replacements: {
-                        profit: profit,
-                        num_items: clientItems[index],
-                        average: profit == 0 ? 0 : profit / clientItems[index],
-                        id: index + 1,
-                    },
-                }
-            );
+            if (profit !== 0) {
+                return queryInterface.sequelize.query(
+                    `
+                    UPDATE public."Clients"
+                    SET profit = :profit,
+                        "convertDate" = :convertDate,
+                        total_items = :num_items,
+                        average = :average
+                    WHERE id = :id
+                    `,
+                    {
+                        replacements: {
+                            profit: profit,
+                            convertDate: clientConvertDate[index],
+                            num_items: clientItems[index],
+                            average: profit / clientItems[index],
+                            id: index + 1,
+                        },
+                    }
+                );
+            } else {
+                return Promise.resolve();
+            }
         });
         await queryInterface.bulkInsert("Orders", orders, {});
         await queryInterface.bulkInsert("OrderItems", orderItems, {});
@@ -97,7 +113,8 @@ module.exports = {
         await queryInterface.sequelize.query(
             `
             UPDATE public."Clients"
-                SET type = 'lead'
+                SET type = 'lead',
+                    "convertDate" = NULL
             WHERE profit = 0
             `
         );

@@ -166,6 +166,7 @@ module.exports = {
                     twoYearsAgo,
                     currentDate
                 );
+                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
                 let date = new Date(client.convertDate);
                 date.setMonth(
                     date.getMonth() - Math.floor(Math.random() * 5) + 1
@@ -220,6 +221,7 @@ module.exports = {
                 client.updatedAt = date;
             } else {
                 client.createdAt = faker.date.between(twoYearsAgo, currentDate);
+                client.updatedAt = client.createdAt;
             }
             clients.push(client);
         }
@@ -265,6 +267,7 @@ module.exports = {
                 client.createdAt = date;
             } else {
                 client.createdAt = faker.date.between(twoYearsAgo, currentDate);
+                client.updatedAt = client.createdAt;
             }
             clients.push(client);
         }
