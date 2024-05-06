@@ -166,7 +166,10 @@ module.exports = {
                     twoYearsAgo,
                     currentDate
                 );
-                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
+                client.segmentDate = faker.date.between(
+                    twoYearsAgo,
+                    currentDate
+                );
                 let date = new Date(client.convertDate);
                 date.setMonth(
                     date.getMonth() - Math.floor(Math.random() * 5) + 1
@@ -212,7 +215,10 @@ module.exports = {
                     twoYearsAgo,
                     currentDate
                 );
-                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
+                client.segmentDate = faker.date.between(
+                    twoYearsAgo,
+                    currentDate
+                );
                 let date = new Date(client.convertDate);
                 date.setMonth(
                     date.getMonth() - Math.floor(Math.random() * 5) + 1
@@ -259,7 +265,10 @@ module.exports = {
                     twoYearsAgo,
                     currentDate
                 );
-                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
+                client.segmentDate = faker.date.between(
+                    twoYearsAgo,
+                    currentDate
+                );
                 let date = new Date(client.convertDate);
                 date.setMonth(
                     date.getMonth() - Math.floor(Math.random() * 5) + 1
@@ -272,53 +281,173 @@ module.exports = {
             clients.push(client);
         }
 
-        const admins = [
-            {
-                username: "manager",
+        const firstnames = [
+            "Nguyễn",
+            "Trần",
+            "Lê",
+            "Phạm",
+            "Hoàng",
+            "Huỳnh",
+            "Khương",
+            "Vũ",
+            "Võ",
+            "Phan",
+            "Trương",
+            "Bùi",
+            "Đặng",
+            "Đỗ",
+            "Ngô",
+            "Hồ",
+            "Dương",
+            "Đinh",
+        ];
+        const lastnames = [
+            "Huy",
+            "Khang",
+            "Bảo",
+            "Minh",
+            "Phúc",
+            "Anh",
+            "Khoa",
+            "Phát",
+            "Đạt",
+            "Khôi",
+            "Long",
+            "Nam",
+            "Linh",
+            "Duy",
+            "Quân",
+            "Kiệt",
+            "Thịnh",
+            "Tuấn",
+            "Hưng",
+            "Hoàng",
+            "Hiếu",
+            "Nhân",
+            "Trí",
+            "Tài",
+            "Phong",
+            "Nguyên",
+        ];
+        let managers = [];
+        let staffs = [];
+        let chefs = [];
+
+        managers.push({
+            username: "manager",
+            email: faker.internet.email(),
+            phone: faker.phone.phoneNumber(),
+            firstname: "Manager",
+            lastname: "Manager",
+            role: "manager",
+            gender: faker.datatype.boolean(),
+            birthday: faker.date.past(),
+            avatar: avatar[0],
+            hashedPassword: await bcrypt.hash("manager", 10),
+            isActive: true,
+            language: "vi",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+        staffs.push({
+            username: "staff",
+            email: faker.internet.email(),
+            phone: faker.phone.phoneNumber(),
+            firstname: "Staff",
+            lastname: "Staff",
+            role: "employee",
+            gender: faker.datatype.boolean(),
+            birthday: faker.date.past(),
+            avatar: avatar[1],
+            hashedPassword: await bcrypt.hash("staff", 10),
+            isActive: true,
+            language: "vi",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+        chefs.push({
+            username: "chef",
+            email: faker.internet.email(),
+            phone: faker.phone.phoneNumber(),
+            firstname: "Chef",
+            lastname: "Chef",
+            role: "chef",
+            gender: faker.datatype.boolean(),
+            birthday: faker.date.past(),
+            avatar: avatar[2],
+            hashedPassword: await bcrypt.hash("chef", 10),
+            isActive: true,
+            language: "vi",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        for (let i = 0; i < 5; i++) {
+            managers.push({
+                username: `manager${i}`,
                 email: faker.internet.email(),
                 phone: faker.phone.phoneNumber(),
-                firstname: "Manager",
-                lastname: "Manager",
+                firstname:
+                    firstnames[Math.floor(Math.random() * firstnames.length)],
+                lastname:
+                    lastnames[Math.floor(Math.random() * lastnames.length)],
                 role: "manager",
                 gender: faker.datatype.boolean(),
                 birthday: faker.date.past(),
+                avatar: avatar[Math.floor(Math.random() * avatar.length)],
                 hashedPassword: await bcrypt.hash("manager", 10),
                 isActive: true,
                 language: "vi",
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            },
-            {
-                username: "staff",
+            });
+        }
+
+        for (let i = 0; i < 20; i++) {
+            staffs.push({
+                username: `staff${i}`,
                 email: faker.internet.email(),
                 phone: faker.phone.phoneNumber(),
-                firstname: "Staff",
-                lastname: "Staff",
+                firstname:
+                    firstnames[Math.floor(Math.random() * firstnames.length)],
+                lastname:
+                    lastnames[Math.floor(Math.random() * lastnames.length)],
                 role: "employee",
                 gender: faker.datatype.boolean(),
                 birthday: faker.date.past(),
+                avatar: avatar[Math.floor(Math.random() * avatar.length)],
                 hashedPassword: await bcrypt.hash("staff", 10),
                 isActive: true,
                 language: "vi",
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            },
-            {
-                username: "chef",
+            });
+        }
+
+        for (let i = 0; i < 5; i++) {
+            chefs.push({
+                username: `chef${i}`,
                 email: faker.internet.email(),
                 phone: faker.phone.phoneNumber(),
-                firstname: "Chef",
-                lastname: "Chef",
+                firstname:
+                    firstnames[Math.floor(Math.random() * firstnames.length)],
+                lastname:
+                    lastnames[Math.floor(Math.random() * lastnames.length)],
                 role: "chef",
                 gender: faker.datatype.boolean(),
                 birthday: faker.date.past(),
+                avatar: avatar[Math.floor(Math.random() * avatar.length)],
                 hashedPassword: await bcrypt.hash("chef", 10),
                 isActive: true,
                 language: "vi",
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            },
-        ];
+            });
+        }
+
+        let admins = [];
+        admins = admins.concat(managers, staffs, chefs);
+
         await queryInterface.bulkInsert("Clients", clients);
         await queryInterface.bulkInsert("Employees", admins);
     },

@@ -4,44 +4,8 @@ const { time } = require("console");
 
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        let tables = await queryInterface.sequelize.query(
-            `SELECT id from public."Tables" WHERE id <> :id`,
-            {
-                replacements: {
-                    id: 1,
-                },
-            }
-        )
-        tables = tables[0]
-        let carts = [
-
-        ]
-        for (let i = 0; i < tables.length; i++) {
-            carts.push({
-                tableId: tables[i].id,
-                total: 0,
-                amount: 0,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            })
-        }
-        let channels = [];
-        for (let i = 1; i <= 10; i++) {
-            let cart = {
-                clientId: i,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            };
-            channels.push(cart);
-        }
-        await queryInterface.bulkInsert("Carts", carts);
-        await queryInterface.bulkInsert("Channels", channels);
-
-        let cart_order = await queryInterface.sequelize.query(
-            `SELECT id, "tableId" from public."Carts" WHERE "tableId" IS NOT NULL LIMIT 4`
-        )
-        cart_order = cart_order[0]
-
+        let clients = await queryInterface.sequelize.query(
+            `SELECT id FROM public."Clients" LIMIT 100 `);
         let products = await queryInterface.sequelize.query(
             `
               SELECT id, price
@@ -50,8 +14,25 @@ module.exports = {
         );
 
         products = products[0]
+        let carts = []
 
-        for (let i = 0; i < cart_order.length; i++) {
+        clients[0].map((client) => {
+            carts.push({
+                clientId: client.id,
+                total: 0,
+                amount: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            })
+        })
+
+        await queryInterface.bulkInsert("Carts", carts);
+
+        carts = await queryInterface.sequelize.query(
+            `SELECT id FROM public."Carts" WHERE "clientId" IS NOT NULL`);
+        carts = carts[0]
+
+        for (let i = 0; i < carts.length; i++) {
             let product_1 = products[Math.floor(Math.random() * (products.length))]
             let product_2 = products[Math.floor(Math.random() * (products.length))]
 
@@ -65,7 +46,7 @@ module.exports = {
                 product_3 = products[Math.floor(Math.random() * (products.length))]
             }
             let cart_product = [{
-                cartId:  cart_order[i].id,
+                cartId: carts[i].id,
                 productId: product_1.id,
                 amount: product_1.price,
                 quantity: 1,
@@ -74,7 +55,7 @@ module.exports = {
                 updatedAt: new Date()
             },
             {
-                cartId:  cart_order[i].id,
+                cartId: carts[i].id,
                 productId: product_2.id,
                 amount: product_2.price,
                 quantity: 1,
@@ -83,7 +64,7 @@ module.exports = {
                 updatedAt: new Date()
             },
             {
-                cartId:  cart_order[i].id,
+                cartId: carts[i].id,
                 productId: product_3.id,
                 amount: product_3.price,
                 quantity: 1,
@@ -103,29 +84,16 @@ module.exports = {
                 {
                     replacements: {
                         amount: amount,
-                        id:  cart_order[i].id,
-                    },
-                }
-            );
-
-            await queryInterface.sequelize.query(
-                `
-              UPDATE public."Tables"
-              SET status = 'Occupied'
-              WHERE id = :id
-          `,
-                {
-                    replacements: {
-                        id:  cart_order[i].tableId,
+                        id: carts[i].id,
                     },
                 }
             );
 
         }
-
     },
 
     down: async (queryInterface, Sequelize) => {
         await queryInterface.bulkDelete("Carts", null, {});
+        await queryInterface.bulkDelete("CartItems", null, {});
     },
 };

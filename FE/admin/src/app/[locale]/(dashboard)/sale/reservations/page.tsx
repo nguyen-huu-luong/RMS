@@ -73,27 +73,42 @@ function Home() {
     };
 
     const fetchResInfo = async () => {
-        setIsLoading(true)
-        const data = await fetchClient({ url: `/reservations/all`, data_return: true })
-        setResInfo(data)
-        setIsLoading(false)
+        try{
+            setIsLoading(true)
+            const data = await fetchClient({ url: `/reservations/all`, data_return: true })
+            setResInfo(data)
+            setIsLoading(false)
+        }
+        catch(err) {
+            console.log(err)
+        }
     }
 
     const fetchNotification = async () => {
-        setIsLoading(true)
-        const data = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
-        setNotifications(data)
-        setIsLoading(false)
+        try{
+            setIsLoading(true)
+            const data = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
+            setNotifications(data)
+            setIsLoading(false)
+        }
+        catch(err) {
+            console.log(err)
+        }
     }
 
     const fetchAllData = async () => {
-        setIsLoading(true)
-        const res_info = await fetchClient({ url: `/reservations/all`, data_return: true })
-        const notification = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
-        setResInfo(res_info)
-        console.log(notification)
-        setNotifications(notification)
-        setIsLoading(false)
+        try{
+            setIsLoading(true)
+            const res_info = await fetchClient({ url: `/reservations/all`, data_return: true })
+            const notification = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
+            setResInfo(res_info)
+            console.log(notification)
+            setNotifications(notification)
+            setIsLoading(false)
+        }
+        catch (err) {
+            console.log(err)
+        }
     }
 
     const showDetailTable = (tableId: any) => {
@@ -134,6 +149,7 @@ function Home() {
                 url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
                 data_return: true,
             });
+            console.log(resInfo)
             setResInfo({ ...resInfo, reservarions: data.reservarions })
             setChecker((current_value) => !current_value);
         }
@@ -489,7 +505,9 @@ function Home() {
         fetchNotification()
     }, [])
 
+
     if (isLoading) return <Loading />;
+
     return (
         <>
             {resInfo ? (
@@ -598,6 +616,17 @@ function Home() {
                                                     }}
                                                 >
                                                     Search
+                                                </button>
+                                                <button
+                                                    type="reset"
+                                                    className='p-1 px-1 text-sm rounded border-0 ml-2'
+                                                    style={{
+                                                        color: "white",
+                                                        backgroundColor:
+                                                            "#4A58EC",
+                                                    }}
+                                                >
+                                                    Reset
                                                 </button>
                                             </div>
                                             <div className='flex'>

@@ -79,7 +79,7 @@ Employee.init(
 			allowNull: false,
 		},
 		avatar: {
-			type: DataTypes.BLOB,
+			type: DataTypes.STRING,
 			allowNull: true,
 		},
 		role: {
