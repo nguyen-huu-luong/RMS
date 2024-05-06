@@ -20,7 +20,7 @@ export default function Order() {
     const { data: session, status } = useSession();
     const [amount, setAmount] = useState<number>(0);
     const [voucher, setVoucher] = useState<number>(0);
-    const [fee, setFee] = useState<any>(0);
+    const [fee, setFee] = useState<number>(0);
     const socket = useSocket();
     useEffect(() => {
         if (status === "loading") return;

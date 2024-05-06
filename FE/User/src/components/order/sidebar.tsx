@@ -143,22 +143,26 @@ const SideBar = ({
                 <span className='w-auto whitespace-nowrap'> {t("Total")}</span>
                 <span className='relative w-auto whitespace-nowrap '>
                     <span className='w-full cursor-pointer text-primary'>
-                        {currentCart.cart.amount +
-                            fee -
-                            (voucher
-                                ? voucher.type === "fixed"
-                                    ? voucher.amount > voucher.maximum_reduce
+                        {Math.max(
+                            currentCart.cart.amount +
+                                fee -
+                                (voucher
+                                    ? voucher.type === "fixed"
+                                        ? voucher.amount >
+                                          voucher.maximum_reduce
+                                            ? voucher.maximum_reduce
+                                            : voucher.amount
+                                        : (voucher.amount *
+                                              currentCart.cart.amount) /
+                                              100 >
+                                          voucher.maximum_reduce
                                         ? voucher.maximum_reduce
-                                        : voucher.amount
-                                    : (voucher.amount *
-                                          currentCart.cart.amount) /
-                                          100 >
-                                      voucher.maximum_reduce
-                                    ? voucher.maximum_reduce
-                                    : (voucher.amount *
-                                          currentCart.cart.amount) /
-                                      100
-                                : 0)}
+                                        : (voucher.amount *
+                                              currentCart.cart.amount) /
+                                          100
+                                    : 0),
+                            0
+                        )}
                     </span>
                 </span>
             </div>

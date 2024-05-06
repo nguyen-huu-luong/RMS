@@ -36,7 +36,7 @@ const Notification = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setWaited(true);
-        }, 3000);
+        }, 5000);
         return () => clearTimeout(timer);
     }, []);
     const {
