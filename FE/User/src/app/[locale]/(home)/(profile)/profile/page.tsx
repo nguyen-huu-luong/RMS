@@ -113,7 +113,7 @@ const Profile = () => {
                 User Profile
             </div>
             <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl py-2 px-3 flex flex-col gap-2 items-center'>
-                <div className='relative w-auto h-auto rounded-full overflow-hidden aspect-square'>
+                <div className='relative w-auto h-auto rounded-full overflow-hidden'>
                     <Image
                         src={
                             !profile.avatar
@@ -126,7 +126,7 @@ const Profile = () => {
                         className='aspect-square'
                         unoptimized
                     />
-                    <Upload {...props} maxCount={1} showUploadList={false}>
+                    <Upload {...props} maxCount={1} showUploadList={false} accept="image/*">
                         <button className='absolute top-1/2 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-medium text-white backdrop-blur-sm rounded-md cursor-pointer'>
                             Change
                         </button>
