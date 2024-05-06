@@ -14,10 +14,13 @@ module.exports = {
         let clientConvertDate = [];
         let clientAmounts = [];
         let clientItems = [];
+        let clientLastPurchased = [];
+
         for (let i = 1; i <= 1000; i++) {
             clientAmounts.push(0);
             clientItems.push(0);
             clientConvertDate.push("");
+            clientLastPurchased.push("");
         }
 
         for (let i = 1; i <= 2000; i++) {
@@ -30,15 +33,24 @@ module.exports = {
                 status: "Done",
                 paymentMethod: "CASH",
                 createdAt: createdAt,
-                updatedAt: new Date(),
+                updatedAt: createdAt,
             });
             if (
                 clientConvertDate[clientId - 1] != "" &&
                 clientConvertDate[clientId - 1] > createdAt
             ) {
                 clientConvertDate[clientId - 1] = createdAt;
-            } else if (clientConvertDate[clientId - 1] == "")
+            } else if (clientConvertDate[clientId - 1] == "") {
                 clientConvertDate[clientId - 1] = createdAt;
+            }
+            if (
+                clientLastPurchased[clientId - 1] != "" &&
+                clientLastPurchased[clientId - 1] < createdAt
+            ) {
+                clientLastPurchased[clientId - 1] = createdAt;
+            } else if (clientLastPurchased[clientId - 1] == "") {
+                clientLastPurchased[clientId - 1] = createdAt;
+            }
         }
 
         let orderItems = [];
@@ -84,21 +96,33 @@ module.exports = {
 
         const promises = clientAmounts.map((profit, index) => {
             if (profit !== 0) {
+                const convertDate = new Date(clientConvertDate[index]);
+                const randomDays = Math.floor(Math.random() * 30) + 1;
+                const newCreatedAt = new Date(convertDate.setDate(convertDate.getDate() - randomDays));
+
                 return queryInterface.sequelize.query(
                     `
                     UPDATE public."Clients"
                     SET profit = :profit,
                         "convertDate" = :convertDate,
+                        "lastPurchase" = :lastPurchase,
                         total_items = :num_items,
-                        average = :average
+                        average = :average,
+                        "segmentDate" = :segmentDate,
+                        "createdAt" = :createdAt,
+                        "updatedAt" = :updatedAt
                     WHERE id = :id
                     `,
                     {
                         replacements: {
                             profit: profit,
                             convertDate: clientConvertDate[index],
+                            lastPurchase: clientLastPurchased[index],
                             num_items: clientItems[index],
                             average: profit / clientItems[index],
+                            segmentDate: clientConvertDate[index],
+                            createdAt: newCreatedAt,
+                            updatedAt: newCreatedAt,
                             id: index + 1,
                         },
                     }

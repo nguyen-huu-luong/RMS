@@ -7,11 +7,11 @@ import {
     CrownTwoTone,
     MinusOutlined,
 } from "@ant-design/icons";
+import Avatar from "@/images/avatar.png"
 import { convertUnit } from "@/lib/utils/convertUnit";
 import {useRouter} from "next-intl/client"; 
 const TopCustomerItem = ({ item, index }: { item: any; index: number }) => {
     const router = useRouter();
-
     return (
         <div onClick={() => router.push(`customers/${item.client.id}`)}  className='h-32 cursor-pointer w-full rounded-xl border-slate-200 flex flex-row justify-start gap-2 border-2 hover:bg-slate-100 p-2 transition-all duration-300'>
             <div className='font-bold text-lg w-full h-full flex flex-row justify-between items-center gap-5 p-2 px-4'>
@@ -34,7 +34,7 @@ const TopCustomerItem = ({ item, index }: { item: any; index: number }) => {
                 </span>
                 <span className='rounded-full overflow-hidden w-40 aspect-square'>
                     <Image
-                        src={item.client.avatar}
+                        src={item.client.avatar?item.client.avatar:Avatar}
                         width={300}
                         height={300}
                         className=' aspect-square rounded-full w-full h-full'
