@@ -31,9 +31,11 @@ export class MoMoService {
         var ipnUrl = 'http://localhost:3003/api/order/momo';
         var requestType = "payWithMethod";
         var amount = req.body["discountAmount"];
-        if (amount == 0) {
+        
+        if (req.body["voucherId"] === 0) {
             amount = cart.amount + req.body["shippingCost"]
         }
+
         var orderId = partnerCode + req.userId  + new Date().getTime();
         var requestId = orderId;
         var extraData = Buffer.from(data).toString('base64');
@@ -80,7 +82,7 @@ export class MoMoService {
             }
         }
 
-        if (amount == 0) {
+        if (amount <= 0) {
             res.send({
                 "payUrl": `http://localhost:3001/en/payment?method=MOMO&resultCode=0&extraData=${extraData}`
             })

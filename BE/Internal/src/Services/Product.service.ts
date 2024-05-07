@@ -41,16 +41,26 @@ export class ProductService {
 
     public async getAllFullInformation(req: Request, res: Response, next: NextFunction) {
         try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                throw new ValidationError(errors.array()[0].msg);
+            let sort_factor: any = req.query.sort_factor
+            let order: any = req.query.order
+
+            if (typeof sort_factor == 'undefined') {
+                sort_factor = 'id'
             }
+
+            if (typeof order == 'undefined') {
+                order = 'ascend'
+            }
+            order = order === 'ascend' ? 'ASC' : 'DESC'
             const status: number = HttpStatusCode.Success;
             const data = await this.productRepository.findByCond({
                 include: [{
                     model: Category
                 }
-                ]
+                ],
+                order: [
+                    [sort_factor, order]
+                ],
             });
             res.status(status).send(data);
             Message.logMessage(req, status);
