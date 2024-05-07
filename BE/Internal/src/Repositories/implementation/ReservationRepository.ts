@@ -94,7 +94,8 @@ export class ReservationRepository
 					},
 					dateTo: date_,
 					status: status_
-				}
+				},
+				include: Table
 			})
 			return allRes;
 		}
@@ -106,7 +107,8 @@ export class ReservationRepository
 					[Op.in]: res_ids
 				},
 				dateTo: date_
-			}
+			},
+			include: Table
 		})
 
 		return allRes;

@@ -66,7 +66,7 @@ const ChatIcon = () => {
                 </span>
             </button>
             {!popup && (
-                <div className='z-50 absolute bottom-5 right-5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-extralight text-xs'>
+                <div className='z-50 fixed bottom-5 right-5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-extralight text-xs'>
                     {unread}
                 </div>
             )}

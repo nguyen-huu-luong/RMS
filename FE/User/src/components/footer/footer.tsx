@@ -141,7 +141,7 @@ const Footer = () => {
                             </div>
                             <div className='w-auto h-auto py-2 font-thin'>
                                 <Link
-                                    href={`/account`}
+                                    href={`/profile`}
                                     locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
@@ -159,7 +159,7 @@ const Footer = () => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/order`}
+                                    href={`/myorder`}
                                     locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
@@ -168,7 +168,7 @@ const Footer = () => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/feedback`}
+                                    href={`/`}
                                     locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >

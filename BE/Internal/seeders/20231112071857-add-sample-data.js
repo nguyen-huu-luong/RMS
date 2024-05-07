@@ -1,5 +1,5 @@
 "use strict";
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 const faker = require("faker");
 const avatar = [
     "https://res.cloudinary.com/djdpobmlv/image/upload/v1711532192/Client/photo-1711292471935-33f01af44bca_mwhryd.jpg",
@@ -11,29 +11,94 @@ const avatar = [
     "https://res.cloudinary.com/djdpobmlv/image/upload/v1711532012/Client/photo-1711298205592-535995310152_rhl8ja.jpg",
     "https://res.cloudinary.com/djdpobmlv/image/upload/v1711531983/Client/photo-1711402905522-b90c0bc15afa_wwu4fe.jpg",
     "https://res.cloudinary.com/djdpobmlv/image/upload/v1711531946/Client/photo-1711403174834-d33851ffc786_qw9apa.jpg",
-    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711531879/Client/photo-1711370865063-12f626e0f7d1_sv29ts.jpg"
-]
+    "https://res.cloudinary.com/djdpobmlv/image/upload/v1711531879/Client/photo-1711370865063-12f626e0f7d1_sv29ts.jpg",
+];
 
+const sources = ["Facebook", "Tiktok", "At Restaurant"];
 
-const sources = [
-    "Facebook", "Tiktok", "At Restaurant"
-]
-
-const types = [
-    "lead", "customer"
-]
+const types = ["lead", "customer"];
 
 const newData = [
-    [ 'Tô', 'Như', 'Phương', '2000-01-26', '59/6/12 Nguyễn Đình Chiểu, Phường 4, Quận 3, Thành phố Hồ Chí Minh', 'TmThin.Tng5@yahoo.com'],
-    [ 'Hà', 'Gia', 'Hùng', '2001-01-08', '142/19 Nguyen Thi Thap, Phường Binh Thuan, Quận 7, Thành phố Hồ Chí Minh', 'DiuHnh93@yahoo.com'],
-    [ 'Trần', 'Nhân', 'Từ', '2000-09-13', '18 Luy Ban Bich Street Tan Thoi Hoa Phường, Thành phố Hồ Chí Minh', 'TunHi.Phng48@gmail.com'],
-    [ 'Hà', 'Lam', 'Tuyền', '2000-05-05', '98 Nguyễn Đình Chiểu, Quận 1, Thành phố Hồ Chí Minh', 'nhChiu.Trng74@yahoo.com'],
-    [ 'Vương', 'Phương', 'Nghi', '1999-01-16', '298 Nguyen Trong Tuyen, Phường 1, Thành phố Hồ Chí Minh', 'ThyVn.Tng@gmail.com'],
-    [ 'Đỗ', 'Bảo', 'Khánh', '2000-05-30', '18 Luy Ban Bich Street Tan Thoi Hoa Phường, Thành phố Hồ Chí Minh', 'MinhL_Lm@yahoo.com'],
-    [ 'Phùng', 'Trung', 'Lực', '1998-09-21', '298 Nguyen Trong Tuyen, Phường 1, Thành phố Hồ Chí Minh', 'PhngLoan.Mai28@yahoo.com'],
-    [ 'Phạm', 'Thu', 'Hằng', '2000-01-19', '142/19 Nguyen Thi Thap, Phường Binh Thuan, Quận 7, Thành phố Hồ Chí Minh', 'YnTrm.on@hotmail.com'],
-    [ 'Mai', 'Quốc', 'Việt', '2000-02-27', '410 Su Van Hanh, Phường 9, Quận 10, Thành phố Hồ Chí Minh', 'HngThu83@gmail.com'],
-    [ 'Lê', 'Sơn', 'Dương', '1999-01-19', '98 Nguyễn Đình Chiểu Dist1, Thành phố Hồ Chí Minh', 'ThinLng_Ng@gmail.com'],
+    [
+        "Tô",
+        "Như",
+        "Phương",
+        "2000-01-26",
+        "59/6/12 Nguyễn Đình Chiểu, Phường 4, Quận 3, Thành phố Hồ Chí Minh",
+        "TmThin.Tng5@yahoo.com",
+    ],
+    [
+        "Hà",
+        "Gia",
+        "Hùng",
+        "2001-01-08",
+        "142/19 Nguyen Thi Thap, Phường Binh Thuan, Quận 7, Thành phố Hồ Chí Minh",
+        "DiuHnh93@yahoo.com",
+    ],
+    [
+        "Trần",
+        "Nhân",
+        "Từ",
+        "2000-09-13",
+        "18 Luy Ban Bich Street Tan Thoi Hoa Phường, Thành phố Hồ Chí Minh",
+        "TunHi.Phng48@gmail.com",
+    ],
+    [
+        "Hà",
+        "Lam",
+        "Tuyền",
+        "2000-05-05",
+        "98 Nguyễn Đình Chiểu, Quận 1, Thành phố Hồ Chí Minh",
+        "nhChiu.Trng74@yahoo.com",
+    ],
+    [
+        "Vương",
+        "Phương",
+        "Nghi",
+        "1999-01-16",
+        "298 Nguyen Trong Tuyen, Phường 1, Thành phố Hồ Chí Minh",
+        "ThyVn.Tng@gmail.com",
+    ],
+    [
+        "Đỗ",
+        "Bảo",
+        "Khánh",
+        "2000-05-30",
+        "18 Luy Ban Bich Street Tan Thoi Hoa Phường, Thành phố Hồ Chí Minh",
+        "MinhL_Lm@yahoo.com",
+    ],
+    [
+        "Phùng",
+        "Trung",
+        "Lực",
+        "1998-09-21",
+        "298 Nguyen Trong Tuyen, Phường 1, Thành phố Hồ Chí Minh",
+        "PhngLoan.Mai28@yahoo.com",
+    ],
+    [
+        "Phạm",
+        "Thu",
+        "Hằng",
+        "2000-01-19",
+        "142/19 Nguyen Thi Thap, Phường Binh Thuan, Quận 7, Thành phố Hồ Chí Minh",
+        "YnTrm.on@hotmail.com",
+    ],
+    [
+        "Mai",
+        "Quốc",
+        "Việt",
+        "2000-02-27",
+        "410 Su Van Hanh, Phường 9, Quận 10, Thành phố Hồ Chí Minh",
+        "HngThu83@gmail.com",
+    ],
+    [
+        "Lê",
+        "Sơn",
+        "Dương",
+        "1999-01-19",
+        "98 Nguyễn Đình Chiểu Dist1, Thành phố Hồ Chí Minh",
+        "ThinLng_Ng@gmail.com",
+    ],
 ];
 
 const phone = [
@@ -46,23 +111,32 @@ const phone = [
     "0594 657 887",
     "0833 421 294",
     "0582 568 184",
-    "0838 060 168"
-]
+    "0838 060 168",
+];
 
-const group = [1,2,3,4,5,6]
+const group = [1, 2, 3, 4, 5, 6];
 
 function randomDate(start, end) {
-    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
-  }
+    return new Date(
+        start.getTime() + Math.random() * (end.getTime() - start.getTime())
+    );
+}
 
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        const clientPassword = await bcrypt.hash("client", 10) ;
+        const clientPassword = await bcrypt.hash("client", 10);
         const currentDate = new Date();
-        const twoYearsAgo = new Date(currentDate.getFullYear() - 3, currentDate.getMonth(), currentDate.getDate());
+        const twoYearsAgo = new Date(
+            currentDate.getFullYear() - 3,
+            currentDate.getMonth(),
+            currentDate.getDate()
+        );
         const clients = [];
+
+        // CREATE 1000 CUSTOMERS
         for (let i = 0; i < newData.length; i++) {
-            const [firstName, middleName, lastName, birthday, address, email] = newData[i];
+            const [firstName, middleName, lastName, birthday, address, email] =
+                newData[i];
             const client = {
                 email: email,
                 phone: phone[i],
@@ -74,8 +148,8 @@ module.exports = {
                 score: 0,
                 address: address,
                 source: sources[Math.floor(Math.random() * sources.length)],
-                groupId: group[Math.floor(Math.random()* group.length)],
-                type: types[Math.floor(Math.random() * types.length)],
+                groupId: group[Math.floor(Math.random() * group.length)],
+                type: "customer",
                 convertDate: randomDate(new Date(2012, 0, 1), new Date()),
                 segmentDate: randomDate(new Date(2012, 0, 1), new Date()),
                 hashedPassword: clientPassword,
@@ -83,104 +157,299 @@ module.exports = {
                 isActive: true,
                 language: "vi",
                 profit: 0,
+                average: 0,
+                total_items: 0,
                 updatedAt: new Date(),
             };
             if (client.type === "customer") {
-                client.convertDate = faker.date.between(twoYearsAgo, currentDate);
-                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
-                let date = new Date(client.convertDate)
-                date.setMonth(date.getMonth() - Math.floor(Math.random() * 5) + 1)
-                client.createdAt = date
+                client.convertDate = faker.date.between(
+                    twoYearsAgo,
+                    currentDate
+                );
+                client.segmentDate = faker.date.between(
+                    twoYearsAgo,
+                    currentDate
+                );
+                let date = new Date(client.convertDate);
+                date.setMonth(
+                    date.getMonth() - Math.floor(Math.random() * 5) + 1
+                );
+                client.createdAt = date;
+                client.updatedAt = date;
             } else {
                 client.createdAt = faker.date.between(twoYearsAgo, currentDate);
             }
             clients.push(client);
         }
-        for (let i = 0; i < 490; i++) {
+        for (let i = 0; i < 990; i++) {
+            const gender = faker.datatype.boolean();
             const client = {
                 email: faker.internet.email(),
-                phone: "0822 740 644",
-                firstname: "User " + i.toString(),
-                lastname: "User " + i.toString(),
-                gender: faker.datatype.boolean(),
-                birthday: new Date(),
+                phone: faker.phone.phoneNumber(),
+                firstname: faker.name.firstName(gender ? "male" : "female"),
+                lastname: faker.name.firstName(gender ? "male" : "female"),
+                gender: gender,
+                birthday: randomDate(
+                    new Date(1950, 0, 1),
+                    new Date(2014, 0, 1)
+                ),
                 avatar: avatar[i % 10],
                 score: 0,
-                groupId: group[Math.floor(Math.random()* group.length)],
-                convertDate: randomDate(new Date(2012, 0, 1), new Date()),
-                segmentDate: randomDate(new Date(2012, 0, 1), new Date()),
-                address: "Address",
+                groupId: group[Math.floor(Math.random() * group.length)],
+                convertDate: randomDate(new Date(2018, 0, 1), new Date()),
+                address: faker.address.streetAddress(true),
                 source: sources[Math.floor(Math.random() * sources.length)],
-                type: types[Math.floor(Math.random() * types.length)],
+                type: "customer",
                 hashedPassword: clientPassword,
                 isRegistered: true,
                 isActive: true,
                 language: "vi",
-                profit: faker.random.number({ min: 300000, max: 3000000,  precision: 20000  }),
+                profit: 0,
+                average: 0,
+                total_items: 0,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             };
             if (client.type === "customer") {
-                client.convertDate = faker.date.between(twoYearsAgo, currentDate);
-                client.segmentDate = faker.date.between(twoYearsAgo, currentDate);
-                let date = new Date(client.convertDate)
-                date.setMonth(date.getMonth() - Math.floor(Math.random() * 5) + 1)
-                client.createdAt = date
+                client.convertDate = faker.date.between(
+                    twoYearsAgo,
+                    currentDate
+                );
+                client.segmentDate = faker.date.between(
+                    twoYearsAgo,
+                    currentDate
+                );
+                let date = new Date(client.convertDate);
+                date.setMonth(
+                    date.getMonth() - Math.floor(Math.random() * 5) + 1
+                );
+                client.createdAt = date;
+                client.updatedAt = date;
             } else {
                 client.createdAt = faker.date.between(twoYearsAgo, currentDate);
+                client.updatedAt = client.createdAt;
             }
             clients.push(client);
         }
 
-        const admins = [
-            {
-                username: "manager",
+        for (let i = 0; i < 300; i++) {
+            const gender = faker.datatype.boolean();
+            const client = {
                 email: faker.internet.email(),
                 phone: faker.phone.phoneNumber(),
-                firstname: "Manager",
-                lastname: 'Manager',
+                firstname: faker.name.firstName(gender ? "male" : "female"),
+                lastname: faker.name.firstName(gender ? "male" : "female"),
+                gender: gender,
+                birthday: randomDate(
+                    new Date(1950, 0, 1),
+                    new Date(2014, 0, 1)
+                ),
+                avatar: avatar[i % 10],
+                score: 0,
+                groupId: group[Math.floor(Math.random() * group.length)],
+                convertDate: null,
+                segmentDate: randomDate(new Date(2012, 0, 1), new Date()),
+                address: faker.address.streetAddress(true),
+                source: sources[Math.floor(Math.random() * sources.length)],
+                type: "lead",
+                hashedPassword: clientPassword,
+                isRegistered: true,
+                isActive: true,
+                language: "vi",
+                profit: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+            if (client.type === "customer") {
+                client.convertDate = faker.date.between(
+                    twoYearsAgo,
+                    currentDate
+                );
+                client.segmentDate = faker.date.between(
+                    twoYearsAgo,
+                    currentDate
+                );
+                let date = new Date(client.convertDate);
+                date.setMonth(
+                    date.getMonth() - Math.floor(Math.random() * 5) + 1
+                );
+                client.createdAt = date;
+            } else {
+                client.createdAt = faker.date.between(twoYearsAgo, currentDate);
+                client.updatedAt = client.createdAt;
+            }
+            clients.push(client);
+        }
+
+        const firstnames = [
+            "Nguyễn",
+            "Trần",
+            "Lê",
+            "Phạm",
+            "Hoàng",
+            "Huỳnh",
+            "Khương",
+            "Vũ",
+            "Võ",
+            "Phan",
+            "Trương",
+            "Bùi",
+            "Đặng",
+            "Đỗ",
+            "Ngô",
+            "Hồ",
+            "Dương",
+            "Đinh",
+        ];
+        const lastnames = [
+            "Huy",
+            "Khang",
+            "Bảo",
+            "Minh",
+            "Phúc",
+            "Anh",
+            "Khoa",
+            "Phát",
+            "Đạt",
+            "Khôi",
+            "Long",
+            "Nam",
+            "Linh",
+            "Duy",
+            "Quân",
+            "Kiệt",
+            "Thịnh",
+            "Tuấn",
+            "Hưng",
+            "Hoàng",
+            "Hiếu",
+            "Nhân",
+            "Trí",
+            "Tài",
+            "Phong",
+            "Nguyên",
+        ];
+        let managers = [];
+        let staffs = [];
+        let chefs = [];
+
+        managers.push({
+            username: "manager",
+            email: faker.internet.email(),
+            phone: faker.phone.phoneNumber(),
+            firstname: "Manager",
+            lastname: "Manager",
+            role: "manager",
+            gender: faker.datatype.boolean(),
+            birthday: faker.date.past(),
+            avatar: avatar[0],
+            hashedPassword: await bcrypt.hash("manager", 10),
+            isActive: true,
+            language: "vi",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+        staffs.push({
+            username: "staff",
+            email: faker.internet.email(),
+            phone: faker.phone.phoneNumber(),
+            firstname: "Staff",
+            lastname: "Staff",
+            role: "employee",
+            gender: faker.datatype.boolean(),
+            birthday: faker.date.past(),
+            avatar: avatar[1],
+            hashedPassword: await bcrypt.hash("staff", 10),
+            isActive: true,
+            language: "vi",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+        chefs.push({
+            username: "chef",
+            email: faker.internet.email(),
+            phone: faker.phone.phoneNumber(),
+            firstname: "Chef",
+            lastname: "Chef",
+            role: "chef",
+            gender: faker.datatype.boolean(),
+            birthday: faker.date.past(),
+            avatar: avatar[2],
+            hashedPassword: await bcrypt.hash("chef", 10),
+            isActive: true,
+            language: "vi",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        for (let i = 0; i < 5; i++) {
+            managers.push({
+                username: `manager${i}`,
+                email: faker.internet.email(),
+                phone: faker.phone.phoneNumber(),
+                firstname:
+                    firstnames[Math.floor(Math.random() * firstnames.length)],
+                lastname:
+                    lastnames[Math.floor(Math.random() * lastnames.length)],
                 role: "manager",
                 gender: faker.datatype.boolean(),
                 birthday: faker.date.past(),
+                avatar: avatar[Math.floor(Math.random() * avatar.length)],
                 hashedPassword: await bcrypt.hash("manager", 10),
                 isActive: true,
                 language: "vi",
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            },
-            {
-                username: "staff",
+            });
+        }
+
+        for (let i = 0; i < 20; i++) {
+            staffs.push({
+                username: `staff${i}`,
                 email: faker.internet.email(),
                 phone: faker.phone.phoneNumber(),
-                firstname: "Staff",
-                lastname: 'Staff',
-                role: 'employee',
+                firstname:
+                    firstnames[Math.floor(Math.random() * firstnames.length)],
+                lastname:
+                    lastnames[Math.floor(Math.random() * lastnames.length)],
+                role: "employee",
                 gender: faker.datatype.boolean(),
                 birthday: faker.date.past(),
+                avatar: avatar[Math.floor(Math.random() * avatar.length)],
                 hashedPassword: await bcrypt.hash("staff", 10),
                 isActive: true,
                 language: "vi",
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            },
-            {
-                username: "chef",
+            });
+        }
+
+        for (let i = 0; i < 5; i++) {
+            chefs.push({
+                username: `chef${i}`,
                 email: faker.internet.email(),
                 phone: faker.phone.phoneNumber(),
-                firstname: "Chef",
-                lastname: 'Chef',
-                role: 'chef',
+                firstname:
+                    firstnames[Math.floor(Math.random() * firstnames.length)],
+                lastname:
+                    lastnames[Math.floor(Math.random() * lastnames.length)],
+                role: "chef",
                 gender: faker.datatype.boolean(),
                 birthday: faker.date.past(),
+                avatar: avatar[Math.floor(Math.random() * avatar.length)],
                 hashedPassword: await bcrypt.hash("chef", 10),
                 isActive: true,
                 language: "vi",
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            }
-        ]
-        await queryInterface.bulkInsert('Clients', clients);
-        await queryInterface.bulkInsert('Employees', admins);
+            });
+        }
+
+        let admins = [];
+        admins = admins.concat(managers, staffs, chefs);
+
+        await queryInterface.bulkInsert("Clients", clients);
+        await queryInterface.bulkInsert("Employees", admins);
     },
 
     down: async (queryInterface, Sequelize) => {
@@ -190,7 +459,7 @@ module.exports = {
          * Example:
          * await queryInterface.bulkDelete('People', null, {});
          */
-        await queryInterface.bulkDelete('Clients', null, {});
-        await queryInterface.bulkDelete('Employees', null, {});
+        await queryInterface.bulkDelete("Clients", null, {});
+        await queryInterface.bulkDelete("Employees", null, {});
     },
 };
