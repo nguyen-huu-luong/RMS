@@ -40,9 +40,9 @@ export abstract class BaseRepository<M extends Model>
             let orderFields: [string, string][] = [] ; // default sort by id
 
             // // sort by 1 field
-            if (options.sort && typeof options.sort.by === "string") {
+            if (options.sort?.by && typeof options.sort.by === "string") {
                 orderFields.push([options.sort.by, options.sort.order.toLocaleUpperCase()])
-            } else if (options.sort && typeof options.sort.by === "object") { 
+            } else if (options.sort?.by && typeof options.sort.by === "object") { 
             // Multiple sort 
                 let temp = options.sort.by.map((item:string) => ([item, sortOrder] as [string, string]))
                 orderFields.push(...temp)
@@ -52,9 +52,7 @@ export abstract class BaseRepository<M extends Model>
                 // attributes: ['*'],
                 limit,
                 offset,
-                order: [
-                   ...orderFields
-                ],
+                order: orderFields.length > 0 ? [...orderFields]: [["id", "ASC"]],
             };
 
             console.log(findOptions.order)
@@ -91,8 +89,6 @@ export abstract class BaseRepository<M extends Model>
             if (this.attributes[0] === "*") {
                 return this._model.findAll({ order: [["id", "ASC"]] });
             }
-
-            const op = "[Op.in]"
             return this._model.findAll({
                 attributes: this.attributes,
                 order: [["id", "ASC"]],
