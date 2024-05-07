@@ -70,7 +70,7 @@ export class TargetListService {
     private groupDataToReturn = (targetlist:  any) => {
         const { Clients, ...rest } = JSON.parse(JSON.stringify(targetlist));
         const groupedData = Clients.reduce((acc:any, client:any) => {
-            const group = client.type === 'Lead' ? 'leads' : 'customers';
+            const group = client.type === 'lead' ? 'leads' : 'customers';
             if (!acc[group]) {
               acc[group] = [];
             }

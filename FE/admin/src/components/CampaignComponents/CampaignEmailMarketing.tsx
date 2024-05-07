@@ -58,14 +58,14 @@ export const CampaignMarketing: React.FC<ICampaignEmailMarketing> = ({ emails = 
             title: 'Start Date',
             dataIndex: 'startDate',
             key: 'startDate',
-            render: (text) => <TimeFormatter time={text}/>
+            render: (text) => <TimeFormatter time={text} />
         },
         {
             title: "Actions",
             dataIndex: "actions",
             key: "actions",
             align: "center",
-            render: (text, row) => (<p 
+            render: (text, row) => (<p
                 className="text-primary decoration cursor-pointer"
                 onClick={() => handleDeleteEmails(row.id)}>Remove
             </p>
@@ -90,16 +90,16 @@ export const CampaignMarketing: React.FC<ICampaignEmailMarketing> = ({ emails = 
                 <div>
                     <h1 className="font-bold">Email marketing</h1>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
                     <CreateEmailCampaigntModal
-                        triggerBtnClasseNames="border-0 outline-0 text-stone-600" 
-                        onOk={handleCreateEmails} 
+                        triggerBtnClasseNames="border-0 outline-0 text-stone-600"
+                        onOk={handleCreateEmails}
                         targetlists={targetlists}
                     />
                 </div>
 
             </div>
-            {dataSource.length > 0  && <Table dataSource={dataSource} columns={columns} size="small" pagination={false} />}
+            {dataSource.length > 0 && <Table dataSource={dataSource} columns={columns} size="small" pagination={false} />}
         </div>)
 }
