@@ -100,7 +100,7 @@ const TargetListDetail = () => {
             title: "Fullname",
             dataIndex: "fullname",
             key: "fullname",
-            render: (text, row) => <a style={{ color: "#4A58EC" }} href={`./customers/${row.id}`}>{text}</a>,
+            render: (text, row) => <Link style={{ color: "#4A58EC" }} href={`/customers/${row.id}`}>{text}</Link>,
         },
         {
             title: "Phone number",
@@ -134,13 +134,14 @@ const TargetListDetail = () => {
             title: "Fullname",
             dataIndex: "fullname",
             key: "fullname",
-            render: (text, row, record) => <Link href={`customers/${row.id}`}>{text}</Link>
+            render: (text, row, record) => <Link href={`/customers/${row.id}`}>{text}</Link>
         },
         {
             title: "email",
             dataIndex: "email",
             key: "email",
         },
+        
     ];
 
     const handleUpdateTargetlistInfo = async (values: any) => {
@@ -183,11 +184,11 @@ const TargetListDetail = () => {
         setData(prev => result.data)
     }
 
-    const handleUpdateField = (fieldname: string) => {
+    const handleUpdateField = async (fieldname: string) => {
         const values: { [key: string]: string } = {}
         values[fieldname] = form.getFieldValue(fieldname)
 
-        handleUpdateTargetlistInfo(values)
+        await handleUpdateTargetlistInfo(values)
     }
     const customers = data && data.customers.map((item, index) => ({ ...item, key: index, fullname: `${item.firstname} ${item.lastname}`, }))
     const leads = data && data.leads.map((item, index) => ({ ...item, key: index, fullname: `${item.firstname} ${item.lastname}`, }))

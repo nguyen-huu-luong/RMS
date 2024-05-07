@@ -9,6 +9,8 @@ import fetchClient from "@/lib/fetch-client";
 import { UpdatableInput } from "@/components/UpdatableInput/UpdatableInput";
 import TimeFormatter from "@/components/TimeFormatter";
 import { DetailPageLayout } from "@/components/DetailPageLayout";
+import { useForm } from "antd/es/form/Form";
+import moment from "moment";
 
 
 interface ActivityDataType {
@@ -20,9 +22,10 @@ interface ActivityDataType {
 const EmployeeProfile = () => {
     const params = useParams<{ locale: string; eid: string }>()
     const [editmode, setEditmode] = useState(false)
-    const [data, setData] = useState(null)
-    const [reload, setReload] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [data, setData] = useState<any>(null)
+    const [reload, setReload] = useState(false)
+    const [form] = useForm();
 
     const columns_activity: TableProps<ActivityDataType>['columns'] = [
         {
@@ -60,21 +63,12 @@ const EmployeeProfile = () => {
     ];
 
     const businessData: ActivityDataType[] = [
-        {
-            key: '1',
-            name: 'Send “Happy birthday” automated email',
-            types: ['Automation'],
-            date: '2011-09-29',
-        },
-    ];
-
-    const userData: ActivityDataType[] = [
-        {
-            key: '1',
-            name: 'Request an order',
-            types: ['Order'],
-            date: '2011-09-29',
-        },
+        // {
+        //     key: '1',
+        //     name: 'Send “Happy birthday” automated email',
+        //     types: ['Automation'],
+        //     date: '2011-09-29',
+        // },
     ];
 
     useEffect(() => {
@@ -99,20 +93,40 @@ const EmployeeProfile = () => {
 
     const handleUpdateEmployee = async (values: any) => {
         console.log(values)
+        setLoading(true)
+        try {
+            const newEmployeeInfo = await fetchClient({
+                method: "PUT",
+                url: `/employees/${params.eid}`,
+                body: { data: values },
+                data_return: true
+
+            })
+            setData(newEmployeeInfo)
+            setEditmode(false)
+            setLoading(false)
+        } catch (error) {
+            setLoading(false)
+            throw error
+        }
     }
 
     const handleUpdateField = async (fieldname: string) => {
-
+        console.log(fieldname)
+        if (fieldname) {
+            await handleUpdateEmployee({ [fieldname]: form.getFieldValue(fieldname) })
+        }
     }
 
     if (!data) return ""
 
     return (
-        <DetailPageLayout>
+        <DetailPageLayout dataCreatedAt={data.createdAt} dataUpdatedAt={data.updatedAt}>
             <Space direction="vertical" className="w-full">
                 <Form
                     layout="vertical"
-                    onFinish={() => { }}
+                    onFinish={handleUpdateEmployee}
+                    form={form}
                     // form={form}
                     className="w-full bg-white rounded-lg border py-3 px-4"
                 >
@@ -127,6 +141,7 @@ const EmployeeProfile = () => {
                                         backgroundColor: "#4A58EC"
                                     }}
                                     htmlType="submit"
+                                    loading={loading}
                                 >
                                     Save
                                 </Button>
@@ -137,6 +152,7 @@ const EmployeeProfile = () => {
                                         borderStyle: "solid", backgroundColor: "#F9FAFB"
                                     }}
                                     htmlType="reset"
+                                    onClick={() => setEditmode(false)}
                                 >
                                     Cancel
                                 </Button>
@@ -156,73 +172,81 @@ const EmployeeProfile = () => {
                         <div className="flex-1">
                             <div className="mt-3 grid grid-cols-2 gap-4 w-100">
                                 <UpdatableInput
-                                    name="name"
+                                    name="firstname"
                                     type="input"
-
-                                    defaultValue={"fdfdasf"}
-                                    editmode={editmode} label={"Name"}
-                                    onUpdate={() => { }}
+                                    defaultValue={data.firstname || ""}
+                                    editmode={editmode} label={"Firstname"}
+                                    onUpdate={handleUpdateField}
                                 />
 
+                                <UpdatableInput
+                                    name="lastname"
+                                    type="input"
+                                    defaultValue={data.lastname || ""}
+                                    editmode={editmode} label={"Lastname"}
+                                    onUpdate={handleUpdateField}
+                                />
+
+                            </div>
+                            <div className="mt-3 grid grid-cols-2 gap-4 w-100">
                                 <UpdatableInput
                                     name="gender"
                                     type="select"
                                     options={[{ label: "Male", value: "0" }, { label: "Female", value: "1" }]}
-                                    defaultValue={"Male"}
+                                    defaultValue={data.gender === "0" ? "Male" : "Female"}
                                     editmode={editmode}
                                     label={"Gender"}
-                                    onUpdate={() => { }}
+                                    onUpdate={handleUpdateField}
                                 />
-                            </div>
-                            <div className="mt-3 grid grid-cols-2 gap-4 w-100">
                                 <UpdatableInput
-                                    name="Birthday"
-                                    type="textarea"
-                                    defaultValue={new Date().toDateString()}
-                                    editmode={editmode} label={"Description"}
-                                    onUpdate={() => { }}
-                                />
-
-                                <UpdatableInput
-                                    name="gender"
-                                    type="select"
-                                    options={[{ label: "Manager", value: "manager" }, { label: "Staff", value: "staff" }, { value: "chef", label: "Chef" }]}
-                                    defaultValue={"Manager"}
-                                    editmode={editmode}
-                                    label={"Gender"}
-                                    onUpdate={() => { }}
+                                    name="birthday"
+                                    type="date"
+                                    defaultValue={moment(data.birthday).format("YYYY-MM-DD")}
+                                    editmode={editmode} label={"Birthday"}
+                                    onUpdate={handleUpdateField}
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="mt-3 grid grid-cols-2 gap-4 w-100 items-center">
+                    <div className="mt-3 grid grid-cols-3 gap-4 w-100 items-center">
                         <UpdatableInput
-                            name="username"
+                            name=""
+                            disabled
                             type="input"
-                            defaultValue={"da fdf fad"}
+                            defaultValue={data.username}
                             editmode={editmode}
                             label={"Username"}
-                            onUpdate={() => { }}
+                            onUpdate={handleUpdateField}
+                        />
+
+                        <UpdatableInput
+                            name="role"
+                            type="select"
+                            options={[{ label: "Manager", value: "manager" }, { label: "Staff", value: "staff" }, { value: "chef", label: "Chef" }]}
+                            defaultValue={data.role}
+                            editmode={editmode}
+                            label={"Role"}
+                            onUpdate={handleUpdateField}
                         />
                         <Form.Item name="isActive" label="Active">
-                            <Checkbox />
+                            <Checkbox defaultChecked={data.isActive} disabled={!editmode}/>
                         </Form.Item>
                         <UpdatableInput
                             name="email"
                             type="input"
-                            defaultValue={"da fdf fad"}
+                            defaultValue={data.email}
                             editmode={editmode}
                             label={"Email"}
-                            onUpdate={() => { }}
+                            onUpdate={handleUpdateField}
                         />
                         <UpdatableInput
                             name="phone"
                             type="input"
-                            defaultValue={"da fdf fad"}
+                            defaultValue={data.phone}
                             editmode={editmode}
                             label={"Phone"}
-                            onUpdate={() => { }}
+                            onUpdate={handleUpdateField}
                         />
                     </div>
                 </Form>

@@ -417,8 +417,8 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, ...props 
 
                 </div>
                 {onSelected && isSelectedRows && onSelected?.render && onSelected.render()}
-                <div className="border bg-white shadow p-3">
-                    <div style={{ marginBottom: 16 }} className="flex items-center gap-2">
+                <div className="border bg-white shadow p-3 my-2 rounded">
+                    <div className="flex items-center gap-2">
                         <p>Sort by: </p>
                         <Select
                             // style={{ width: '20%' }}

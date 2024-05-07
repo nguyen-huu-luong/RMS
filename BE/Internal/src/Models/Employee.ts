@@ -98,6 +98,14 @@ Employee.init(
 			type: DataTypes.STRING,
 			defaultValue: "en"
 		},
+		createdAt: {
+			type: DataTypes.DATE,
+			allowNull: false
+		},
+		updatedAt: {
+			type: DataTypes.DATE,
+			allowNull: false
+		}
 	},
 	{
 		sequelize: Loader.sequelize,
