@@ -23,13 +23,17 @@ class ClientController {
 		ensurePermissionIsValid(req.action, "read:any");
 		const queries = { ...req.query };
 
-		// if (!req.query["type"] || req.query["type"] === "customer") {
-		// 	queries.type = "customer"
-		// } else if (req.query["type"] === "lead") {
-		// 	queries.type = "lead"
-		// }
+		if (!req.query["type"]) {
+			queries.type = "customer"
+		} else if (req.query["type"] === "lead") {
+			queries.type = "lead"
+		}
 		if (queries["sort"] && queries["sort"] === "fullname") {
 			queries["sort"] = ["firstname", "lastname"];
+		} 
+
+		if (queries["sort"] === "age") {
+			queries["sort"] = "birthday"
 		}
 
 		const options: QueryOptions = parseRequesQueries(queries);

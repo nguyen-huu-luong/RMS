@@ -73,12 +73,12 @@ export class AuthService {
 			}
 
 			this.sendToken(res, user);
-			mailler.sendEmail({
-				from: "minhvuonglht10@gmail.com",
-				to: "vuong.lieu080519@hcmut.edu.vn",
-				subject: "Sending Email using Node.js",
-				html: "<p>Bạn đã đăng nhập vào BK food",
-			})
+			// mailler.sendEmail({
+			// 	from: "minhvuonglht10@gmail.com",
+			// 	to: "vuong.lieu080519@hcmut.edu.vn",
+			// 	subject: "Sending Email using Node.js",
+			// 	html: "<p>Bạn đã đăng nhập vào BK food",
+			// })
 
 		} catch (err) {
 			//
@@ -105,7 +105,7 @@ export class AuthService {
 						"User already exists"
 					);
 				}
-				await user.update({ isRegisterd: true });
+				await user.update({ isRegistered: true });
 				this.sendToken(res, user);
 			} else {
 				const hashedPassword = await Password.hash(password);

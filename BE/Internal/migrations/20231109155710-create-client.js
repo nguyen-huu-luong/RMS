@@ -57,7 +57,8 @@ module.exports = {
         type: Sequelize.STRING
       },
       isRegistered: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       isActive: {
         type: Sequelize.BOOLEAN

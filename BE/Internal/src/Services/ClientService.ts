@@ -60,12 +60,12 @@ export class ClientService {
         const user = await this.clientRepository.findByEmail(email)
 
         if (user) {
-            throw new CustomError(HttpStatusCode.Conflict, ErrorName.CONFLICT, "User exists")
+            throw new CustomError(HttpStatusCode.Conflict, ErrorName.CONFLICT, `User existss with id=<${user.id}>`)
         }
 
-        if (!type) {
+        if (!type && typeof type === "string") {
             data.type = "lead"
-        } else if (type === "customer") {
+        } else if (type.toLocaleLowerCase() === "customer") {
             data.type = "customer"
         }
         return await this.clientRepository.create(data)

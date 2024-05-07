@@ -12,7 +12,8 @@ class ClientValidator {
             } else {
                 next()
             }
-        }
+        },
+        body("data.email").isEmail().withMessage("Email invallid format"),
 	];
 
     

@@ -1,12 +1,14 @@
 "use client";
 import React from "react";
 import { Form, Input, Button, Radio, ConfigProvider, DatePicker } from "antd";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { register } from "module";
 // import SignIn from '../[locale]/(auth)/signin/page';
 import { signIn } from "next-auth/react";
+import { useForm } from "antd/es/form/Form";
 
 const RegistrationForm = () => {
+    const [form] = useForm()
     const resgisterUser = async (data: any) => {
         return await axios({
             url: "http://localhost:3003/api/users/signup",
@@ -28,11 +30,20 @@ const RegistrationForm = () => {
                 birthday,
                 gender: gender === "male" ? 1 : 0,
             });
-            if (result.data.success) {
+            if (result) {
                 console.log(result.data);
                 signIn("credentials", { email, password, redirect: true });
             }
         } catch (error) {
+            if (error instanceof AxiosError && error.response) {
+                const {code, name, message} = error.response.data ;
+                if (name === "Conflict") {
+                    form.setFields([{name: "email", errors: ["Email đã tồn tại"]}])
+                } 
+                else {
+                    message.error(`From Server: Code = ${code}, name = ${name}, message: ${message}`)
+                }
+            }
             console.log(error);
         }
     };
@@ -57,6 +68,7 @@ const RegistrationForm = () => {
             }}
         >
             <Form
+                form={form}
                 name='registration-form'
                 className='login-form w-full px-8 py-4 max-w-[400px] bg-white shadow-lg rounded-xl border-0'
                 onFinish={onFinish}
