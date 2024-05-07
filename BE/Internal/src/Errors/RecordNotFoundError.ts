@@ -6,6 +6,6 @@ export class RecordNotFoundError extends BaseError {
 		public message = "Record not found",
 		public stackTrace?: string
 	) {
-		super(HttpStatusCode.NotFound, ErrorName.RECORD_NOT_FOUND, message, stackTrace);
+		super(HttpStatusCode.NotFound, ErrorName.RECORD_NOT_FOUND, message,"", stackTrace);
 	}
 }

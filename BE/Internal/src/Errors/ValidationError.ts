@@ -6,6 +6,6 @@ export class ValidationError extends BaseError {
 		public message = "Validation faild!",
 		public stackTrace?: string
 	) {
-		super(HttpStatusCode.BadRequest, ErrorName.VALIDAION_ERROR, message, stackTrace);
+		super(HttpStatusCode.BadRequest, ErrorName.VALIDAION_ERROR, message,"", stackTrace);
 	}
 }

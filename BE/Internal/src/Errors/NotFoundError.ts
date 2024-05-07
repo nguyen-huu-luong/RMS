@@ -6,6 +6,6 @@ export class NotFoundError extends BaseError {
 		public message = "API not found",
 		public stackTrace?: string
 	) {
-		super(HttpStatusCode.NotFound, ErrorName.NOT_FOUND, message, stackTrace);
+		super(HttpStatusCode.NotFound, ErrorName.NOT_FOUND, message,"", stackTrace);
 	}
 }

@@ -30,22 +30,22 @@ export class EmployeeService {
     }
 
     public async create(data: any) {
-        const { username } = data;
+        const { username, email } = data;
         const user = await this.employeeRepository.findByUsername(username);
-
+        console.log("user found: ", user)
         if (user) {
             throw new CustomError(
                 HttpStatusCode.Conflict,
                 ErrorName.CONFLICT,
-                "User exists"
+                "User exists",
+                (user.username === username && "username") || ( user.email === email && "email") || ""
             );
         }
 
         return await this.employeeRepository.create({
             ...data,
             hashedPassword: await PasswordUtil.hash(data.password),
-            isActive: true,
-            languege: "en",
+            // isActive: true,
         });
     }
 
@@ -54,11 +54,8 @@ export class EmployeeService {
         if (!user) {
             throw new RecordNotFoundError();
         }
-        let { birthday, gender, ...info } = data;
-        birthday = new Date(Date.parse(birthday));
-        gender = Boolean(JSON.parse(gender));
-        let clientInfo = { birthday: birthday, gender: gender, ...info };
-        return await this.employeeRepository.update(id, clientInfo);
+
+        return await this.employeeRepository.update(id, data);
     }
 
     public async delete(id: number) {

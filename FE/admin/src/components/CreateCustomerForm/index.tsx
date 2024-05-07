@@ -82,7 +82,7 @@ export const CreateCustomerForm: React.FC<ICreateCustomerFormRProps> = ({ ...pro
             </div>
 
             <div className='w-full'>
-                <Form.Item label="Description" name="description">
+                <Form.Item label="Description" name="address">
                     <RMSDatePicker className='w-full' />
                 </Form.Item>
             </div>

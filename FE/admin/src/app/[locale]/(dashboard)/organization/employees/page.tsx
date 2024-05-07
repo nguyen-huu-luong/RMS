@@ -9,6 +9,8 @@ import { CreateTargetListModal } from "@/components/Modals/CreateTargetListModal
 import { useRouter } from "next/navigation";
 import { useForm } from "antd/es/form/Form";
 import moment from "moment";
+import { CreateaEmployeeModal } from "@/components/Modals/CreateNewEmployeeModal";
+import { AxiosError } from "axios";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 interface DataType {
@@ -114,7 +116,7 @@ const EmployeeListPages: React.FC = () => {
 						<Space>
 							<p>Selected {selectedRows.length} Employees</p>
 							{/* <Button icon={<EllipsisOutlined />} /> */}
-							<Button danger onClick={handleDeleteEmplyees}>Delete {selectedRows.length} records</Button>
+							<Button danger onClick={handleDeleteEmployees}>Delete {selectedRows.length} records</Button>
 						</Space>
 						:
 						<Space>
@@ -130,7 +132,7 @@ const EmployeeListPages: React.FC = () => {
 		)
 	}
 
-	const handleDeleteEmplyees = async () => {
+	const handleDeleteEmployees = async () => {
 		try {
 			const result = await fetchClient({
 				url: "/employees",
@@ -147,11 +149,44 @@ const EmployeeListPages: React.FC = () => {
 		}
 	}
 
+	const handleCreateEmployee = async (values: any) => {
+		try {
+			const  result = await fetchClient({
+				method: "POST",
+				url: "/employees", 
+				body: {
+					data: {
+						...values
+					}
+				}
+			})
+			setReload(!reload) ;
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				if (error.response)  {
+					const {code, name, message} = error?.response.data
+					if (name  === "Conflict") {
+						form_create.setFields([{name: "username", errors: ["Username đã tồn tại"]}])
+					} else {
+						message.error("From Server: ", message)
+					}
+				}
+				throw error
+			} else {
+				message.error("Đã xãy ra lỗi")
+				throw error
+			}
+		}
+	}	
+
+
+
 	return (
 		<TableRender<DataType>
 			columns={columns}
 			url="/employees"
 			createModalTitle="Add new employee"
+			createModal = {<CreateaEmployeeModal formControl={form_create} onCreate={handleCreateEmployee}/>}
 			reload={reload}
 			onSelected={onSelectedRows}
 			filterItems={filterItems}
