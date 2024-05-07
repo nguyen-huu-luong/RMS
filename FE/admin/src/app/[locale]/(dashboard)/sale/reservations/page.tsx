@@ -490,9 +490,9 @@ function Home() {
         if (!socket) return;
         socket.on(
             "tableItem:finish:fromChef",
-            (tableId: string, name: string) => {
+            async (tableId: string, name: string) => {
                 message.info(`Finish ${name} for table ${tableId}`);
-                fetchNotification();
+                await fetchNotification();
             }
         );
         return () => {
@@ -501,8 +501,11 @@ function Home() {
     }, [socket]);
 
     useEffect(() => {
-        fetchAllData()
-        fetchNotification()
+        const fetchData = async () => {
+            await fetchAllData();
+            await fetchNotification();
+        };
+        fetchData();
     }, [])
 
 

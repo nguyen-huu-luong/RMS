@@ -270,11 +270,15 @@ function Home() {
 
     useEffect(() => {
         setIsLoading(true)
-        fetchTable()
-        fetchCategory()
-        fetchFood()
-        fetchCartItems()
-        fetchNotification()
+        const fetchData = async () => {
+            await fetchTable()
+            await fetchCategory()
+            await fetchFood()
+            await fetchCartItems()
+            await fetchNotification()
+        };
+    
+        fetchData();
         setIsLoading(false)
     }, [])
 
