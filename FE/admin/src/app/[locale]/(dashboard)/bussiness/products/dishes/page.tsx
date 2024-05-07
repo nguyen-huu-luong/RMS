@@ -101,6 +101,14 @@ const Dish = () => {
             key: "name",
             title: "Name"
         },
+        {
+            key: "price",
+            title: "Price"
+        },
+        {
+            key: "categoryId",
+            title: "Category"
+        },
     ]
     const [error, setError] = useState<ErrorType>({
         isError: false,
@@ -232,7 +240,7 @@ const Dish = () => {
             if (sort) {
                 const sort_factor = tableParams.sorter?.field
                 const order = tableParams.sorter?.order
-                url = `/categories/all?sort_factor=${sort_factor}&order=${order}`
+                url = `/products/allFullInformation?sort_factor=${sort_factor}&order=${order}`
             }
             else {
                 url = "/products/allFullInformation"
@@ -286,18 +294,18 @@ const Dish = () => {
     }, [isReFetch]);
 
 
-    // useEffect(() => {
-    //     setTableParams({
-    //         ...tableParams,
-    //         pagination: {
-    //             current: 1,
-    //             pageSize: 10,
-    //             total: 0,
-    //         }
-    //     });
+    useEffect(() => {
+        setTableParams({
+            ...tableParams,
+            pagination: {
+                current: 1,
+                pageSize: 10,
+                total: 0,
+            }
+        });
 
-    //     fetchData(true)
-    // }, [isSorting])
+        fetchData(true)
+    }, [isSorting])
 
     return (
         <>
