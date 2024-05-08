@@ -142,6 +142,7 @@ export class AuthService {
 					amount: 0,
 					clientId: user.getDataValue('id')
 				})
+				await user.createChannel()
 				this.sendToken(res, user);
 			} else {
 				const hashedPassword = await Password.hash(password);
