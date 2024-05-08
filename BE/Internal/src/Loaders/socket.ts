@@ -19,7 +19,11 @@ class SocketConnection {
                         },
                     });
                     if (existClient && customId) {
-                        socket.join("Channel_" + existClient?.dataValues.id);
+                        const channel = await Channel.findOne({
+                            where: { clientId: existClient?.dataValues.id },
+                        });
+                        socket.join("Channel_" + channel?.dataValues.id);
+                        console.log(socket.rooms);
                     } else {
                         const client = {
                             firstname: socket.id,
@@ -27,7 +31,7 @@ class SocketConnection {
                             isRegistered: true,
                             isActive: true,
                             language: "vi",
-                            type: "Anonymous Client",
+                            type: "lead",
                             createdAt: new Date(),
                             updatedAt: new Date(),
                         };
@@ -107,6 +111,7 @@ class SocketConnection {
             socket.on(
                 "staff:message:send",
                 (channelId: string, message: string, employeeId: string) => {
+                    console.log(message, channelId);
                     io.to("Channel_" + channelId).emit(
                         "message:send:fromStaff",
                         channelId,
