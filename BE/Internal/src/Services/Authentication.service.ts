@@ -59,17 +59,18 @@ export class AuthService {
 
 			const { email, password } = req.body;
 			const user = await this.clientRepository.findByEmail(email);
+	
 			if (!user) {
-				throw new RecordNotFoundError("User not exist");
+				throw new RecordNotFoundError("User not exist", "email");
 			}
 
 			if (!user.isRegistered) {
-				throw new RecordNotFoundError("User not exist");
+				throw new RecordNotFoundError("User not exist", "email");
 			}
 
 			const isCorrectPassword = await user.checkPassword(password);
 			if (!isCorrectPassword) {
-				throw new BadRequestError("Password is incorrect");
+				throw new BadRequestError("Password is incorrect", "password");
 			}
 
 			this.sendToken(res, user);
@@ -95,6 +96,35 @@ export class AuthService {
 			if (!errors.isEmpty()) {
 				throw new ValidationError(errors.array()[0].msg);
 			}
+			
+			if (req.body["isGoogleAccount"]) {
+				const {email, firstname, lastname, picture} = req.body 
+				if (!email || ! firstname || !lastname || !picture) {
+					throw new BadRequestError("Missing parameter")
+				} 
+
+				const user = await this.clientRepository.findByEmail(email)
+				if (user) {
+					this.sendToken(res, user);
+				} else {
+					const user = await this.clientRepository.create({
+						email, firstname, lastname, 
+						avatar: picture, 
+						password: await Password.hash("clidjdbcdcnwfnaewcnawent"),
+						isRegistered: true
+					})
+
+					const cart = await this.cartRepository.create({
+						total: 0,
+						amount: 0,
+						clientId: user.getDataValue('id')
+					})
+
+					this.sendToken(res, user);
+				}
+
+				return ;
+			}
 			const { firstname, lastname, email, password, birthday } = req.body;
 			let user = await this.clientRepository.findByEmail(email);
 			if (user) {
@@ -105,7 +135,13 @@ export class AuthService {
 						"User already exists"
 					);
 				}
-				await user.update({ isRegistered: true });
+				const hashedPassword = await Password.hash(password);
+				user = await user.update({ isRegistered: true, firstname, lastname, email, hashedPassword, birthday});
+				const cart = await this.cartRepository.create({
+					total: 0,
+					amount: 0,
+					clientId: user.getDataValue('id')
+				})
 				this.sendToken(res, user);
 			} else {
 				const hashedPassword = await Password.hash(password);

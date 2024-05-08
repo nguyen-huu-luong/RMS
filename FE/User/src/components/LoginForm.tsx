@@ -7,24 +7,30 @@ import Link from "next-intl/link";
 import { useRouter } from "next-intl/client";
 import { useState } from "react";
 import { useLocale } from "next-intl";
+import { useForm } from "antd/es/form/Form";
 export const LoginForm: React.FC = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const [loading, setLoading] = useState<boolean>();
     const router = useRouter();
     const locale = useLocale();
+    const [form] = useForm()
     const onFinish = async (values: any) => {
         setLoading(true);
         console.log("Received values of form: ", values);
         let result = await signIn("credentials", {
             ...values,
-            // redirect: true,
+            redirect: false,
         });
         setLoading(false);
         if (result && !result.ok) {
             if (result.error) {
                 const error = JSON.parse(result.error);
-                showError(`${error?.name}: ${error.message}`);
-                console.log(error);
+                // showError(`${error?.name}: ${error.message}`);
+                if (error.fieldError && error.fieldError === "password" && error.name === "BadRequestError") {
+                    form.setFields([{name :"password", errors: ["Password incorect"]}])
+                } else if (error.fieldError && error.fieldError === "email" && error.name === "RecordNotFoundError") {
+                    form.setFields([{name :"email", errors: ["Account not found"]}])
+                }
             }
         } else {
             router.push("/profile");
@@ -64,6 +70,7 @@ export const LoginForm: React.FC = () => {
             >
                 <Form
                     name='normal_login'
+                    form={form}
                     className='login-form w-full px-8 py-4 max-w-[400px] bg-white shadow-lg rounded-xl border-0'
                     initialValues={{ remember: true }}
                     onFinish={onFinish}
