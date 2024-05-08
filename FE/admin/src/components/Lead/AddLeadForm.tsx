@@ -27,13 +27,15 @@ interface AddLeadFormProps {
 
 export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
     const [form] = Form.useForm();
-
+    const { data, status } = useSession();
     const onFinish = async (values: any) => {
         form.validateFields();
         try {
             const response = fetchClient({
                 url: "/customers",
-                body: { data: { ...values, type: "lead" } },
+                body: {
+                    data: { ...values, type: "lead", creatorId: data.user.id },
+                },
                 method: "POST",
                 data_return: true,
             });
@@ -57,6 +59,7 @@ export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
         }
         return e?.fileList;
     };
+    console.log(data);
     return (
         <ConfigProvider
             theme={{

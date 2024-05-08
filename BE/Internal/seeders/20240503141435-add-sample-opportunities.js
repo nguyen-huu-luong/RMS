@@ -5,7 +5,7 @@ const { time } = require("console");
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         let clients = await queryInterface.sequelize.query(
-            `SELECT id FROM public."Clients" LIMIT 100 `);
+            `SELECT id FROM public."Clients"`);
         let products = await queryInterface.sequelize.query(
             `
               SELECT id, price
@@ -29,7 +29,7 @@ module.exports = {
         await queryInterface.bulkInsert("Carts", carts);
 
         carts = await queryInterface.sequelize.query(
-            `SELECT id FROM public."Carts" WHERE "clientId" IS NOT NULL`);
+            `SELECT id FROM public."Carts" WHERE "clientId" IS NOT NULL LIMIT 100`);
         carts = carts[0]
 
         for (let i = 0; i < carts.length; i++) {

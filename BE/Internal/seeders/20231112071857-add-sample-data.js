@@ -148,11 +148,7 @@ module.exports = {
                 score: 0,
                 address: address,
                 source: sources[Math.floor(Math.random() * sources.length)],
-                groupId: group[Math.floor(Math.random() * group.length)],
-                type: "customer",
-                convertDate: randomDate(new Date(2012, 0, 1), new Date()),
-                segmentDate: randomDate(new Date(2012, 0, 1), new Date()),
-                hashedPassword: clientPassword,
+                type: "lead",
                 isRegistered: true,
                 isActive: true,
                 language: "vi",
@@ -181,7 +177,7 @@ module.exports = {
             }
             clients.push(client);
         }
-        for (let i = 0; i < 990; i++) {
+        for (let i = 0; i < 1290; i++) {
             const gender = faker.datatype.boolean();
             const client = {
                 email: faker.internet.email(),
@@ -190,65 +186,11 @@ module.exports = {
                 lastname: faker.name.firstName(gender ? "male" : "female"),
                 gender: gender,
                 birthday: randomDate(
-                    new Date(1950, 0, 1),
-                    new Date(2014, 0, 1)
+                    new Date(1980, 0, 1),
+                    new Date(2010, 0, 1)
                 ),
                 avatar: avatar[i % 10],
                 score: 0,
-                groupId: group[Math.floor(Math.random() * group.length)],
-                convertDate: randomDate(new Date(2018, 0, 1), new Date()),
-                address: faker.address.streetAddress(true),
-                source: sources[Math.floor(Math.random() * sources.length)],
-                type: "customer",
-                hashedPassword: clientPassword,
-                isRegistered: true,
-                isActive: true,
-                language: "vi",
-                profit: 0,
-                average: 0,
-                total_items: 0,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            };
-            if (client.type === "customer") {
-                client.convertDate = faker.date.between(
-                    twoYearsAgo,
-                    currentDate
-                );
-                client.segmentDate = faker.date.between(
-                    twoYearsAgo,
-                    currentDate
-                );
-                let date = new Date(client.convertDate);
-                date.setMonth(
-                    date.getMonth() - Math.floor(Math.random() * 5) + 1
-                );
-                client.createdAt = date;
-                client.updatedAt = date;
-            } else {
-                client.createdAt = faker.date.between(twoYearsAgo, currentDate);
-                client.updatedAt = client.createdAt;
-            }
-            clients.push(client);
-        }
-
-        for (let i = 0; i < 300; i++) {
-            const gender = faker.datatype.boolean();
-            const client = {
-                email: faker.internet.email(),
-                phone: faker.phone.phoneNumber(),
-                firstname: faker.name.firstName(gender ? "male" : "female"),
-                lastname: faker.name.firstName(gender ? "male" : "female"),
-                gender: gender,
-                birthday: randomDate(
-                    new Date(1950, 0, 1),
-                    new Date(2014, 0, 1)
-                ),
-                avatar: avatar[i % 10],
-                score: 0,
-                groupId: group[Math.floor(Math.random() * group.length)],
-                convertDate: null,
-                segmentDate: randomDate(new Date(2012, 0, 1), new Date()),
                 address: faker.address.streetAddress(true),
                 source: sources[Math.floor(Math.random() * sources.length)],
                 type: "lead",
@@ -257,6 +199,8 @@ module.exports = {
                 isActive: true,
                 language: "vi",
                 profit: 0,
+                average: 0,
+                total_items: 0,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             };
@@ -274,13 +218,14 @@ module.exports = {
                     date.getMonth() - Math.floor(Math.random() * 5) + 1
                 );
                 client.createdAt = date;
+                client.updatedAt = date;
             } else {
-                client.createdAt = faker.date.between(twoYearsAgo, currentDate);
-                client.updatedAt = client.createdAt;
+                let date = faker.date.between(twoYearsAgo, currentDate);
+                client.createdAt = date;
+                client.updatedAt = date;
             }
             clients.push(client);
         }
-
         const firstnames = [
             "Nguyễn",
             "Trần",

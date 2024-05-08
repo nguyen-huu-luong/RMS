@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 
-export default function Business() {
+export default function Marketing() {
   const router = useRouter()
-  router.push('/bussiness/products')
+  router.push('/marketing/campaigns')
 }
