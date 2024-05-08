@@ -322,7 +322,6 @@ const CustomerProfile = () => {
     ];
 
     console.log(recentHistory)
-
     return (
         <>
             {
@@ -499,7 +498,7 @@ const CustomerProfile = () => {
                                         <CalendarOutlined
                                             style={{ color: "#4A58EC" }}
                                         />{" "}
-                                        {moment(userInfo.createdAt).format(
+                                        {moment(customerInfo.createdAt).format(
                                             "MMMM D, YYYY"
                                         )}{" "}
                                         by{" "}
@@ -519,7 +518,7 @@ const CustomerProfile = () => {
                                         <CalendarOutlined
                                             style={{ color: "#4A58EC" }}
                                         />{" "}
-                                        {moment(userInfo.updatedAt).format(
+                                        {moment(customerInfo.updatedAt).format(
                                             "MMMM D, YYYY"
                                         )}{" "}
                                     </p>
@@ -592,7 +591,7 @@ const CustomerProfile = () => {
                                                                     </p>
                                                                     <p>
                                                                         {moment(
-                                                                            item.createddAt
+                                                                            item.createdAt
                                                                         ).format(
                                                                             "MMMM D, YYYY"
                                                                         )}

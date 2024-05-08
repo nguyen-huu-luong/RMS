@@ -94,6 +94,7 @@ const LeadProfile = () => {
             </>
         );
     } else {
+        console.log(leadInfo)
         if (leadInfo) {
             userInfo = {
                 name: leadInfo.firstname + " " + leadInfo.lastname,
@@ -496,7 +497,7 @@ const LeadProfile = () => {
                                         <CalendarOutlined
                                             style={{ color: "#4A58EC" }}
                                         />{" "}
-                                        {moment(userInfo.createdAt).format(
+                                        {moment(leadInfo.createdAt).format(
                                             "MMMM D, YYYY"
                                         )}{" "}
                                         by{" "}
@@ -516,7 +517,7 @@ const LeadProfile = () => {
                                         <CalendarOutlined
                                             style={{ color: "#4A58EC" }}
                                         />{" "}
-                                        {moment(userInfo.updatedAt).format(
+                                        {moment(leadInfo.updatedAt).format(
                                             "MMMM D, YYYY"
                                         )}{" "}
                                     </p>
@@ -589,7 +590,7 @@ const LeadProfile = () => {
                                                                     </p>
                                                                     <p>
                                                                         {moment(
-                                                                            item.createddAt
+                                                                            item.createdAt
                                                                         ).format(
                                                                             "MMMM D, YYYY"
                                                                         )}
