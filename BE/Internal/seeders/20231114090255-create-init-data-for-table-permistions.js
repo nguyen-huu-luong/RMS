@@ -92,6 +92,7 @@ module.exports = {
             { role: 'employee', resource: 'groups', action: 'delete:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'groups', action: 'create:any', attributes: '*', createdAt: d, updatedAt: d },
             { role: 'employee', resource: 'groups', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
+            { role: 'employee', resource: 'reports', action: 'read:any', attributes: '*', createdAt: d, updatedAt: d },
 
             // Thêm dữ liệu cho các role khác tương tự ở đây
 

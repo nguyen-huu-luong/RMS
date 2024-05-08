@@ -1,7 +1,6 @@
-"use client";
 import {useTranslations} from 'next-intl';
-import { useRouter } from "next/navigation";
+ 
 export default function Index() {
-  const router = useRouter()
-  router.push('/overview')
+  const t = useTranslations('Index');
+  return <h1>{t('title')}</h1>;
 }
