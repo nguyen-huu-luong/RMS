@@ -90,7 +90,7 @@ export class OrderRepository
                 yesterday.getFullYear(),
                 yesterday.getMonth(),
                 yesterday.getDate() + 1
-            );
+            ); 
             const [todayOrders, yesterdayOrders] = await Promise.all([
                 this._model.findAll({
                     where: {

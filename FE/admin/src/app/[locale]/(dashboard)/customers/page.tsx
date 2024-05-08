@@ -235,7 +235,8 @@ const CustomerListPages: React.FC = () => {
 				url: "/customers", 
 				body: {
 					data: {
-						...values
+						...values,
+						convertDate: new Date()
 					}
 				}
 			})

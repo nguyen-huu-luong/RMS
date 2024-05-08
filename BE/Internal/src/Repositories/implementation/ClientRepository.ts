@@ -37,15 +37,19 @@ export class ClientRepository
         const clients = await this._model.findAll({
             where: { profit: { [Op.gt]: profit } },
         });
-		const clientsWithoutVoucher = await Promise.all(clients.map(async (client: Client) => {
-			const voucher = await client.getVouchers({
-				where: {
-					id: voucherId,
-				},
-			});
-			if (voucher.length === 0) return client;
-		}));
-		const res = clientsWithoutVoucher.filter(client => client !== undefined);
+        const clientsWithoutVoucher = await Promise.all(
+            clients.map(async (client: Client) => {
+                const voucher = await client.getVouchers({
+                    where: {
+                        id: voucherId,
+                    },
+                });
+                if (voucher.length === 0) return client;
+            })
+        );
+        const res = clientsWithoutVoucher.filter(
+            (client) => client !== undefined
+        );
         return res;
     }
 
@@ -220,6 +224,17 @@ export class ClientRepository
             const endOfToday = today;
             const yesterday = new Date();
             yesterday.setDate(today.getDate() - 1);
+            yesterday.setDate(today.getDate() - 1);
+            const startOfYesterday = new Date(
+                yesterday.getFullYear(),
+                yesterday.getMonth(),
+                yesterday.getDate()
+            );
+            const endOfYesterday = new Date(
+                yesterday.getFullYear(),
+                yesterday.getMonth(),
+                yesterday.getDate() + 1
+            );
             const [todayConversions, yesterdayConversions] = await Promise.all([
                 this._model.findAll({
                     where: {
@@ -231,7 +246,7 @@ export class ClientRepository
                 this._model.findAll({
                     where: {
                         convertDate: {
-                            [Op.between]: [startOfToday, endOfToday],
+                            [Op.between]: [startOfYesterday, endOfYesterday],
                         },
                     },
                 }),
@@ -384,15 +399,21 @@ export class ClientRepository
                 group: ["date"],
             });
             const leadsMap = Object.fromEntries(
-                leads.map((item: any) => [item.getDataValue('date'), item.getDataValue('count')])
+                leads.map((item: any) => [
+                    item.getDataValue("date"),
+                    item.getDataValue("count"),
+                ])
             );
             const customersMap = Object.fromEntries(
-                customers.map((item: any) => [item.getDataValue('date'), item.getDataValue('count')])
+                customers.map((item: any) => [
+                    item.getDataValue("date"),
+                    item.getDataValue("count"),
+                ])
             );
 
             const dates = new Set([
-                ...leads.map((item: any) => item.getDataValue('date')),
-                ...customers.map((item: any) => item.getDataValue('date')),
+                ...leads.map((item: any) => item.getDataValue("date")),
+                ...customers.map((item: any) => item.getDataValue("date")),
             ]);
             const result = [];
             for (const date of dates) {
@@ -409,27 +430,29 @@ export class ClientRepository
     }
 
     public async checkExist(email: string) {
-		return await this._model.findAll({
-			where: {
-				email: email
-			}
-		})
-	}
+        return await this._model.findAll({
+            where: {
+                email: email,
+            },
+        });
+    }
 
-	public async findByCond(cond: any) {
-		return await this._model.findAll(cond)
-	}
+    public async findByCond(cond: any) {
+        return await this._model.findAll(cond);
+    }
 
     public async updateBaseCond(value: any, cond: any) {
         return await this._model.update(value, cond);
     }
 
     public async deleteManyClients(ids: number[]) {
-        const result = await this._model.destroy({where: {
-            id: ids
-        }})
+        const result = await this._model.destroy({
+            where: {
+                id: ids,
+            },
+        });
 
-        console.log(result)
-        return result
+        console.log(result);
+        return result;
     }
 }
