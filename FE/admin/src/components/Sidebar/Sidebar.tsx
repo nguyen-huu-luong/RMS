@@ -5,8 +5,11 @@ import {
 	UserAddOutlined,
 	AccountBookOutlined,
 	LeftOutlined,
-	SnippetsOutlined
-	
+	SnippetsOutlined,
+	LineChartOutlined,
+	PicRightOutlined,
+	DeliveredProcedureOutlined,
+	HomeOutlined 
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { Button } from "antd";
@@ -36,7 +39,7 @@ export default function Sidebar() {
 			title: t("overview"),
 			itemId: "/overview",
 			navigateTo: "/overview",
-			icon: <UserAddOutlined />,
+			icon: <LineChartOutlined />,
 		},
 		{
 			title: t("customer"),
@@ -54,7 +57,7 @@ export default function Sidebar() {
 			title: t("organization"),
 			itemId: "/organization",
 			navigateTo: "#",
-			icon: <UserAddOutlined />,
+			icon: <PicRightOutlined />,
 			subNavs: [
 				{
 					title: t("employee"),
@@ -90,17 +93,12 @@ export default function Sidebar() {
 			title: t("marketing"),
 			itemId: "/marketing",
 			navigateTo: "#",
-			icon: <UserAddOutlined />,
+			icon: <DeliveredProcedureOutlined />,
 			subNavs: [
 				{
 					title: t("campaign"),
 					itemId: "/marketing/campaigns",
 					navigateTo: "/marketing/campaigns",
-				},
-				{
-					title: t("automated-message"),
-					itemId: "/marketing/automations",
-					navigateTo: "/marketing/automations",
 				},
 				{
 					title: t("message-template"),
@@ -119,7 +117,7 @@ export default function Sidebar() {
 			title: t("bussiness"),
 			itemId: "/bussiness",
 			navigateTo: "#",
-			icon: <UserAddOutlined />,
+			icon: <HomeOutlined />,
 			subNavs: [
 				{
 					title: t("product"),
@@ -127,39 +125,10 @@ export default function Sidebar() {
 					navigateTo: "/bussiness/products",
 				},
 				{
-					title: t("news"),
-					itemId: "/bussiness/news",
-					navigateTo: "/bussiness/news",
-				},
-				{
 					title: t("voucher"),
 					itemId: "/bussiness/vouchers",
 					navigateTo: "/bussiness/vouchers",
-				},
-				{
-					title: t("information"),
-					itemId: "/bussiness/infomation",
-					navigateTo: "/bussiness/information",
-				},
-			],
-		},
-
-		{
-			title: t("report"),
-			itemId: "/report",
-			navigateTo: "#",
-			icon: <UserAddOutlined />,
-			subNavs: [
-				{
-					title: t("crm-report"),
-					itemId: "/report/crm",
-					navigateTo: "/report/crm",
-				},
-				{
-					title: t("bussiness-report"),
-					itemId: "/report/rbussiness",
-					navigateTo: "/report/rbussiness",
-				},
+				}
 			],
 		},
 

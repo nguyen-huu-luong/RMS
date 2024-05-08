@@ -170,8 +170,8 @@ export class ClientService {
 
     }
 
-    public updateCustomerGroup = async (group_info: any, update_convert_time: boolean) => {
-        if (update_convert_time) {
+    public updateCustomerGroup = async (group_info: any, update_segment_time: boolean) => {
+        if (update_segment_time) {
             await Promise.all(
                 group_info.map(async (item: any) => {
                     await this.clientRepository.updateBaseCond({
@@ -206,20 +206,21 @@ export class ClientService {
             )
         }
         else {
-            await Promise.all(
-                group_info.map(async (item: any) => {
-                    await this.clientRepository.update(item.id, {
-                        groupId: item.groupId,
-                    })
-                }
-                )
-            )
+            for(let i = 0; i < group_info.length; i++) {
+                let client: any = await this.clientRepository.findById(group_info[i].id)
+                let segmentDate = client.createdAt
+                segmentDate.setDate(segmentDate.getDate() + Math.floor(Math.random()*30))
+                await this.clientRepository.update(client.id, {
+                    groupId: group_info[i].groupId + 1,
+                    segmentDate: segmentDate
+                })
+            }
         }
     }
 
-    public segmentProcess = async (customers: any, update_convert_time = true) => {
+    public segmentProcess = async (customers: any, update_segment_time: any) => {
         const res = await axios.post(`http://${process.env.FLASK_HOST}:${process.env.FLASK_PORT}/api/segment`, customers);
-        await this.updateCustomerGroup(res.data, update_convert_time)
+        await this.updateCustomerGroup(res.data, update_segment_time)
     }
 
     public segmentCustomerAll = async () => {
@@ -232,7 +233,7 @@ export class ClientService {
             })
 
             if (customers.length > 0) {
-                await this.segmentProcess(customers, true)
+                await this.segmentProcess(customers, false)
             }
 
             return { "status": "success" }
@@ -378,23 +379,23 @@ export class ClientService {
                                                                     ORDER BY groups.name ASC
                                                                 `);
 
-                const [avg_convert_time, metadata_avg_convert_time] = await sequelizeObj.query(`SELECT groups.name, avg(DATE_PART('day', "Clients"."createdAt"::timestamp - "segmentDate"::timestamp)) as avg_convert_date
-                                                                    FROM "Clients" JOIN "Groups" as groups ON "groupId" = groups.id
-                                                                    GROUP BY groups.name, groups.id
-                                                                    ORDER BY groups.name ASC
-            `);
+            //     const [avg_convert_time, metadata_avg_convert_time] = await sequelizeObj.query(`SELECT groups.name, avg(DATE_PART('day', "Clients"."createdAt"::timestamp - "segmentDate"::timestamp)) as avg_convert_date
+            //                                                         FROM "Clients" JOIN "Groups" as groups ON "groupId" = groups.id
+            //                                                         GROUP BY groups.name, groups.id
+            //                                                         ORDER BY groups.name ASC
+            // `);
 
                 let temp_groups = []
                 for (let idx in gender) {
                     let temp_gender: any = gender[idx]
                     let temp_source: any = source[idx]
-                    let temp_avg_convert_time: any = avg_convert_time[idx]
+                    // let temp_avg_convert_time: any = avg_convert_time[idx]
                     let element = {
                         name: temp_gender.name,
                         description: temp_gender.description,
                         gender: temp_gender.gender ? "Male" : "Female",
                         source: temp_source.source,
-                        avg_convert_day: parseInt(temp_avg_convert_time.avg_convert_date)
+                        // avg_convert_day: parseInt(temp_avg_convert_time.avg_convert_date)
                     }
                     temp_groups.push(element)
 

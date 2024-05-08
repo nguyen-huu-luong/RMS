@@ -99,12 +99,6 @@ const SegmentationOverview = () => {
             dataIndex: 'source',
             key: 'source',
             render: (text, record) => <p style={{ color: `${chartDataTemp.columnStyle[record.name]}` }}>{text}</p>
-        },
-        {
-            title: 'Convert Day Average',
-            dataIndex: 'avg_convert_day',
-            key: 'avg_convert_day',
-            render: (text, record) => <p style={{ color: `${chartDataTemp.columnStyle[record.name]}` }}>{text}</p>
         }
     ];
 
@@ -128,10 +122,10 @@ const SegmentationOverview = () => {
                 <span>Customer Group Overview</span>
             </div>
             <div className='flex pb-5'>
-                <div className='flex-auto'>
+                <div className='flex-1' >
                     <Pie data={data} />
                 </div>
-                <div className='flex-auto  flex justify-center items-center'>
+                <div className='flex-1  flex justify-center items-center'>
                     <Table columns={group_columns} dataSource={groupSumarize} pagination={false} className='' />
                 </div>
             </div>

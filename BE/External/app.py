@@ -26,7 +26,6 @@ def getAverageItem(profit, total_items):
   return profit/total_items
 
 def getDaySinceLastPurchase(last_purchase):
-    print(last_purchase)
     today = date.today()
     last_purchase_day = last_purchase.split('T')[0]
     last_purchase_day_obj = datetime.strptime(last_purchase_day, "%Y-%m-%d").date()
