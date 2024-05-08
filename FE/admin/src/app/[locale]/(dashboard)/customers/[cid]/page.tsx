@@ -396,7 +396,7 @@ const CustomerProfile = () => {
                                         <div>
                                             <p className="font-bold">Email</p>
                                             <div>
-                                                <input type="text" defaultValue={userInfo.email ? userInfo.email : "None"} className="rounded-md py-1" style={style} readOnly={editFlag} name="email"></input>
+                                                <input type="text" defaultValue={userInfo.email ? userInfo.email : "None"} className="rounded-md py-1" style={{outline: "0", backgroundColor: "", border: "", paddingLeft: ""}}  name="email"></input>
                                             </div>
                                         </div>
 
