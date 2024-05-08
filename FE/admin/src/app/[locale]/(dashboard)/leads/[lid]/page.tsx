@@ -94,7 +94,7 @@ const LeadProfile = () => {
             </>
         );
     } else {
-        console.log(leadInfo)
+        console.log(leadInfo);
         if (leadInfo) {
             userInfo = {
                 name: leadInfo.firstname + " " + leadInfo.lastname,
@@ -536,8 +536,8 @@ const LeadProfile = () => {
                                                     {history
                                                         .slice(
                                                             (historyPage - 1) *
-                                                                8,
-                                                            historyPage * 8
+                                                                2,
+                                                            historyPage * 2
                                                         )
                                                         .map((item: any) => {
                                                             return (
@@ -607,7 +607,7 @@ const LeadProfile = () => {
                                                             total={
                                                                 history.length
                                                             }
-                                                            pageSize={8}
+                                                            pageSize={2}
                                                         />
                                                     </div>
                                                 </>

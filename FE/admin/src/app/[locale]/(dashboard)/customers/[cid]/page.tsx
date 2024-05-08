@@ -537,8 +537,8 @@ const CustomerProfile = () => {
                                                     {customerHistory
                                                         .slice(
                                                             (historyPage - 1) *
-                                                            8,
-                                                            historyPage * 8
+                                                            2,
+                                                            historyPage * 2
                                                         )
                                                         .map((item: any) => {
                                                             return (
@@ -608,7 +608,7 @@ const CustomerProfile = () => {
                                                             total={
                                                                 customerHistory.length
                                                             }
-                                                            pageSize={8}
+                                                            pageSize={2}
                                                         />
                                                     </div>
                                                 </>
