@@ -31,7 +31,7 @@ class SocketConnection {
                             isRegistered: true,
                             isActive: true,
                             language: "vi",
-                            type: "lead",
+                            type: "Anonymous Client",
                             createdAt: new Date(),
                             updatedAt: new Date(),
                         };
