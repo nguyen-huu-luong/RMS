@@ -32,16 +32,7 @@ module.exports = {
             };
             channels.push(cart);
         }
-        for (let i = 1; i <= 1300; i++) {
-            let cart = {
-                total: 0,
-                amount: 0,
-                clientId: i,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            };
-            carts.push(cart);
-        }
+
         await queryInterface.bulkInsert("Carts", carts);
         await queryInterface.bulkInsert("Channels", channels);
 

@@ -6,7 +6,7 @@ module.exports = {
         let orders = [];
         const currentDate = new Date();
         const twoYearsAgo = new Date(
-            currentDate.getFullYear() - 3,
+            currentDate.getFullYear() - 1,
             currentDate.getMonth(),
             currentDate.getDate()
         );
@@ -104,6 +104,7 @@ module.exports = {
                     `
                     UPDATE public."Clients"
                     SET profit = :profit,
+                        type = :type,
                         "convertDate" = :convertDate,
                         "lastPurchase" = :lastPurchase,
                         total_items = :num_items,
@@ -116,6 +117,7 @@ module.exports = {
                     {
                         replacements: {
                             profit: profit,
+                            type: "customer",
                             convertDate: clientConvertDate[index],
                             lastPurchase: clientLastPurchased[index],
                             num_items: clientItems[index],

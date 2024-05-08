@@ -22,7 +22,7 @@ export class ReportService {
         let profitBefore = 0;
         let orderNow = 0;
         let orderBefore = 0;
-        let clientNow = 0;
+        let clientNow = 0; 
         let clientBefore = 0;
         if (options?.type === "DAILY") {
             const { todayOrders, yesterdayOrders } = await this.orderRepository.getDailyOrder();
