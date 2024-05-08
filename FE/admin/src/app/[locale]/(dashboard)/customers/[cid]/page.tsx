@@ -322,7 +322,6 @@ const CustomerProfile = () => {
     ];
 
     console.log(recentHistory)
-
     return (
         <>
             {
@@ -499,7 +498,7 @@ const CustomerProfile = () => {
                                         <CalendarOutlined
                                             style={{ color: "#4A58EC" }}
                                         />{" "}
-                                        {moment(userInfo.createdAt).format(
+                                        {moment(customerInfo.createdAt).format(
                                             "MMMM D, YYYY"
                                         )}{" "}
                                         by{" "}
@@ -519,7 +518,7 @@ const CustomerProfile = () => {
                                         <CalendarOutlined
                                             style={{ color: "#4A58EC" }}
                                         />{" "}
-                                        {moment(userInfo.updatedAt).format(
+                                        {moment(customerInfo.updatedAt).format(
                                             "MMMM D, YYYY"
                                         )}{" "}
                                     </p>
@@ -538,8 +537,8 @@ const CustomerProfile = () => {
                                                     {customerHistory
                                                         .slice(
                                                             (historyPage - 1) *
-                                                            8,
-                                                            historyPage * 8
+                                                            2,
+                                                            historyPage * 2
                                                         )
                                                         .map((item: any) => {
                                                             return (
@@ -592,7 +591,7 @@ const CustomerProfile = () => {
                                                                     </p>
                                                                     <p>
                                                                         {moment(
-                                                                            item.createddAt
+                                                                            item.createdAt
                                                                         ).format(
                                                                             "MMMM D, YYYY"
                                                                         )}
@@ -609,7 +608,7 @@ const CustomerProfile = () => {
                                                             total={
                                                                 customerHistory.length
                                                             }
-                                                            pageSize={8}
+                                                            pageSize={2}
                                                         />
                                                     </div>
                                                 </>

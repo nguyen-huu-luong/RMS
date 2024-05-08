@@ -94,6 +94,7 @@ const LeadProfile = () => {
             </>
         );
     } else {
+        console.log(leadInfo);
         if (leadInfo) {
             userInfo = {
                 name: leadInfo.firstname + " " + leadInfo.lastname,
@@ -496,7 +497,7 @@ const LeadProfile = () => {
                                         <CalendarOutlined
                                             style={{ color: "#4A58EC" }}
                                         />{" "}
-                                        {moment(userInfo.createdAt).format(
+                                        {moment(leadInfo.createdAt).format(
                                             "MMMM D, YYYY"
                                         )}{" "}
                                         by{" "}
@@ -516,7 +517,7 @@ const LeadProfile = () => {
                                         <CalendarOutlined
                                             style={{ color: "#4A58EC" }}
                                         />{" "}
-                                        {moment(userInfo.updatedAt).format(
+                                        {moment(leadInfo.updatedAt).format(
                                             "MMMM D, YYYY"
                                         )}{" "}
                                     </p>
@@ -535,8 +536,8 @@ const LeadProfile = () => {
                                                     {history
                                                         .slice(
                                                             (historyPage - 1) *
-                                                                8,
-                                                            historyPage * 8
+                                                                2,
+                                                            historyPage * 2
                                                         )
                                                         .map((item: any) => {
                                                             return (
@@ -589,7 +590,7 @@ const LeadProfile = () => {
                                                                     </p>
                                                                     <p>
                                                                         {moment(
-                                                                            item.createddAt
+                                                                            item.createdAt
                                                                         ).format(
                                                                             "MMMM D, YYYY"
                                                                         )}
@@ -606,7 +607,7 @@ const LeadProfile = () => {
                                                             total={
                                                                 history.length
                                                             }
-                                                            pageSize={8}
+                                                            pageSize={2}
                                                         />
                                                     </div>
                                                 </>
