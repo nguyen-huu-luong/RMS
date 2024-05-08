@@ -446,8 +446,7 @@ const LeadProfile = () => {
                                                             : "None"
                                                     }
                                                     className='rounded-md py-1'
-                                                    style={style}
-                                                    readOnly={editFlag}
+                                                    style={{outline: "0", backgroundColor: "", border: "", paddingLeft: ""}}
                                                     name='email'
                                                 ></input>
                                             </div>
