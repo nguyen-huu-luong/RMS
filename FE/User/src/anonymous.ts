@@ -7,20 +7,21 @@ export default function useAnonymousSocket() {
     const [socket, setSocket] = useState<any>();
 
     useEffect(() => {
-        const storedValue = Cookies.get('socketId');
+        const storedValue = Cookies.get("socketId");
         const newSocket = io(`http://localhost:3003`, {
             query: { customId: storedValue },
         });
-
+        console.log("first connected");
         newSocket.on("connect", () => {
-
-            if (!storedValue){
+            if (!storedValue) {
                 const id: any = newSocket.id;
                 const expires = new Date();
                 expires.setHours(expires.getHours() + 24);
-                Cookies.set('socketId', id, { expires });
-            };
+                Cookies.set("socketId", id, { expires });
+                newSocket.io.opts.query = { customId: id };
+            }
             console.log("Connected");
+            console.log(newSocket.io.opts.query);
         });
 
         newSocket.on("disconnect", () => {

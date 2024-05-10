@@ -1,95 +1,60 @@
-"use client";
-import React from "react";
-import {
-    Button,
-    ConfigProvider,
-    DatePicker,
-    Form,
-    Input,
-    Select,
-    Space,
-    Upload,
-    message,
-} from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import styled from "styled-components";
-import useToken from "antd/es/theme/useToken";
+import { Form, FormInstance, Select, message } from "antd";
+import { AxiosError } from "axios";
+import { ReactNode, useState } from "react";
 import RMSInput from "../inputs/RMSInput";
 import RMSDatePicker from "../inputs/RMSDatePicker";
-import axios from "axios";
-import { useSession } from "next-auth/react";
-import fetchClient from "@/lib/fetch-client";
+import TextArea from "antd/es/input/TextArea";
+import Link from "next/link";
 
-interface AddLeadFormProps {
-    afterSubmit: () => void;
-    afterCancel: () => void;
+export interface ICreateModal {
+    formControl: FormInstance<any>;
+    onCreate: (values: any) => Promise<void>;
 }
 
-export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
-    const [form] = Form.useForm();
-    const { data, status } = useSession();
-    const onFinish = async (values: any) => {
-        form.validateFields();
+export const CreateNewLeadForm: React.FC<ICreateModal> = ({ formControl, onCreate }) => {
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+    const [boxInformation, setBoxInformation] = useState<ReactNode>(<></>);
+
+    const handleFormSubmit = async (values: any) => {
+        setErrorMsg("");
+        setBoxInformation(<></>);
+        setLoading(true);
         try {
-            const response = fetchClient({
-                url: "/customers",
-                body: {
-                    data: { ...values, type: "lead", creatorId: data.user.id },
-                },
-                method: "POST",
-                data_return: true,
-            });
-            console.log(response);
-            message.success("Lead added successfully");
-            form.resetFields();
-            props.afterSubmit();
+            await onCreate(values);
+            message.success("Create lead successfully");
+            formControl.resetFields();
         } catch (error) {
-            console.error("Error adding Lead:", error);
-            message.error("Failed to add Lead");
+            setLoading(false);
+            if (!(error instanceof AxiosError)) {
+                throw error;
+            } else {
+                if (error.response && error.response.data.name !== "Conflict") {
+                    setErrorMsg(error.response.data.message || "Đã xảy ra lỗi");
+                } else {
+                    const message = error.response ? error.response.data.message : "";
+                    if (message) {
+                        const regex = /id=<([^>]*)>/;
+                        const match = message.match(regex);
+                        if (match) {
+                            setBoxInformation(
+                                <div className="flex items-center p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                                    <span className="font-medium">Found user with email={formControl.getFieldValue("email")}</span>
+                                    <Link className="ms-3" href={`/leads/${match[1]}`}>View profile</Link>
+                                </div>
+                            );
+                        }
+                    }
+                }
+            }
         }
+        setLoading(false);
     };
 
-    const onFinishFailed = (errorInfo: any) => {
-        console.error("Failed:", errorInfo);
-    };
-    const normFile = (e: any) => {
-        console.log("Upload event:", e);
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e?.fileList;
-    };
-    console.log(data);
     return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    Form: {
-                        itemMarginBottom: 16,
-                    },
-                    Input: {
-                        addonBg: "#F6FAFD",
-                        colorFillTertiary: "#F6FAFD",
-                    },
-                    DatePicker: {
-                        colorFillTertiary: "#F6FAFD",
-                    },
-
-                    Select: {
-                        colorFillTertiary: "#F6FAFD",
-                    },
-                },
-            }}
-        >
-            <Form
-                name='form_item_path'
-                variant='filled'
-                layout='vertical'
-                style={{ maxWidth: 1000 }}
-                onFinish={onFinish}
-                onReset={props.afterCancel}
-            >
-                <div className='flex space-x-2'>
+        <>
+            <Form variant="filled" form={formControl} layout="vertical" style={{ maxWidth: 1000 }} onFinish={handleFormSubmit}>
+                <div className="flex space-x-2">
                     <div className='w-full'>
                         <Form.Item
                             label='Firstname'
@@ -122,17 +87,14 @@ export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
                     </div>
                 </div>
 
-                <div className='flex space-x-2'>
+                <Form.Item name="type" initialValue="lead" hidden />
+
+                <div className="flex space-x-2">
                     <div className='w-full'>
                         <Form.Item
                             label='Phone'
                             name='phone'
-                            required
                             rules={[
-                                {
-                                    required: true,
-                                    message: "Please input your phone number!",
-                                },
                                 {
                                     pattern: /^(\+?\d{1,3}[- ]?)?\d{10}$/,
                                     message:
@@ -165,13 +127,13 @@ export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
                     </div>
                 </div>
 
-                <div className='flex space-x-2'>
+                <div className="flex space-x-2">
                     <div className='w-full'>
-                        <Form.Item label='Birthday' name='birthday'>
+                        <Form.Item label="Birthday" name="birthday">
                             <RMSDatePicker className='w-full' />
                         </Form.Item>
                     </div>
-                    <div className='w-full'>
+                    <div className="w-full">
                         <Form.Item
                             label='Source'
                             name='source'
@@ -193,24 +155,18 @@ export const AddLeadForm: React.FC<AddLeadFormProps> = (props) => {
                                 <Select.Option value='Facebook'>
                                     Facebook
                                 </Select.Option>
-                                <Select.Option value='Subcriptions'>
-                                    Subcriptions
+                                <Select.Option value='Subscriptions'>
+                                    Subscriptions
                                 </Select.Option>
                             </Select>
                         </Form.Item>
                     </div>
                 </div>
-                <Form.Item>
-                    <div className='flex justify-end space-x-2'>
-                        <Button type='default' htmlType='reset'>
-                            Cancel
-                        </Button>
-                        <Button type='primary' htmlType='submit'>
-                            Save
-                        </Button>
-                    </div>
-                </Form.Item>
             </Form>
-        </ConfigProvider>
+            {errorMsg && <p className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400">
+                Error message response from server: {errorMsg}
+            </p>}
+            {boxInformation}
+        </ >
     );
 };

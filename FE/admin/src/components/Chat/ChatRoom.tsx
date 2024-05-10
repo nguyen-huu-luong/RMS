@@ -9,15 +9,22 @@ import Status from "./Status";
 import { useState, useEffect, useCallback, useRef } from "react";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
-import { Spin, Upload, UploadProps, message } from "antd";
+import {
+    Button,
+    Drawer,
+    Space,
+    Spin,
+    Upload,
+    UploadProps,
+    message,
+} from "antd";
 import Loading from "../loading";
 import { variables } from "@/app";
 import { useRouter } from "next-intl/client";
-import { CreateNewLeadModal } from "../Modals/CreateNewLeadModal";
 import { useForm } from "antd/es/form/Form";
 import { AxiosError } from "axios";
 import { uploadImage } from "@/app/api/upload";
-
+import { CreateNewLeadForm } from "../Lead/AddLeadForm";
 const ChatBox = ({
     channel,
     setChannel,
@@ -41,7 +48,13 @@ const ChatBox = ({
     const [initial, setInitial] = useState<boolean>(false);
     const router = useRouter();
     const [form_create] = useForm();
-
+    const [open, setOpen] = useState(false);
+    const showDrawer = () => {
+        setOpen(true);
+    };
+    const onClose = () => {
+        setOpen(false);
+    };
     //CREATE LEAD
     const handleCreateLead = async (values: any) => {
         try {
@@ -56,6 +69,7 @@ const ChatBox = ({
                     },
                 },
             });
+            onClose();
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.response) {
@@ -71,6 +85,15 @@ const ChatBox = ({
                 message.error("Đã xãy ra lỗi");
                 throw error;
             }
+        }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            form_create.submit();
+        } catch (error) {
+            message.error("Đã xãy ra lỗi");
+            throw error;
         }
     };
 
@@ -113,6 +136,11 @@ const ChatBox = ({
     useEffect(() => {
         fetchData();
     }, [index, channel]);
+
+    useEffect(() => {
+        form_create.resetFields();
+        onClose();
+    }, [channel]);
 
     useEffect(() => {
         setLoading(false);
@@ -219,7 +247,7 @@ const ChatBox = ({
         file?: any;
         onSuccess?: any;
     }) => {
-        const image = await uploadImage(file, "Dish");
+        const image = await uploadImage(file, "Chat");
         if (image.url) {
             await fetchClient({
                 url: `/channels/admin`,
@@ -324,11 +352,38 @@ const ChatBox = ({
 
     if (channel === -1) return "Choose customer to chat";
     if (!data) return <Loading />;
-    
+
     return (
         <div
-            className={` bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full bottom-5 right-5 z-50`}
+            className={` bg-white relative border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full z-50`}
         >
+            <Drawer
+                title='Create new lead'
+                placement='top'
+                closable={false}
+                onClose={onClose}
+                open={open}
+                getContainer={false}
+                mask={false}
+                maskClosable={false}
+                extra={
+                    <Space>
+                        <Button onClick={onClose}>Cancel</Button>
+                        <Button
+                            type='default'
+                            style={{ backgroundColor: "white" }}
+                            onClick={handleSubmit}
+                        >
+                            Create
+                        </Button>
+                    </Space>
+                }
+            >
+                <CreateNewLeadForm
+                    formControl={form_create}
+                    onCreate={handleCreateLead}
+                />
+            </Drawer>
             <div
                 style={{ backgroundColor: variables.backgroundSecondaryColor }}
                 className='header h-12 w-full text-white items-center flex flex-row justify-between p-4 font-bold border-b-white border-b-2'
@@ -353,10 +408,13 @@ const ChatBox = ({
                         />
                     </span>
                 ) : (
-                    <CreateNewLeadModal
-                        formControl={form_create}
-                        onCreate={handleCreateLead}
-                    />
+                    <Button
+                        type='default'
+                        style={{ backgroundColor: "white" }}
+                        onClick={showDrawer}
+                    >
+                        Create Lead
+                    </Button>
                 )}
             </div>
             <div
@@ -415,9 +473,10 @@ const ChatBox = ({
                         maxCount={1}
                         showUploadList={false}
                         accept='image/*'
-                    >
+                        style={{color: 'aqua'}}
+                        >
                         <FileImageOutlined
-                            style={{ fontSize: "1.4rem" }}
+                            style={{ fontSize: "1.4rem", color: '#4A58EC' }}
                             className='hover:cursor-pointer'
                         />
                     </Upload>
