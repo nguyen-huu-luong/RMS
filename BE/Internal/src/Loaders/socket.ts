@@ -23,7 +23,6 @@ class SocketConnection {
                             where: { clientId: existClient?.dataValues.id },
                         });
                         socket.join("Channel_" + channel?.dataValues.id);
-                        console.log(socket.rooms);
                     } else {
                         const client = {
                             firstname: socket.id,
@@ -111,7 +110,8 @@ class SocketConnection {
             socket.on(
                 "staff:message:send",
                 (channelId: string, message: string, employeeId: string) => {
-                    console.log(message, channelId);
+                    console.log(channelId, message, employeeId);
+
                     io.to("Channel_" + channelId).emit(
                         "message:send:fromStaff",
                         channelId,
@@ -183,11 +183,15 @@ class SocketConnection {
                     const id = socket.handshake.query.customId
                         ? socket.handshake.query.customId
                         : socket.id;
+                    console.log(id)
                     const client = await Client.findOne({
                         where: {
                             firstname: id,
                         },
                     });
+                    if (!client) {
+
+                    }
                     const channel = await Channel.findOne({
                         where: {
                             clientId: client?.dataValues.id,
@@ -199,7 +203,6 @@ class SocketConnection {
                         content: message,
                         status: "Not seen",
                     });
-                    console.log(message, channel?.dataValues.id);
                     io.to("Channel_" + channel?.dataValues.id).emit(
                         "message:send:fromClient",
                         channel?.dataValues.id,

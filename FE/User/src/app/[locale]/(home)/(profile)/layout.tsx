@@ -62,7 +62,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     ];
     if (status === "loading") return <Loading />;
     if (status === "unauthenticated") router.push("/signin");
-    if (profileError) return <div>Failed to load</div>;
+    if (profileError) return <Loading />;
     if (profileLoading) return <Loading />;
     if (!profile) return <Loading />;
     return (

@@ -542,7 +542,7 @@ import { SendEmailModal } from "@/components/Modals/SendEmailModal";
 import { CreateTargetListModal } from "@/components/Modals/CreateTargetListModal";
 import { useRouter } from "next/navigation";
 import { useForm } from "antd/es/form/Form";
-import { CreateNewCustomerModal } from "@/components/Modals/CreateNewCustomerModal";
+import { CreateNewLeadModal } from "@/components/Modals/CreateNewLeadModal";
 import { AxiosError } from "axios";
 import moment from "moment";
 import Link from "next/link";
@@ -593,7 +593,7 @@ const CustomerListPages: React.FC = () => {
 			title: "Fullname",
 			dataIndex: "fullname",
 			key: "fullname",
-			render: (text, row) => <Link style={{ color: "#4A58EC" }} href={`/customers/${row.id}`}>{text}</Link>,
+			render: (text, row) => <Link style={{ color: "#4A58EC" }} href={`/leads/${row.id}`}>{text}</Link>,
 			// ...getColumnSearchProps("fullname"),
 		},
 		{
@@ -622,6 +622,7 @@ const CustomerListPages: React.FC = () => {
 			title: "Score",
 			dataIndex: "score",
 			key: "score",
+			render: (text, _) => text ? text: 0
 		},
 		{
 			title: "Age",
@@ -762,7 +763,7 @@ const CustomerListPages: React.FC = () => {
 		}
 	}
 
-	const handleCreateCustomer = async (values: any) => {
+	const handleCreateLead = async (values: any) => {
 		try {
 			const  result = await fetchClient({
 				method: "POST",
@@ -799,13 +800,12 @@ const CustomerListPages: React.FC = () => {
 			columns={columns}   
 			url="/customers"
             queryStr="type=lead"
-			createModalTitle="Add new customer"
+			createModalTitle="Add new lead"
 			reload={reload}
 			onSelected={onSelectedRows}
-			createModal={<CreateNewCustomerModal formControl={form_create} onCreate={handleCreateCustomer} />}
+			createModal={<CreateNewLeadModal formControl={form_create} onCreate={handleCreateLead} />}
 			filterItems={filterItems}
 		/>
-
 	);
 };
 

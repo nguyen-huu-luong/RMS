@@ -32,6 +32,8 @@ import moment from "moment";
 import { message } from "antd";
 import fetchClient from "@/lib/fetch-client";
 import useSocket from "@/socket";
+import TableRender, { FilterItemType } from "@/components/TableComponents";
+import TableOrderRender from "@/components/TableOrder";
 
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
@@ -85,6 +87,7 @@ const Order: React.FC = () => {
     const [selectedOrders, setSelectedOrders] = useState<DataType[]>();
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState<any>([]);
+    const [reload, setReload] = useState(false);
     const socket = useSocket();
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
@@ -143,82 +146,30 @@ const Order: React.FC = () => {
     });
     const { styles } = useStyle();
 
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            let filterQueriesStr = "";
-            for (const key in tableParams.filters) {
-                filterQueriesStr = `${filterQueriesStr}&${key}=${tableParams.filters[key]}`;
-            }
-            let sortQueries =
-                tableParams.sorter?.field && tableParams.sorter?.order
-                    ? `&sort=${tableParams.sorter?.field}&order=${
-                          tableParams.sorter?.order === "ascend"
-                              ? "asc"
-                              : "desc"
-                      }`
-                    : "";
-
-            const results = await fetchClient({
-                url: `/orders/admin?page=${tableParams.pagination?.current}
-            &pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
-                data_return: true,
-            });
-            const data = results.data.map((item: any) => ({
-                ...item.order,
-                key: item.order.id,
-                fullname: `${item.client.firstname} ${item.client.lastname}`,
-            }));
-            setData(data);
-            setLoading(false);
-            setTableParams({
-                ...tableParams,
-                pagination: {
-                    ...tableParams.pagination,
-                    pageSize: results.pageSize,
-                    current: parseInt(results.page, 10),
-                    total: results.totalCount,
-                },
-            });
-        } catch (error: any) {
-            console.log(error);
-            setError({
-                isError: true,
-                title: error?.name || "Something went wrong!",
-                message: error?.message || "Unknown error",
-            });
-        }
-    };
-
     useEffect(() => {
         if (!socket) return;
         socket.on("order:finish:fromChef", async (orderId: any) => {
             message.success(`Finish order #${orderId}! Ready to deliver!`);
-            await fetchData();
+            setReload((prev) => !prev)
         });
         socket.on("cancelOrder:fromClient", async (orderId: any) => {
             message.warning(`Order #${orderId} is cancel by client!`);
-            await fetchData();
+            setReload((prev) => !prev)
         });
         socket.on("newOrder:fromClient", async (name: any) => {
             message.success(`New order from client ${name}!`);
-            await fetchData();
+            setReload((prev) => !prev)
         });
         return () => {
             socket.off("order:finish:fromChef");
         };
     }, [socket]);
 
-    useEffect(() => {
-        fetchData();
-    }, [JSON.stringify(tableParams)]);
-
     const showModal = async (id: any) => {
         const res = await fetchClient({
             url: `/orders/${id}`,
             data_return: true,
         });
-        console.log(res);
         if (res) setItems(res.items);
         setOpen(true);
     };
@@ -258,132 +209,6 @@ const Order: React.FC = () => {
         },
     };
 
-    const handleSearch = (
-        selectedKeys: string[],
-        confirm: (param?: FilterConfirmProps) => void,
-        dataIndex: DataIndex
-    ) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
-
-    const handleReset = (clearFilters: () => void) => {
-        clearFilters();
-        setSearchText("");
-    };
-    const getColumnSearchProps = (
-        dataIndex: DataIndex
-    ): TableColumnType<DataType> => ({
-        filterDropdown: ({
-            setSelectedKeys,
-            selectedKeys,
-            confirm,
-            clearFilters,
-            close,
-        }: any) => (
-            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) =>
-                        setSelectedKeys(e.target.value ? [e.target.value] : [])
-                    }
-                    onPressEnter={() =>
-                        handleSearch(
-                            selectedKeys as string[],
-                            confirm,
-                            dataIndex
-                        )
-                    }
-                    style={{ marginBottom: 8, display: "block" }}
-                />
-                <Space>
-                    <Button
-                        type='primary'
-                        onClick={() =>
-                            handleSearch(
-                                selectedKeys as string[],
-                                confirm,
-                                dataIndex
-                            )
-                        }
-                        icon={<SearchOutlined />}
-                        size='small'
-                        style={{ width: 90 }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            clearFilters && handleReset(clearFilters)
-                        }
-                        size='small'
-                        style={{ width: 90 }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type='link'
-                        size='small'
-                        onClick={() => {
-                            confirm({ closeDropdown: false });
-                            setSearchText((selectedKeys as string[])[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
-                    </Button>
-                    <Button
-                        type='link'
-                        size='small'
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered: boolean) => (
-            <SearchOutlined
-                style={{ color: filtered ? "#1677ff" : undefined }}
-            />
-        ),
-        onFilter: (value: any, record: any) =>
-            record[dataIndex]
-                .toString()
-                .toLowerCase()
-                .includes((value as string).toLowerCase()),
-        onFilterDropdownOpenChange: (visible: any) => {
-            if (visible) {
-                setTimeout(() => searchInput.current?.select(), 100);
-            }
-        },
-        render: (text: string) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ""}
-                />
-            ) : (
-                text
-            ),
-    });
-
-    const rowSelection = {
-        onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-            setSelectedOrders(selectedRows);
-        },
-        getCheckboxProps: (record: DataType) => ({
-            disabled: record.fullname === "",
-            name: record.fullname,
-        }),
-    };
 
     const columns: ColumnsType<DataType> = [
         {
@@ -449,13 +274,11 @@ const Order: React.FC = () => {
                     </Space>
                 );
             },
-            // ...getColumnSearchProps("status"),
         },
         {
             title: "Amount",
             dataIndex: "amount",
             key: "amount",
-            ...getColumnSearchProps("amount"),
         },
         {
             title: "Created At",
@@ -464,7 +287,6 @@ const Order: React.FC = () => {
             render: (text, record) => {
                 return <>{moment(text).format("MMMM Do YYYY, h:mm:ss a")}</>;
             },
-            ...getColumnSearchProps("createdAt"),
         },
         {
             title: "Action",
@@ -484,8 +306,8 @@ const Order: React.FC = () => {
                                             },
                                         },
                                         okText: "Accept",
-                                        onOk: () => {
-                                            handleAcceptOrder(record);
+                                        onOk: async () => {
+                                            await handleAcceptOrder(record);
                                         },
                                         footer: (_, { OkBtn, CancelBtn }) => (
                                             <>
@@ -511,8 +333,8 @@ const Order: React.FC = () => {
                                                 },
                                             },
                                             okText: "Reject",
-                                            onOk: () =>
-                                                handleRejectOrder(record),
+                                            onOk: async () =>
+                                                await handleRejectOrder(record),
                                             footer: (
                                                 _,
                                                 { OkBtn, CancelBtn }
@@ -545,7 +367,7 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: "Deliver",
-                                    onOk: () => handleDeliverOrder(record),
+                                    onOk: async () => await handleDeliverOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
                                             <CancelBtn />
@@ -570,7 +392,7 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: "Finish",
-                                    onOk: () => handleDoneOrder(record),
+                                    onOk: async () => await handleDoneOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
                                             <CancelBtn />
@@ -591,92 +413,6 @@ const Order: React.FC = () => {
         },
     ];
 
-    const handleTableChange: TableProps["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        console.log(pagination, filters, sorter, extra);
-        if (Array.isArray(sorter)) {
-            const firstSorter = sorter[0];
-            console.log("Sorter is array");
-            setTableParams((prev) => ({
-                ...prev,
-                pagination,
-                filters,
-                sorter: {
-                    field: firstSorter?.field || prev.sorter?.field,
-                    order: firstSorter?.order || prev.sorter?.order,
-                },
-            }));
-        } else {
-            console.log("Sorter is not an array");
-
-            setTableParams((prev) => ({
-                pagination,
-                filters,
-                sorter: {
-                    field: sorter?.field || prev.sorter?.field,
-                    order: sorter?.order || prev.sorter?.order,
-                },
-            }));
-        }
-
-        setChecker((prevState) => !prevState);
-    };
-
-    const handleSortFieldChange = (key: string) => {
-        console.log(key, tableParams);
-        setTableParams((prev) => ({
-            ...prev,
-            sorter: { ...prev.sorter, field: key },
-        }));
-        setChecker((prevState) => !prevState);
-        console.log(tableParams);
-    };
-
-    const handleToggleSorter = () => {
-        setTableParams((prev) => ({
-            ...prev,
-            sorter: {
-                ...prev.sorter,
-                order: prev.sorter?.order === "ascend" ? "descend" : "ascend",
-            },
-        }));
-        setChecker((prevState) => !prevState);
-    };
-
-    const handleClearFilter = () => {
-        setTableParams((prev: any) => ({
-            ...prev,
-            filters: {},
-        }));
-    };
-
-    const handleClearAll = () => {
-        setTableParams((prev: any) => ({
-            ...prev,
-            pagination: {
-                current: 1,
-                pageSize: 10,
-                total: 0,
-            },
-            filters: {},
-            sorter: {
-                field: "id",
-                order: "ascend",
-            },
-        }));
-        setSearchText("");
-        setSearchedColumn("");
-    };
-
-    const handleCloseError = () => {
-        console.log(error);
-        setError({ isError: false, title: "", message: "" });
-    };
-
     const handleAcceptOrder = async (order: any) => {
         await fetchClient({
             url: `/orders/admin`,
@@ -696,7 +432,7 @@ const Order: React.FC = () => {
                 order.id
             );
         }
-        await fetchData();
+        setReload((prev) => !prev)
     };
 
     const handleDeliverOrder = async (order: any) => {
@@ -717,7 +453,7 @@ const Order: React.FC = () => {
                 order.id
             );
         }
-        await fetchData();
+        setReload((prev) => !prev)
     };
 
     const handleDoneOrder = async (order: any) => {
@@ -743,7 +479,7 @@ const Order: React.FC = () => {
                 order.id
             );
         }
-        await fetchData();
+        setReload((prev) => !prev)
     };
 
     const handleRejectOrder = async (order: any) => {
@@ -764,98 +500,29 @@ const Order: React.FC = () => {
                 order.id
             );
         }
-        await fetchData();
+        setReload((prev) => !prev)
     };
-
+    // const filterItems: FilterItemType[] = [
+    //     {
+    //         key: "1",
+    //         title: "Status",
+    //         fieldName: "status",
+    //         type: "input",
+    //     },
+    //     {
+    //         key: "6",
+    //         title: "CreatedAt",
+    //         fieldName: "createdAt",
+    //         type: "date",
+    //     },
+    // ];
     return (
         <>
-            <ConfigProvider
-                theme={{
-                    components: {
-                        Table: {
-                            headerBg: variables.backgroundSecondaryColor,
-                            footerBg: "#fff",
-                        },
-                    },
-                }}
-            >
-                <div className='w-full flex flex-col justify-start gap-5'>
-                    {/* <CustomerFilterBar /> */}
-                    {error.isError && (
-                        <Alert
-                            message={error.title}
-                            description={error.message}
-                            type='error'
-                            showIcon
-                            onClose={handleCloseError}
-                            closeIcon
-                        />
-                    )}
-                    <div className='border bg-white shadow p-3 w-full'>
-                        <div className='flex items-center gap-2'>
-                            <p>Sort by: </p>
-                            <Select
-                                placeholder='Columns'
-                                value={
-                                    tableParams.sorter?.field?.toString() ||
-                                    "id"
-                                }
-                                onChange={handleSortFieldChange}
-                                options={columns
-                                    .filter(
-                                        (item) =>
-                                            item.key !== "fullname" &&
-                                            item.key !== "action"
-                                    )
-                                    .map((item) => ({
-                                        value: item.key,
-                                        label: item.title,
-                                    }))}
-                            />
-
-                            <p>Order: </p>
-
-                            <Button
-                                onClick={handleToggleSorter}
-                                icon={
-                                    tableParams.sorter?.order === "ascend" ? (
-                                        <SortAscendingOutlined />
-                                    ) : (
-                                        <SortDescendingOutlined />
-                                    )
-                                }
-                            />
-                            <Button onClick={handleClearFilter}>
-                                Clear filters
-                            </Button>
-                            <Button onClick={handleClearAll}>
-                                Clear filters and sorters
-                            </Button>
-                        </div>
-                    </div>
-                    <div className='w-full h-auto'>
-                        <Table
-                            rowSelection={{
-                                ...rowSelection,
-                            }}
-                            columns={columns}
-                            pagination={{
-                                className: "bg-white rounded px-4 py-2",
-                                showTotal: (total: number) =>
-                                    `Total ${total} items`,
-                                position: ["bottomCenter", "bottomRight"],
-                                showSizeChanger: true,
-                                showQuickJumper: true,
-                                total: tableParams.pagination?.total,
-                                pageSize: tableParams.pagination?.pageSize,
-                            }}
-                            loading={loading}
-                            dataSource={data}
-                            onChange={handleTableChange}
-                        />
-                    </div>
-                </div>
-            </ConfigProvider>
+            <TableOrderRender<DataType>
+                columns={columns}
+                url='/orders/admin'
+                reload={reload}
+            />
             <Modal
                 classNames={classNames}
                 styles={modalStyles}
