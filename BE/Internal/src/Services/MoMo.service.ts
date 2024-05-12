@@ -27,8 +27,8 @@ export class MoMoService {
         var orderInfo = `MOMO thanh toan ho cho khach hang ${fullname}`;
         var partnerCode = 'MOMO';
         var partnerName = "Home Cuisine"
-        var redirectUrl = 'http://localhost:3001/en/payment?method=MOMO';
-        var ipnUrl = 'http://localhost:3003/api/order/momo';
+        var redirectUrl = `http://${process.env.USER_HOST}:${process.env.USER_PORT}/en/payment?method=MOMO`;
+        var ipnUrl = `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api/order/momo`;
         var requestType = "payWithMethod";
         var amount = req.body["discountAmount"];
         
@@ -84,7 +84,7 @@ export class MoMoService {
 
         if (amount <= 0) {
             res.send({
-                "payUrl": `http://localhost:3001/en/payment?method=MOMO&resultCode=0&extraData=${extraData}`
+                "payUrl": `http://${process.env.USER_HOST}:${process.env.USER_PORT}/en/payment?method=MOMO&resultCode=0&extraData=${extraData}`
             })
             return 
         }
@@ -119,8 +119,8 @@ export class MoMoService {
         var requestId = partnerCode + new Date().getTime();
         var orderId = requestId;
         var orderInfo = `MOMO thanh toan ho cho khach hang ${fullname}`;
-        var redirectUrl = `http://localhost:3000/en/sale/reservations/payment?method=MOMO&tid=${table_id}`;
-        var ipnUrl =  `http://localhost:3000/en/sale/reservations/payment?method=MOMO&tid=${table_id}`;
+        var redirectUrl = `http://${process.env.ADMIN_HOST}:${process.env.ADMIN_PORT}/en/sale/reservations/payment?method=MOMO&tid=${table_id}`;
+        var ipnUrl =  `http://${process.env.ADMIN_HOST}:${process.env.ADMIN_PORT}/en/sale/reservations/payment?method=MOMO&tid=${table_id}`;
         var extraData = Buffer.from(data).toString('base64');
         var amount = table_cart.amount;
         var requestType = "captureWallet"

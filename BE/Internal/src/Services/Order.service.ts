@@ -359,7 +359,7 @@ export class OrderService {
                     html: ` <p>Hello <i>${client.getDataValue(
                         "firstname"
                     )} ${client.getDataValue("lastname")}</i>,</p>
-                            <p style="padding-top: px;">To view the order detail, click <a href="http://localhost:3001/en/myorder/${orderId}" target="_blank">here</a></p> 
+                            <p style="padding-top: px;">To view the order detail, click <a href="http://${process.env.USER_HOST}:${process.env.USER_PORT}/en/myorder/${orderId}" target="_blank">here</a></p> 
                             ${
                                 status.status === "Done"
                                     ? `<p style="padding-top: px;">Enjoy your meal!</p>`

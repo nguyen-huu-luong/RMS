@@ -9,6 +9,8 @@ import mustache from "mustache";
 import { ITrackUrlRepository } from "../Repositories/IITrackUrlRepository";
 import { IProductRepository } from "../Repositories";
 
+const backend_api = `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api`
+
 export interface IEmailMessage {
     from: string;
     to: string;
@@ -118,7 +120,7 @@ export class EmailService {
                     if (trackUrl) {
                         xmlEmail = xmlEmail.replace(`{{${field}}}`,`{{${trackUrl.codeToInsert}}}`) ;
                         dataReplace[trackUrl.codeToInsert] = 
-                            `${process.env.BACK_END_URL}/api/track/url?email=${message.to}&campaignId=${trackUrl.campaignId}&redirectUrl=${trackUrl.redirectUrl}`
+                            `${backend_api}/track/url?email=${message.to}&campaignId=${trackUrl.campaignId}&redirectUrl=${trackUrl.redirectUrl}`
                     }
                 }
             }
@@ -198,7 +200,7 @@ export class EmailService {
 
             const renderedMJML = mustache.render(xmlEmail, dataReplace);
 
-            const imgSrc = `http://localhost:3003/api/track/email/image.png?email=${encodeURIComponent(
+            const imgSrc = `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api/track/email/image.png?email=${encodeURIComponent(
                 message.to
             )}&campaign=${campaignId}`;
             const imgTag = `<img src="${imgSrc}" style="display: none"/>`;

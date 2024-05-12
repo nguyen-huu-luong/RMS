@@ -5,6 +5,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { POST } from "./route";
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 export const authOptions: AuthOptions = {
     providers: [
         GoogleProvider({
@@ -21,7 +23,7 @@ export const authOptions: AuthOptions = {
                 console.log("authorized");
                 try {
                     const response = await axios({
-                        url: "http://localhost:3003/api/users/signin",
+                        url: `${backend_api}/users/signin`,
                         method: "POST",
                         data: {
                             email: credentials?.email,

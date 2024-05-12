@@ -5,13 +5,14 @@ import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 
 const aToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIiLCJmdWxsTmFtZSI6IlN0YWZmIFN0YWZmIiwiZW1haWwiOiJOaWNvbGEuUHJpY2U4NUBob3RtYWlsLmNvbSIsInJvbGUiOiJlbXBsb3llZSIsImlhdCI6MTcwOTQ0ODcyNCwiZXhwIjoxNzA5NTA4NzI0fQ.70OZmcolJwo9UNRh8p5QbRy0Qcbwc5v5edXp67fmjZY';
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}`
 
 function Chat() {
     const [channel, setChannel] = useState(-1);
     const [socket, setSocket] = useState<any>(null);
     const [index, setIndex] = useState<number>(1);
     useEffect(() => {
-        const socketClient = io("http://localhost:3003", {
+        const socketClient = io(backend_api, {
             auth: {
                 token: aToken,
             },

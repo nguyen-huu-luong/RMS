@@ -8,9 +8,11 @@ interface fetchGeneralProps {
     data_return?: boolean
 }
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 async function fetchGeneral({ method = "GET", url, body = "", data_return = false }: fetchGeneralProps) {
     try {
-        const response = await axios("http://localhost:3003/api" + url, {
+        const response = await axios(backend_api + url, {
             method: method,
             headers: {
                 Accept: "application/json",

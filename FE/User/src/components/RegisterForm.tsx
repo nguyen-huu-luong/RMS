@@ -7,11 +7,13 @@ import { register } from "module";
 import { signIn } from "next-auth/react";
 import { useForm } from "antd/es/form/Form";
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 const RegistrationForm = () => {
     const [form] = useForm()
     const resgisterUser = async (data: any) => {
         return await axios({
-            url: "http://localhost:3003/api/users/signup",
+            url: `${backend_api}/users/signup`,
             method: "POST",
             data,
         });
