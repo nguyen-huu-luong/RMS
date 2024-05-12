@@ -391,7 +391,7 @@ const ChatBox = ({
                 <span className='font-semibold text-black'>{data.client}</span>
                 {data.type == "customer" || data.type == "lead" ? (
                     <span
-                        className='font-semibold text-black'
+                        className='font-semibold  text-black'
                         onClick={() =>
                             router.push(
                                 `${

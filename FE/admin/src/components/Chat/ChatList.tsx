@@ -5,11 +5,15 @@ import { fetchData } from "next-auth/client/_utils";
 import Loading from "../loading";
 
 const ChatList = ({
+    id,
+    channel,
     setChannel,
     socket,
     setIndex,
     staffId,
 }: {
+    id: any;
+    channel: any;
     setChannel: any;
     socket: any;
     setIndex: any;
@@ -26,7 +30,12 @@ const ChatList = ({
                 data_return: true,
             });
             setChannels(fetchedData);
-            console.log(fetchedData);
+            fetchedData.channel.map((item: any) => {
+                if (item.channel.clientId == parseInt(id, 10) && channel == -1) {
+                    setChannel(item.channel.id);
+
+                }
+            });
         } catch (error) {
             console.log(error);
         }
