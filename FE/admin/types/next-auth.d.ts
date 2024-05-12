@@ -30,7 +30,7 @@
 import NextAuth, { DefaultSession } from "next-auth";
 
 import "next-auth";
-import type { User } from "next-auth";
+import type { DefaultUser, User } from "next-auth";
 
 declare module "next-auth" {
   /**
@@ -41,7 +41,7 @@ declare module "next-auth" {
     accessToken?: string;
   }
 
-  interface User {
+  interface User extends DefaultUser{
     id: number;
     username: string;
     role: string;
