@@ -133,7 +133,9 @@
         "Invalid_email": "Email không hợp lệ!",
         "Male": "Nam",
         "Female": "Nữ",
-        "Invalid_password": "Mật khẩu xác nhận không khớp!"
+        "Invalid_password": "Mật khẩu xác nhận không khớp!",
+        "Phone": "Số điện thoại",
+        "Invalid_phone": "Số điện thoại không hợp lệ!"
     },
     "About":{
         "About": "Về chúng tôi",
@@ -160,6 +162,25 @@
         "Welcome3": "Chúng tôi sẽ giữ đoạn tin nhắn này để phục vụ bạn tốt nhất!",
         "Seed": "Đã xem",
         "Not_seen": "Chưa xem"
+    },
+    "User_profile": {
+        "Change": "Thay đổi",
+        "Profile": "Thông tin người dùng",
+        "Edit": "Chỉnh sửa",
+        "Save": "Lưu",
+        "Cancel": "Hủy"
+    },
+    "Noti":{
+        "Noti": "Thông báo",
+        "Pending": "Đang đợi",
+        "Preparing": "Đang chuẩn bị",
+        "Delivering": "Đang giao",
+        "Done": "Hoàn thành",
+        "Text1": "đã bị từ chối",
+        "Text2": "đang được chuẩn bị bởi đầu bếp",
+        "Text3": "đang được vận chuyển",
+        "Text4": "hoàn thành",
+        "Order": "Đơn"
     },
     "404":{
         "Lang": "Tiếng việt"

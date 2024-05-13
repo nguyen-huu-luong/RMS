@@ -133,7 +133,9 @@
         "Invalid_email": "Invalid email!",
         "Male": "Male",
         "Female": "Female",
-        "Invalid_password": "Invalid confirm password!"
+        "Invalid_password": "Invalid confirm password!",
+        "Phone": "Phone",
+        "Invalid_phone": "Invalid phone number!"
     },
     "About":{
         "About": "About Us",
@@ -160,6 +162,25 @@
         "Welcome3": "We will keep this chat history for better service to you!",
         "Seed": "Seen",
         "Not_seen": "Not seen"
+    },
+    "User_profile": {
+        "Change": "Change",
+        "Profile": "User Profile",
+        "Edit": "Edit information",
+        "Save": "Save",
+        "Cancel": "Cancel"
+    },
+    "Noti":{
+        "Noti": "Notification",
+        "Pending": "Pending",
+        "Preparing": "Preparing",
+        "Delivering": "Delivering",
+        "Done": "Done",
+        "Text1": "has been rejected",
+        "Text2": "has been accepted and preparing by chefs",
+        "Text3": "is now delivering",
+        "Text4": "has been delivered",
+        "Order": "Order"
     },
     "404":{
         "Lang": "Tiếng anh"

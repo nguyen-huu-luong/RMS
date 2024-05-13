@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, usePathname } from "next-intl/client";
 import { Popover, Switch } from "antd";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useRef } from "react";
 import { BellOutlined } from "@ant-design/icons";
 import Item from "@/components/header/notification/item";
@@ -10,6 +10,7 @@ import fetchClient from "@/lib/fetch-client";
 import useSWR from "swr";
 const Notification = () => {
     const socket = useSocket();
+    const t = useTranslations('Noti')
     const [child, setChild] = useState<boolean>(false);
     const [waited, setWaited] = useState<boolean>(false);
     const hide = () => {
@@ -97,7 +98,7 @@ const Notification = () => {
                     ref={ref}
                     className='fixed top-20 right-5 z-50 w-auto h-auto bg-white rounded-md border-2 p-4'
                 >
-                    <div className='font-bold text-xl p-2'>Notification</div>
+                    <div className='font-bold text-xl p-2'>{t('Noti')}</div>
                     <div className='w-96 max-h-[500px] p-1 overflow-auto'>
                         <div className='flex flex-col justify-start gap-1'>
                             <div className='w-full h-full flex flex-col justify-start gap-1'>
