@@ -38,23 +38,25 @@ class ClientController {
 			queries["sort"] = "birthday"
 		}
 
+		if (queries["sort"] === "group") {
+			queries["sort"] = "groupId"
+		}
+
+
+		if (queries["group_in"]) {
+			queries["groupId_in"] = queries["group_in"]
+		}
+
+		if (queries["group"]) {
+			queries["groupId"] = queries["group"]
+		}
+
 		const options: QueryOptions = parseRequesQueries(queries);
 
 
 		const data = await this.clientService.getAll(options);
 
 		res.send(data);
-		if (req.action === "read:any") {
-			const queries = { ...req.body, ...req.query };
-			const options: QueryOptions = parseRequesQueries(queries);
-
-			const data = await this.clientService.getAll(options);
-
-			res.send(data);
-		} else {
-			throw new ForbiddenError();
-		}
-
 	}
 
 	public async getClientInfo(req: Request, res: Response, next: NextFunction) {
@@ -64,6 +66,7 @@ class ClientController {
 			res.send(data);
 		} if (req.action === "read:own") {
 			const data = await this.clientService.getById(Number(req.userId));
+			console.log(data)
 			res.send(data);
 		} else {
 			throw new ForbiddenError();

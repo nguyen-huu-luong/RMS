@@ -77,6 +77,7 @@ type QueryOptions = {
     pageSize: number;
   };
   type?: string;
+  associations?: string[] 
 };
 
 type ChartQueryOptions = {
