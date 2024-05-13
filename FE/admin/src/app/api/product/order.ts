@@ -2,10 +2,11 @@
 import axios from 'axios';
 import { mutate } from 'swr';
 import { useRouter } from 'next/navigation';
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
 
 export const createOrder = async (token: any, requestBody: any, method: any) => {
     try {
-        const response = await axios.post(`${process.env.BASE_URL}/orders?method=${method}`, requestBody, {
+        const response = await axios.post(`${backend_api}/orders?method=${method}`, requestBody, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -20,7 +21,7 @@ export const createOrder = async (token: any, requestBody: any, method: any) => 
 
 export const recordMoMoOrder = async (requestBody: any) => {
     try {
-        const response = await axios.post(`${process.env.BASE_URL}/orders/momo`, requestBody);
+        const response = await axios.post(`${backend_api}/orders/momo`, requestBody);
         return response.data;
     } catch (error) {
         console.error('Error recording MoMo result:', error);
@@ -46,7 +47,7 @@ export const orderItemsFetcher = async (url: any, token: any) => {
 export const updateItemsStatus = async (url: any, requestBody: any, token: any) => {
     try {
         const response = await axios.put(
-            `http://localhost:3003/api/orders/chef`,
+            `${backend_api}/orders/chef`,
             requestBody,
             {
                 headers: {

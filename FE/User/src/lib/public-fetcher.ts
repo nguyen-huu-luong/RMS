@@ -7,6 +7,8 @@ interface fetchClientProps {
     data_return?: boolean;
 }
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 async function publicFetcher({
     method = "GET",
     url,
@@ -19,7 +21,7 @@ async function publicFetcher({
             url,
             process.env.NEXT_BACKEND_API_URL
         );
-        const response = await axios("http://localhost:3003/api" + url, {
+        const response = await axios(backend_api + url, {
             method: method,
             headers: {
                 Accept: "application/json",

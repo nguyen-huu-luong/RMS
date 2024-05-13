@@ -2,9 +2,11 @@
 import axios from 'axios';
 import { mutate } from 'swr';
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 export const queryClientInfo = async (token: any, requestBody: object) => {
     try {
-        const response = await axios.get(`${process.env.BASE_URL}/customers/21`, {
+        const response = await axios.get(`${backend_api}/customers/21`, {
             headers: {
                 'Authorization': `Bearer ${process.env.TOKEN}`,
                 'Content-Type': 'application/json',
@@ -19,7 +21,7 @@ export const queryClientInfo = async (token: any, requestBody: object) => {
 
 export const customerFetcher = async (customerId: string, token: any) => {
     try {
-        let url = `${process.env.BASE_URL}/customers/${customerId}`
+        let url = `${backend_api}/customers/${customerId}`
         const response = await fetch(url, {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -36,7 +38,7 @@ export const customerFetcher = async (customerId: string, token: any) => {
 export const updateCustomerInfo = async (data: any, cid: any, token: any) => {
     try {
         console.log(token)
-        const response = await axios.put(`${process.env.BASE_URL}/customers/${cid}`, data, {
+        const response = await axios.put(`${backend_api}/customers/${cid}`, data, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -52,7 +54,7 @@ export const updateCustomerInfo = async (data: any, cid: any, token: any) => {
 export const customersFetcher = async (token: any, tableParams: any, sortQueries: any) => {
     try {
         console.log(`${process.env.BASE_URL}`)
-        const response = await axios.get(`${process.env.BASE_URL}/customers/all?page=${tableParams.pagination?.current}
+        const response = await axios.get(`${backend_api}/customers/all?page=${tableParams.pagination?.current}
     &pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
             {
                 headers: {

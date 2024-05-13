@@ -3,15 +3,17 @@ import axios from 'axios';
 import { mutate } from 'swr';
 import { useRouter } from 'next/navigation';
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 export const useCreateOrder = async (token: any, requestBody: any, method: any) => {
     try {
-        const response = await axios.post(`${process.env.BASE_URL}/orders?method=${method}`, requestBody, {
+        const response = await axios.post(`${backend_api}/orders?method=${method}`, requestBody, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
-        mutate([`http://localhost:3003/api/carts`, token])
+        mutate([`${backend_api}/carts`, token])
         return response.data;
     } catch (error) {
         console.error('Error adding to cart:', error);
@@ -21,7 +23,7 @@ export const useCreateOrder = async (token: any, requestBody: any, method: any) 
 
 export const recordMoMoOrder = async (requestBody: any) => {
     try {
-        const response = await axios.post(`${process.env.BASE_URL}/orders/momo`, requestBody);
+        const response = await axios.post(`${backend_api}/orders/momo`, requestBody);
         return response.data;
     } catch (error) {
         console.error('Error recording MoMo result:', error);
@@ -31,13 +33,13 @@ export const recordMoMoOrder = async (requestBody: any) => {
 
 export const cancelOrder = async (token: any, requestBody: any) => {
     try {
-        const response = await axios.put(`${process.env.BASE_URL}/orders`, requestBody, {
+        const response = await axios.put(`${backend_api}/orders`, requestBody, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
-        mutate([`http://localhost:3003/api/orders`, token])
+        mutate([`${backend_api}/orders`, token])
         return response.data;
     } catch (error) {
         console.error('Error adding to cart:', error);

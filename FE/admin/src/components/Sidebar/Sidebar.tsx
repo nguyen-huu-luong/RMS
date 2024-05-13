@@ -21,7 +21,7 @@ import { INavItemProps } from "./NavItem";
 export default function Sidebar() {
 	const [role, setRole] = useState("")
 	const t = useTranslations("Sidebar");
-	
+	const t_general = useTranslations("General");
 	useEffect(() => {
 		const setSessionRole = async () => {
 			const session = await getSession();
@@ -154,7 +154,7 @@ export default function Sidebar() {
 	
 	return (
 		<main className="flex-col h-screen border-r  bg-white fixed left-0 top-0 w-sidebar" >
-			<h2 className="text-center font-bold my-4 text-2xl"> Admin dashboard</h2>
+			<h2 className="text-center font-bold my-4 text-2xl">{t_general("admin_dashboard")}</h2>
 			<div className="flex-1 h-full">
 				<Navigation
                     type="expand"

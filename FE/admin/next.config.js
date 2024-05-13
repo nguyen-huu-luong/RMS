@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const path = require('path')
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
 
 const nextConfig = {
     reactStrictMode: true,
@@ -10,7 +11,7 @@ const nextConfig = {
         serverComponentsExternalPackages: ["mjml"],
       },
       env: {
-        BASE_URL:"http://localhost:3003/api"
+        BASE_URL: backend_api
     },
     images: {
       domains: ["res.cloudinary.com"],

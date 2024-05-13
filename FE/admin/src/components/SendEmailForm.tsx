@@ -19,7 +19,7 @@ const adminEmail = [
     "admin@admin.com", "rms@gmail.com", "support.rms@gmail.com"
 ]
 
-
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
 
 export interface ISendEmailFormProps {
     customerEmailLists: string[],
@@ -46,7 +46,7 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
 
     const loadMjMl = async (emailData: any) => {
         setLoading(true)
-        const url = `http://localhost:3000/api/email-editor/generate-mjml`;
+        const url = `${backend_api}/email-editor/generate-mjml`;
 
         const withHtml = {
             tagName: "mjml",

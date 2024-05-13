@@ -10,8 +10,11 @@ interface fetchClientProps {
   data_return?: boolean
 }
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 async function fetchClient({ method = "GET", url, body = "", token, data_return = false }: fetchClientProps) {
   try {
+    console.log(backend_api)
     const session = await getSession();
     const accessToken = token || session?.accessToken;
 
@@ -20,7 +23,7 @@ async function fetchClient({ method = "GET", url, body = "", token, data_return 
     }
 
     // console.log("Fetch client" , url, session, accessToken, process.env.NEXT_BACKEND_API_URL )
-    const response = await axios(process.env.NEXT_PUBLIC_BACKEND_URL + url, {
+    const response = await axios(backend_api + url, {
       method: method,
       headers: {
         Accept: "application/json",

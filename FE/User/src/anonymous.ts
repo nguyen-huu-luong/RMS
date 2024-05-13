@@ -5,10 +5,10 @@ import Cookies from "js-cookie";
 export default function useAnonymousSocket() {
     const router = useRouter();
     const [socket, setSocket] = useState<any>();
-
+    const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}`
     useEffect(() => {
-        const storedValue = Cookies.get("socketId");
-        const newSocket = io(`http://localhost:3003`, {
+        const storedValue = Cookies.get('socketId');
+        const newSocket = io(backend_api, {
             query: { customId: storedValue },
         });
         console.log("first connected");
