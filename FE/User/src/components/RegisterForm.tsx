@@ -6,8 +6,10 @@ import { register } from "module";
 // import SignIn from '../[locale]/(auth)/signin/page';
 import { signIn } from "next-auth/react";
 import { useForm } from "antd/es/form/Form";
+import { useTranslations } from "next-intl";
 
 const RegistrationForm = () => {
+    const t = useTranslations('Login')
     const [form] = useForm()
     const resgisterUser = async (data: any) => {
         return await axios({
@@ -38,7 +40,7 @@ const RegistrationForm = () => {
             if (error instanceof AxiosError && error.response) {
                 const {code, name, message} = error.response.data ;
                 if (name === "Conflict") {
-                    form.setFields([{name: "email", errors: ["Email đã tồn tại"]}])
+                    form.setFields([{name: "email", errors: [t('Email_existed')]}])
                 } 
                 else {
                     message.error(`From Server: Code = ${code}, name = ${name}, message: ${message}`)
@@ -76,8 +78,8 @@ const RegistrationForm = () => {
                 layout='vertical'
             >
                 <div className='text-center w-full'>
-                    <h3 className='text-xl font-bold my-2'>Sign up</h3>
-                    <p> Sign up an account</p>
+                    <h3 className='text-xl font-bold my-2'>{t('Signup')}</h3>
+                    <p> {t('Signup_account')}</p>
                 </div>
                 <Form.Item
                     name='email'
@@ -85,11 +87,11 @@ const RegistrationForm = () => {
                     rules={[
                         {
                             type: "email",
-                            message: "Email không hợp lệ!",
+                            message: t('Invalid_email'),
                         },
                         {
                             required: true,
-                            message: "Vui lòng nhập email!",
+                            message: t('No_email'),
                         },
                     ]}
                 >
@@ -98,26 +100,26 @@ const RegistrationForm = () => {
                 <div className='flex justify-between gap-2'>
                     <Form.Item
                         name='gender'
-                        label='Gender'
+                        label={t('Gender')}
                         rules={[
                             {
                                 required: true,
-                                message: "Vui lòng chọn giới tính!",
+                                message: t('Val_gender'),
                             },
                         ]}
                     >
                         <Radio.Group>
-                            <Radio value='male'>Male</Radio>
-                            <Radio value='female'>Female</Radio>
+                            <Radio value='male'>{t('Male')}</Radio>
+                            <Radio value='female'>{t('Female')}</Radio>
                         </Radio.Group>
                     </Form.Item>
                     <Form.Item
                         name='birthday'
-                        label='Birthday'
+                        label={t('Birthday')}
                         rules={[
                             {
                                 required: true,
-                                message: "Vui lòng nhập ngày sinh!",
+                                message: t('Val_birthday'),
                             },
                         ]}
                     >
@@ -128,11 +130,11 @@ const RegistrationForm = () => {
                 <div className='flex gap-2'>
                     <Form.Item
                         name='firstname'
-                        label='First Name'
+                        label={t('Firstname')}
                         rules={[
                             {
                                 required: true,
-                                message: "Vui lòng nhập tên!",
+                                message:t('Val_first'),
                             },
                         ]}
                     >
@@ -141,11 +143,11 @@ const RegistrationForm = () => {
 
                     <Form.Item
                         name='lastname'
-                        label='Last Name'
+                        label={t('Lastname')}
                         rules={[
                             {
                                 required: true,
-                                message: "Vui lòng nhập họ!",
+                                message: t('Val_last'),
                             },
                         ]}
                     >
@@ -155,11 +157,11 @@ const RegistrationForm = () => {
 
                 <Form.Item
                     name='password'
-                    label='Password'
+                    label={t('Password')}
                     rules={[
                         {
                             required: true,
-                            message: "Vui lòng nhập mật khẩu!",
+                            message:t('No_password'),
                         },
                     ]}
                     hasFeedback
@@ -169,13 +171,13 @@ const RegistrationForm = () => {
 
                 <Form.Item
                     name='confirm'
-                    label='Confirm Password'
+                    label={t('Confirm_password')}
                     dependencies={["password"]}
                     hasFeedback
                     rules={[
                         {
                             required: true,
-                            message: "Vui lòng xác nhận mật khẩu!",
+                            message: t('Val_password'),
                         },
                         ({ getFieldValue }) => ({
                             validator(_, value) {
@@ -186,7 +188,7 @@ const RegistrationForm = () => {
                                     return Promise.resolve();
                                 }
                                 return Promise.reject(
-                                    "Mật khẩu xác nhận không khớp!"
+                                   t('Invalid_password')
                                 );
                             },
                         }),
@@ -201,7 +203,7 @@ const RegistrationForm = () => {
                         htmlType='submit'
                         className='bg-primary w-full mt-2'
                     >
-                        Sign Up
+                        {t('Login')}
                     </Button>
                 </Form.Item>
             </Form>

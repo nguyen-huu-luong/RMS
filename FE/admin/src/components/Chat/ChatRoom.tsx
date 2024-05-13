@@ -1,13 +1,30 @@
-import { SendOutlined } from "@ant-design/icons";
+import {
+    ExclamationCircleOutlined,
+    FileImageOutlined,
+    SendOutlined,
+} from "@ant-design/icons";
 import TimeStamp from "./Timestamp";
 import Message from "./Message";
 import Status from "./Status";
 import { useState, useEffect, useCallback, useRef } from "react";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
-import { Spin } from "antd";
+import {
+    Button,
+    Drawer,
+    Space,
+    Spin,
+    Upload,
+    UploadProps,
+    message,
+} from "antd";
 import Loading from "../loading";
-
+import { variables } from "@/app";
+import { useRouter } from "next-intl/client";
+import { useForm } from "antd/es/form/Form";
+import { AxiosError } from "axios";
+import { uploadImage } from "@/app/api/upload";
+import { CreateNewLeadForm } from "../Lead/AddLeadForm";
 const ChatBox = ({
     channel,
     setChannel,
@@ -29,6 +46,57 @@ const ChatBox = ({
     const [loading, setLoading] = useState<boolean>(false);
     const [isAllLoaded, setIsAllLoaded] = useState<boolean>(false);
     const [initial, setInitial] = useState<boolean>(false);
+    const router = useRouter();
+    const [form_create] = useForm();
+    const [open, setOpen] = useState(false);
+    const showDrawer = () => {
+        setOpen(true);
+    };
+    const onClose = () => {
+        setOpen(false);
+    };
+    //CREATE LEAD
+    const handleCreateLead = async (values: any) => {
+        try {
+            const result = await fetchClient({
+                method: "POST",
+                url: "/customers",
+                body: {
+                    data: {
+                        ...values,
+                        convertDate: new Date(),
+                        type: "lead",
+                    },
+                },
+            });
+            onClose();
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                if (error.response) {
+                    const { code, name, message } = error?.response.data;
+                    if (name === "Conflict") {
+                        form_create.setFields([
+                            { name: "email", errors: ["Email đã tồn tại"] },
+                        ]);
+                    }
+                }
+                throw error;
+            } else {
+                message.error("Đã xãy ra lỗi");
+                throw error;
+            }
+        }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            form_create.submit();
+        } catch (error) {
+            message.error("Đã xãy ra lỗi");
+            throw error;
+        }
+    };
+
     // HANDLE SCROLL TO BOTTOM
     const scrollToBottom = () => {
         const container = messageContainerRef.current;
@@ -48,7 +116,6 @@ const ChatBox = ({
                 }`,
                 data_return: true,
             });
-            console.log(fetchedData);
             if (index == 1) {
                 setData(fetchedData);
             } else {
@@ -69,6 +136,11 @@ const ChatBox = ({
     useEffect(() => {
         fetchData();
     }, [index, channel]);
+
+    useEffect(() => {
+        form_create.resetFields();
+        onClose();
+    }, [channel]);
 
     useEffect(() => {
         setLoading(false);
@@ -168,6 +240,60 @@ const ChatBox = ({
         }
     };
 
+    const handleUpload = async ({
+        file,
+        onSuccess,
+    }: {
+        file?: any;
+        onSuccess?: any;
+    }) => {
+        const image = await uploadImage(file, "Chat");
+        if (image.url) {
+            await fetchClient({
+                url: `/channels/admin`,
+                method: "POST",
+                body: {
+                    content: image.url,
+                    channelId: channel,
+                    status: "Not seen",
+                },
+            });
+            setValue("");
+            setData((prevData: any) => ({
+                ...prevData,
+                message: [
+                    ...prevData.message,
+                    {
+                        content: image.url,
+                        createdAt: new Date(),
+                        employeeId: "1",
+                        status: "Not seen",
+                    },
+                ],
+            }));
+            await socket.emit(
+                "staff:message:send",
+                data.channel,
+                image.url,
+                image.url
+            );
+            setAction("Scroll");
+        }
+        onSuccess("ok");
+    };
+
+    const props: UploadProps = {
+        name: "image",
+        customRequest: handleUpload,
+        onChange(info) {
+            if (info.file.status === "done") {
+                message.success(`Send image successfully`);
+            } else if (info.file.status === "error") {
+                message.error(`Send image failed.`);
+            }
+        },
+    };
+
     const viewMessage = async () => {
         await fetchClient({
             url: `/channels`,
@@ -226,12 +352,70 @@ const ChatBox = ({
 
     if (channel === -1) return "Choose customer to chat";
     if (!data) return <Loading />;
+
     return (
         <div
-            className={` bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full bottom-5 right-5 z-50`}
+            className={` bg-white relative border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full z-50`}
         >
-            <div className='header h-10 w-full text-white bg-primary items-center flex flex-row justify-between p-2 font-bold border-b-white border-b-2'>
-                <span>{data.client}</span>
+            <Drawer
+                title='Create new lead'
+                placement='top'
+                closable={false}
+                onClose={onClose}
+                open={open}
+                getContainer={false}
+                mask={false}
+                maskClosable={false}
+                extra={
+                    <Space>
+                        <Button onClick={onClose}>Cancel</Button>
+                        <Button
+                            type='default'
+                            style={{ backgroundColor: "white" }}
+                            onClick={handleSubmit}
+                        >
+                            Create
+                        </Button>
+                    </Space>
+                }
+            >
+                <CreateNewLeadForm
+                    formControl={form_create}
+                    onCreate={handleCreateLead}
+                />
+            </Drawer>
+            <div
+                style={{ backgroundColor: variables.backgroundSecondaryColor }}
+                className='header h-12 w-full text-white items-center flex flex-row justify-between p-4 font-bold border-b-white border-b-2'
+            >
+                <span className='font-semibold text-black'>{data.client}</span>
+                {data.type == "customer" || data.type == "lead" ? (
+                    <span
+                        className='font-semibold  text-black'
+                        onClick={() =>
+                            router.push(
+                                `${
+                                    data.type === "customer"
+                                        ? "/customers/"
+                                        : "/leads/"
+                                }${data.id}`
+                            )
+                        }
+                    >
+                        <ExclamationCircleOutlined
+                            style={{ fontSize: "1.4rem" }}
+                            className='hover:cursor-pointer'
+                        />
+                    </span>
+                ) : (
+                    <Button
+                        type='default'
+                        style={{ backgroundColor: "white" }}
+                        onClick={showDrawer}
+                    >
+                        Create Lead
+                    </Button>
+                )}
             </div>
             <div
                 ref={messageContainerRef}
@@ -283,6 +467,20 @@ const ChatBox = ({
                     className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
                     placeholder='Enter text'
                 />
+                <span className='text-primary'>
+                    <Upload
+                        {...props}
+                        maxCount={1}
+                        showUploadList={false}
+                        accept='image/*'
+                        style={{color: 'aqua'}}
+                        >
+                        <FileImageOutlined
+                            style={{ fontSize: "1.4rem", color: '#4A58EC' }}
+                            className='hover:cursor-pointer'
+                        />
+                    </Upload>
+                </span>
                 <span className='text-primary' onClick={(e) => send(e)}>
                     <SendOutlined
                         style={{ fontSize: "1.4rem" }}

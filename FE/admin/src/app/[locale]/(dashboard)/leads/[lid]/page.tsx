@@ -7,6 +7,7 @@ import {
     ArrowRightOutlined,
     UserOutlined,
     CloseCircleFilled,
+    MessageOutlined,
 } from "@ant-design/icons";
 import { Pagination, Space, Table, Tag } from "antd";
 import type { PaginationProps, TableProps } from "antd";
@@ -18,8 +19,10 @@ import fetchClient from "@/lib/fetch-client";
 import Loading from "@/components/loading";
 import moment from "moment";
 import Link from "next-intl/link";
+import { useRouter } from "next-intl/client";
 
 const LeadProfile = () => {
+    const router = useRouter()
     const editStyle = {
         outline: "0",
         backgroundColor: "#F6FAFD",
@@ -285,8 +288,11 @@ const LeadProfile = () => {
                                     borderRadius: "0px 4px 4px 0px",
                                     backgroundColor: "#F9FAFB",
                                 }}
+                                onClick={() =>
+                                    router.push(`/chat?id=${leadInfo.id}`)
+                                }
                             >
-                                <EllipsisOutlined />
+                                <MessageOutlined />
                             </button>
                         </div>
                     )}

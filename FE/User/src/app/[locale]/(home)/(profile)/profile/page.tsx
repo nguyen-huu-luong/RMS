@@ -92,7 +92,7 @@ const Profile = () => {
     const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
         await updateInformation(values);
         mutate();
-        setLoading(false);
+        setLoading(false); 
         setEdit(true);
     };
 
