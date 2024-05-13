@@ -5,6 +5,8 @@ import { getServerSession, type AuthOptions, type Awaitable, type User } from "n
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 export const authOptions: AuthOptions = {
     providers: [
         CredentialsProvider({
@@ -105,7 +107,7 @@ export const authOptions: AuthOptions = {
 async function refreshAccessToken(token: JWT) {
     try {
         const response = await axios({
-            url: `${process.env.NEXT_BACKEND_API_URL}/user/refresh`,
+            url: `${backend_api}/user/refresh`,
             method: "POST",
         });
 

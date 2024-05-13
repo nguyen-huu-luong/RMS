@@ -5,6 +5,8 @@ import { SendOutlined } from "@ant-design/icons";
 
 import useAnonymousSocket from "@/anonymous";
 import { useEffect, useState } from "react";
+import Loading from "@/components/loading";
+import Cookies from "js-cookie";
 export default function Chat() {
     const socket = useAnonymousSocket();
     const [data, setData] = useState<any>({
@@ -92,12 +94,13 @@ export default function Chat() {
                         },
                     ],
                 }));
-                socket.emit("anonymousclient:message:send", value);
+                socket.emit("anonymousclient:message:send", value, Cookies.get("socketId"));
             }
         } catch (error) {
             console.error("Error sending message:", error);
         }
     };
+    if (!socket) return <Loading/>
     return (
         <div
             className={`w-full h-[500px] bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg`}
