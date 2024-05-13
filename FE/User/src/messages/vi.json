@@ -146,6 +146,21 @@
         "P2": "Chúng tôi hiểu rằng để tạo nên một nhà hàng thành công thì không chỉ đơn thuần là phục vụ những món ăn ngon, mà còn cần phải xây dựng các chủ đề ẩm thực cuốn hút và kết nối mạnh mẽ đến đối tượng mục tiêu khách hàng của chúng tôi. Với sự tỉ mỉ chú ý đến từng chi tiết, chúng tôi đã xây dựng bản sắc thương hiệu của mình, từ logo và thiết kế nội thất đến thực đơn và trải nghiệm của khách hàng. Chúng tôi mong muốn thể hiện niềm đam mê của mình đối với các nguyên liệu lấy từ địa phương và các công thức ẩm thực mới lạ. Thông qua mạng xã hội, chúng tôi đã chia sẻ hành trình của mình, gắn kết với cộng đồng và xây dựng một thương hiệu bền vững. Ngoài ra, bằng cách hợp tác với các nghệ nhân địa phương và tổ chức các sự kiện từ thiện, chúng tôi đã khắc sâu thương hiệu của mình vào trái tim của cộng đồng. Ngày nay, nhà hàng của chúng tôi là minh chứng cho việc phát triển không ngừng nghỉ của chúng tôi về chất lượng và sự kết nối chân thành với khách hàng. Câu chuyện truyền cảm hứng của chúng tôi là lời nhắc nhở rằng - Để xây dựng một thương hiệu nhà hàng thành công không chỉ cần kỹ năng ẩm thực tuyệt vời mà còn cần sự cống hiến không ngừng nghỉ để tạo ra một trải nghiệm độc đáo và đáng nhớ.",
         "Member": "THÀNH VIÊN"
     },
+    "News": {
+        "Offer": "NHỮNG ƯU ĐÃI TỐT NHẤT",
+        "Eat": "Ăn những món ăn mà bạn thích với giá thành hợp lý",
+        "Food": "Ẩm thực",
+        "News": "Tin tức"
+    },
+    "Chat": {
+        "Chat": "Nhắn tin",
+        "Enter": "Nhập văn bản",
+        "Welcome1": "Chào mừng đến với dịch vụ nhắn tin của Home Cuisine",
+        "Welcome2": "Nhân viên của chúng tôi sẽ trả lời bạn ngay!",
+        "Welcome3": "Chúng tôi sẽ giữ đoạn tin nhắn này để phục vụ bạn tốt nhất!",
+        "Seed": "Đã xem",
+        "Not_seen": "Chưa xem"
+    },
     "404":{
         "Lang": "Tiếng việt"
     }

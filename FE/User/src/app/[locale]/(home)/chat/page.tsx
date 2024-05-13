@@ -7,14 +7,16 @@ import useAnonymousSocket from "@/anonymous";
 import { useEffect, useState } from "react";
 import Loading from "@/components/loading";
 import Cookies from "js-cookie";
+import { useTranslations } from "next-intl";
 export default function Chat() {
     const socket = useAnonymousSocket();
+    const t = useTranslations("Chat");
     const [data, setData] = useState<any>({
         channel: 1,
         message: [
             {
                 id: 1,
-                content: "Welcome to Home Cuisine Chat Service!",
+                content: t("Welcome1"),
                 status: "Not seen",
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -24,7 +26,7 @@ export default function Chat() {
             },
             {
                 id: 2,
-                content: "Our staff will reply to you soon!",
+                content: t("Welcome2"),
                 status: "Not seen",
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -34,8 +36,7 @@ export default function Chat() {
             },
             {
                 id: 3,
-                content:
-                    " We will keep this chat history for better service to you!",
+                content: t("Welcome3"),
                 status: "Not seen",
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -94,19 +95,23 @@ export default function Chat() {
                         },
                     ],
                 }));
-                socket.emit("anonymousclient:message:send", value, Cookies.get("socketId"));
+                socket.emit(
+                    "anonymousclient:message:send",
+                    value,
+                    Cookies.get("socketId")
+                );
             }
         } catch (error) {
             console.error("Error sending message:", error);
         }
     };
-    if (!socket) return <Loading/>
+    if (!socket) return <Loading />;
     return (
         <div
             className={`w-full h-[500px] bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg`}
         >
             <div className='header h-10 w-full text-white bg-primary items-center flex flex-row justify-between p-2 font-bold border-b-white border-b-2'>
-                <span>Live chat</span>
+                <span>{t('Chat')}</span>
             </div>
             <div className='body w-full grow font-normal text-sm overflow-auto max-h-full flex flex-col justify-start gap-2 px-2 py-2'>
                 {data.message.map((item: any, index: number) => {
@@ -144,7 +149,7 @@ export default function Chat() {
                     }}
                     onKeyDown={(e) => (e.key === "Enter" ? send(e) : {})}
                     className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
-                    placeholder='Enter text'
+                    placeholder={t('Enter')}
                 ></input>
                 <span className='text-primary' onClick={(e) => send(e)}>
                     <SendOutlined

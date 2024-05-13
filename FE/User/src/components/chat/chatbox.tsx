@@ -16,6 +16,7 @@ import useSocket from "@/socket";
 import fetchClient from "@/lib/fetch-client";
 import { Spin, Upload, UploadProps, message } from "antd";
 import { uploadImage } from "@/app/api/upload/image";
+import { useTranslations } from "next-intl";
 
 const ChatBox = ({
     params,
@@ -37,7 +38,7 @@ const ChatBox = ({
     const [value, setValue] = useState<string>("");
     const [action, setAction] = useState<string>("Default");
     const router = useRouter();
-
+    const t = useTranslations('Chat')
     // FETCHING DATA
     const fetchData = useCallback(async () => {
         try {
@@ -290,7 +291,7 @@ const ChatBox = ({
             className={`${styles.chat} w-64 h-80 bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg fixed bottom-5 right-5 z-50`}
         >
             <div className='header h-10 w-full text-white bg-primary items-center flex flex-row justify-between p-2 font-bold border-b-white border-b-2'>
-                <span>Live chat</span>
+                <span>{t('Chat')}</span>
                 <span onClick={() => params.setShow(false)}>
                     <FullscreenExitOutlined
                         style={{
@@ -349,7 +350,7 @@ const ChatBox = ({
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
-                    placeholder='Enter text'
+                    placeholder={t('Enter')}
                 ></input>
                 <span className='text-primary'>
                     <Upload
