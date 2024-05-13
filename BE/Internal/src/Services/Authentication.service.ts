@@ -59,26 +59,27 @@ export class AuthService {
 
 			const { email, password } = req.body;
 			const user = await this.clientRepository.findByEmail(email);
+	
 			if (!user) {
-				throw new RecordNotFoundError("User not exist");
+				throw new RecordNotFoundError("User not exist", "email");
 			}
 
 			if (!user.isRegistered) {
-				throw new RecordNotFoundError("User not exist");
+				throw new RecordNotFoundError("User not exist", "email");
 			}
 
 			const isCorrectPassword = await user.checkPassword(password);
 			if (!isCorrectPassword) {
-				throw new BadRequestError("Password is incorrect");
+				throw new BadRequestError("Password is incorrect", "password");
 			}
 
 			this.sendToken(res, user);
-			mailler.sendEmail({
-				from: "minhvuonglht10@gmail.com",
-				to: "vuong.lieu080519@hcmut.edu.vn",
-				subject: "Sending Email using Node.js",
-				html: "<p>Bạn đã đăng nhập vào BK food",
-			})
+			// mailler.sendEmail({
+			// 	from: "minhvuonglht10@gmail.com",
+			// 	to: "vuong.lieu080519@hcmut.edu.vn",
+			// 	subject: "Sending Email using Node.js",
+			// 	html: "<p>Bạn đã đăng nhập vào BK food",
+			// })
 
 		} catch (err) {
 			//
@@ -95,7 +96,36 @@ export class AuthService {
 			if (!errors.isEmpty()) {
 				throw new ValidationError(errors.array()[0].msg);
 			}
-			const { firstname, lastname, email, password } = req.body;
+			
+			if (req.body["isGoogleAccount"]) {
+				const {email, firstname, lastname, picture} = req.body 
+				if (!email || ! firstname || !lastname || !picture) {
+					throw new BadRequestError("Missing parameter")
+				} 
+
+				const user = await this.clientRepository.findByEmail(email)
+				if (user) {
+					this.sendToken(res, user);
+				} else {
+					const user = await this.clientRepository.create({
+						email, firstname, lastname, 
+						avatar: picture, 
+						password: await Password.hash("clidjdbcdcnwfnaewcnawent"),
+						isRegistered: true
+					})
+
+					const cart = await this.cartRepository.create({
+						total: 0,
+						amount: 0,
+						clientId: user.getDataValue('id')
+					})
+
+					this.sendToken(res, user);
+				}
+
+				return ;
+			}
+			const { firstname, lastname, email, password, birthday } = req.body;
 			let user = await this.clientRepository.findByEmail(email);
 			if (user) {
 				if (user.isRegistered) {
@@ -105,7 +135,14 @@ export class AuthService {
 						"User already exists"
 					);
 				}
-				await user.update({ isRegisterd: true });
+				const hashedPassword = await Password.hash(password);
+				user = await user.update({ isRegistered: true, firstname, lastname, email, hashedPassword, birthday});
+				const cart = await this.cartRepository.create({
+					total: 0,
+					amount: 0,
+					clientId: user.getDataValue('id')
+				})
+				await user.createChannel()
 				this.sendToken(res, user);
 			} else {
 				const hashedPassword = await Password.hash(password);
@@ -114,6 +151,7 @@ export class AuthService {
 					firstname,
 					lastname,
 					hashedPassword,
+					birthday,
 					isRegistered: true,
 					type: ClientType.LEAD,
 				});

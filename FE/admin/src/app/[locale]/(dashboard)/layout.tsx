@@ -8,7 +8,6 @@ import { ReactNode } from "react";
 import { NextIntlClientProvider, useLocale, useMessages } from "next-intl";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { DynamicBreadcrumb } from "@/components";
 import { variables } from "@/app";
 import Provider from "@/components/SessionProvider/SessionProvider";
 
@@ -47,7 +46,7 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
                 <NextIntlClientProvider locale={locale} messages={messages}>
                     <Provider>
                         <div
-                            className='flex relative justify-center min-h-screen'
+                            className='flex relative justify-center max-h-screen overflow-scroll'
                             style={{
                                 backgroundColor: Colors.defaultBackgroundColor,
                             }}
@@ -55,9 +54,10 @@ export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
                             <Sidebar />
                             <Header />
                             <div
-                                className='min-h-screen  ps-sidebar mx-4 flex flex-col items-center w-full space-y-2'
+                                className='ps-sidebar mx-4 flex flex-col items-center w-full space-y-2'
                                 style={{
-                                    paddingTop: `calc(${variables.headerHeight} + 8px)`,
+                                    minHeight: "calc(100vh - var(--header-height))",
+                                    marginTop: `calc(${variables.headerHeight} + 8px)`,
                                 }}
                             >
                                 <div className='flex-1 w-full'>{children} </div>

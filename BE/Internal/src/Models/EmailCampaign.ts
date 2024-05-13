@@ -1,19 +1,32 @@
-import { DataTypes, Model } from "sequelize";
+import { BelongsToManySetAssociationsMixin, DataTypes, Model } from "sequelize";
 import Loader from "../Loaders";
 import Campaign from "./Campaign";
+import TargetList from "./Targetlist";
+import EmailCampaignTargetList from "./EmailCampaignTargetlist";
+import MessageTemplate from "./Messagetemplate";
 
 class EmailCampaign extends Model {
-	/**
-	 * Helper method for defining associations.
-	 * This method is not a part of Sequelize lifecycle.
-	 * The `models/index` file will call this method automatically.
-	 */
+	declare setTargetLists: BelongsToManySetAssociationsMixin<TargetList, TargetList["id"]>
+	declare id:number ;
 	static associate() {
 		EmailCampaign.belongsTo(Campaign, {
 			foreignKey: {
 				name: "campaignId",
 			},
 		});
+
+		EmailCampaign.belongsToMany(TargetList, {
+			through: EmailCampaignTargetList,
+			foreignKey: "emailId",
+			otherKey: "targetListId"
+		})
+
+		EmailCampaign.belongsTo(MessageTemplate, {
+			foreignKey: {
+				name: "templateId",
+				allowNull: true,
+			},
+		})
 	}
 }
 EmailCampaign.init(

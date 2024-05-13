@@ -10,6 +10,7 @@ export class UnknownError extends BaseError {
 			HttpStatusCode.InternalServerError,
 			'Unknown Error',
 			message,
+			",",
 			stackTrace
 		);
 	}

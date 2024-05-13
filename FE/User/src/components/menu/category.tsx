@@ -6,7 +6,7 @@ import { useLocale } from "next-intl";
 const Category = ({
     params,
 }: {
-    params: { category: string; state: boolean };
+    params: { category: string; state: boolean; thumbnails: string };
 }) => {
     const locale = useLocale();
     return (
@@ -19,7 +19,7 @@ const Category = ({
         >
             <div className='relative z-1 w-full h-full p-5 flex flex-col items-center justify-between duration-300 transition-all'>
                 <Image
-                    src={`/category/${params.category}-icon.png`}
+                    src={params.thumbnails}
                     alt={`${params.category}-icon`}
                     width={50}
                     height={50}

@@ -59,6 +59,15 @@ class TargetListController {
 
         res.send(data);
      }
+
+     public async deleteMany(req: Request, res: Response, next: NextFunction) {
+        console.log("fefafadfa")
+        ensurePermissionIsValid(req.action, "delete:any");
+        const ids = req.body["ids"] ;
+        const data = await this.targetListService.deleteMany(ids);
+
+        res.send(data);
+     }
 }
 
 export default TargetListController;

@@ -9,7 +9,7 @@ class TrackingRouter {
     
     public initialize(router: Router) {
         // const trackingRouter  = Router()
-        router.get("/track/email", this.trackingControlller.trackEmail.bind(this.trackingControlller));
+        router.get("/track/email/image.png", this.trackingControlller.trackEmail.bind(this.trackingControlller));
         router.get("/track/url", this.trackingControlller.trackUrl.bind(this.trackingControlller));
        
     }

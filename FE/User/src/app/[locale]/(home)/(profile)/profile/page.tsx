@@ -23,7 +23,6 @@ import type { UploadProps } from "antd";
 import useSWR from "swr";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
-
 type FieldType = {
     firstname?: string;
     lastname?: string;
@@ -38,13 +37,12 @@ const Profile = () => {
     const [edit, setEdit] = useState<boolean>(true);
     const [form] = Form.useForm();
     const [loading, setLoading] = useState<boolean>(false);
-
     const {
         data: profile,
         error: profileError,
         isLoading: profileLoading,
         mutate,
-    } = useSWR(`/customers`, (url) =>
+    } = useSWR(`/customers/${session?.user.id}`, (url) =>
         fetchClient({ url: url, data_return: true })
     );
 
@@ -74,7 +72,7 @@ const Profile = () => {
 
     const updateImage = async (url: string) => {
         await fetchClient({
-            url: `/customers`,
+            url: `/customers/${session?.user.id}`,
             method: "PUT",
             body: {
                 avatar: url,
@@ -85,7 +83,7 @@ const Profile = () => {
 
     const updateInformation = async (data: any) => {
         await fetchClient({
-            url: `/customers`,
+            url: `/customers/${session?.user.id}`,
             method: "PUT",
             body: data,
         });
@@ -94,7 +92,7 @@ const Profile = () => {
     const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
         await updateInformation(values);
         mutate();
-        setLoading(false);
+        setLoading(false); 
         setEdit(true);
     };
 
@@ -128,8 +126,8 @@ const Profile = () => {
                         className='aspect-square'
                         unoptimized
                     />
-                    <Upload {...props} maxCount={1} showUploadList={false}>
-                        <button className='absolute top-1/2 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-medium text-black backdrop-blur-sm rounded-md cursor-pointer'>
+                    <Upload {...props} maxCount={1} showUploadList={false} accept="image/*">
+                        <button className='absolute top-1/2 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-medium text-white backdrop-blur-sm rounded-md cursor-pointer'>
                             Change
                         </button>
                     </Upload>

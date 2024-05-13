@@ -5,7 +5,7 @@ import TextArea from "antd/es/input/TextArea";
 import { ChangeEventHandler, useEffect, useState } from "react";
 
 const Setting = () => {
-    const { activeNode, updateAttributes, updateContent } = useEmailDataStore();
+    const { activeNode, updateAttributes, updateContent, updateActiveNodeAttributes } = useEmailDataStore();
     const { section } = activeNode;
     const attributes = section.attributes;
     const [formData, setFormData] = useState({
@@ -14,8 +14,16 @@ const Setting = () => {
         href: attributes["href"]
     });
 
-
     const [content, setContent] = useState(section.content);
+
+    useEffect(() => {
+        setContent(activeNode.section.content)
+        setFormData({
+            "background-color": activeNode.section.attributes["background-color"],
+            color: activeNode.section.attributes["color"],
+            href: activeNode.section.attributes["href"]
+        })
+    }, [activeNode])
 
     const handleChangeColor = (color: Color, type: string) => {
         console.log(color)
@@ -40,6 +48,7 @@ const Setting = () => {
 
         updateAttributes(newAttributes, activeNode.path);
         updateContent(content, activeNode.path);
+        updateActiveNodeAttributes(newAttributes, activeNode.path)
     }
 
     return <Space direction="vertical" className="w-full">

@@ -73,6 +73,8 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const EmailTemplate: React.FC = () => {
+	const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 	const [searchText, setSearchText] = useState("");
 	const [searchedColumn, setSearchedColumn] = useState("");
 	const searchInput = useRef<InputRef>(null);
@@ -301,7 +303,7 @@ const EmailTemplate: React.FC = () => {
 					}`
 					: "";
 			fetch(
-				`http://localhost:3003/api/customers/all?page=${tableParams.pagination?.current}
+				`${backend_api}/customers/all?page=${tableParams.pagination?.current}
 							&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
 				{
 					headers: {

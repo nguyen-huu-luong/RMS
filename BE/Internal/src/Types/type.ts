@@ -1,7 +1,7 @@
 const TYPES = {
     // IClientController: Symbol.for("IClientController"),
     // IClientService: Symbol.for("IClientService"),
-    
+
     IBaseRepository: Symbol.for("IBaseRepository"),
     IClientRepository: Symbol.for("IClientRepository"),
     IOrderRepository: Symbol.for("IOrderRepository"),
@@ -25,12 +25,17 @@ const TYPES = {
     IClickEventRepository: Symbol.for("IClickEventREpository"),
     IOpenEventRepository: Symbol.for("IOpenEventRepository"),
     INotificationRepository: Symbol.for("INotificationRepository"),
+    IPos_notificationRepository: Symbol.for("IPos_notificationRepository"),
     IClientHistoryRepository: Symbol.for("IClientHistoryRepository"),
     ISubscriberRepository: Symbol.for("ISubscriberRepository"),
     ICampaignRepository: Symbol.for("ICampaignReposittory"),
-    ITargetListRepository: Symbol.for("ITargetListRepository"),
-    
+    ITargetListRepository: Symbol.for("ITargetListRepository"),  
+    IEmailCampaignRepository: Symbol.for("IEmailCampaignRepository"),
+    ITrackUrlRepository: Symbol.for("ITrackUrlRepository"),
+    IGroupRepository: Symbol.for("IGroupRepository")
+
 };
+    
 
 
 type Filter = {
@@ -65,7 +70,7 @@ type QueryOptions = {
   filter: Filter;
   sort?: {
     order: "asc" | "desc";
-    by: string;
+    by: string | string [];
   };
   paginate?: {
     page: number;
@@ -74,4 +79,17 @@ type QueryOptions = {
   type?: string;
 };
 
-export { TYPES, QueryOptions, Filter};
+type ChartQueryOptions = {
+    type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM",
+    beginDate?: Date,
+    endDate?: Date
+}
+
+type FilterCondition = {
+  value: string | number;  // hoặc có thể sử dụng union type nếu giá trị có thể là nhiều kiểu khác nhau
+  op: string | "gt" | "lt" | "gte" | "lte";
+};
+
+type RegularFilter = Record<string, string>;
+
+export { TYPES, QueryOptions, Filter, FilterCondition, RegularFilter, ChartQueryOptions };

@@ -3,6 +3,8 @@ import { io } from "socket.io-client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}`
+
 export default function useSocket() {
     const { data: session, status } = useSession();
     const router = useRouter();
@@ -13,7 +15,7 @@ export default function useSocket() {
             router.push("/signin");
         } else if (status == "loading") return;
 
-        const newSocket = io(`http://localhost:3003`, {
+        const newSocket = io(backend_api, {
             auth: {
                 token: session?.accessToken,
             },

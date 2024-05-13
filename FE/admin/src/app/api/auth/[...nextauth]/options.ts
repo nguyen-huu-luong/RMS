@@ -1,9 +1,11 @@
 import fetchClient from "@/lib/fetch-client";
 import { jwt } from "@/lib/jwt";
 import axios, { Axios, AxiosError } from "axios";
-import type { AuthOptions, Awaitable, User } from "next-auth";
+import { getServerSession, type AuthOptions, type Awaitable, type User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -24,7 +26,7 @@ export const authOptions: AuthOptions = {
                         },
                     });
 
-                    console.log(response.data)
+                    // console.log(response.data)
 
                     const data: { accessToken: string; user: User } = response.data;
 
@@ -55,8 +57,9 @@ export const authOptions: AuthOptions = {
             session.accessToken = token.accessToken;
             session.user.username = token.username || "";
             session.user.role = token.role || ""; 
+            session.user.id = token.id || 0; 
 
-            console.log(session)
+            // console.log(session)
             return session;
         },
         async jwt({ token, user, trigger, session }) {
@@ -83,6 +86,16 @@ export const authOptions: AuthOptions = {
             return token;
 
         },
+        // async redirect({baseUrl, url}) {
+        //     const token = await getServerSession();
+        //     console.log("redicredcfdsf f", baseUrl, url)
+        //     console.log((token?.user))
+        //     if (!(token?.user.role === "chef")) {
+        //         return baseUrl
+        //     } 
+        //     return "/chef"
+
+        // }
        
     },
     pages: {
@@ -94,7 +107,7 @@ export const authOptions: AuthOptions = {
 async function refreshAccessToken(token: JWT) {
     try {
         const response = await axios({
-            url: `${process.env.NEXT_BACKEND_API_URL}/user/refresh`,
+            url: `${backend_api}/user/refresh`,
             method: "POST",
         });
 

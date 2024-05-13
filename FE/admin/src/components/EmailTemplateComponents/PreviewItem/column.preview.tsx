@@ -24,8 +24,8 @@ const defaultStyle: CSSProperties = {
     height: "auto",
     outline: "2px dashed black",
     position: "relative",
-    margin: 16,
-    padding: 16
+    // margin: 16,
+    // padding: 16
 };
 
 const hoverStyle = {
@@ -79,6 +79,7 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
                     <ButtonPreview
                         section={pSection}
                         index={index}
+                        buttonIndex={tindex}
                         key={tindex}
                         path={`${path}.children.${tindex}`}
                     />
@@ -150,7 +151,7 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
     };
 
     return (
-        <div className="flex-1" ref={drop}>
+        <div className="w-full h-auto" ref={drop}>
             <div
                 style={{
                     ...getBoxStyle()
@@ -158,6 +159,7 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
                 onClick={handleClick}
+                className="h-auto"
             >
                 {hasChildren.length > 0 &&
                     hasChildren.map((tsection: any, tindex: any) => {

@@ -32,6 +32,7 @@ import Channel from "./Channel";
 import Message from "./Message";
 import Notification from "./Notification";
 import ClientHistory from "./ClientHistory";
+import Group from "./Group";
 
 class Client extends Person {
 	declare getOrders: HasManyGetAssociationsMixin<Order>;
@@ -52,6 +53,8 @@ class Client extends Person {
     declare getNotifications: HasManyGetAssociationsMixin<Notification>;
     declare createNotification: HasManyCreateAssociationMixin<Notification>;
 	declare setNotification: HasManySetAssociationsMixin<Notification, Notification>;
+
+	declare getOrder: HasManyGetAssociationsMixin<Order> ;
 
 	declare id: number;
 	declare firstname: string;
@@ -90,6 +93,13 @@ class Client extends Person {
 			foreignKey: "clientId",
 			otherKey: "targetListId",
 		});
+
+		Client.belongsTo(Group, {
+            foreignKey: {
+              name: "groupId",
+              allowNull: true,
+            }
+          })
 
 		// Client.hasMany(Reservation, {
 		// 	foreignKey: {
@@ -198,6 +208,18 @@ Client.init(
 			type: DataTypes.STRING,
 			values: [],
 		},
+		convertDate: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
+		segmentDate: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
+		lastPurchase: {
+			type: DataTypes.DATE,
+			allowNull: true
+		},
 		hashedPassword: {
 			type: DataTypes.STRING,
 		},
@@ -228,6 +250,14 @@ Client.init(
 			type: DataTypes.INTEGER,
 			defaultValue: 0,
 		},
+		createdAt: {
+			type: DataTypes.DATE,
+			allowNull: false
+		},
+		updatedAt: {
+			type: DataTypes.DATE,
+			allowNull: false
+		}
 	},
 	{ sequelize: Loader.sequelize }
 );

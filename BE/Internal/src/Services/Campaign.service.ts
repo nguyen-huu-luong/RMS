@@ -12,6 +12,8 @@ import {
 import { ICamPaignRepository } from "../Repositories/ICampaignRepository";
 import { Model, Transaction } from "sequelize";
 import { ITargetListRepository } from "../Repositories/ITargetListRepository";
+import { EmailCampaign } from "../Models";
+import { IEmailCampaignRepository } from "../Repositories/IEmailCampaignRepository";
 
 type AssociationWithResourceType = {
     action: string;
@@ -35,6 +37,21 @@ export type TargetListData = {
     description: string;
 };
 
+
+export type EmailCampaignData = {
+    name: string,
+    status: string,
+    startDate: string,
+    subjext: string,
+    targetlistIds: Array<any>,
+    templateId: number
+}
+
+export type TrackUrlData = {
+    name: string,
+    redirectUrl: string
+}
+
 export class CampaignService {
     constructor(
         private campaignRepository = container.get<ICamPaignRepository>(
@@ -42,7 +59,10 @@ export class CampaignService {
         ),
         private targetlistRepository = container.get<ITargetListRepository>(
             TYPES.ITargetListRepository
-        )
+        ) ,
+        private emailCampaignRepository = container.get<IEmailCampaignRepository>(
+            TYPES.IEmailCampaignRepository
+        ) 
     ) { }
 
     public async getAll(options?: QueryOptions) {
@@ -55,13 +75,13 @@ export class CampaignService {
     public async getById(id: number) {
         const campaignInfo = await this.campaignRepository.findById(id);
 
-        const { TargetLists, EmailCampaign, TrackUrls, ...rest } = JSON.parse(
+        const { TargetLists, EmailCampaigns, TrackUrls, ...rest } = JSON.parse(
             JSON.stringify(campaignInfo)
         );
         return {
             ...rest,
             targetLists: TargetLists,
-            emailCampaign: EmailCampaign,
+            emailCampaigns: EmailCampaigns,
             trackUrls: TrackUrls,
         };
     }
@@ -84,7 +104,7 @@ export class CampaignService {
             // validate actions
             if (!["add", "remove", "replace"].includes(data.targetlists.action)) {
                 throw new ValidationError(
-                    "Invalid params targetlist.action. Allow action in ['add', 'remove', 'replace'"
+                    "Invalid params targetlist.action. Allow action in ['add', 'remove', 'replace']"
                 );
             }
             const allTargetListIds = await this.targetlistRepository.getIds();
@@ -122,6 +142,33 @@ export class CampaignService {
         }
 
         return true;
+    }
+
+    public async createEmailCampaign(campaignId: number, data: EmailCampaignData) {
+        const dataToCreate = {
+            ...data,
+            campaignId,
+        }
+
+        const result = await this.emailCampaignRepository.create(dataToCreate)
+
+        return result ;
+    }
+
+    public async deleteEmailCampaign(campaignId: number, emailId: number) {
+        return await this.emailCampaignRepository.delete(emailId, {campaignId})
+    } 
+
+    public async createTrackUrl(campaignId : number, data: TrackUrlData) {
+        return await this.campaignRepository.createTrackUrl(campaignId, data)
+    }
+
+    public async deleteTrackUrl(campaignId : number, trackUrlId: number) {
+        return await this.campaignRepository.deleteTrackUrl(campaignId, trackUrlId)
+    }
+
+    public async getCampaignStatisTic(id : number) {
+        return await this.campaignRepository.getStatistic(id) 
     }
 
     private checkArrayContains = (arr: number[], targetArray: number[]) =>

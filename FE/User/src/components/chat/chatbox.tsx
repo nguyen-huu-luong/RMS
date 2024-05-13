@@ -1,5 +1,9 @@
 "use client";
-import { FullscreenExitOutlined, SendOutlined } from "@ant-design/icons";
+import {
+    FileImageOutlined,
+    FullscreenExitOutlined,
+    SendOutlined,
+} from "@ant-design/icons";
 import TimeStamp from "./timestamp";
 import Message from "./message";
 import Status from "./status";
@@ -10,9 +14,14 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import moment from "moment";
 import useSocket from "@/socket";
 import fetchClient from "@/lib/fetch-client";
-import { Spin } from "antd";
+import { Spin, Upload, UploadProps, message } from "antd";
+import { uploadImage } from "@/app/api/upload/image";
 
-const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
+const ChatBox = ({
+    params,
+}: {
+    params: { show: boolean; setShow: any; setUnread: any };
+}) => {
     const socket = useSocket();
     const [inputFocused, setInputFocused] = useState(false);
     const [data, setData] = useState<any>({
@@ -28,7 +37,6 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
     const [value, setValue] = useState<string>("");
     const [action, setAction] = useState<string>("Default");
     const router = useRouter();
-
 
     // FETCHING DATA
     const fetchData = useCallback(async () => {
@@ -54,6 +62,58 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
         }
     }, [status, index]);
 
+    // SEND IMAGE
+    const handleUpload = async ({
+        file,
+        onSuccess,
+    }: {
+        file?: any;
+        onSuccess?: any;
+    }) => {
+        const image = await uploadImage(file, "Chat");
+        if (image.url) {
+            await fetchClient({
+                url: `/channels`,
+                method: "POST",
+                body: {
+                    content: image.url,
+                    status: "Not seen",
+                },
+            });
+            setData((prevData: any) => ({
+                ...prevData,
+                message: [
+                    ...prevData.message,
+                    {
+                        content: image.url,
+                        createdAt: new Date(),
+                        clientId: session?.user.id,
+                        status: "Not seen",
+                    },
+                ],
+            }));
+            await socket.emit(
+                "client:message:send",
+                data.channel,
+                image.url,
+                session?.user.id
+            );
+            setAction("Scroll");
+        }
+        onSuccess("ok");
+    };
+
+    const props: UploadProps = {
+        name: "image",
+        customRequest: handleUpload,
+        onChange(info) {
+            if (info.file.status === "done") {
+                // mess.success(`Send image successfully`);
+            } else if (info.file.status === "error") {
+                message.error(`Send image failed.`);
+            }
+        },
+    };
 
     // HANDLE SCROLL TO BOTTOM
     const scrollToBottom = () => {
@@ -76,7 +136,6 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
         if (status === "unauthenticated") router.push("/signin");
         fetchData();
     }, [status, index]);
-
 
     // SOCKET
     useEffect(() => {
@@ -131,7 +190,6 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
         }
     }, [data]);
 
-
     // HANDLE SCROLL FOR LOADING MORE
     const loadMore = () => {
         if (loading || isAllLoaded) return;
@@ -166,7 +224,6 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
         };
     }, [loading, isAllLoaded]);
 
-
     // FOCUS TEXT
     const handleFocus = () => {
         viewMessage();
@@ -176,7 +233,6 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
     const handleBlur = () => {
         setInputFocused(false);
     };
-
 
     // SENDING MESSAGE
     const send = async (e: any) => {
@@ -205,7 +261,7 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
                         },
                     ],
                 }));
-                socket.emit(
+                await socket.emit(
                     "client:message:send",
                     data.channel,
                     value,
@@ -221,8 +277,9 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
     // VIEW MESSAGE
     const viewMessage = async () => {
         await fetchClient({ url: `/channels`, method: "put", body: {} });
-        socket.emit("client:message:read", data.channel);
+        await socket.emit("client:message:read", data.channel);
         setValue("");
+        params.setUnread(0);
         scrollToBottom();
     };
 
@@ -294,6 +351,20 @@ const ChatBox = ({ params }: { params: { show: boolean; setShow: any } }) => {
                     className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
                     placeholder='Enter text'
                 ></input>
+                <span className='text-primary'>
+                    <Upload
+                        {...props}
+                        maxCount={1}
+                        showUploadList={false}
+                        accept='image/*'
+                        style={{ color: "aqua" }}
+                    >
+                        <FileImageOutlined
+                            style={{ fontSize: "1.4rem", color: "#EA6A12", marginRight: 10 }}
+                            className='hover:cursor-pointer'
+                        />
+                    </Upload>
+                </span>
                 <span className='text-primary' onClick={(e) => send(e)}>
                     <SendOutlined
                         style={{

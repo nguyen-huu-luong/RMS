@@ -20,6 +20,8 @@ import axios from 'axios';
 //   }
 // `; 
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 interface AddEmployeeFormProps {
     afterSubmit: () => void
     afterCancel: () => void
@@ -31,7 +33,7 @@ export const AddEmployeeForm: React.FC<AddEmployeeFormProps> = (props) => {
 
     const onFinish = async (values: any) => {
         try {
-            const response = await axios.post('http://localhost:3003/api/employees', { data: values }, {
+            const response = await axios.post(`${backend_api}/employees`, { data: values }, {
                 headers: {
                     Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiTW9ydG9uLk1vcmFyQHlhaG9vLmNvbSIsInJvbGUiOiJtYW5hZ2VyIiwiaWF0IjoxNzEwNjgyMjY5LCJleHAiOjE3MTA2ODI4Njl9.jPycRT81xcOXMtJIePOafNQKy1T9oo3cm4jrTETRA4Q"
                 }

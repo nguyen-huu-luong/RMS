@@ -7,7 +7,7 @@ import bodyParse from "body-parser";
 import cors from "cors";
 import http from "http";
 import Loader from "./Loaders";
-import Tables from "./Models";
+import Tables, { Client } from "./Models";
 import { Server as SocketIOServer, Socket } from "socket.io";
 import router from "./Routers";
 import { ErrorHandler } from "./Middlewares";
@@ -35,7 +35,7 @@ export class Server {
 
     public initial() {
         this.app.use(express.json());
-		this.app.use(express.urlencoded({ extended: true }));
+		    this.app.use(express.urlencoded({ extended: true }));
         this.app.use(
             cors({
                 origin: "*",
@@ -98,7 +98,6 @@ export class Server {
         });
         await socket.init(io);
         server.start();
-
     } catch (err) {
         console.log("Connect to server failed!");
         console.log(`Error: ${err}`);

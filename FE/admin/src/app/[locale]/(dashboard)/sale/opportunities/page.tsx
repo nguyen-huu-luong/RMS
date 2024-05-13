@@ -3,23 +3,17 @@ import React, { useEffect, useRef, useState } from "react";
 import {
     Button,
     ConfigProvider,
-    InputRef,
     Table,
-    Input,
-    Space,
     Select,
     Alert,
 } from "antd";
-import { TableProps, GetProp, TableColumnType } from "antd";
+import { TableProps, GetProp} from "antd";
 import { variables } from "@/app";
 import {
-    SearchOutlined,
     SortAscendingOutlined,
     SortDescendingOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import type {
-    FilterConfirmProps,
     Key,
     SortOrder,
 } from "antd/es/table/interface";
@@ -107,6 +101,7 @@ const Opportunities: React.FC = () => {
         message: "",
         title: "",
     });
+    const link_ref: any = {"customer": "../customers", "lead": "../leads"}
 
     const rowSelection = {
         // onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
@@ -122,12 +117,13 @@ const Opportunities: React.FC = () => {
         {
             title: "ID",
             dataIndex: "id",
-            key: "id",
+            key: "id"
         },
         {
             title: "Fullname",
             dataIndex: "fullname",
             key: "fullname",
+            render: (text, row) => <a style={{ color: "#4A58EC" }} href={`${link_ref[row.type]}/${row.id}`}>{text}</a>
         },
         {
             title: "Amount",
@@ -144,7 +140,7 @@ const Opportunities: React.FC = () => {
             title: "Action",
             dataIndex: "action",
             key: "action",
-            render: (text, row) => <Button color="primary" onClick={() => handleOpenModalCart(row.id - 1, row.fullname, row.amount)}>View cart</Button>
+            render: (text, row, index) => <Button color="primary" onClick={() => handleOpenModalCart(index, row.fullname, row.amount)}>View cart</Button>
         }];
 
 
@@ -254,8 +250,6 @@ const Opportunities: React.FC = () => {
                 url = "/customers/opportunity/all"
             }
 
-            console.log(url)
-
             const response = await fetchClient({
                 url: url, data_return: true
             })
@@ -265,7 +259,7 @@ const Opportunities: React.FC = () => {
             const results = response
             const data = results.map((item: any, index: any) => ({
                 key: index,
-                id: index + 1,
+                id: item.clientId,
                 amount: item.amount,
                 type: item.Client.type,
                 fullname: `${item.Client.firstname} ${item.Client.lastname}`,
@@ -317,9 +311,9 @@ const Opportunities: React.FC = () => {
         }
     }
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    // useEffect(() => {
+    //     fetchData();
+    // }, []);
 
     useEffect(() => {
         setTableParams({
@@ -361,7 +355,7 @@ const Opportunities: React.FC = () => {
                     )}
                     <div className='border bg-white shadow p-3 w-full'>
                         <div
-                            style={{ marginBottom: 16 }}
+                            style={{ marginBottom: 0 }}
                             className='flex items-center gap-2'
                         >
                             <p>Sort by: </p>

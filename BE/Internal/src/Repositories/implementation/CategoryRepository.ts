@@ -13,4 +13,7 @@ export class CategoryRepository
 		super(Category);
 	}
 
+	public async getByCond(cond: any){
+		return await this._model.findAll(cond)
+	}
 }

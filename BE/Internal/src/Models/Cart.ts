@@ -15,6 +15,9 @@ import Product from "./Product";
 import CartItem from "./CartItem";
 import Table from "./Table";
 class Cart extends Model {
+	declare getProducts: HasManyGetAssociationsMixin<Product>;
+    declare addProduct: any;
+
 	public static associate() {
 		Cart.belongsTo(Client, {
 			foreignKey: {

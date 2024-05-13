@@ -15,9 +15,11 @@ import { LocaleSwitcher } from "../LocaleSwitcher/";
 import variables from "@/app/variables.module.scss";
 import { DynamicBreadcrumb } from "..";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
 	const t = useTranslations("Header");
+	const router = useRouter()
 	const items: MenuProps["items"] = [
 		{
 			label: <Link href="/profile">{t("profile")}</Link>,
@@ -50,9 +52,10 @@ export default function Header() {
 		>
             <DynamicBreadcrumb />
 			<div className="flex items-center">
-				<Tooltip title={t("chat-center")}>
+				<Tooltip title={t("chat-center")} >
 					<Button
 						className="border-0 ms-auto hover:border"
+						onClick={() => router.push("/chat")}
 						icon={<MessageOutlined className="align-middle" />}
 					/>
 				</Tooltip>

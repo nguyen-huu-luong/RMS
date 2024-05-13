@@ -1,5 +1,5 @@
 import { Campaign, Cart } from "../Models";
-import { CampaignData } from "../Services";
+import { CampaignData, TrackUrlData } from "../Services";
 import { IBaseRepository } from "./IBaseRepository";
 
 export interface ICamPaignRepository extends IBaseRepository<Campaign> {
@@ -7,4 +7,8 @@ export interface ICamPaignRepository extends IBaseRepository<Campaign> {
     id: number,
     data: CampaignData,
   ): Promise<Object>;
+
+  createTrackUrl(campaignId: number, data: TrackUrlData): Promise<any> ;
+  deleteTrackUrl(campaignId: number, trackUrlId: number): Promise<any> ;
+  getStatistic(campaignsId: number): Promise<any>
 }

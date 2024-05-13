@@ -41,11 +41,24 @@ module.exports = {
       type: {
         type: Sequelize.STRING
       },
+      convertDate: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      segmentDate: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      lastPurchase: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
       hashedPassword: {
         type: Sequelize.STRING
       },
       isRegistered: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       isActive: {
         type: Sequelize.BOOLEAN

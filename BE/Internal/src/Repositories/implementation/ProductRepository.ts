@@ -19,4 +19,8 @@ export class ProductRepository
 		return await this._model.findAll(cond)
 	}
 
+	public async  getOne(id: number  | string) {
+		return  this._model.findOne({where:  {id}})
+	}
+
 }

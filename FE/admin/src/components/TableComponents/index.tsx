@@ -1,22 +1,32 @@
 "use client"
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+    Alert,
+    Button,
     ConfigProvider,
-    Flex,
+    Dropdown,
+    Form,
     Input,
+    Select,
     Space,
     Table,
+    message,
 } from "antd";
-import type { TableProps, GetProp } from "antd";
+import type { TableProps, GetProp, SelectProps } from "antd";
 import { variables } from "@/app";
 import type {
     Key,
     SortOrder,
 } from "antd/es/table/interface";
-import { SearchOutlined } from "@ant-design/icons";
+import {SearchOutlined, SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons";
 import fetchClient from "@/lib/fetch-client";
 import { AnyObject } from "antd/es/_util/type";
 import { CreateModal } from "./CreateModal";
+import { useFormatter } from "next-intl";
+import { FilterItem } from "./FilterItems";
+import { FaEllipsisV } from "react-icons/fa";
+import { AxiosError } from "axios";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -25,16 +35,21 @@ type TablePaginationConfig = Exclude<
 >;
 interface ITableRenderProps<T> {
     // data: readonly Record<string, any>[];
+    data?: T[],  
+    setData?: React.Dispatch<React.SetStateAction<T[]>>,
     columns: ColumnsType<T>;
     url: string,
-    formCreateElement: React.ReactNode
+    queryStr?: string,
+    createModal?: React.ReactNode
     onSelected?: {
         handle?: (selecteds: T[]) => void,
         render?: () => React.ReactNode
     },
-    excludeDataHasIds?: number[]
+    reload?: boolean,
+    filterItems?: FilterItemType[]
+    excludeDataHasIds?: number[],
+    createModalTitle? : string
 }
-
 
 type SorterParams = {
     field?: Key | readonly Key[];
@@ -51,14 +66,24 @@ interface TableParams {
     pagination?: TablePaginationConfig;
     sorter?: SorterParams;
     filters?: Parameters<GetProp<TableProps, "onChange">>[1];
+    queryString?: string
 }
 
+export type FilterItemType = {
+    key: string,
+    type: "input" | "select" | "date",
+    fieldName: string,
+    title: string,
+    options?: SelectProps['options']
+}
 
-const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreateElement, ...props }: ITableRenderProps<T>) => {
+const TableRender = <T extends AnyObject,>({ columns, url, onSelected, ...props }: ITableRenderProps<T>) => {
+    const t_general: any = useTranslations("General")
     const [checker, setChecker] = useState(true);
     const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(false);
     const [isSelectedRows, setIsSelectedRows] = useState(false);
+    const [filterItems, setFilterItems] = useState<FilterItemType[]>([])
     const [error, setError] = useState<ErrorType>({
         isError: false,
         message: "",
@@ -71,11 +96,14 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
             total: 0,
         },
         filters: {},
+        queryString: "",
         sorter: {
             field: "id",
             order: "ascend",
         },
     });
+
+    const format = useFormatter();
 
     // rowSelection object indicates the need for row selection
     const rowSelection = {
@@ -95,15 +123,12 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
 
     useEffect(() => {
         fetchData();
-    }, [JSON.stringify(tableParams)]);
+    }, [JSON.stringify(tableParams), props.reload]);
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            let filterQueriesStr = "";
-            for (const key in tableParams.filters) {
-                filterQueriesStr = `${filterQueriesStr}&${key}=${tableParams.filters[key]}`;
-            }
+            let filterQueriesStr = tableParams.queryString
             let sortQueries =
                 tableParams.sorter?.field && tableParams.sorter?.order
                     ? `&sort=${tableParams.sorter?.field}&order=${tableParams.sorter?.order === "ascend" ? "asc" : "desc"
@@ -111,7 +136,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                     : "";
             const respone = await fetchClient({
                 url: `${url}/all?page=${tableParams.pagination?.current}
-				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`
+				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}${filterQueriesStr}${props.queryStr ? `&${props.queryStr}`: ""}`
             })
 
             console.log(respone)
@@ -122,9 +147,9 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                 fullname: `${item.firstname} ${item.lastname}`,
             }));
             if (props.excludeDataHasIds) {
-                data = data.filter((item:any) => !props.excludeDataHasIds?.includes(item.id))
+                data = data.filter((item: any) => !props.excludeDataHasIds?.includes(item.id))
             }
-            setData(data);
+            props.setData ? props.setData(data) : setData(data);
             setLoading(false);
             setTableParams({
                 ...tableParams,
@@ -137,18 +162,20 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
             });
         } catch (error: any) {
             setLoading(false)
-            console.log(error);
-            setError({
-                isError: true,
-                title: error?.name || "Something went wrong!",
-                message: error?.message || "Unknown error",
-            });
+            if (error instanceof AxiosError && error.response) {
+                if(error.status === 404) {
+                    message.error("Vui lòng thao tác chậm lại!")
+                } else {
+                    console.log(error);
+                    setError({
+                        isError: true,
+                        title: (error.response && error.response.data.name) || error?.name || "Unknown error",
+                        message: (error.response && error.response.data.message) || error?.message || "Something went wrong!",
+                    });
+                }
+            }
         }
     };
-
-    useEffect(() => {
-        fetchData();
-    }, [JSON.stringify(tableParams)]);
 
     const handleTableChange: TableProps["onChange"] = (
         pagination,
@@ -173,6 +200,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
             console.log("Sorter is not an array");
 
             setTableParams(prev => ({
+                ...prev,
                 pagination,
                 filters,
                 sorter: {
@@ -184,6 +212,133 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
 
         setChecker(prevState => !prevState)
     };
+
+    const handleCloseError = () => {
+        console.log(error);
+        setError({ isError: false, title: "", message: "" });
+    };
+
+    const handleSortFieldChange = (key: string) => {
+        console.log(key, tableParams);
+        setTableParams((prev) => ({
+            ...prev,
+            sorter: { ...prev.sorter, field: key },
+        }));
+        setChecker(prevState => !prevState)
+        console.log(tableParams);
+    };
+
+    const handleToggleSorter = () => {
+        setTableParams((prev) => ({
+            ...prev,
+            sorter: {
+                ...prev.sorter,
+                order: prev.sorter?.order === "ascend" ? "descend" : "ascend",
+            },
+        }));
+        setChecker(prevState => !prevState)
+    };
+
+    const handleApplyFilter = (values: any) => {
+        console.log(values)
+        let queryStr = ""
+        for (let key of Object.keys(values)) {
+            if (["startsWith", "endsWith", "like", "contains"].includes(values[key].expr)) {
+                queryStr = values[key].value ? `${queryStr}&${key}_${values[key].expr}=${values[key].value}` : queryStr
+            } else if (["today", "last7day", "currentMonth"].includes(values[key].expr)) {
+                const timeQuery = timeConvert(values[key].expr)
+                queryStr = `${queryStr}&${key}_gt=${timeQuery}`
+            } else if (["lastXDays"].includes(values[key].expr)) {
+                const timeQuery = timeConvert(values[key].expr, Number(values[key].value))
+                queryStr = values[key].value ? `${queryStr}&${key}_gt=${timeQuery}` : queryStr
+            } else if (["before", "after"].includes(values[key].expr)) {
+                queryStr = values[key].value ? `${queryStr}&${key}_gt=${values[key].value.toString()}` : queryStr
+            } else if (values[key].expr === "in") {
+                let str = ""
+                if (values[key].value) {
+                    let array: string[] = values[key].value
+                    for (let i = 0; i < array.length; i++) {
+                        str += array[i]
+                        if (i !== (array.length - 1)) {
+                            str += ","
+                        }
+                    }
+                    queryStr = `${queryStr}&${key}_in=${str}`
+
+                }
+            }
+        }
+        setTableParams(prev => ({
+            ...prev,
+            queryString: queryStr
+        }))
+    }
+
+    const timeConvert = (type: string, numDays?: number) => {
+        const firstTimeOfToday = new Date();
+        firstTimeOfToday.setHours(0, 0, 0, 0);
+
+        // Get the first time of the last 7 days
+        const last7Days = new Date();
+        last7Days.setDate(last7Days.getDate() - 7);
+        last7Days.setHours(0, 0, 0, 0);
+
+        // Get the first time of the current month
+        const firstTimeOfCurrentMonth = new Date();
+        firstTimeOfCurrentMonth.setDate(1);
+        firstTimeOfCurrentMonth.setHours(0, 0, 0, 0);
+        const formatter = (dateTime: Date) => format.dateTime(dateTime, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric', minute: 'numeric'
+        })
+        if (type === "today") {
+            return formatter(firstTimeOfToday);
+        } else if (type === "last7day") {
+            return formatter(last7Days)
+        } else if (type === "currentMonth") {
+            return formatter(firstTimeOfCurrentMonth)
+        } else if (type === "lastXDays" && numDays && numDays > 0) {
+            const lastXDays = new Date()
+            lastXDays.setDate(last7Days.getDate() - numDays);
+            lastXDays.setHours(0, 0, 0, 0);
+            return formatter(lastXDays)
+        }
+    }
+
+    const handleAddFilterItem = (key: string) => {
+        if (props.filterItems) {
+            const item = props.filterItems.find(item => item.key === key)
+            if (item) {
+                setFilterItems(prev => [...prev, item])
+            }
+        }
+    }
+
+    const handleDeleteFilteritem = (key: string) => {
+        if (props.filterItems) {
+            // console.log(filterItems, key)
+            // filterItems.filter(item => item.key !== key)
+            // console.log(filterItems, key)
+            const newFilterItems = filterItems.filter(item => item.key !== key)  ;
+            setFilterItems(prev => newFilterItems)
+            if (newFilterItems.length === 0) {
+                setTableParams(prev  => ({...prev, queryString: ""}))
+            }
+
+        }
+    }
+
+    const handleClearFilter = () => {
+        setFilterItems([])
+        setTableParams(prev  => ({...prev, queryString: ""}))
+    }
+
+    const remainingFilterItems = props.filterItems ? props.filterItems.filter((item) => {
+        const keys = filterItems.map(item => item.key);
+        return !keys.includes(item.key)
+    }) : []
 
     return (
         <ConfigProvider
@@ -217,22 +372,101 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
 
             <div className="w-full h-auto flex-col gap-3">
                 <div className="bg-white w-full py-2 px-3 rounded-md border">
-                    <Flex>
-                        {
-                            <Space>
-                                <Input
-                                    placeholder="Enter keywork to search...."
-                                    prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
-                                    className="flex items-center"
-                                />
-                            </Space>
-                        }
+                    {error.isError && (
+                        <Alert
+                            message={error.title}
+                            description={error.message}
+                            type="error"
+                            showIcon
+                            onClose={handleCloseError}
+                            closeIcon
+                        />
+                    )}
+                    <div className="flex">
+                        <div className="flex-1 flex space-x-2 items-center">
+                            <Input
+                                placeholder="Enter keywork to search...."
+                                prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
+                                className="flex items-center w-2/5"
+                            />
+                            {props.filterItems &&
+                                <Dropdown
+                                    disabled={remainingFilterItems.length === 0}
+                                    menu={{
+                                        items: [
+                                            {
+                                                key: "1",
+                                                type: 'group',
+                                                label: "Filter",
+                                                children: remainingFilterItems.map((item) => ({
+                                                    label: item.title,
+                                                    key: `1-${item.key}`,
+                                                    onClick: (menuInfo) => {
+                                                        handleAddFilterItem(menuInfo.key.split("-")[1])
+                                                    }
+                                                }))
+                                            }
+                                        ]
+                                    }}
+                                >
+                                    <FaEllipsisV />
+                                </Dropdown>}
+                        </div>
 
-                        {onSelected && isSelectedRows && onSelected?.render &&  onSelected.render()
-                        }
-                        <CreateModal afterCreated={() => fetchData()} createUrl={url} formElement={formCreateElement} />
-                    </Flex>
+                        {props.createModal && props.createModal}
+                    </div>
+
                 </div>
+                {onSelected && isSelectedRows && onSelected?.render && onSelected.render()}
+                <div className="border bg-white shadow p-3 my-2 rounded">
+                    <div className="flex items-center gap-2">
+                        <p>{t_general("sort")}: </p>
+                        <Select
+                            // style={{ width: '20%' }}
+                            placeholder="Columns"
+                            value={tableParams.sorter?.field?.toString() || "id"}
+                            onChange={handleSortFieldChange}
+                            options={columns && columns.map((item) => ({
+                                value: item.key,
+                                label: item.title,
+                            }))}
+                            style={{minWidth: 120}}
+                        />
+
+                        <p>{t_general("order")}: </p>
+
+                        <Button onClick={handleToggleSorter} icon={tableParams.sorter?.order === "ascend" ? (
+                            <SortAscendingOutlined />
+                        ) : (
+                            <SortDescendingOutlined />
+                        )} />
+                    </div>
+
+                    {props.filterItems && <Form onFinish={handleApplyFilter}>
+                        <div className="flex justify-start gap-2 flex-wrap">
+                            {
+                                filterItems.map((item) => (
+                                    <FilterItem 
+                                        type={item.type}
+                                        fieldName={item.fieldName} 
+                                        key={item.key} 
+                                        title={item.title} 
+                                        options={item.options}
+                                        onDelete={() => handleDeleteFilteritem(item.key)} 
+                                    />
+                                ))
+                            }
+                        </div>
+
+                        {filterItems.length > 0 && <Form.Item>
+                            <Space className="mt-2">
+                                <Button htmlType="submit">Apply</Button>
+                                <Button onClick={handleClearFilter}>Clear filters</Button>
+                            </Space>
+                        </Form.Item>}
+                    </Form>}
+                </div>
+
 
                 <div className="mt-2">
                     <Table<T>
@@ -242,7 +476,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                         columns={columns}
                         pagination={{
                             className: "bg-white rounded px-4 py-2",
-                            showTotal: (total: number) => `Total ${total} items`,
+                            showTotal: (total: number) => `${t_general("total")} ${total} ${t_general("item")}`,
                             position: ["bottomCenter", "bottomRight"],
                             showSizeChanger: true,
                             showQuickJumper: true,
@@ -250,12 +484,12 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                             pageSize: tableParams.pagination?.pageSize,
                         }}
                         loading={loading}
-                        dataSource={data}
+                        dataSource={props.data ? props.data : data}
                         onChange={handleTableChange}
                     />
                 </div>
             </div>
-        </ConfigProvider>
+        </ConfigProvider >
     )
 };
 

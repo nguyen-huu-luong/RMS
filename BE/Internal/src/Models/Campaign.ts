@@ -13,6 +13,8 @@ import {
 	BelongsToManyRemoveAssociationMixin,
 	BelongsToManyAddAssociationsMixin,
 	BelongsToManyRemoveAssociationsMixin,
+	HasManyCreateAssociationMixin,
+	HasManyRemoveAssociationMixin,
 } from "sequelize";
 import Loader from "../Loaders";
 import TargetList from "./Targetlist";
@@ -20,6 +22,7 @@ import CampaignTargetList from "./CampaignTargetList";
 import EmailCampaign from "./EmailCampaign";
 import ClickEvent from "./ClickEvent";
 import OpenEvent from "./OpenEvent";
+import TrackUrl from "./TrackUrl";
 
 class Campaign extends Model {
 	declare setTargetLists: BelongsToManySetAssociationsMixin<TargetList, TargetList["id"]>;
@@ -28,7 +31,10 @@ class Campaign extends Model {
 	declare removeTargetList: BelongsToManyRemoveAssociationMixin<TargetList, number> ;
 	declare removeTargetLists: BelongsToManyRemoveAssociationsMixin<TargetList, number> ;
 
-	declare setEmailCampaign: HasManySetAssociationsMixin<EmailCampaign, number>;
+	declare setEmailCampaigns: HasManySetAssociationsMixin<EmailCampaign, EmailCampaign["id"]>;
+
+	declare createTrackUrl: HasManyCreateAssociationMixin<TrackUrl>
+	declare removeTrackUrl: HasManyRemoveAssociationMixin<TrackUrl, TrackUrl["id"]>
 
 	public static associate() {
 		Campaign.belongsToMany(TargetList, {
@@ -57,6 +63,13 @@ class Campaign extends Model {
                 allowNull: false
 			},
 		});
+
+		Campaign.hasMany(TrackUrl, {
+			foreignKey: {
+				name: "campaignId",
+			},
+			onDelete: "SET NULL"
+		})
 	}
 }
 

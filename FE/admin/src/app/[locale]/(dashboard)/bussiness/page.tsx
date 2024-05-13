@@ -1,5 +1,7 @@
-function Home() {
-    return ( <h1>dcncc</h1> );
-}
+"use client";
+import { useRouter } from "next/navigation";
 
-export default Home;
+export default function Business() {
+  const router = useRouter()
+  router.push('/bussiness/products')
+}

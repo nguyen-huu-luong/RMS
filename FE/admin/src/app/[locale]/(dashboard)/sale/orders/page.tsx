@@ -32,6 +32,8 @@ import moment from "moment";
 import { message } from "antd";
 import fetchClient from "@/lib/fetch-client";
 import useSocket from "@/socket";
+import TableRender, { FilterItemType } from "@/components/TableComponents";
+import TableOrderRender from "@/components/TableOrder";
 
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
@@ -40,7 +42,6 @@ const useStyle = createStyles(({ token }) => ({
     "my-modal-footer": {},
     "my-modal-content": {},
 }));
-const { confirm } = Modal;
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
     GetProp<TableProps, "pagination">,
@@ -54,6 +55,7 @@ interface DataType {
     createdAt: string;
     amount: number;
     clientId: number;
+    paymentMethod: string;
 }
 
 type ErrorType = {
@@ -76,6 +78,7 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const Order: React.FC = () => {
+    const [checker, setChecker] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInput = useRef<InputRef>(null);
@@ -84,6 +87,7 @@ const Order: React.FC = () => {
     const [selectedOrders, setSelectedOrders] = useState<DataType[]>();
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState<any>([]);
+    const [reload, setReload] = useState(false);
     const socket = useSocket();
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
@@ -142,74 +146,30 @@ const Order: React.FC = () => {
     });
     const { styles } = useStyle();
 
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            let filterQueriesStr = "";
-            for (const key in tableParams.filters) {
-                filterQueriesStr = `${filterQueriesStr}&${key}=${tableParams.filters[key]}`;
-            }
-            let sortQueries =
-                tableParams.sorter?.field && tableParams.sorter?.order
-                    ? `&sort=${tableParams.sorter?.field}&order=${
-                          tableParams.sorter?.order === "ascend"
-                              ? "asc"
-                              : "desc"
-                      }`
-                    : "";
-
-            const results = await fetchClient({
-                url: `/orders/admin?page=${tableParams.pagination?.current}
-            &pageSize=${tableParams.pagination?.pageSize}${sortQueries}`,
-                data_return: true,
-            });
-            const data = results.data.map((item: any) => ({
-                ...item.order,
-                key: item.order.id,
-                fullname: `${item.client.firstname} ${item.client.lastname}`,
-            }));
-            setData(data);
-            setLoading(false);
-            setTableParams({
-                ...tableParams,
-                pagination: {
-                    ...tableParams.pagination,
-                    pageSize: results.pageSize,
-                    current: results.page,
-                    total: results.totalCount,
-                },
-            });
-        } catch (error: any) {
-            console.log(error);
-            setError({
-                isError: true,
-                title: error?.name || "Something went wrong!",
-                message: error?.message || "Unknown error",
-            });
-        }
-    };
-
     useEffect(() => {
         if (!socket) return;
-        socket.on("order:finish:fromChef", (orderId: any) => {
+        socket.on("order:finish:fromChef", async (orderId: any) => {
             message.success(`Finish order #${orderId}! Ready to deliver!`);
-            fetchData();
+            setReload((prev) => !prev)
+        });
+        socket.on("cancelOrder:fromClient", async (orderId: any) => {
+            message.warning(`Order #${orderId} is cancel by client!`);
+            setReload((prev) => !prev)
+        });
+        socket.on("newOrder:fromClient", async (name: any) => {
+            message.success(`New order from client ${name}!`);
+            setReload((prev) => !prev)
         });
         return () => {
             socket.off("order:finish:fromChef");
         };
     }, [socket]);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
     const showModal = async (id: any) => {
         const res = await fetchClient({
             url: `/orders/${id}`,
             data_return: true,
         });
-        console.log(res);
         if (res) setItems(res.items);
         setOpen(true);
     };
@@ -249,132 +209,6 @@ const Order: React.FC = () => {
         },
     };
 
-    const handleSearch = (
-        selectedKeys: string[],
-        confirm: (param?: FilterConfirmProps) => void,
-        dataIndex: DataIndex
-    ) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
-
-    const handleReset = (clearFilters: () => void) => {
-        clearFilters();
-        setSearchText("");
-    };
-    const getColumnSearchProps = (
-        dataIndex: DataIndex
-    ): TableColumnType<DataType> => ({
-        filterDropdown: ({
-            setSelectedKeys,
-            selectedKeys,
-            confirm,
-            clearFilters,
-            close,
-        }: any) => (
-            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) =>
-                        setSelectedKeys(e.target.value ? [e.target.value] : [])
-                    }
-                    onPressEnter={() =>
-                        handleSearch(
-                            selectedKeys as string[],
-                            confirm,
-                            dataIndex
-                        )
-                    }
-                    style={{ marginBottom: 8, display: "block" }}
-                />
-                <Space>
-                    <Button
-                        type='primary'
-                        onClick={() =>
-                            handleSearch(
-                                selectedKeys as string[],
-                                confirm,
-                                dataIndex
-                            )
-                        }
-                        icon={<SearchOutlined />}
-                        size='small'
-                        style={{ width: 90 }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            clearFilters && handleReset(clearFilters)
-                        }
-                        size='small'
-                        style={{ width: 90 }}
-                    >
-                        Reset
-                    </Button>
-                    <Button
-                        type='link'
-                        size='small'
-                        onClick={() => {
-                            confirm({ closeDropdown: false });
-                            setSearchText((selectedKeys as string[])[0]);
-                            setSearchedColumn(dataIndex);
-                        }}
-                    >
-                        Filter
-                    </Button>
-                    <Button
-                        type='link'
-                        size='small'
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered: boolean) => (
-            <SearchOutlined
-                style={{ color: filtered ? "#1677ff" : undefined }}
-            />
-        ),
-        onFilter: (value: any, record: any) =>
-            record[dataIndex]
-                .toString()
-                .toLowerCase()
-                .includes((value as string).toLowerCase()),
-        onFilterDropdownOpenChange: (visible: any) => {
-            if (visible) {
-                setTimeout(() => searchInput.current?.select(), 100);
-            }
-        },
-        render: (text: string) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ""}
-                />
-            ) : (
-                text
-            ),
-    });
-
-    const rowSelection = {
-        onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-            setSelectedOrders(selectedRows);
-        },
-        getCheckboxProps: (record: DataType) => ({
-            disabled: record.fullname === "",
-            name: record.fullname,
-        }),
-    };
 
     const columns: ColumnsType<DataType> = [
         {
@@ -436,17 +270,15 @@ const Order: React.FC = () => {
                 }
                 return (
                     <Space size='small'>
-                        <Tag color={color}>{record.status.toUpperCase()}</Tag>;
+                        <Tag color={color}>{record.status.toUpperCase()}</Tag>
                     </Space>
                 );
             },
-            ...getColumnSearchProps("status"),
         },
         {
             title: "Amount",
             dataIndex: "amount",
             key: "amount",
-            ...getColumnSearchProps("amount"),
         },
         {
             title: "Created At",
@@ -455,7 +287,6 @@ const Order: React.FC = () => {
             render: (text, record) => {
                 return <>{moment(text).format("MMMM Do YYYY, h:mm:ss a")}</>;
             },
-            ...getColumnSearchProps("createdAt"),
         },
         {
             title: "Action",
@@ -475,8 +306,8 @@ const Order: React.FC = () => {
                                             },
                                         },
                                         okText: "Accept",
-                                        onOk: () => {
-                                            handleAcceptOrder(record);
+                                        onOk: async () => {
+                                            await handleAcceptOrder(record);
                                         },
                                         footer: (_, { OkBtn, CancelBtn }) => (
                                             <>
@@ -490,31 +321,36 @@ const Order: React.FC = () => {
                             >
                                 Accept
                             </a>
-                            <a
-                                onClick={() => {
-                                    Modal.confirm({
-                                        title: "Reject this order",
-                                        autoFocusButton: null,
-                                        okButtonProps: {
-                                            style: {
-                                                backgroundColor: "#f7454e",
+                            {record.paymentMethod != "MOMO" && (
+                                <a
+                                    onClick={() => {
+                                        Modal.confirm({
+                                            title: "Reject this order",
+                                            autoFocusButton: null,
+                                            okButtonProps: {
+                                                style: {
+                                                    backgroundColor: "#f7454e",
+                                                },
                                             },
-                                        },
-                                        okText: "Reject",
-                                        onOk: () =>
-                                            handleRejectOrder(record),
-                                        footer: (_, { OkBtn, CancelBtn }) => (
-                                            <>
-                                                <CancelBtn />
-                                                <OkBtn />
-                                            </>
-                                        ),
-                                    });
-                                }}
-                                className='text-red-700 hover:text-red-600'
-                            >
-                                Reject
-                            </a>
+                                            okText: "Reject",
+                                            onOk: async () =>
+                                                await handleRejectOrder(record),
+                                            footer: (
+                                                _,
+                                                { OkBtn, CancelBtn }
+                                            ) => (
+                                                <>
+                                                    <CancelBtn />
+                                                    <OkBtn />
+                                                </>
+                                            ),
+                                        });
+                                    }}
+                                    className='text-red-700 hover:text-red-600'
+                                >
+                                    Reject
+                                </a>
+                            )}
                         </>
                     ) : (
                         ""
@@ -531,7 +367,7 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: "Deliver",
-                                    onOk: () => handleDeliverOrder(record),
+                                    onOk: async () => await handleDeliverOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
                                             <CancelBtn />
@@ -556,7 +392,7 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: "Finish",
-                                    onOk: () => handleDoneOrder(record),
+                                    onOk: async () => await handleDoneOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
                                             <CancelBtn />
@@ -577,64 +413,6 @@ const Order: React.FC = () => {
         },
     ];
 
-    const handleTableChange: TableProps["onChange"] = (
-        pagination,
-        filters,
-        sorter,
-        extra
-    ) => {
-        if (Array.isArray(sorter)) {
-            const firstSorter = sorter[0];
-            setTableParams((prev) => ({
-                ...prev,
-                pagination,
-                filters,
-                sorter: {
-                    field: firstSorter?.field || prev.sorter?.field,
-                    order: firstSorter?.order || prev.sorter?.order,
-                },
-            }));
-            fetchData()
-        } else {
-            setTableParams((prev) => ({
-                pagination,
-                filters,
-                sorter: {
-                    field: sorter?.field || prev.sorter?.field,
-                    order: sorter?.order || prev.sorter?.order,
-                },
-            }));
-            fetchData()
-        }
-    };
-
-    const handleSortFieldChange = (key: string) => {
-        setTableParams((prev) => ({
-            ...prev,
-            sorter: { ...prev.sorter, field: key },
-        }));
-        console.log(tableParams);
-    };
-
-    const handleToggleSorter = () => {
-        setTableParams((prev) => ({
-            ...prev,
-            sorter: {
-                ...prev.sorter,
-                order: prev.sorter?.order === "ascend" ? "descend" : "ascend",
-            },
-        }));
-    };
-
-    const handleClearFilter = () => {};
-
-    const handleClearAll = () => {};
-
-    const handleCloseError = () => {
-        console.log(error);
-        setError({ isError: false, title: "", message: "" });
-    };
-
     const handleAcceptOrder = async (order: any) => {
         await fetchClient({
             url: `/orders/admin`,
@@ -647,10 +425,14 @@ const Order: React.FC = () => {
             body: { status: false, orderStatus: `${order.id}-1` },
         });
         if (socket) {
-            socket.emit("staff:order:prepare", order.id);
-            socket.emit("staff:notifications:prepare", order.clientId, order.id);
+            await socket.emit("staff:order:prepare", order.id);
+            await socket.emit(
+                "staff:notifications:prepare",
+                order.clientId,
+                order.id
+            );
         }
-        fetchData();
+        setReload((prev) => !prev)
     };
 
     const handleDeliverOrder = async (order: any) => {
@@ -665,9 +447,13 @@ const Order: React.FC = () => {
             body: { status: false, orderStatus: `${order.id}-2` },
         });
         if (socket) {
-            socket.emit("staff:notifications:deliver", order.clientId, order.id);
+            await socket.emit(
+                "staff:notifications:deliver",
+                order.clientId,
+                order.id
+            );
         }
-        fetchData();
+        setReload((prev) => !prev)
     };
 
     const handleDoneOrder = async (order: any) => {
@@ -681,10 +467,19 @@ const Order: React.FC = () => {
             method: "POSt",
             body: { status: false, orderStatus: `${order.id}-3` },
         });
+        await fetchClient({
+            url: `/customers/segment/${order.clientId}`,
+            method: "POST",
+            body: {},
+        });
         if (socket) {
-            socket.emit("staff:notifications:done", order.clientId, order.id);
+            await socket.emit(
+                "staff:notifications:done",
+                order.clientId,
+                order.id
+            );
         }
-        fetchData();
+        setReload((prev) => !prev)
     };
 
     const handleRejectOrder = async (order: any) => {
@@ -699,98 +494,35 @@ const Order: React.FC = () => {
             body: { status: false, orderStatus: `${order.id}-0` },
         });
         if (socket) {
-            socket.emit("staff:notifications:reject", order.clientId, order.id);
+            await socket.emit(
+                "staff:notifications:reject",
+                order.clientId,
+                order.id
+            );
         }
-        fetchData();
+        setReload((prev) => !prev)
     };
-
+    // const filterItems: FilterItemType[] = [
+    //     {
+    //         key: "1",
+    //         title: "Status",
+    //         fieldName: "status",
+    //         type: "input",
+    //     },
+    //     {
+    //         key: "6",
+    //         title: "CreatedAt",
+    //         fieldName: "createdAt",
+    //         type: "date",
+    //     },
+    // ];
     return (
         <>
-            <ConfigProvider
-                theme={{
-                    components: {
-                        Table: {
-                            headerBg: variables.backgroundSecondaryColor,
-                            footerBg: "#fff",
-                        },
-                    },
-                }}
-            >
-                <div className='w-full flex flex-col justify-start gap-5'>
-                    {/* <CustomerFilterBar /> */}
-                    {error.isError && (
-                        <Alert
-                            message={error.title}
-                            description={error.message}
-                            type='error'
-                            showIcon
-                            onClose={handleCloseError}
-                            closeIcon
-                        />
-                    )}
-                    <div className='border bg-white shadow p-3 w-full'>
-                        <div
-                            style={{ marginBottom: 16 }}
-                            className='flex items-center gap-2'
-                        >
-                            <p>Sort by: </p>
-                            <Select
-                                // style={{ width: '20%' }}
-                                placeholder='Columns'
-                                value={
-                                    tableParams.sorter?.field?.toString() ||
-                                    "id"
-                                }
-                                onChange={handleSortFieldChange}
-                                options={columns.map((item) => ({
-                                    value: item.key,
-                                    label: item.title,
-                                }))}
-                            />
-
-                            <p>Order: </p>
-
-                            <Button
-                                onClick={handleToggleSorter}
-                                icon={
-                                    tableParams.sorter?.order === "ascend" ? (
-                                        <SortAscendingOutlined />
-                                    ) : (
-                                        <SortDescendingOutlined />
-                                    )
-                                }
-                            />
-                            <Button onClick={handleClearFilter}>
-                                Clear filters
-                            </Button>
-                            <Button onClick={handleClearAll}>
-                                Clear filters and sorters
-                            </Button>
-                        </div>
-                    </div>
-                    <div className='w-full h-auto'>
-                        <Table
-                            rowSelection={{
-                                ...rowSelection,
-                            }}
-                            columns={columns}
-                            pagination={{
-                                className: "bg-white rounded px-4 py-2",
-                                showTotal: (total: number) =>
-                                    `Total ${total} items`,
-                                position: ["bottomCenter", "bottomRight"],
-                                showSizeChanger: true,
-                                showQuickJumper: true,
-                                total: tableParams.pagination?.total,
-                                pageSize: tableParams.pagination?.pageSize,
-                            }}
-                            loading={loading}
-                            dataSource={data}
-                            onChange={handleTableChange}
-                        />
-                    </div>
-                </div>
-            </ConfigProvider>
+            <TableOrderRender<DataType>
+                columns={columns}
+                url='/orders/admin'
+                reload={reload}
+            />
             <Modal
                 classNames={classNames}
                 styles={modalStyles}

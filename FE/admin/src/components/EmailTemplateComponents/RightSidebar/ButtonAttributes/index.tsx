@@ -23,16 +23,12 @@ const items: CollapseProps['items'] = [
     },
 ];
 const ButtonAttributes = () => {
-
     const { activeNode } = useEmailDataStore()
     const [content, setContent] = useState("")
     console.log(content)
     useEffect(() => {
         setContent((activeNode && activeNode.section.content) || "")
-    }, [])
-
-
-
+    }, [activeNode])
 
     if (!activeNode || (activeNode && activeNode.section.tagName !== "mj-button"))
         return <></>;

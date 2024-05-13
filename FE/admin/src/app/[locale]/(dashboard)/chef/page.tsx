@@ -1,14 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { io } from "socket.io-client";
 import { useRouter } from "next-intl/client";
-import useSWR from "swr";
-import { orderItemsFetcher } from "@/app/api/product/order";
 import Column from "@/components/Chef/column";
 import { message } from "antd";
 import useSocket from "@/socket";
 import fetchClient from "@/lib/fetch-client";
+import Loading from "@/components/loading";
 
 function Chef() {
     const router = useRouter();
@@ -16,16 +14,22 @@ function Chef() {
     const [preparingItems, setPreparingItems] = useState<any>(null);
     const [cookingItems, setCookingItems] = useState<any>(null);
     const [doneItems, setDoneItems] = useState<any>(null);
-    const [refetch, setRefetch] = useState<any>(null);
+    const [refetch, setRefetch] = useState<boolean>(false);
     const { data: session, status } = useSession();
-    const [authenticated, setAuthenticated] = useState(false);
     const socket = useSocket();
     useEffect(() => {
         if (!socket) return;
         socket.on("order:prepare:fromStaff", (orderId: any) => {
             message.info(`New order #${orderId}`);
-            setRefetch(`New order #${orderId}`);
+            setRefetch((pre: any) => !pre);
+
         });
+
+        socket.on("table:prepare:fromStaff", (tableId: any) => {
+            message.info(`New order from table #${tableId}`);
+            setRefetch((pre: any) => !pre);
+        });
+
         return () => {
             socket.off("order:prepare:fromStaff");
         };
@@ -33,40 +37,100 @@ function Chef() {
 
     useEffect(() => {
         const fetchOrders = async () => {
-            if (status === "loading") return;
-            if (status === "unauthenticated") {
-                router.push("/signin");
-                return;
-            }
             try {
                 const ordersData = await fetchClient({
                     url: "/orders/chef",
                     data_return: true,
                 });
-                const filteredItems = ordersData.flatMap((order: any) =>
-                    order.orderItems.filter(
+                const filteredOrderItems = ordersData.orderItems.flatMap(
+                    (order: any) =>
+                        order.orderItems.filter(
+                            (item: any) =>
+                                item.OrderItem.status === "Preparing" ||
+                                item.OrderItem.status === "Cooking" ||
+                                item.OrderItem.status === "Ready"
+                        )
+                );
+                const filteredTableItems = ordersData.tableItems.flatMap(
+                    (table: any) =>
+                        table.cartItems.filter(
+                            (item: any) =>
+                                item.CartItem.status === "Preparing" ||
+                                item.CartItem.status === "Cooking" ||
+                                item.CartItem.status === "Ready"
+                        )
+                );
+
+                const filteredItems =
+                    filteredOrderItems.concat(filteredTableItems);
+                const preparingItems = filteredItems
+                    .filter(
                         (item: any) =>
-                            item.OrderItem.status === "Preparing" ||
-                            item.OrderItem.status === "Cooking" ||
-                            item.OrderItem.status === "Ready"
-                    )
+                            (item.OrderItem &&
+                                item.OrderItem.status === "Preparing") ||
+                            (item.CartItem &&
+                                item.CartItem.status === "Preparing")
+                    ).sort((a: any, b: any) => {
+                        const dateA = a.OrderItem
+                            ? new Date(a.OrderItem.createdAt)
+                            : new Date(a.CartItem.createdAt);
+                        const dateB = b.OrderItem
+                            ? new Date(b.OrderItem.createdAt)
+                            : new Date(b.CartItem.createdAt);
+                        return dateA.getTime() - dateB.getTime();
+                    });
+
+                const cookingItems = filteredItems
+                    .filter(
+                        (item: any) =>
+                            (item.OrderItem &&
+                                item.OrderItem.status === "Cooking") ||
+                            (item.CartItem &&
+                                item.CartItem.status === "Cooking")
+                    ).sort((a: any, b: any) => {
+                        const dateA = a.OrderItem
+                            ? new Date(a.OrderItem.updatedAt)
+                            : new Date(a.CartItem.updatedAt);
+                        const dateB = b.OrderItem
+                            ? new Date(b.OrderItem.updatedAt)
+                            : new Date(b.CartItem.updatedAt);
+                        return dateA.getTime() - dateB.getTime();
+                    });
+
+
+                const doneItems = filteredItems
+                    .filter(
+                        (item: any) =>
+                            (item.OrderItem &&
+                                item.OrderItem.status === "Ready") ||
+                            (item.CartItem && item.CartItem.status === "Ready")
+                    ).sort((a: any, b: any) => {
+                        const dateA = a.OrderItem
+                            ? new Date(a.OrderItem.updatedAt)
+                            : new Date(a.CartItem.updatedAt);
+                        const dateB = b.OrderItem
+                            ? new Date(b.OrderItem.updatedAt)
+                            : new Date(b.CartItem.updatedAt);
+                        return dateA.getTime() - dateB.getTime();
+                    });
+
+                const filteredOrders = ordersData.orderItems.map(
+                    (order: any) => ({
+                        orderId: order.id,
+                        createdAt: order.createdAt,
+                        descriptions: order.descriptions,
+                        status: order.status,
+                    })
                 );
-                const preparingItems = filteredItems.filter(
-                    (item: any) => item.OrderItem.status === "Preparing"
+                const filteredTables = ordersData.tableItems.map(
+                    (table: any) => ({
+                        orderId: table.id,
+                        createdAt: table.createdAt,
+                        descriptions: "",
+                        status: "",
+                    })
                 );
-                const cookingItems = filteredItems.filter(
-                    (item: any) => item.OrderItem.status === "Cooking"
-                );
-                const doneItems = filteredItems.filter(
-                    (item: any) => item.OrderItem.status === "Ready"
-                );
-                const filteredOrders = ordersData.map((order: any) => ({
-                    orderId: order.id,
-                    createdAt: order.createdAt,
-                    descriptions: order.descriptions,
-                    status: order.status,
-                }));
-                setOrders(filteredOrders);
+                setOrders(filteredOrders.concat(filteredTables));
                 setPreparingItems(preparingItems);
                 setCookingItems(cookingItems);
                 setDoneItems(doneItems);
@@ -76,7 +140,7 @@ function Chef() {
         };
         fetchOrders();
     }, [status, router, refetch]);
-    if (!orders) return "Loading...";
+    if (!orders) return <Loading />;
     return (
         <div className='flex flex-row justify-between gap-10 w-full h-[680px] p-5'>
             <Column
