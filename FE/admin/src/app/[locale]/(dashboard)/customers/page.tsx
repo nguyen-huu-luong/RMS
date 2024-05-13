@@ -12,6 +12,7 @@ import { CreateNewCustomerModal } from "@/components/Modals/CreateNewCustomerMod
 import { AxiosError } from "axios";
 import moment from "moment";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 interface DataType {
@@ -47,56 +48,57 @@ const CustomerListPages: React.FC = () => {
 	const [selectedRows, setSelectedRows] = useState<DataType[]>([])
 	const [reload, setReload] = useState(false)
 	const router = useRouter()
-
+	const t_general: any = useTranslations("General")
+	const t_customer: any = useTranslations("Customer")
 	const [form_create] = useForm()
 	const columns: ColumnsType<DataType> = [
 		{
-			title: "ID",
+			title: t_general("id"),
 			dataIndex: "id",
 			key: "id",
 		},
 		{
-			title: "Fullname",
+			title: t_general("fullname"),
 			dataIndex: "fullname",
 			key: "fullname",
 			render: (text, row) => <Link style={{ color: "#4A58EC" }} href={`/customers/${row.id}`}>{text}</Link>,
 			// ...getColumnSearchProps("fullname"),
 		},
 		{
-			title: "Phone number",
+			title: t_general("phone"),
 			dataIndex: "phone",
 			key: "phone",
 			// sorter: (a, b) => a.age - b.age,
 		},
 		{
-			title: "Email",
+			title: t_general("email"),
 			dataIndex: "email",
 			key: "email",
 		},
 		{
-			title: "Type",
+			title: t_general("type"),
 			dataIndex: "type",
 			key: "type",
 		},
 		{
-			title: "Birthday",
+			title: t_general("birthday"),
 			dataIndex: "birthday",
 			key: "birthday",
 			render: (text, _) => text ? moment(text).format("DD-MM-YYYY"): "None"
 		},
 		{
-			title: "Score",
+			title: t_general("score"),
 			dataIndex: "score",
 			key: "score",
 		},
 		{
-			title: "Age",
+			title: t_general("age"),
 			dataIndex: "age",
 			key: "age",
 			render: (text, row) => <span>{getAge(row.birthday)}</span>
 		},
 		{
-			title: "CreatedAt",
+			title: t_general("created_at"),
 			dataIndex: "createdAt",
 			key: "createdAt",
 			render: (text) => moment(text).format("HH:mm DD-MM-YYYY")
@@ -106,31 +108,31 @@ const CustomerListPages: React.FC = () => {
 	const filterItems: FilterItemType[] = [
 		{
 			key: "1",
-			title: "Firstname",
+			title: t_general("firstname"),
 			fieldName: "firstname",
 			type: "input"
 		},
 		{
 			key: "8",
-			title: "Lastname",
+			title: t_general("lastname"),
 			fieldName: "lastname",
 			type: "input"
 		},
 		{
 			key: "2",
-			title: "Phone number",
+			title: t_general("phone"),
 			fieldName: "phone",
 			type: "input"
 		},
 		{
 			key: "3",
-			title: "Email",
+			title: t_general("phone"),
 			fieldName: "email",
 			type: "input"
 		},
 		{
 			key: "4",
-			title: "Birthday",
+			title: t_general("birthday"),
 			fieldName: "birthday",
 			type: "date"
 		},
@@ -156,7 +158,7 @@ const CustomerListPages: React.FC = () => {
 		// },
 		{
 			key: "6",
-			title: "CreatedAt",
+			title: t_general("created_at"),
 			fieldName: "createdAt",
 			type: "date"
 		},
@@ -191,16 +193,16 @@ const CustomerListPages: React.FC = () => {
 				<Flex>
 					{(selectedRows && selectedRows.length > 0) ?
 						<Space>
-							<p>Selected {selectedRows.length} customer</p>
+							<p>{t_general("selected")} {selectedRows.length} {t_customer("customer")}</p>
 							<CreateTargetListModal onOk={handleCreateTargetlist} triggerText="Create targetlist" />
 							<SendEmailModal emailLists={selectedRows.map((item) => item.email)} />
 							{/* <Button icon={<EllipsisOutlined />} /> */}
-							<Button danger onClick={handleDeleteCustomers}>Delete {selectedRows.length} customers</Button>
+							<Button danger onClick={handleDeleteCustomers}>{t_general("delete")} {selectedRows.length} {t_customer("customer")}</Button>
 						</Space>
 						:
 						<Space>
 							<Input
-								placeholder="Enter keywork to search...."
+								placeholder={t_general("search_placeholder")}
 								prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
 								className="flex items-center"
 							/>

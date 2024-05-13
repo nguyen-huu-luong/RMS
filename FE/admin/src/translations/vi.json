@@ -2,6 +2,36 @@
 	"Index": {
 		"title": "Xin chào!"
 	},
+	"General": {
+		"new": "Tạo mới",
+		"id": "ID",
+		"phone": "Số điện thoại",
+		"fullname": "Tên đầy đủ",
+		"email": "Email",
+		"type": "Loại",
+		"birthday": "Ngày sinh",
+		"score": "Điểm",
+		"age": "Tuổi",
+		"created_at": "Ngày tạo",
+		"firstname": "Tên",
+		"lastname": "Họ",
+		"total": "Tổng cộng",
+		"item": "hàng",
+		"order": "Thứ tự",
+		"sort": "Sắp xếp",
+		"search_placeholder": "Nhập từ khóa tìm kiếm....",
+		"selected": "Đã chọn",
+		"delete": "Xóa",
+		"source": "Nguồn",
+		"cancel": "Hủy",
+		"confirm": "Xác nhận",
+		"address": "Địa điểm",
+		"admin_dashboard": "Trang Admin"
+	},
+	"Customer": {
+		"customer": "khách hàng",
+		"add_new_customer": "Tạo khách hàng mới"
+	},
 	"Header": {
 		"chat-center": "Tin nhắn",
 		"notification": "Thông báo",
