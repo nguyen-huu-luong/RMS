@@ -85,7 +85,7 @@ function Item({
                 POS: item.OrderItem ? false : true,
             },
         });
-        refetch((pre: any) => pre + 1);
+        refetch((pre: any) => !pre);
 
         if (item.CartItem && item.CartItem.status == "Cooking") await socket.emit("chef:tableItem:finish", item.CartItem.cartId, item.name);
         if (res.data == "Update Order") {

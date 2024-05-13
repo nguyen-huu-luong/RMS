@@ -199,9 +199,11 @@ export class ChannelService {
                 message: message.slice(startIndex, endIndex).reverse(),
                 isAll: isAll,
                 client:
-                    client.getDataValue("firstname") +
+                    client.getDataValue("lastname") +
                     " " +
-                    client.getDataValue("lastname"),
+                    client.getDataValue("firstname"),
+                type: client.getDataValue("type"),
+                id: client.getDataValue('id')
             };
             Message.logMessage(req, status);
             if (res.headersSent) return;

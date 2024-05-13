@@ -26,7 +26,8 @@ const publicPages = [
   '/register',
   '/chat',
   '/about',
-  '/news'
+  '/news',
+  '/menu'
 ];
 
 const intlMiddleware = createIntlMiddleware({
