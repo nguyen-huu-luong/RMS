@@ -31,6 +31,7 @@ import ClientHistoryRouter from "./ClientHistory.router";
 import SubscriberRouter from "./Subscriber.router";
 import OrderItemRouter from "./OrderItem.router";
 import GroupRouter from "./Group.router";
+import JobRouter from "./Job.router";
 
 process.on("unhandledRejection", (reason, promise) => {
 	console.error("Unhandled Rejection at:", promise, "reason:", reason);
@@ -61,8 +62,10 @@ class Routers {
 		const subscriberRouter = new SubscriberRouter()
 		const orderItemRouter = new OrderItemRouter()
 		const groupRouter = new GroupRouter()
+		const  jobRouter = new JobRouter()
 		// declare your router here
 		const router = Router();
+		jobRouter.initialize(router)
         
 		trackingRouter.initialize(router)
 		orderRouter.initialize(router);

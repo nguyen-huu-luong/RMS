@@ -1,5 +1,5 @@
 import { ExpandAltOutlined, PlusCircleFilled, PlusOutlined } from "@ant-design/icons"
-import { Button, Form, Input, Modal, Select, Space } from "antd"
+import { Button, DatePicker, Form, Input, Modal, Select, Space } from "antd"
 import { useState } from "react";
 import { CustomModal } from "./MyCustomModal";
 import TextArea from "antd/es/input/TextArea";
@@ -60,11 +60,14 @@ export const CreateEmailCampaigntModal: React.FC<ICreateEmailCampaigntModal> = (
                     <Input placeholder='Group name' />
                 </Form.Item>
 
-                <Form.Item label="Status" name="status" required rules={[{ required: true, message: 'Please input the group description !' }]}>
+                {/* <Form.Item label="Status" name="status" required rules={[{ required: true, message: 'Please input the group description !' }]}>
                     <Select>
                         <Select.Option value="pending">Pending</Select.Option>
                         <Select.Option value="draft">Draft</Select.Option>
                     </Select>
+                </Form.Item> */}
+                <Form.Item label="Start at" name="startDate">
+                    <DatePicker format="DD/MM/YYYY hh:mm:A" showTime={{use12Hours: false}}/>
                 </Form.Item>
                 <Form.Item label="Subject" name="subject" required rules={[{ required: true, message: 'Please input the group description !' }]}>
                     <Input placeholder='Subject' />

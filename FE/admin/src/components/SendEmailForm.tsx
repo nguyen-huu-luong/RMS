@@ -1,7 +1,7 @@
-import { Button, Form, Input, Select, Space, Spin, Upload, message } from "antd"
+import { Button, Form, Input, Select, Space, Spin, Tooltip, Upload, message } from "antd"
 
 
-import { ExpandAltOutlined, UploadOutlined } from "@ant-design/icons";
+import { ExpandAltOutlined, InfoCircleFilled, UploadOutlined } from "@ant-design/icons";
 import React, { useEffect, useRef, useState } from 'react';
 const ReactQuill = typeof window === 'object' ?
     require('react-quill')
@@ -18,8 +18,6 @@ import fetchClient from "@/lib/fetch-client";
 const adminEmail = [
     "admin@admin.com", "rms@gmail.com", "support.rms@gmail.com"
 ]
-
-const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
 
 export interface ISendEmailFormProps {
     customerEmailLists: string[],
@@ -46,7 +44,7 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
 
     const loadMjMl = async (emailData: any) => {
         setLoading(true)
-        const url = `${backend_api}/email-editor/generate-mjml`;
+        const url = `http://localhost:3000/api/email-editor/generate-mjml`;
 
         const withHtml = {
             tagName: "mjml",
@@ -144,7 +142,7 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
     const sendEmail = async (emailData: any) => {
         try {
             setLoading(true)
-            const response = await fetchClient({url: "/send-email", method: "POST", body: {emailData} })
+            const response = await fetchClient({ url: "/send-email", method: "POST", body: { emailData } })
             console.log('sent email', response.data);
             message.success('Sent email successfully');
             setLoading(false)
@@ -187,7 +185,12 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
                     </Space>
                 </Form.Item>
 
-                <Form.Item name="emailCampaign" label={<b>Email campaign:</b>} required>
+                <Form.Item name="emailCampaign" label={<div className="flex items-center">
+                    <Tooltip title="Create and campagin help you will status of email sent, tracking click event and open event.">
+                        <InfoCircleFilled  className="text-primary"/>
+                    </Tooltip>
+                    <b className="ms-2">Email campaign:</b>
+                </div>}>
                     <Input />
                 </Form.Item>
 
