@@ -72,7 +72,7 @@ export class Server {
     }
 
     public start() {
-        this.server.listen(3003, () => {
+        this.server.listen(3003, '0.0.0.0',() => {
             console.log("Server is listening on port", process.env.PORT);
         });
     }
