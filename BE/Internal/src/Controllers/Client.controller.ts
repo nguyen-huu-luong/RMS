@@ -8,6 +8,8 @@ import { ForbiddenError, ValidationError } from "../Errors";
 import { validationResult } from "express-validator";
 import { AddTryCatchBlock, LogRequests } from "../Utils/decorators";
 
+
+
 @LogRequests
 @AddTryCatchBlock
 class ClientController {
@@ -36,6 +38,19 @@ class ClientController {
 			queries["sort"] = "birthday"
 		}
 
+		if (queries["sort"] === "group") {
+			queries["sort"] = "groupId"
+		}
+
+
+		if (queries["group_in"]) {
+			queries["groupId_in"] = queries["group_in"]
+		}
+
+		if (queries["group"]) {
+			queries["groupId"] = queries["group"]
+		}
+
 		const options: QueryOptions = parseRequesQueries(queries);
 
 
@@ -51,6 +66,7 @@ class ClientController {
 			res.send(data);
 		} if (req.action === "read:own") {
 			const data = await this.clientService.getById(Number(req.userId));
+			console.log(data)
 			res.send(data);
 		} else {
 			throw new ForbiddenError();

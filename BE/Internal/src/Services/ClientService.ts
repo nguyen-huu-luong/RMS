@@ -38,20 +38,20 @@ export class ClientService {
     ) { }
 
     public async getAll(options?: QueryOptions) {
-        const result = await this.clientRepository.all(options);
+        const result = await this.clientRepository.all({...options, associations: ["group"]} as QueryOptions);
         return {
             ...result
         }
     }
-
+    
     public async getById(id: number) {
-        let customerInfo: any = await this.clientRepository.findById(id);
+        let customerInfo: any = await this.clientRepository.findById(id);   
         let group = await this.groupRepository.findByCond({
             where: {
                 id: customerInfo.groupId
             }
         })
-        let orderInfo = await await this.orderRepository.viewOrders(id);
+        let orderInfo = await this.orderRepository.viewOrders(id);
 
         return { ...customerInfo["dataValues"], orderInfo, group: group }
     }

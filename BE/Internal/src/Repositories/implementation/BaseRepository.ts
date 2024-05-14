@@ -72,10 +72,16 @@ export abstract class BaseRepository<M extends Model>
                 findOptions.attributes = this.attributes;
             }
             
-            console.log(this.attributes)
+            if (options.associations) {
+                const allowAssocations = Object.keys(this._model.associations)
+                let assocations = options.associations.filter(item => allowAssocations.includes(item)) ;
+
+                findOptions.include = assocations
+            }
             
+
             const { count, rows } = await this._model.findAndCountAll(
-                findOptions,
+                {...findOptions},
             );
 
             return { 

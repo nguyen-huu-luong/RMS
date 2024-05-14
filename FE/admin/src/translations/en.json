@@ -26,7 +26,8 @@
 		"cancel": "Cancel",
 		"confirm": "Confirm",
 		"address": "Address",
-		"admin_dashboard": "Admin Dashboard"
+		"admin_dashboard": "Admin Dashboard",
+		"group": "Group"
 	},
 	"Customer": {
 		"customer": "customers",

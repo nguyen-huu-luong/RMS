@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { type TableProps, type GetProp, Form, Upload, Button, Select, Flex, Space, Input, message } from "antd";
+import { type TableProps, type GetProp, Form, Upload, Button, Select, Flex, Space, Input, message, Tooltip } from "antd";
 import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
 import TableRender, { FilterItemType } from "@/components/TableComponents";
 import fetchClient from "@/lib/fetch-client";
@@ -27,21 +27,26 @@ interface DataType {
 	score: number;
 	age: number;
 	address: string;
+	group: {
+		id: number,
+		name: string,
+		description: string
+	}
 	// updatedAt: Date ;
 }
 
 function getAge(birthDateString: string): number {
-    const birthDate = new Date(birthDateString);
-    const currentDate = new Date();
-    
-    let age = currentDate.getFullYear() - birthDate.getFullYear();
-    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+	const birthDate = new Date(birthDateString);
+	const currentDate = new Date();
 
-    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
-        age--;
-    }
+	let age = currentDate.getFullYear() - birthDate.getFullYear();
+	const monthDiff = currentDate.getMonth() - birthDate.getMonth();
 
-    return age;
+	if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
+		age--;
+	}
+
+	return age;
 }
 
 const CustomerListPages: React.FC = () => {
@@ -84,7 +89,7 @@ const CustomerListPages: React.FC = () => {
 			title: t_general("birthday"),
 			dataIndex: "birthday",
 			key: "birthday",
-			render: (text, _) => text ? moment(text).format("DD-MM-YYYY"): "None"
+			render: (text, _) => text ? moment(text).format("DD-MM-YYYY") : "None"
 		},
 		{
 			title: t_general("score"),
@@ -98,13 +103,26 @@ const CustomerListPages: React.FC = () => {
 			render: (text, row) => <span>{getAge(row.birthday)}</span>
 		},
 		{
+			title: t_general("group"),
+			dataIndex: "group",
+			key: "group",
+			render: (text, row) => row.group ? (<Tooltip title={row.group.description || ""}>
+				<span className="px-2 py-1 rounded-xl text-white" style={{background: getColor(row.group.id)}}>{row.group.name}</span>
+			</Tooltip>) : "Unknown"
+		},
+		{
 			title: t_general("created_at"),
 			dataIndex: "createdAt",
 			key: "createdAt",
 			render: (text) => moment(text).format("HH:mm DD-MM-YYYY")
 		},
 	];
-
+	const getColor = (num: number) => {
+		const color = ["#FF69B4", "#1E90FF", "#FFD700", "#00FF00", "#FF4500", "#9400D3", 
+		"#FF69B4", "#1E90FF", "#FFD700", "#00FF00", "#FF4500", "#9400D3"]
+		
+		return color[num]
+	}
 	const filterItems: FilterItemType[] = [
 		{
 			key: "1",
@@ -136,26 +154,38 @@ const CustomerListPages: React.FC = () => {
 			fieldName: "birthday",
 			type: "date"
 		},
-		// {
-		// 	key: "5",
-		// 	title: "Group",
-		// 	fieldName: "group",
-		// 	type: "select",
-		// 	options: [
-		// 		{
-		// 			label: "Group 1",
-		// 			value: 1
-		// 		},
-		// 		{
-		// 			label: "Group 2",
-		// 			value: 2
-		// 		},
-		// 		{
-		// 			label: "Group ",
-		// 			value: 3
-		// 		},
-		// 	]
-		// },
+		{
+			key: "5",
+			title: "Group",
+			fieldName: "group",
+			type: "select",
+			options: [
+				{
+					label: "Group 0",
+					value: 1
+				},
+				{
+					label: "Group 1",
+					value: 2
+				},
+				{
+					label: "Group 2",
+					value: 3
+				},
+				{
+					label: "Group 3",
+					value: 4
+				},
+				{
+					label: "Group 4",
+					value: 5
+				},
+				{
+					label: "Group 5",
+					value: 6
+				},
+			]
+		},
 		{
 			key: "6",
 			title: t_general("created_at"),
@@ -232,9 +262,9 @@ const CustomerListPages: React.FC = () => {
 
 	const handleCreateCustomer = async (values: any) => {
 		try {
-			const  result = await fetchClient({
+			const result = await fetchClient({
 				method: "POST",
-				url: "/customers", 
+				url: "/customers",
 				body: {
 					data: {
 						...values,
@@ -242,14 +272,14 @@ const CustomerListPages: React.FC = () => {
 					}
 				}
 			})
-			setReload(!reload) ;
+			setReload(!reload);
 		} catch (error) {
 			if (error instanceof AxiosError) {
-				if (error.response)  {
-					const {code, name, message} = error?.response.data
-					if (name  === "Conflict") {
-						form_create.setFields([{name: "email", errors: ["Email đã tồn tại"]}])
-					} 
+				if (error.response) {
+					const { code, name, message } = error?.response.data
+					if (name === "Conflict") {
+						form_create.setFields([{ name: "email", errors: ["Email đã tồn tại"] }])
+					}
 				}
 				throw error
 			} else {
