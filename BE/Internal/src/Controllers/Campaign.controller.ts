@@ -39,8 +39,8 @@ class CampaingController {
 		} else {
 			throw new ForbiddenError();
 		}
-	
 	}
+
 
 	public async createCampaign(req: Request, res: Response, next: NextFunction) {
 		// const errors = validationResult(req);
@@ -95,6 +95,34 @@ class CampaingController {
 			throw new ForbiddenError();
 		}
 	}
+
+
+	public async getEmailCampaignDetails(req: Request, res: Response, next: NextFunction) {
+		ensurePermissionIsValid(req.action, "read:any");
+		const campaignId = req.params["campaignId"]
+		const emailId = req.params["emailId"]
+
+		const result = await this.campaignService.getEmailCampaign(Number(campaignId), Number(emailId));
+
+		res.send(result) ;
+
+	}
+
+
+	public async getAllJobs(req: Request, res: Response, next: NextFunction)  {
+		const campaignId = req.params["campaignId"]
+		const emailId = req.params["emailId"]
+		const status = req.query["status"] as string
+
+		if (status) {
+			const result = await this.campaignService.getAllJob(campaignId, emailId)
+			res.send(result)
+		} else {
+			const result = await this.campaignService.getAllJob(campaignId, emailId)
+			res.send(result)
+		}
+
+	}	
 
 
 	public async createEmailCampaing(req: Request, res: Response, next: NextFunction) {

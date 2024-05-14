@@ -15,7 +15,7 @@ export interface IEmailMessage {
     from: string;
     to: string;
     subject: string;
-    html: string;
+    html: string;   
     type?: string;
 }
 
@@ -215,4 +215,7 @@ export class EmailService {
             return result;
         }
     }
+
+
+    
 }

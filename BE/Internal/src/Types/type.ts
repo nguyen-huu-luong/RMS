@@ -28,10 +28,8 @@ const TYPES = {
     IPos_notificationRepository: Symbol.for("IPos_notificationRepository"),
     IClientHistoryRepository: Symbol.for("IClientHistoryRepository"),
     ISubscriberRepository: Symbol.for("ISubscriberRepository"),
-
     ICampaignRepository: Symbol.for("ICampaignReposittory"),
-    ITargetListRepository: Symbol.for("ITargetListRepository"),
-  
+    ITargetListRepository: Symbol.for("ITargetListRepository"),  
     IEmailCampaignRepository: Symbol.for("IEmailCampaignRepository"),
     ITrackUrlRepository: Symbol.for("ITrackUrlRepository"),
     IGroupRepository: Symbol.for("IGroupRepository")
@@ -79,6 +77,7 @@ type QueryOptions = {
     pageSize: number;
   };
   type?: string;
+  associations?: string[] 
 };
 
 type ChartQueryOptions = {

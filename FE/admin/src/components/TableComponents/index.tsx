@@ -260,8 +260,8 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, ...props 
                     for (let i = 0; i < array.length; i++) {
                         str += array[i]
                         if (i !== (array.length - 1)) {
-                            str += ","
-                        }
+                            str += ";"
+                        }   
                     }
                     queryStr = `${queryStr}&${key}_in=${str}`
 
