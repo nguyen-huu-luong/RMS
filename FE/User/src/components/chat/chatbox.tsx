@@ -17,6 +17,7 @@ import fetchClient from "@/lib/fetch-client";
 import { Spin, Upload, UploadProps, message } from "antd";
 import { uploadImage } from "@/app/api/upload/image";
 import { useTranslations } from "next-intl";
+import SendStatus from "./send_status";
 
 const ChatBox = ({
     params,
@@ -25,6 +26,7 @@ const ChatBox = ({
 }) => {
     const socket = useSocket();
     const [inputFocused, setInputFocused] = useState(false);
+    const [sending, setSending] = useState<boolean>(false);
     const [data, setData] = useState<any>({
         channel: {},
         message: [],
@@ -38,7 +40,7 @@ const ChatBox = ({
     const [value, setValue] = useState<string>("");
     const [action, setAction] = useState<string>("Default");
     const router = useRouter();
-    const t = useTranslations('Chat')
+    const t = useTranslations("Chat");
     // FETCHING DATA
     const fetchData = useCallback(async () => {
         try {
@@ -62,59 +64,6 @@ const ChatBox = ({
             setLoading(false);
         }
     }, [status, index]);
-
-    // SEND IMAGE
-    const handleUpload = async ({
-        file,
-        onSuccess,
-    }: {
-        file?: any;
-        onSuccess?: any;
-    }) => {
-        const image = await uploadImage(file, "Chat");
-        if (image.url) {
-            await fetchClient({
-                url: `/channels`,
-                method: "POST",
-                body: {
-                    content: image.url,
-                    status: "Not seen",
-                },
-            });
-            setData((prevData: any) => ({
-                ...prevData,
-                message: [
-                    ...prevData.message,
-                    {
-                        content: image.url,
-                        createdAt: new Date(),
-                        clientId: session?.user.id,
-                        status: "Not seen",
-                    },
-                ],
-            }));
-            await socket.emit(
-                "client:message:send",
-                data.channel,
-                image.url,
-                session?.user.id
-            );
-            setAction("Scroll");
-        }
-        onSuccess("ok");
-    };
-
-    const props: UploadProps = {
-        name: "image",
-        customRequest: handleUpload,
-        onChange(info) {
-            if (info.file.status === "done") {
-                // mess.success(`Send image successfully`);
-            } else if (info.file.status === "error") {
-                message.error(`Send image failed.`);
-            }
-        },
-    };
 
     // HANDLE SCROLL TO BOTTOM
     const scrollToBottom = () => {
@@ -235,20 +184,62 @@ const ChatBox = ({
         setInputFocused(false);
     };
 
+    // SEND IMAGE
+    const handleUpload = async ({
+        file,
+        onSuccess,
+    }: {
+        file?: any;
+        onSuccess?: any;
+    }) => {
+        const image = await uploadImage(file, "Chat");
+        if (image.url) {
+            setSending(true);
+            setData((prevData: any) => ({
+                ...prevData,
+                message: [
+                    ...prevData.message,
+                    {
+                        content: image.url,
+                        createdAt: new Date(),
+                        clientId: session?.user.id,
+                        status: "Not seen",
+                    },
+                ],
+            }));
+            const response = await socket.timeout(5000)(
+                "client:message:send",
+                data.channel,
+                image.url,
+                session?.user.id
+            );
+            if (!response.status) {
+                message.error("Sending message failed!");
+            }
+            setSending(false);
+            setAction("Scroll");
+        }
+        onSuccess("ok");
+    };
+
+    const props: UploadProps = {
+        name: "image",
+        customRequest: handleUpload,
+        onChange(info) {
+            if (info.file.status === "done") {
+            } else if (info.file.status === "error") {
+                message.error(`Send image failed.`);
+            }
+        },
+    };
+
     // SENDING MESSAGE
     const send = async (e: any) => {
         e.preventDefault();
         try {
             if (value != "") {
                 e.preventDefault();
-                await fetchClient({
-                    url: `/channels`,
-                    method: "POST",
-                    body: {
-                        content: value,
-                        status: "Not seen",
-                    },
-                });
+                setSending(true);
                 setValue("");
                 setData((prevData: any) => ({
                     ...prevData,
@@ -262,16 +253,23 @@ const ChatBox = ({
                         },
                     ],
                 }));
-                await socket.emit(
-                    "client:message:send",
-                    data.channel,
-                    value,
-                    session?.user.id
-                );
+                const response = await socket
+                    .timeout(5000)
+                    .emitWithAck(
+                        "client:message:send",
+                        data.channel,
+                        value,
+                        session?.user.id
+                    );
+                if (!response.status) {
+                    message.error("Sending message failed!");
+                }
+                setSending(false);
                 setAction("Scroll");
             }
         } catch (error) {
             console.error("Error sending message:", error);
+            message.error("Sending message failed!");
         }
     };
 
@@ -291,7 +289,7 @@ const ChatBox = ({
             className={`${styles.chat} w-64 h-80 bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg fixed bottom-5 right-5 z-50`}
         >
             <div className='header h-10 w-full text-white bg-primary items-center flex flex-row justify-between p-2 font-bold border-b-white border-b-2'>
-                <span>{t('Chat')}</span>
+                <span>{t("Chat")}</span>
                 <span onClick={() => params.setShow(false)}>
                     <FullscreenExitOutlined
                         style={{
@@ -332,17 +330,19 @@ const ChatBox = ({
                                     time: item.createdAt,
                                 }}
                             />
-                            {lastMessage && (
+                            {lastMessage && !sending && (
                                 <Status read={item.status != "Not seen"} />
                             )}
                         </>
                     );
                 })}
+                {sending && <SendStatus />}
             </div>
             <div className='footer h-10 w-full bg-primary-100 items-center flex flex-row justify-between p-2 font-medium text-base'>
                 <input
                     id='message'
                     value={value}
+                    disabled={sending}
                     onChange={(e) => {
                         setValue(e.currentTarget.value);
                     }}
@@ -350,7 +350,7 @@ const ChatBox = ({
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
-                    placeholder={t('Enter')}
+                    placeholder={t("Enter")}
                 ></input>
                 <span className='text-primary'>
                     <Upload
@@ -361,7 +361,11 @@ const ChatBox = ({
                         style={{ color: "aqua" }}
                     >
                         <FileImageOutlined
-                            style={{ fontSize: "1.4rem", color: "#EA6A12", marginRight: 10 }}
+                            style={{
+                                fontSize: "1.4rem",
+                                color: "#EA6A12",
+                                marginRight: 10,
+                            }}
                             className='hover:cursor-pointer'
                         />
                     </Upload>

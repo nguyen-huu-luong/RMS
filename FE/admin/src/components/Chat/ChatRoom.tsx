@@ -25,6 +25,9 @@ import { useForm } from "antd/es/form/Form";
 import { AxiosError } from "axios";
 import { uploadImage } from "@/app/api/upload";
 import { CreateNewLeadForm } from "../Lead/AddLeadForm";
+import { useSession } from "next-auth/react";
+import SendStatus from "./send_status";
+
 const ChatBox = ({
     channel,
     setChannel,
@@ -38,7 +41,9 @@ const ChatBox = ({
     setIndex: any;
     index: any;
 }) => {
+    const { data: session, status } = useSession();
     const [value, setValue] = useState("");
+    const [sending, setSending] = useState<boolean>(false);
     const [data, setData] = useState<any>(null);
     const [inputFocused, setInputFocused] = useState(false);
     const [action, setAction] = useState<string>("Default");
@@ -211,15 +216,7 @@ const ChatBox = ({
         if (value == "") return;
         e.preventDefault();
         try {
-            await fetchClient({
-                url: `/channels/admin`,
-                method: "POST",
-                body: {
-                    content: value,
-                    channelId: channel,
-                    status: "Not seen",
-                },
-            });
+            setSending(true);
             setValue("");
             setData((prevData: any) => ({
                 ...prevData,
@@ -233,7 +230,16 @@ const ChatBox = ({
                     },
                 ],
             }));
-            await socket.emit("staff:message:send", data.channel, value, value);
+            const response = await socket.emitWithAck(
+                "staff:message:send",
+                data.channel,
+                value,
+                session?.user.id
+            );
+            if (!response.status) {
+                message.error("Sending message failed!");
+            }
+            setSending(false);
             setAction("Scroll");
         } catch (error) {
             console.error("Error sending message:", error);
@@ -249,15 +255,7 @@ const ChatBox = ({
     }) => {
         const image = await uploadImage(file, "Chat");
         if (image.url) {
-            await fetchClient({
-                url: `/channels/admin`,
-                method: "POST",
-                body: {
-                    content: image.url,
-                    channelId: channel,
-                    status: "Not seen",
-                },
-            });
+            setSending(true);
             setValue("");
             setData((prevData: any) => ({
                 ...prevData,
@@ -271,12 +269,16 @@ const ChatBox = ({
                     },
                 ],
             }));
-            await socket.emit(
+            const response = await socket.emitWithAck(
                 "staff:message:send",
                 data.channel,
                 image.url,
-                image.url
+                session?.user.id
             );
+            if (!response.status) {
+                message.error("Sending message failed!");
+            }
+            setSending(false);
             setAction("Scroll");
         }
         onSuccess("ok");
@@ -453,6 +455,7 @@ const ChatBox = ({
                         </>
                     );
                 })}
+                {sending && <SendStatus />}
             </div>
             <div className='footer h-10 w-full bg-primary-100 items-center flex flex-row justify-between p-2 font-medium text-base'>
                 <input
@@ -473,10 +476,10 @@ const ChatBox = ({
                         maxCount={1}
                         showUploadList={false}
                         accept='image/*'
-                        style={{color: 'aqua'}}
-                        >
+                        style={{ color: "aqua" }}
+                    >
                         <FileImageOutlined
-                            style={{ fontSize: "1.4rem", color: '#4A58EC' }}
+                            style={{ fontSize: "1.4rem", color: "#4A58EC" }}
                             className='hover:cursor-pointer'
                         />
                     </Upload>

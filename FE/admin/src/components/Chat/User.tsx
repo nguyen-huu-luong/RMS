@@ -70,6 +70,7 @@ function User({
                 });
             }
         };
+        
         const handleStaffMessage = (
             channelId: any,
             message: string,
@@ -161,7 +162,7 @@ function User({
     const handleJoinRoom = async () => {
         try {
             const response = await socket
-                .timeout(5000)
+                .timeout(5000) 
                 .emitWithAck("staff:channel:join", params.channel.id, staffId);
             if (response.status == "0") {
                 message.warning(

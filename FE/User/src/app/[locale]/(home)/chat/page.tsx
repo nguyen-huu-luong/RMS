@@ -8,9 +8,12 @@ import { useEffect, useState } from "react";
 import Loading from "@/components/loading";
 import Cookies from "js-cookie";
 import { useTranslations } from "next-intl";
+import { message } from "antd";
+import SendStatus from "@/components/chat/send_status";
 export default function Chat() {
     const socket = useAnonymousSocket();
     const t = useTranslations("Chat");
+    const [sending, setSending] = useState<boolean>(false);
     const [data, setData] = useState<any>({
         channel: 1,
         message: [
@@ -77,11 +80,12 @@ export default function Chat() {
             socket.off("message:send:fromStaff", handleNewMessage);
         };
     }, [socket]);
-    const send = (e: any) => {
+    const send = async (e: any) => {
         e.preventDefault();
         try {
             if (value != "") {
                 e.preventDefault();
+                setSending(true);
                 setValue("");
                 setData((prevData: any) => ({
                     ...prevData,
@@ -95,11 +99,15 @@ export default function Chat() {
                         },
                     ],
                 }));
-                socket.emit(
+                const response = await socket.emitWithAck(
                     "anonymousclient:message:send",
                     value,
                     Cookies.get("socketId")
                 );
+                if (!response.status) {
+                    message.error("Sending message failed!");
+                }
+                setSending(false);
             }
         } catch (error) {
             console.error("Error sending message:", error);
@@ -111,7 +119,7 @@ export default function Chat() {
             className={`w-full h-[500px] bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg`}
         >
             <div className='header h-10 w-full text-white bg-primary items-center flex flex-row justify-between p-2 font-bold border-b-white border-b-2'>
-                <span>{t('Chat')}</span>
+                <span>{t("Chat")}</span>
             </div>
             <div className='body w-full grow font-normal text-sm overflow-auto max-h-full flex flex-col justify-start gap-2 px-2 py-2'>
                 {data.message.map((item: any, index: number) => {
@@ -139,6 +147,7 @@ export default function Chat() {
                         </>
                     );
                 })}
+                {sending && <SendStatus />}
             </div>
             <div className='footer h-10 w-full bg-primary-100 items-center flex flex-row justify-between p-2 font-medium text-base'>
                 <input
@@ -149,7 +158,7 @@ export default function Chat() {
                     }}
                     onKeyDown={(e) => (e.key === "Enter" ? send(e) : {})}
                     className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
-                    placeholder={t('Enter')}
+                    placeholder={t("Enter")}
                 ></input>
                 <span className='text-primary' onClick={(e) => send(e)}>
                     <SendOutlined

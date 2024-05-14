@@ -160,7 +160,7 @@
         "Welcome1": "Welcome to Home Cuisine Chat Service!",
         "Welcome2": "Our staff will reply to you soon!",
         "Welcome3": "We will keep this chat history for better service to you!",
-        "Seed": "Seen",
+        "Seen": "Seen",
         "Not_seen": "Not seen"
     },
     "User_profile": {

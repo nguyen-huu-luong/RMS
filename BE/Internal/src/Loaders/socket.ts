@@ -2,6 +2,7 @@ import { NextFunction } from "express";
 import { Cart, Channel, Client, Message, Table } from "../Models";
 import { TokenUtil } from "../Utils";
 import type { Socket } from "socket.io";
+import { callback } from "chart.js/dist/helpers/helpers.core";
 class SocketConnection {
     private channels: { [channelId: string]: string } = {};
     private employee: Socket[] = [];
@@ -41,7 +42,7 @@ class SocketConnection {
                         await Message.create({
                             channelId: anonymousChannel.getDataValue("id"),
                             clientId: anonymousClient.getDataValue("id"),
-                            content: 'New user want to chat!',
+                            content: "New user want to chat!",
                             status: "Not seen",
                         });
                         await socket.join(
@@ -107,35 +108,95 @@ class SocketConnection {
                 async (
                     channelId: string,
                     message: string,
-                    clientId: string
+                    clientId: string,
+                    callback: any
                 ) => {
-                    await io
-                        .to("Channel_" + channelId)
-                        .emit(
-                            "message:send:fromClient",
-                            channelId,
-                            message,
-                            clientId
-                        );
+                    try {
+                        await Message.create({
+                            channelId: channelId,
+                            clientId: clientId,
+                            content: message,
+                            status: "Not seen",
+                        });
+                        await io
+                            .to("Channel_" + channelId)
+                            .emit(
+                                "message:send:fromClient",
+                                channelId,
+                                message,
+                                clientId
+                            );
+                        callback({
+                            status: true,
+                        });
+                    } catch (error: any) {
+                        callback({
+                            status: false,
+                            error: error.message,
+                        });
+                    }
                 }
             );
+
             socket.on(
                 "staff:message:send",
                 async (
                     channelId: string,
                     message: string,
-                    employeeId: string
+                    employeeId: string,
+                    callback: any
                 ) => {
-                    await io
-                        .to("Channel_" + channelId)
-                        .emit(
-                            "message:send:fromStaff",
-                            channelId,
-                            message,
-                            employeeId
-                        );
+                    try {
+                        await Message.create({
+                            channelId: channelId,
+                            employeeId: employeeId,
+                            content: message,
+                            status: "Not seen",
+                        });
+                        await io
+                            .to("Channel_" + channelId)
+                            .emit(
+                                "message:send:fromStaff",
+                                channelId,
+                                message,
+                                employeeId
+                            );
+                        callback({
+                            status: true,
+                        });
+                    } catch (error: any) {
+                        callback({
+                            status: true,
+                            error: error.message,
+                        });
+                    }
                 }
             );
+
+            socket.on(
+                "newClient:message:info",
+                async (clientId: string, callback: any) => {
+                    try {
+                        const user = await Client.findByPk(clientId);
+                        callback({
+                            status: true,
+                            client: {
+                                userAvatar: user?.getDataValue("avatar"),
+                                userName:
+                                    user?.getDataValue("lastname") +
+                                    " " +
+                                    user?.getDataValue("firstname"),
+                            },
+                        });
+                    } catch (error: any) {
+                        callback({
+                            status: true,
+                            error: error.message,
+                        });
+                    }
+                }
+            );
+
             socket.on("client:message:read", async (channelId: string) => {
                 await io
                     .to("Channel_" + channelId)
@@ -193,36 +254,45 @@ class SocketConnection {
             // Chat service - anonymous client
             socket.on(
                 "anonymousclient:message:send",
-                async (message: string, socketId?: string) => {
-                    const id = socket.handshake.query.customId != undefined
-                        ? socket.handshake.query.customId
-                        : socketId;
-                    const client = await Client.findOne({
-                        where: {
-                            firstname: id,
-                        },
-                    });
-                    if (!client) {
-                    }
-                    const channel = await Channel.findOne({
-                        where: {
+                async (message: string, socketId: string, callback: any) => {
+                    try {
+                        const id = socketId;
+                        const client = await Client.findOne({
+                            where: {
+                                firstname: id,
+                            },
+                        });
+                        if (!client) {
+                        }
+                        const channel = await Channel.findOne({
+                            where: {
+                                clientId: client?.dataValues.id,
+                            },
+                        });
+                        await Message.create({
+                            channelId: channel?.dataValues.id,
                             clientId: client?.dataValues.id,
-                        },
-                    });
-                    await Message.create({
-                        channelId: channel?.dataValues.id,
-                        clientId: client?.dataValues.id,
-                        content: message,
-                        status: "Not seen",
-                    });
-                    await io
-                        .to("Channel_" + channel?.dataValues.id)
-                        .emit(
-                            "message:send:fromClient",
-                            channel?.dataValues.id,
-                            message,
-                            client?.dataValues.id
-                        );
+                            content: message,
+                            status: "Not seen",
+                        });
+                        await io
+                            .to("Channel_" + channel?.dataValues.id)
+                            .emit(
+                                "message:send:fromClient",
+                                channel?.dataValues.id,
+                                message,
+                                client?.dataValues.id
+                            );
+                        callback({
+                            status: true,
+                        });
+                    } catch (error: any) {
+                        console.log(error);
+                        callback({
+                            status: false,
+                            error: error.message,
+                        });
+                    }
                 }
             );
 

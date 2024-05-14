@@ -31,9 +31,11 @@ const ChatList = ({
             });
             setChannels(fetchedData);
             fetchedData.channel.map((item: any) => {
-                if (item.channel.clientId == parseInt(id, 10) && channel == -1) {
+                if (
+                    item.channel.clientId == parseInt(id, 10) &&
+                    channel == -1
+                ) {
                     setChannel(item.channel.id);
-
                 }
             });
         } catch (error) {
@@ -48,6 +50,46 @@ const ChatList = ({
         socket.on("channel:status:update", (updatedChannels: any) => {
             setChannelStatus(updatedChannels);
         });
+
+        const handleClientMessage = async (
+            channelId: any,
+            message: string,
+            clientId: string
+        ) => {
+            if (channels) {
+                const channelExists = channels.channel.some(
+                    (channel: any) => channel.channel.id === channelId
+                );
+                if (!channelExists) {
+                    const response = await socket.emitWithAck(
+                        "newClient:message:info",
+                        clientId
+                    );
+                    const newChannel = {
+                        channel: {
+                            id: channelId,
+                        },
+                        latestMessage: {
+                            content: message,
+                            createdAt: new Date(),
+                            employeeId: null,
+                            clientId: clientId,
+                            status: "Not seen",
+                        },
+                        updateTime: new Date(),
+                        userAvatar: response.client.userAvatar,
+                        userName: response.client.userName,
+                    };
+                    setChannels((prevChannels: any) => {
+                        return {
+                            ...prevChannels,
+                            channel: [...prevChannels.channel, newChannel],
+                        };
+                    });
+                }
+            }
+        };
+
         socket.on(
             "anonymous:channel:create",
             async (channelId: string, userName: string, clientId: string) => {
@@ -76,6 +118,11 @@ const ChatList = ({
                 }
             }
         );
+        socket.on("message:send:fromClient", handleClientMessage);
+
+        return () => {
+            socket.off("message:send:fromClient", handleClientMessage);
+        };
     }, [socket, channels]);
     const handleKeyDown = (event: any) => {
         if (event.key === "Enter") {
