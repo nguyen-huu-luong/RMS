@@ -19,7 +19,7 @@ export const authOptions: AuthOptions = {
                 try {
                     const response = await axios({
                         // fix when deploy n production
-                        url: `http://${process.env.NEXT_PUBLIC_BACKEND_NAME}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/users/admin/signin`,
+                        url: `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/users/admin/signin`,
                         method: "POST",
                         body: {
                             username: credentials?.username,
