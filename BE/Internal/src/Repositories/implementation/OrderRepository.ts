@@ -23,9 +23,7 @@ export class OrderRepository
                     clientId: userId,
                 },
 
-                order: [
-                    ["createdAt", "DESC"],
-                ],
+                order: [["createdAt", "DESC"]],
             });
             return allOrders;
         } catch (err) {
@@ -90,7 +88,7 @@ export class OrderRepository
                 yesterday.getFullYear(),
                 yesterday.getMonth(),
                 yesterday.getDate() + 1
-            ); 
+            );
             const [todayOrders, yesterdayOrders] = await Promise.all([
                 this._model.findAll({
                     where: {
@@ -269,13 +267,15 @@ export class OrderRepository
                 const orderItems = await order.getProducts();
                 for (const orderItem of orderItems) {
                     const { productId, quantity } = orderItem.OrderItem;
-                    if (!productSales.has(productId)) {
-                        productSales.set(productId, quantity);
-                    } else {
-                        productSales.set(
-                            productId,
-                            productSales.get(productId) + quantity
-                        );
+                    if (quantity > 0) {
+                        if (!productSales.has(productId)) {
+                            productSales.set(productId, quantity);
+                        } else {
+                            productSales.set(
+                                productId,
+                                productSales.get(productId) + quantity
+                            );
+                        }
                     }
                 }
             }
@@ -287,7 +287,10 @@ export class OrderRepository
                 productSales
             ).map(([productId, quantity]) => [productId, quantity, -10]);
             productSalesArray.sort((a, b) => b[1] - a[1]);
-            const topProducts = productSalesArray.slice(0, 10);
+            const topProducts = productSalesArray.slice(
+                0,
+                Math.min(10, productSalesArray.length)
+            );
             if (previousMonth) {
                 const result: [number, number, number][] = topProducts.map(
                     ([productId, quantity, rank], index) => {
@@ -328,13 +331,15 @@ export class OrderRepository
                 const orderItems = await order.getProducts();
                 for (const orderItem of orderItems) {
                     const { productId, quantity } = orderItem.OrderItem;
-                    if (!productSales.has(productId)) {
-                        productSales.set(productId, quantity);
-                    } else {
-                        productSales.set(
-                            productId,
-                            productSales.get(productId) + quantity
-                        );
+                    if (quantity > 0) {
+                        if (!productSales.has(productId)) {
+                            productSales.set(productId, quantity);
+                        } else {
+                            productSales.set(
+                                productId,
+                                productSales.get(productId) + quantity
+                            );
+                        }
                     }
                 }
             }
@@ -346,7 +351,10 @@ export class OrderRepository
                 productSales
             ).map(([productId, quantity]) => [productId, quantity, -10]);
             productSalesArray.sort((a, b) => b[1] - a[1]);
-            const topProducts = productSalesArray.slice(0, 10);
+            const topProducts = productSalesArray.slice(
+                0,
+                Math.min(10, productSalesArray.length)
+            );
             if (previosYear) {
                 const result: [number, number, number][] = topProducts.map(
                     ([productId, quantity, rank], index) => {
@@ -385,20 +393,25 @@ export class OrderRepository
                 const orderItems = await order.getProducts();
                 for (const orderItem of orderItems) {
                     const { productId, quantity } = orderItem.OrderItem;
-                    if (!productSales.has(productId)) {
-                        productSales.set(productId, quantity);
-                    } else {
-                        productSales.set(
-                            productId,
-                            productSales.get(productId) + quantity
-                        );
+                    if (quantity > 0) {
+                        if (!productSales.has(productId)) {
+                            productSales.set(productId, quantity);
+                        } else {
+                            productSales.set(
+                                productId,
+                                productSales.get(productId) + quantity
+                            );
+                        }
                     }
                 }
             }
             const productSalesArray: [number, number][] =
                 Array.from(productSales);
             productSalesArray.sort((a, b) => b[1] - a[1]);
-            const topProducts = productSalesArray.slice(0, 10);
+            const topProducts = productSalesArray.slice(
+                0,
+                Math.min(10, productSalesArray.length)
+            );
             return topProducts;
         } catch (err) {
             message.queryError(err);
@@ -413,11 +426,10 @@ export class OrderRepository
         }
     }
 
-
-    public async getNewestOrder(customerId: number |  string) {
-        return await  this._model.findOne({
-            where: {clientId: customerId},
-            order: [ [ 'createdAt', 'DESC' ]],
+    public async getNewestOrder(customerId: number | string) {
+        return await this._model.findOne({
+            where: { clientId: customerId },
+            order: [["createdAt", "DESC"]],
         });
     }
 }

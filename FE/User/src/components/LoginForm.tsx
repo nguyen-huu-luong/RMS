@@ -6,10 +6,12 @@ import Image from "next/image";
 import Link from "next-intl/link";
 import { useRouter } from "next-intl/client";
 import { useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "antd/es/form/Form";
+
 export const LoginForm: React.FC = () => {
     const [messageApi, contextHolder] = message.useMessage();
+    const t = useTranslations('Login');
     const [loading, setLoading] = useState<boolean>();
     const router = useRouter();
     const locale = useLocale();
@@ -37,9 +39,9 @@ export const LoginForm: React.FC = () => {
         }
     };
     const signInGoogle = () => {
-        signIn("google", {
-            redirect: true,
-        });
+        const result = signIn("google");
+
+        console.log(result)
     };
     const showError = (message?: string) => {
         messageApi.open({
@@ -77,8 +79,8 @@ export const LoginForm: React.FC = () => {
                     layout='vertical'
                 >
                     <div className='text-center w-full'>
-                        <h3 className='text-xl font-bold my-2'>Sign in</h3>
-                        <p> Sign in to stay connected</p>
+                        <h3 className='text-xl font-bold my-2'>{t('Login')}</h3>
+                        <p> {t('Slogan')}</p>
                     </div>
                     <Form.Item
                         name='email'
@@ -86,7 +88,7 @@ export const LoginForm: React.FC = () => {
                         rules={[
                             {
                                 required: true,
-                                message: "Please input your email!",
+                                message: t('No_email'),
                             },
                             
                         ]}
@@ -104,17 +106,17 @@ export const LoginForm: React.FC = () => {
                         rules={[
                             {
                                 required: true,
-                                message: "Please input your Password!",
+                                message: t("No_password"),
                             },
                         ]}
-                        label={<div>Password</div>}
+                        label={<div>{t('Password')}</div>}
                     >
                         <Input.Password
                             prefix={
                                 <LockOutlined className='site-form-item-icon' />
                             }
                             type='password'
-                            placeholder='Password'
+                            placeholder={t('Password')}
                         />
                     </Form.Item>
                     <Form.Item>
@@ -141,12 +143,12 @@ export const LoginForm: React.FC = () => {
                             type='primary'
                             className='login-form-button bg-primary w-full flex items-center justify-center'
                         >
-                            {loading && <ReloadOutlined spin={true} />} Log in
+                            {loading && <ReloadOutlined spin={true} />} {t('Login')}
                         </Button>
                     </Form.Item>
                     <div className='flex flex-row items-center space-x-4 my-2'>
                         <div className='h-[1px] w-full bg-primary line'></div>
-                        <span>Or</span>
+                        <span>{t('Or')}</span>
                         <div className='h-[1px] w-full bg-primary line'></div>
                     </div>
 
@@ -177,8 +179,8 @@ export const LoginForm: React.FC = () => {
                     </div>
 
                     <div className='text-center my-2 py-2'>
-                        <span>Don't have an account ? </span>
-                        <Link href={"/register"} locale={locale}>Sign up</Link>
+                        <span>{t('No_account')}</span> {" "}
+                        <Link href={"/register"} locale={locale}>{t('Signup')}</Link>
                     </div>
                 </Form>
             </ConfigProvider>

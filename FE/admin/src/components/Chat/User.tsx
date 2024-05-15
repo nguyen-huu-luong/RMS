@@ -7,7 +7,7 @@ import axios from "axios";
 import { message } from "antd";
 import { Tag } from "antd";
 import fetchClient from "@/lib/fetch-client";
-import Avatar from "@/images/avatar.png"
+import Avatar from "@/images/avatar.png";
 const TimeDisplay = (time: any) => {
     const momentDate = moment(time);
     const isToday = momentDate.isSame(moment(), "day");
@@ -70,6 +70,7 @@ function User({
                 });
             }
         };
+        
         const handleStaffMessage = (
             channelId: any,
             message: string,
@@ -101,6 +102,7 @@ function User({
             }
         };
         const handleSeenMessage = (channelId: any) => {
+            if (!params.latestMessage) return;
             setChannels((prevChannels: any) => {
                 if (!prevChannels) return prevChannels;
                 const updatedChannels = prevChannels.channel.map(
@@ -161,7 +163,7 @@ function User({
     const handleJoinRoom = async () => {
         try {
             const response = await socket
-                .timeout(5000)
+                .timeout(5000) 
                 .emitWithAck("staff:channel:join", params.channel.id, staffId);
             if (response.status == "0") {
                 message.warning(
@@ -193,7 +195,7 @@ function User({
         >
             <div className='Avatar flex-none rounded-full border-2 w-16 h-16 border-primary border-opacity-20 overflow-hidden'>
                 <Image
-                    src={params.userAvatar?params.userAvatar:Avatar}
+                    src={params.userAvatar ? params.userAvatar : Avatar}
                     alt='User avatar'
                     width={16}
                     height={16}
@@ -204,7 +206,9 @@ function User({
             <div
                 className={`body text-sm flex flex-col justify-between items-start w-full`}
             >
-                <div className='w-40 font-bold overflow-ellipsis whitespace-nowrap overflow-hidden pr-2'>{params.userName}</div>
+                <div className='w-40 font-bold overflow-ellipsis whitespace-nowrap overflow-hidden pr-2'>
+                    {params.userName}
+                </div>
                 <div
                     className={`w-40 overflow-ellipsis whitespace-nowrap overflow-hidden ${
                         params.latestMessage.status == "Not seen" &&
@@ -213,7 +217,11 @@ function User({
                             : ""
                     }`}
                 >
-                    {params.latestMessage.content}
+                    {params.latestMessage.content.startsWith(
+                        "http://res.cloudinary.com/"
+                    )
+                        ? "Send an image"
+                        : params.latestMessage.content}
                 </div>
                 <div> </div>
             </div>
@@ -234,13 +242,12 @@ function User({
         >
             <div className='Avatar flex-none rounded-full border-2 w-16 h-16 border-primary border-opacity-20 overflow-hidden'>
                 <Image
-                    src={params.userAvatar?params.userAvatar:"/abc"}
+                    src={params.userAvatar ? params.userAvatar : "/abc"}
                     alt='User avatar'
                     width={16}
                     height={16}
                     className='h-full w-full min-w-fit aspect-square'
                     unoptimized
-
                 />
             </div>
             <div

@@ -4,7 +4,6 @@ import axios, { Axios, AxiosError } from "axios";
 import { getServerSession, type AuthOptions, type Awaitable, type User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getSession } from "next-auth/react";
 
 const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
 
@@ -88,16 +87,16 @@ export const authOptions: AuthOptions = {
             return token;
 
         },
-        async redirect({baseUrl, url}) {
-            const token = await getServerSession();
-            console.log("redicredcfdsf f", baseUrl, url)
-            console.log((token?.user))
-            if (!(token?.user.role === "chef")) {
-                return baseUrl
-            } 
-            return "/chef"
+        // async redirect({baseUrl, url}) {
+        //     const token = await getServerSession();
+        //     console.log("redicredcfdsf f", baseUrl, url)
+        //     console.log((token?.user))
+        //     if (!(token?.user.role === "chef")) {
+        //         return baseUrl
+        //     } 
+        //     return "/chef"
 
-        }
+        // }
        
     },
     pages: {

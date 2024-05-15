@@ -5,18 +5,22 @@ import { fetchData } from "next-auth/client/_utils";
 import Loading from "../loading";
 
 const ChatList = ({
+    id,
+    channel,
     setChannel,
     socket,
     setIndex,
     staffId,
 }: {
+    id: any;
+    channel: any;
     setChannel: any;
     socket: any;
     setIndex: any;
     staffId: any;
 }) => {
     const [channels, setChannels] = useState<any>(null);
-    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const [searchParams, setSearchParams] = useState<string>("");
     const [channelStatus, setChannelStatus] = useState<any>({});
     const fetchChannels = useCallback(async () => {
@@ -26,7 +30,14 @@ const ChatList = ({
                 data_return: true,
             });
             setChannels(fetchedData);
-            console.log(fetchedData)
+            fetchedData.channel.map((item: any) => {
+                if (
+                    item.channel.clientId == parseInt(id, 10) &&
+                    channel == -1
+                ) {
+                    setChannel(item.channel.id);
+                }
+            });
         } catch (error) {
             console.log(error);
         }
@@ -34,37 +45,84 @@ const ChatList = ({
 
     useEffect(() => {
         socket.on("initial:channels", (initialChannels: any) => {
-            console.log("INITIAL", initialChannels)
             setChannelStatus(initialChannels);
         });
         socket.on("channel:status:update", (updatedChannels: any) => {
             setChannelStatus(updatedChannels);
         });
-        socket.on("anonymous:channel:create", async (channelId: string, userName: string, clientId: string) => {
-            if (channels !== null) {
-                const newChannels = [...channels.channel];
-                const newChannel = {
-                    channel:{
-                        id: channelId,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                    },
-                    latestMessage: {
-                        id: userName,
-                        content: "Click to chat",
-                        status: "Not seen",
-                        employeeId: null,
-                        clientId: clientId,
-                        channelId: channelId,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                    },
-                    userName: userName
+
+        const handleClientMessage = async (
+            channelId: any,
+            message: string,
+            clientId: string
+        ) => {
+            if (channels) {
+                const channelExists = channels.channel.some(
+                    (channel: any) => channel.channel.id === channelId
+                );
+                if (!channelExists) {
+                    const response = await socket.emitWithAck(
+                        "newClient:message:info",
+                        clientId
+                    );
+                    const newChannel = {
+                        channel: {
+                            id: channelId,
+                        },
+                        latestMessage: {
+                            content: message,
+                            createdAt: new Date(),
+                            employeeId: null,
+                            clientId: clientId,
+                            status: "Not seen",
+                        },
+                        updateTime: new Date(),
+                        userAvatar: response.client.userAvatar,
+                        userName: response.client.userName,
+                    };
+                    setChannels((prevChannels: any) => {
+                        return {
+                            ...prevChannels,
+                            channel: [...prevChannels.channel, newChannel],
+                        };
+                    });
                 }
-                newChannels.push(newChannel)
-                setChannels({channel: newChannels})
             }
-        });
+        };
+
+        socket.on(
+            "anonymous:channel:create",
+            async (channelId: string, userName: string, clientId: string) => {
+                if (channels !== null) {
+                    const newChannels = [...channels.channel];
+                    const newChannel = {
+                        channel: {
+                            id: channelId,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        },
+                        latestMessage: {
+                            id: userName,
+                            content: "New user want to chat!",
+                            status: "Not seen",
+                            employeeId: null,
+                            clientId: clientId,
+                            channelId: channelId,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        },
+                        userName: userName,
+                    };
+                    newChannels.unshift(newChannel);
+                    setChannels({ channel: newChannels });
+                }
+            }
+        );
+        socket.on("message:send:fromClient", handleClientMessage);
+
+        return () => {
+            socket.off("message:send:fromClient", handleClientMessage);
+        };
     }, [socket, channels]);
     const handleKeyDown = (event: any) => {
         if (event.key === "Enter") {
@@ -79,7 +137,7 @@ const ChatList = ({
         fetchChannels();
     }, [fetchChannels]);
 
-    if (!channels) return <Loading/>;
+    if (!channels) return <Loading />;
     return (
         <>
             <div
@@ -116,7 +174,7 @@ const ChatList = ({
                     })
                     .map((item: any, index: any) => {
                         return (
-                            <User 
+                            <User
                                 key={index}
                                 params={item}
                                 setChannel={setChannel}

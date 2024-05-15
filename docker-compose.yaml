@@ -17,14 +17,23 @@ services:
         environment:
             - ADMINER_DEFAULT_SERVER=db_postgres
 
+    redis:
+        image: redis:latest
+        restart: always
+        ports:
+            - 6379:6379
+
+
     backend_internal:
         build: ./BE/Internal
         depends_on:
             - db_postgres
+            - redis
         ports:
             - 3003:3003
         environment:
             - DB_HOST=db_postgres
+            - REDIS_HOST=redis
         volumes:
             - ./BE/Internal/migrations:/RMS/BE/Internal/migrations
             - ./BE/Internal/seeders:/RMS/BE/Internal/seeders

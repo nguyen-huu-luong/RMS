@@ -23,6 +23,7 @@ import type { UploadProps } from "antd";
 import useSWR from "swr";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
+import { useTranslations } from "next-intl";
 type FieldType = {
     firstname?: string;
     lastname?: string;
@@ -37,6 +38,9 @@ const Profile = () => {
     const [edit, setEdit] = useState<boolean>(true);
     const [form] = Form.useForm();
     const [loading, setLoading] = useState<boolean>(false);
+    const t = useTranslations("User_profile");
+    const t_form = useTranslations("Login");
+
     const {
         data: profile,
         error: profileError,
@@ -110,7 +114,7 @@ const Profile = () => {
     return (
         <>
             <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl py-2 px-3'>
-                User Profile
+                {t("Profile")}
             </div>
             <div className='bg-primary-white w-full h-auto font-bold text-normal rounded-xl py-2 px-3 flex flex-col gap-2 items-center'>
                 <div className='relative w-auto h-auto rounded-full overflow-hidden'>
@@ -126,9 +130,14 @@ const Profile = () => {
                         className='aspect-square'
                         unoptimized
                     />
-                    <Upload {...props} maxCount={1} showUploadList={false} accept="image/*">
+                    <Upload
+                        {...props}
+                        maxCount={1}
+                        showUploadList={false}
+                        accept='image/*'
+                    >
                         <button className='absolute top-1/2 left-1/2 transform -translate-x-1/2  px-2 py-1 border-2 font-medium text-white backdrop-blur-sm rounded-md cursor-pointer'>
-                            Change
+                            {t("Change")}
                         </button>
                     </Upload>
                 </div>
@@ -143,26 +152,26 @@ const Profile = () => {
                         disabled={edit}
                     >
                         <Form.Item
-                            label='First Name'
+                            label={t_form('Firstname')}
                             initialValue={profile.firstname}
                             name='firstname'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input your first name!",
+                                    message: t_form('Val_first'),
                                 },
                             ]}
                         >
                             <Input />
                         </Form.Item>
                         <Form.Item
-                            label='Last Name'
+                            label={t_form('Lastname')}
                             initialValue={profile.lastname}
                             name='lastname'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input your last name!",
+                                    message:t_form('Val_last'),
                                 },
                             ]}
                         >
@@ -176,21 +185,21 @@ const Profile = () => {
                             <Input disabled />
                         </Form.Item>
                         <Form.Item
-                            label='Phone'
+                            label={t_form('Phone')}
                             initialValue={profile.phone}
                             name='phone'
                             rules={[
                                 {
                                     min: 9,
                                     max: 11,
-                                    message: "Invalid phone number!",
+                                    message: t_form('Invalid_phone'),
                                 },
                             ]}
                         >
                             <Input />
                         </Form.Item>
                         <Form.Item
-                            label='Birthday'
+                            label={t_form('Birthday')}
                             initialValue={
                                 profile.birthday
                                     ? moment(profile.birthday)
@@ -201,13 +210,13 @@ const Profile = () => {
                             <DatePicker />
                         </Form.Item>
                         <Form.Item
-                            label='Gender'
+                            label={t_form('Gender')}
                             initialValue={profile.gender}
                             name='gender'
                         >
                             <Radio.Group>
-                                <Radio value={true}>Male</Radio>
-                                <Radio value={false}>Female</Radio>
+                                <Radio value={true}>{t_form('Male')}</Radio>
+                                <Radio value={false}>{t_form('Female')}</Radio>
                             </Radio.Group>
                         </Form.Item>
                     </Form>{" "}
@@ -221,7 +230,7 @@ const Profile = () => {
                                     }}
                                     loading={loading}
                                 >
-                                    Save
+                                    {t("Save")}
                                 </Button>
                                 <Button
                                     onClick={() => {
@@ -229,7 +238,7 @@ const Profile = () => {
                                         form.resetFields();
                                     }}
                                 >
-                                    Cancel
+                                    {t("Cancel")}
                                 </Button>
                             </>
                         ) : (
@@ -238,7 +247,7 @@ const Profile = () => {
                                     setEdit(false);
                                 }}
                             >
-                                Edit information
+                                {t("Edit")}
                             </Button>
                         )}
                     </div>

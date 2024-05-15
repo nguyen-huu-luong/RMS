@@ -140,6 +140,7 @@ export default function Home() {
                                 >
                                     <Category
                                         params={{
+                                            thumbnails: item.thumnails,
                                             category: item.name,
                                             state:
                                                 item.name !== currentCategory,

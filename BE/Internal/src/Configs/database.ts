@@ -9,7 +9,6 @@ const config = {
     dialectOptions: {
       ssl: process.env.NODE_ENV === "production",
     }
-
   };
   
 module.exports = config

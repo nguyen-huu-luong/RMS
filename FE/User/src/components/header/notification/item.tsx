@@ -11,11 +11,12 @@ import { useState } from "react";
 import { Steps, ConfigProvider, Modal } from "antd";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
+import { useTranslations } from "next-intl";
 
 const Item = ({
     params,
     setChild,
-    mutate
+    mutate,
 }: {
     params: {
         id: number;
@@ -25,17 +26,20 @@ const Item = ({
         createdAt: string;
     };
     setChild: any;
-    mutate: any
+    mutate: any;
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const t = useTranslations("Noti");
     const showModal = async () => {
         setChild(true);
         setIsModalOpen(true);
-        await fetchClient({url: `/notifications/${params.id}`, method: "PUT"});
-        setTimeout(async () =>{
-            await mutate()
-        }, 1000)
+        await fetchClient({
+            url: `/notifications/${params.id}`,
+            method: "PUT",
+        });
+        setTimeout(async () => {
+            await mutate();
+        }, 1000);
     };
 
     const handleOk = () => {
@@ -50,99 +54,94 @@ const Item = ({
     const items: any = [
         [
             {
-                title: "Pending",
+                title: t("Pending"),
                 status: "error",
                 icon: <FileOutlined />,
             },
             {
-                title: "Preparing",
+                title: t("Preparing"),
                 status: "wait",
                 icon: <FireOutlined />,
             },
             {
-                title: "Delivering",
+                title: t("Delivering"),
                 status: "wait",
                 icon: <CarOutlined />,
             },
             {
-                title: "Done",
+                title: t("Done"),
                 status: "wait",
                 icon: <FileDoneOutlined />,
             },
         ],
         [
             {
-                title: "Pending",
+                title: t("Pending"),
                 status: "finish",
                 icon: <FileOutlined />,
             },
             {
-                title: "Preparing",
+                title: t("Delivering"),
                 status: "process",
                 icon: <LoadingOutlined />,
             },
             {
-                title: "Delivering",
+                title: t("Delivering"),
                 status: "wait",
                 icon: <CarOutlined />,
             },
             {
-                title: "Done",
+                title:  t("Done"),
                 status: "wait",
                 icon: <FileDoneOutlined />,
             },
         ],
         [
             {
-                title: "Pending",
+                title: t("Pending"),
                 status: "finish",
                 icon: <FileOutlined />,
             },
             {
-                title: "Preparing",
+                title: t("Delivering"),
                 status: "finish",
                 icon: <FireOutlined />,
             },
             {
-                title: "Delivering",
+                title: t("Delivering"),
                 status: "process",
                 icon: <LoadingOutlined />,
             },
             {
-                title: "Done",
+                title:  t("Done"),
                 status: "wait",
                 icon: <FileDoneOutlined />,
             },
         ],
         [
             {
-                title: "Pending",
+                title: t("Pending"),
                 status: "finish",
                 icon: <FileOutlined />,
             },
             {
-                title: "Preparing",
+                title: t("Delivering"),
                 status: "finish",
                 icon: <FireOutlined />,
             },
             {
-                title: "Delivering",
+                title: t("Delivering"),
                 status: "finish",
                 icon: <CarOutlined />,
             },
             {
-                title: "Done",
+                title:  t("Done"),
                 status: "finish",
                 icon: <FileDoneOutlined />,
             },
         ],
     ];
-    const items_text: any = [
-        "has been rejected",
-        "has been accepted and preparing by chefs",
-        "is now delivering",
-        "has been delivered",
-    ];
+    const items_text: any = [t("Text1"), t("Text2"), t("Text3"), t("Text4")];
     const status_splitter: any = (orderStatus: string) => {
         const order = orderStatus.split("-");
         return [parseInt(order[0]), parseInt(order[1])];
@@ -191,7 +190,11 @@ const Item = ({
                             },
                         }}
                     >
-                        <Steps items={items[status_splitter(params.orderStatus)[1]]} />
+                        <Steps
+                            items={
+                                items[status_splitter(params.orderStatus)[1]]
+                            }
+                        />
                     </ConfigProvider>
                 </div>
             </Modal>

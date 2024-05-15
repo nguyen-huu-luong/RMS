@@ -2,6 +2,37 @@
 	"Index": {
 		"title": "Hello world!"
 	},
+	"General": {
+		"new": "New",
+		"id": "ID",
+		"phone": "Phone number",
+		"fullname": "Fullname",
+		"email": "Email",
+		"type": "Type",
+		"birthday": "Birthday",
+		"score": "Score",
+		"age": "Age",
+		"created_at": "CreatedAt",
+		"firstname": "Firstname",
+		"lastname": "Lastname",
+		"total": "Total",
+		"item": "items",
+		"order": "Order",
+		"sort": "Sort by",
+		"search_placeholder": "Enter keywork to search....",
+		"selected": "Selected",
+		"delete": "Delete",
+		"source": "Source",
+		"cancel": "Cancel",
+		"confirm": "Confirm",
+		"address": "Address",
+		"admin_dashboard": "Admin Dashboard",
+		"group": "Group"
+	},
+	"Customer": {
+		"customer": "customers",
+		"add_new_customer": "Add new customer"
+	},
 	"Header": {
 		"chat-center": "Chat center",
 		"notification": "Notification",

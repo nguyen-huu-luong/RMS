@@ -98,19 +98,22 @@ export class AuthService {
 			}
 			
 			if (req.body["isGoogleAccount"]) {
-				const {email, firstname, lastname, picture} = req.body 
-				if (!email || ! firstname || !lastname || !picture) {
+				const {email, firstname, lastname, avatar} = req.body 
+				if (!email || !lastname) {
 					throw new BadRequestError("Missing parameter")
 				} 
 
 				const user = await this.clientRepository.findByEmail(email)
 				if (user) {
+					await this.clientRepository.update(user.getDataValue("id"), {firstname, lastname, avatar})
 					this.sendToken(res, user);
 				} else {
+					const password = await Password.hash("clidjdbcdcnwfnaewcnawent");
 					const user = await this.clientRepository.create({
-						email, firstname, lastname, 
-						avatar: picture, 
-						password: await Password.hash("clidjdbcdcnwfnaewcnawent"),
+						email, lastname, firstname,
+						avatar, 
+						type: "lead",
+						password,
 						isRegistered: true
 					})
 
@@ -125,7 +128,7 @@ export class AuthService {
 
 				return ;
 			}
-			const { firstname, lastname, email, password, birthday } = req.body;
+			const { firstname, lastname, email, password, birthday, gender } = req.body;
 			let user = await this.clientRepository.findByEmail(email);
 			if (user) {
 				if (user.isRegistered) {

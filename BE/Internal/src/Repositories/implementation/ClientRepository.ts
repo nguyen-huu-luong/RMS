@@ -24,6 +24,7 @@ export class ClientRepository
             "birthday",
             "source",
             "score",
+            "groupId",
             "createdAt",
             "updatedAt",
         ]);
@@ -96,13 +97,18 @@ export class ClientRepository
                 for (const order of orders) {
                     totalAmount += order.getDataValue("amount");
                 }
-                clientAmounts.set(client.getDataValue("id"), totalAmount);
+                if (totalAmount > 0) {
+                    clientAmounts.set(client.getDataValue("id"), totalAmount);
+                }
             }
             const clientAmountsArray: [number, number, number][] = Array.from(
                 clientAmounts
             ).map(([clientId, amount]) => [clientId, amount, -10]);
             clientAmountsArray.sort((a, b) => b[1] - a[1]);
-            const topClients = clientAmountsArray.slice(0, 10);
+            const topClients = clientAmountsArray.slice(
+                0,
+                Math.min(10, clientAmountsArray.length)
+            );
             const previousMonth = await this.getCustomTopCustomer(
                 startOfLastMonth,
                 endOfLastMonth
@@ -151,13 +157,18 @@ export class ClientRepository
                 for (const order of orders) {
                     totalAmount += order.getDataValue("amount");
                 }
-                clientAmounts.set(client.getDataValue("id"), totalAmount);
+                if (totalAmount > 0) {
+                    clientAmounts.set(client.getDataValue("id"), totalAmount);
+                }
             }
             const clientAmountsArray: [number, number, number][] = Array.from(
                 clientAmounts
             ).map(([clientId, amount]) => [clientId, amount, -10]);
             clientAmountsArray.sort((a, b) => b[1] - a[1]);
-            const topClients = clientAmountsArray.slice(0, 10);
+            const topClients = clientAmountsArray.slice(
+                0,
+                Math.min(10, clientAmountsArray.length)
+            );
             const previousYear = await this.getCustomTopCustomer(
                 startOfLastYear,
                 endOfLastYear
@@ -201,12 +212,17 @@ export class ClientRepository
                 for (const order of orders) {
                     totalAmount += order.getDataValue("amount");
                 }
-                clientAmounts.set(client.getDataValue("id"), totalAmount);
+                if (totalAmount > 0) {
+                    clientAmounts.set(client.getDataValue("id"), totalAmount);
+                }
             }
             const clientAmountsArray: [number, number][] =
                 Array.from(clientAmounts);
             clientAmountsArray.sort((a, b) => b[1] - a[1]);
-            const topClients = clientAmountsArray.slice(0, 10);
+            const topClients = clientAmountsArray.slice(
+                0,
+                Math.min(10, clientAmountsArray.length)
+            );
             return topClients;
         } catch (err) {
             message.queryError(err);

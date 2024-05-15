@@ -8,6 +8,8 @@ const authRoutes = ["/", "/customers", "/bussiness", "/chat", "/leads",
                     "/marketing", "/organization", "/overview", "/profile", 
                     "/report", "/sale", "/setting"];
 
+// const staffRoutes = 
+
 const intlMiddleware = createIntlMiddleware({
     locales,
     localePrefix: "as-needed",
@@ -27,10 +29,9 @@ const authMiddleware = withAuth(
             if (isAuthRoute) {
                 const redirectUrl = new URL("/signin", request.url);
                 redirectUrl.searchParams.set("callbackUrl", request.nextUrl.href);
-                // return NextResponse.redirect(redirectUrl);
+                return NextResponse.redirect(redirectUrl);
             }
-        } 
-        
+        }
         return intlMiddleware(request);
         
     },
