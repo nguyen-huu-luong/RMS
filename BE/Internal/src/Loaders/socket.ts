@@ -28,6 +28,7 @@ class SocketConnection {
                         const client = {
                             firstname: socket.id,
                             lastname: "User",
+                            email: `${socket.id}@gmail.com`,
                             isRegistered: true,
                             isActive: true,
                             language: "vi",

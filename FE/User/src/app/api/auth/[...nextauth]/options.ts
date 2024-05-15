@@ -62,7 +62,7 @@ export const authOptions: AuthOptions = {
                 try {
                     const result = await axios({
                         method: "POST",
-                        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/signup`,
+                        url: `${backend_api}/users/signup`,
                         data: {
                             firstname: family_name,
                             lastname: given_name,
