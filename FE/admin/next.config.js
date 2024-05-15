@@ -16,6 +16,12 @@ const nextConfig = {
     images: {
       domains: ["res.cloudinary.com"],
     },
+    serverRuntimeConfig: {
+      apiUrl: process.env.NEXT_SERVER_API_URL
+    },
+    publicRuntimeConfig: {
+      apiUrl: process.env.NEXT_PUBLIC_BACKEND_HOST
+    },
 }
 
 const withNextIntl = require("next-intl/plugin")(
