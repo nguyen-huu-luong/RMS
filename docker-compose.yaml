@@ -52,8 +52,6 @@ services:
             - 8080:8080
         volumes:
             - ./BE/External:/RMS/BE/External
-        dns:
-            hostname:localhost
     
     frontend_user:
         build: ./FE/User
