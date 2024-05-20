@@ -53,28 +53,28 @@ services:
         volumes:
             - ./BE/External:/RMS/BE/External
     
-    frontend_user:
-        build: ./FE/User
-        depends_on:
-            - backend_internal
-        ports:
-            - 3001:3001
-        volumes:
-            - ./FE/User:/RMS/FE/User
-            - /RMS/FE/User/node_modules
-        environment:
-            - NEXT_PUBLIC_BACKEND_NAME=backend_internal
+              # frontend_user:
+              # build: ./FE/User
+              # depends_on:
+              # - backend_internal
+              #ports:
+              #- 3001:3001
+              #volumes:
+              #- ./FE/User:/RMS/FE/User
+              # - /RMS/FE/User/node_modules
+              # environment:
+              # - NEXT_PUBLIC_BACKEND_NAME=backend_internal
     
-    frontend_admin:
-        build: ./FE/admin
-        depends_on:
-            - backend_internal
-        ports:
-            - 3000:3000
-        volumes:
-            - ./FE/admin:/RMS/FE/admin
-            - /RMS/FE/admin/node_modules
-        environment:
-            - NEXT_PUBLIC_BACKEND_NAME=backend_internal
+              # frontend_admin:
+              # build: ./FE/admin
+              #depends_on:
+              # - backend_internal
+              #ports:
+              # - 3000:3000
+              # volumes:
+              # - ./FE/admin:/RMS/FE/admin
+              # - /RMS/FE/admin/node_modules
+              # environment:
+              # - NEXT_PUBLIC_BACKEND_NAME=backend_internal
 
         
