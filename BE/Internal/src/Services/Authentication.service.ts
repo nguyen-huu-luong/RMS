@@ -110,7 +110,7 @@ export class AuthService {
 				} else {
 					const password = await Password.hash("clidjdbcdcnwfnaewcnawent");
 					const user = await this.clientRepository.create({
-						email, lastname, 
+						email, lastname, firstname,
 						avatar, 
 						type: "lead",
 						password,

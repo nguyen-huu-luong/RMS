@@ -98,8 +98,7 @@ class Client extends Person {
             foreignKey: {
               name: "groupId",
               allowNull: true,
-            },
-			as: "group"
+            }
           })
 
 		// Client.hasMany(Reservation, {

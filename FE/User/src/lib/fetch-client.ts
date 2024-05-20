@@ -16,7 +16,7 @@ async function fetchClient({ method = "GET", url, body = "", token, data_return 
     const session = await getSession();
     const accessToken = token || session?.user.accessToken;
     if (accessToken) {
-      console.log("Fetch client", url, session, accessToken, process.env.NEXT_BACKEND_API_URL)
+      console.log("Fetch client", url, session, accessToken, backend_api)
       const response = await axios(backend_api + url, {
         method: method,
         headers: {

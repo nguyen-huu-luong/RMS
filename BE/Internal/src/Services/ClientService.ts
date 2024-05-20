@@ -38,7 +38,7 @@ export class ClientService {
     ) { }
 
     public async getAll(options?: QueryOptions) {
-        const result = await this.clientRepository.all({...options, associations: ["group"]} as QueryOptions);
+        const result = await this.clientRepository.all({...options, associations: ["Group"]} as QueryOptions);
         return {
             ...result
         }

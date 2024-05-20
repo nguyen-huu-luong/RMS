@@ -9,13 +9,19 @@ const nextConfig = {
     },
     experimental: {
         serverComponentsExternalPackages: ["mjml"],
-        serverActions: true,
+        // serverActions: true,
       },
       env: {
         BASE_URL: backend_api
     },
     images: {
       domains: ["res.cloudinary.com"],
+    },
+    serverRuntimeConfig: {
+      apiUrl: process.env.NEXT_SERVER_API_URL
+    },
+    publicRuntimeConfig: {
+      apiUrl: process.env.NEXT_PUBLIC_BACKEND_HOST
     },
 }
 

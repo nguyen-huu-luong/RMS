@@ -2,7 +2,6 @@ import { NextFunction } from "express";
 import { Cart, Channel, Client, Message, Table } from "../Models";
 import { TokenUtil } from "../Utils";
 import type { Socket } from "socket.io";
-// import { callback } from "chart.js/dist/helpers/helpers.core";
 class SocketConnection {
     private channels: { [channelId: string]: string } = {};
     private employee: Socket[] = [];
@@ -28,6 +27,7 @@ class SocketConnection {
                         const client = {
                             firstname: socket.id,
                             lastname: "User",
+                            email: `${socket.id}@gmail.com`,
                             isRegistered: true,
                             isActive: true,
                             language: "vi",

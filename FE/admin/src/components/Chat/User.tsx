@@ -102,6 +102,7 @@ function User({
             }
         };
         const handleSeenMessage = (channelId: any) => {
+            if (!params.latestMessage) return;
             setChannels((prevChannels: any) => {
                 if (!prevChannels) return prevChannels;
                 const updatedChannels = prevChannels.channel.map(

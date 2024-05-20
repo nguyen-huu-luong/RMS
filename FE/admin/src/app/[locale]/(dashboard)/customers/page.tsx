@@ -27,7 +27,7 @@ interface DataType {
 	score: number;
 	age: number;
 	address: string;
-	group: {
+	Group: {
 		id: number,
 		name: string,
 		description: string
@@ -106,8 +106,8 @@ const CustomerListPages: React.FC = () => {
 			title: t_general("group"),
 			dataIndex: "group",
 			key: "group",
-			render: (text, row) => row.group ? (<Tooltip title={row.group.description || ""}>
-				<span className="px-2 py-1 rounded-xl text-white" style={{background: getColor(row.group.id)}}>{row.group.name}</span>
+			render: (text, row) => row.Group ? (<Tooltip title={row.Group.description || ""}>
+				<span className="px-2 py-1 rounded-xl text-white" style={{background: getColor(row.Group.id)}}>{row.Group.name}</span>
 			</Tooltip>) : "Unknown"
 		},
 		{
@@ -183,6 +183,10 @@ const CustomerListPages: React.FC = () => {
 				{
 					label: "Group 5",
 					value: 6
+				},
+				{
+					label: "Group 6",
+					value: 7
 				},
 			]
 		},

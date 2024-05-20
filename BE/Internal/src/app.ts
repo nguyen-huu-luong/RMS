@@ -92,10 +92,10 @@ export class Server {
   }
 
   public start() {
-    this.server.listen(3003, () => {
-      console.log("Server is listening on port", process.env.PORT);
+    this.server.listen(process.env.PORT, process.env.HOST, () => {
+        console.log("Server is listening on port", process.env.PORT);
     });
-  }
+}
 }
 
 (async () => {

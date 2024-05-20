@@ -32,7 +32,7 @@ export const authOptions: AuthOptions = {
                 console.log("authorized");
                 try {
                     const response = await axios({
-                        url: `${backend_api}/users/signin`,
+                        url: `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/users/signin`,
                         method: "POST",
                         data: {
                             email: credentials?.email,
@@ -45,6 +45,7 @@ export const authOptions: AuthOptions = {
                         return { ...user, accessToken } as unknown as Awaitable<User>;
                     }
                 } catch (error: any) {
+                    console.log(error)
                     console.log(error.response.data);
                     throw new Error(JSON.stringify(error?.response?.data || error));
                 }
@@ -62,7 +63,7 @@ export const authOptions: AuthOptions = {
                 try {
                     const result = await axios({
                         method: "POST",
-                        url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/signup`,
+                        url: `${backend_api}/users/signup`,
                         data: {
                             firstname: family_name,
                             lastname: given_name,
@@ -123,7 +124,7 @@ export const authOptions: AuthOptions = {
                 token = {...googleUser, iat: token.iat, exp: token.exp,jti: token.jti}
             }
             if (typeof user !== "undefined") {
-                // user has just signed in so the user object is populated
+                // user has just signed in so the user object is populate   d
                 return user as unknown as JWT;
             }
 

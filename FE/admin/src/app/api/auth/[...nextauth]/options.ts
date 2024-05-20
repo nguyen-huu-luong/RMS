@@ -17,13 +17,14 @@ export const authOptions: AuthOptions = {
             },
             async authorize(credentials) {
                 try {
-                    const response = await fetchClient({
-                        url: `/users/admin/signin`,
+                    const response = await axios({
+                        // fix when deploy n production
+                        url: `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/users/admin/signin`,
                         method: "POST",
-                        body: {
+                        data: {
                             username: credentials?.username,
                             password: credentials?.password,
-                        },
+                        }
                     });
 
                     // console.log(response.data)
