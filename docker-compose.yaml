@@ -1,4 +1,5 @@
 services:
+<<<<<<< HEAD
     frontend_user:
         build: ./FE/User
         ports:
@@ -7,3 +8,16 @@ services:
             - ./FE/User:/RMS/FE/User
             - /RMS/FE/User/
               node_modules        
+=======
+    frontend_admin:
+        build: ./FE/admin
+        ports:
+            - 3000:3000
+        volumes:
+            - ./FE/admin:/RMS/FE/admin
+            - /RMS/FE/admin/node_modules
+        environment:
+            - NEXT_PUBLIC_BACKEND_NAME=backend_internal
+
+        
+>>>>>>> 096cc5931e173a2e02318bf15cb44f41aff44c2e
