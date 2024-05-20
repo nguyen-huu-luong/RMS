@@ -32,7 +32,7 @@ export const authOptions: AuthOptions = {
                 console.log("authorized");
                 try {
                     const response = await axios({
-                        url: `http://${process.env.NEXT_PUBLIC_BACKEND_NAME}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/users/signin`,
+                        url: `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/users/signin`,
                         method: "POST",
                         data: {
                             email: credentials?.email,
