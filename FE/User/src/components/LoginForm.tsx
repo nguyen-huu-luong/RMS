@@ -39,9 +39,9 @@ export const LoginForm: React.FC = () => {
         }
     };
     const signInGoogle = () => {
-        signIn("google", {
-            redirect: true,
-        });
+        const result = signIn("google");
+
+        console.log(result)
     };
     const showError = (message?: string) => {
         messageApi.open({

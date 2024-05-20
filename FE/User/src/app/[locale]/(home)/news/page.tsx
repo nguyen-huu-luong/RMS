@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next-intl/link";
 export default function News() {
     const locale = useLocale();
+    const t = useTranslations('News');
     return (
         <div className='w-full h-auto py-10 px-20 bg-white rounded-xl flex flex-col justify-start gap-2'>
-            <div className='text-4xl font-bold  font-serif text-black flex flex-col justify-start gap-1 p-5'>
-                <span>GET THE BEST OFFER</span>
+            <div className='text-4xl font-bold text-black flex flex-col justify-start gap-1 p-5'>
+                <span>{t("Offer")}</span>
                 <span className='text-xs font-normal text-slate-600'>
-                    Eat the food you want at an affordable prices
+                    {t("Eat")}
                 </span>
             </div>
             <div className='flex flex-row justify-between gap-5'>
@@ -30,16 +31,17 @@ export default function News() {
                         />
                     </div>
                     <div className='w-full h-auto font-extrabold text-3xl text-primary font-serif'>
-                        Food
+                        {t("Food")}
                     </div>
                     <div className='h-auto text-xl w-full flex flex-col justify-start gap-4'>
                         <span className='font-bold font-serif text-3xl'>
                             Our latest pizza is now available at our restaurant!
                         </span>
                         <span>
-                        Introducing the pizza revolution you've been waiting for! 
-                        Prepare to be blown away by our innovative new pizza creation that will redefine your perception of cheesy goodness
-                            ...
+                            Introducing the pizza revolution you've been waiting
+                            for! Prepare to be blown away by our innovative new
+                            pizza creation that will redefine your perception of
+                            cheesy goodness ...
                         </span>
                     </div>
                 </Link>
@@ -50,7 +52,9 @@ export default function News() {
                         className='w-auto h-auto flex flex-row justify-between gap-2 hover:bg-slate-200 cursor-pointer rounded-xl p-5'
                     >
                         <Image
-                            src={"https://res.cloudinary.com/djdpobmlv/image/upload/v1714978347/%22General%22/photo-1714752890679-7f329ccaa6de_l9xzww.jpg"}
+                            src={
+                                "https://res.cloudinary.com/djdpobmlv/image/upload/v1714978347/%22General%22/photo-1714752890679-7f329ccaa6de_l9xzww.jpg"
+                            }
                             alt={"News"}
                             width={150}
                             height={120}
@@ -63,11 +67,12 @@ export default function News() {
                                     Our new branch
                                 </span>
                                 <span className='font-extrabold text-xl font-serif text-primary'>
-                                    News
+                                    {t("News")}
                                 </span>
                             </div>
                             <div className='font-normal text-xl font-serif'>
-                            Attention all food enthusiasts and discerning palates! ...
+                                Attention all food enthusiasts and discerning
+                                palates! ...
                             </div>
                         </div>
                     </Link>
@@ -77,7 +82,9 @@ export default function News() {
                         className='w-auto h-auto flex flex-row justify-between gap-2 hover:bg-slate-200 cursor-pointer rounded-xl p-5'
                     >
                         <Image
-                            src={"https://res.cloudinary.com/djdpobmlv/image/upload/v1714978732/%22General%22/photo-1607082351305-62d667815b4a_jggp1s.jpg"}
+                            src={
+                                "https://res.cloudinary.com/djdpobmlv/image/upload/v1714978732/%22General%22/photo-1607082351305-62d667815b4a_jggp1s.jpg"
+                            }
                             alt={"News"}
                             width={150}
                             height={120}
@@ -90,11 +97,12 @@ export default function News() {
                                     Big sale - Special offer
                                 </span>
                                 <span className='font-extrabold text-xl font-serif text-primary'>
-                                    News
+                                    {t("News")}
                                 </span>
                             </div>
                             <div className='font-normal text-xl font-serif'>
-                            It's time to satisfy your cravings and indulge in a feast of flavors ...
+                                It's time to satisfy your cravings and indulge
+                                in a feast of flavors ...
                             </div>
                         </div>
                     </Link>
@@ -104,7 +112,9 @@ export default function News() {
                         className='w-auto h-auto flex flex-row justify-between gap-2 hover:bg-slate-200 cursor-pointer rounded-xl p-5'
                     >
                         <Image
-                            src={"https://res.cloudinary.com/djdpobmlv/image/upload/v1714979515/%22General%22/360_F_316016017_eRRs0wfGneyPguUhwIbQkKlN9RZhl5GG_wwvfwb.jpg"}
+                            src={
+                                "https://res.cloudinary.com/djdpobmlv/image/upload/v1714979515/%22General%22/360_F_316016017_eRRs0wfGneyPguUhwIbQkKlN9RZhl5GG_wwvfwb.jpg"
+                            }
                             alt={"News"}
                             width={150}
                             height={120}
@@ -117,11 +127,12 @@ export default function News() {
                                     Top 5 best restaurant
                                 </span>
                                 <span className='font-extrabold text-xl font-serif text-primary'>
-                                    News
+                                    {t("News")}
                                 </span>
                             </div>
                             <div className='font-normal text-xl font-serif'>
-                            Welcome to a culinary experience like no other, where excellence ...
+                                Welcome to a culinary experience like no other,
+                                where excellence ...
                             </div>
                         </div>
                     </Link>
@@ -131,7 +142,9 @@ export default function News() {
                         className='w-auto h-auto flex flex-row justify-between gap-2 hover:bg-slate-200 cursor-pointer rounded-xl p-5'
                     >
                         <Image
-                            src={"https://res.cloudinary.com/djdpobmlv/image/upload/v1714979967/%22General%22/images_t6i09z.png"}
+                            src={
+                                "https://res.cloudinary.com/djdpobmlv/image/upload/v1714979967/%22General%22/images_t6i09z.png"
+                            }
                             alt={"News"}
                             width={150}
                             height={120}
@@ -144,11 +157,12 @@ export default function News() {
                                     We are hiring
                                 </span>
                                 <span className='font-extrabold text-xl font-serif text-primary'>
-                                    News
+                                    {t("News")}
                                 </span>
                             </div>
                             <div className='font-normal text-xl font-serif'>
-                            We are excited to announce that our esteemed restaurant ...
+                                We are excited to announce that our esteemed
+                                restaurant ...
                             </div>
                         </div>
                     </Link>

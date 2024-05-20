@@ -26,7 +26,8 @@
 		"cancel": "Hủy",
 		"confirm": "Xác nhận",
 		"address": "Địa điểm",
-		"admin_dashboard": "Trang Admin"
+		"admin_dashboard": "Trang Admin",
+		"group": "Nhóm"
 	},
 	"Customer": {
 		"customer": "khách hàng",

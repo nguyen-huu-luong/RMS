@@ -24,6 +24,7 @@ export class ClientRepository
             "birthday",
             "source",
             "score",
+            "groupId",
             "createdAt",
             "updatedAt",
         ]);

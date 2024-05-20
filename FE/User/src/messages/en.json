@@ -133,7 +133,9 @@
         "Invalid_email": "Invalid email!",
         "Male": "Male",
         "Female": "Female",
-        "Invalid_password": "Invalid confirm password!"
+        "Invalid_password": "Invalid confirm password!",
+        "Phone": "Phone",
+        "Invalid_phone": "Invalid phone number!"
     },
     "About":{
         "About": "About Us",
@@ -145,6 +147,40 @@
         "P1": "In a small hometown in Vietnam, a group of friends named Hung, Luong, and Vuong harbored a shared love for food and a burning desire to create a unique dining experience. We recognized the growing demand for innovative culinary concepts that catered to modern tastes and dietary preferences. With our combined expertise in cooking, business, and design, we embarked on a journey to start our own restaurant. However, we faced a highly competitive market, rising costs, and the challenge of standing out amidst a sea of eateries. Undeterred, we embraced technology and social media, leveraging the power of online platforms to build a strong brand and connect with food enthusiasts. Through crowdfunding campaigns and community support, we successfully raised the necessary funds and found a prime location for our venture.",
         "P2": "We understood that creating a successful restaurant was more than just serving delicious food; it required a compelling story and a strong connection with our target audience. With meticulous attention to detail, we meticulously crafted our brand's identity, from the logo and interior design to the menu and customer experience. We believed in authenticity and sought to showcase our passion for locally sourced ingredients and sustainable practices. Through social media, we shared our journey, engaging with our community and building anticipation for our grand opening. By forging partnerships with local artisans and hosting charity events, we ingrained our brand in the hearts of the community. Today, our restaurant stands as a testament to our unwavering commitment to quality, consistency, and a genuine connection with our customers. our inspiring story serves as a reminder that building a successful restaurant brand requires not only exceptional culinary skills but also a well-crafted narrative and an unwavering dedication to creating a unique and memorable experience.",
         "Member": "OUR MEMBERS"
+    },
+    "News": {
+        "Offer": "GET THE BEST OFFER",
+        "Eat": "Eat the food you want at an affordable prices",
+        "Food": "Food",
+        "News": "News"
+    },
+    "Chat": {
+        "Chat": "Live Chat",
+        "Enter": "Enter text",
+        "Welcome1": "Welcome to Home Cuisine Chat Service!",
+        "Welcome2": "Our staff will reply to you soon!",
+        "Welcome3": "We will keep this chat history for better service to you!",
+        "Seen": "Seen",
+        "Not_seen": "Not seen"
+    },
+    "User_profile": {
+        "Change": "Change",
+        "Profile": "User Profile",
+        "Edit": "Edit information",
+        "Save": "Save",
+        "Cancel": "Cancel"
+    },
+    "Noti":{
+        "Noti": "Notification",
+        "Pending": "Pending",
+        "Preparing": "Preparing",
+        "Delivering": "Delivering",
+        "Done": "Done",
+        "Text1": "has been rejected",
+        "Text2": "has been accepted and preparing by chefs",
+        "Text3": "is now delivering",
+        "Text4": "has been delivered",
+        "Order": "Order"
     },
     "404":{
         "Lang": "Tiếng anh"

@@ -15,6 +15,9 @@ class CampaignRouter {
         const campaignController = new CampaingController();
         const campaignRouter = Router();
         campaignRouter.get("/:id/statistic", campaignController.getCampaignStatistic.bind(campaignController))
+        campaignRouter.get("/:campaignId/emails/:emailId", campaignController.getEmailCampaignDetails.bind(campaignController))
+        campaignRouter.get("/:campaignId/emails/:emailId/jobs", campaignController.getAllJobs.bind(campaignController))
+
         campaignRouter.post("/:campaignId/emails", campaignController.createEmailCampaing.bind(campaignController))
         campaignRouter.delete("/:campaignId/emails/:id", campaignController.deleteEmailCampaing.bind(campaignController))
        

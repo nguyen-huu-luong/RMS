@@ -133,7 +133,9 @@
         "Invalid_email": "Email không hợp lệ!",
         "Male": "Nam",
         "Female": "Nữ",
-        "Invalid_password": "Mật khẩu xác nhận không khớp!"
+        "Invalid_password": "Mật khẩu xác nhận không khớp!",
+        "Phone": "Số điện thoại",
+        "Invalid_phone": "Số điện thoại không hợp lệ!"
     },
     "About":{
         "About": "Về chúng tôi",
@@ -145,6 +147,40 @@
         "P1": "Tại một thị trấn nhỏ ở Việt Nam, có một nhóm bạn tên Hùng, Lượng và Vương có chung niềm đam mê ẩm thực và mong muốn cháy bỏng tạo ra một trải nghiệm ăn uống độc đáo. Chúng tôi nhận thấy nhu cầu của khách hàng trong ngành ẩm thực ngày càng tăng, gu ẩm thực và sở thích ăn uống ngày các đa dạng hơn. Bằng cách kết hợp nấu ăn, kinh doanh, thiết kế và xây dựng hệ thống, chúng tôi bắt đầu hành trình mở nhà hàng riêng. Tuy nhiên, chúng tôi phải đối mặt với thị trường cạnh tranh khắc nghiệt, chi phí tăng cao và thách thức để làm cho nhà hàng nổi bật giữa một rừng các quán ăn khác. Không nản lòng, chúng tôi đã tiếp cận và nắm bắt công nghệ và mạng xã hội, tận dụng sức mạnh của các nền tảng trực tuyến để xây dựng một thương hiệu mạnh mẽ và kết nối với những người đam mê ẩm thực. Thông qua các chiến dịch gây quỹ cộng đồng và sự hỗ trợ của cộng đồng, chúng tôi đã huy động thành công các khoản tài trợ cần thiết và tìm thấy một vị trí đắc địa cho dự án kinh doanh của mình.",
         "P2": "Chúng tôi hiểu rằng để tạo nên một nhà hàng thành công thì không chỉ đơn thuần là phục vụ những món ăn ngon, mà còn cần phải xây dựng các chủ đề ẩm thực cuốn hút và kết nối mạnh mẽ đến đối tượng mục tiêu khách hàng của chúng tôi. Với sự tỉ mỉ chú ý đến từng chi tiết, chúng tôi đã xây dựng bản sắc thương hiệu của mình, từ logo và thiết kế nội thất đến thực đơn và trải nghiệm của khách hàng. Chúng tôi mong muốn thể hiện niềm đam mê của mình đối với các nguyên liệu lấy từ địa phương và các công thức ẩm thực mới lạ. Thông qua mạng xã hội, chúng tôi đã chia sẻ hành trình của mình, gắn kết với cộng đồng và xây dựng một thương hiệu bền vững. Ngoài ra, bằng cách hợp tác với các nghệ nhân địa phương và tổ chức các sự kiện từ thiện, chúng tôi đã khắc sâu thương hiệu của mình vào trái tim của cộng đồng. Ngày nay, nhà hàng của chúng tôi là minh chứng cho việc phát triển không ngừng nghỉ của chúng tôi về chất lượng và sự kết nối chân thành với khách hàng. Câu chuyện truyền cảm hứng của chúng tôi là lời nhắc nhở rằng - Để xây dựng một thương hiệu nhà hàng thành công không chỉ cần kỹ năng ẩm thực tuyệt vời mà còn cần sự cống hiến không ngừng nghỉ để tạo ra một trải nghiệm độc đáo và đáng nhớ.",
         "Member": "THÀNH VIÊN"
+    },
+    "News": {
+        "Offer": "NHỮNG ƯU ĐÃI TỐT NHẤT",
+        "Eat": "Ăn những món ăn mà bạn thích với giá thành hợp lý",
+        "Food": "Ẩm thực",
+        "News": "Tin tức"
+    },
+    "Chat": {
+        "Chat": "Nhắn tin",
+        "Enter": "Nhập văn bản",
+        "Welcome1": "Chào mừng đến với dịch vụ nhắn tin của Home Cuisine",
+        "Welcome2": "Nhân viên của chúng tôi sẽ trả lời bạn ngay!",
+        "Welcome3": "Chúng tôi sẽ giữ đoạn tin nhắn này để phục vụ bạn tốt nhất!",
+        "Seen": "Đã xem",
+        "Not_seen": "Chưa xem"
+    },
+    "User_profile": {
+        "Change": "Thay đổi",
+        "Profile": "Thông tin người dùng",
+        "Edit": "Chỉnh sửa",
+        "Save": "Lưu",
+        "Cancel": "Hủy"
+    },
+    "Noti":{
+        "Noti": "Thông báo",
+        "Pending": "Đang đợi",
+        "Preparing": "Đang chuẩn bị",
+        "Delivering": "Đang giao",
+        "Done": "Hoàn thành",
+        "Text1": "đã bị từ chối",
+        "Text2": "đang được chuẩn bị bởi đầu bếp",
+        "Text3": "đang được vận chuyển",
+        "Text4": "hoàn thành",
+        "Order": "Đơn"
     },
     "404":{
         "Lang": "Tiếng việt"
