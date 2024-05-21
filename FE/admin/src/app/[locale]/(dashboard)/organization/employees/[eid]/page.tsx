@@ -10,6 +10,7 @@ import { UpdatableInput } from "@/components/UpdatableInput/UpdatableInput";
 import TimeFormatter from "@/components/TimeFormatter";
 import { DetailPageLayout } from "@/components/DetailPageLayout";
 import { useForm } from "antd/es/form/Form";
+import { useLocale, useTranslations } from "next-intl";
 import moment from "moment";
 
 
@@ -26,16 +27,19 @@ const EmployeeProfile = () => {
     const [data, setData] = useState<any>(null)
     const [reload, setReload] = useState(false)
     const [form] = useForm();
+    const t_general: any = useTranslations("General")
+	const t_customer: any = useTranslations("Customer")
+	const t_employee: any = useTranslations("Employee")
 
     const columns_activity: TableProps<ActivityDataType>['columns'] = [
         {
-            title: 'Name',
+            title: t_general('name'),
             dataIndex: 'name',
             key: 'name',
             render: (text) => <a>{text}</a>,
         },
         {
-            title: 'Type',
+            title: t_general('type'),
             key: 'types',
             dataIndex: 'types',
             render: (_, { types }) => (
@@ -55,7 +59,7 @@ const EmployeeProfile = () => {
             ),
         },
         {
-            title: 'Date',
+            title: t_general('date'),
             dataIndex: 'date',
             key: 'date',
             render: (text) => <a><CalendarOutlined style={{ color: "#4A58EC" }} /> {text}</a>,
@@ -143,7 +147,7 @@ const EmployeeProfile = () => {
                                     htmlType="submit"
                                     loading={loading}
                                 >
-                                    Save
+                                    {t_general('save')}
                                 </Button>
                                 <Button
                                     className="p-1 px-1"
@@ -154,13 +158,13 @@ const EmployeeProfile = () => {
                                     htmlType="reset"
                                     onClick={() => setEditmode(false)}
                                 >
-                                    Cancel
+                                    {t_general('cancel')}
                                 </Button>
                             </Space>
 
                         </Form.Item>) :
 
-                        <Button onClick={() => setEditmode(true)}>Edit</Button>
+                        <Button onClick={() => setEditmode(true)}>{t_general('edit')}</Button>
                     }
 
                     <div className="flex gap-5 items-center mt-3">
@@ -175,7 +179,7 @@ const EmployeeProfile = () => {
                                     name="firstname"
                                     type="input"
                                     defaultValue={data.firstname || ""}
-                                    editmode={editmode} label={"Firstname"}
+                                    editmode={editmode} label={t_general('firstname')}
                                     onUpdate={handleUpdateField}
                                 />
 
@@ -183,7 +187,7 @@ const EmployeeProfile = () => {
                                     name="lastname"
                                     type="input"
                                     defaultValue={data.lastname || ""}
-                                    editmode={editmode} label={"Lastname"}
+                                    editmode={editmode} label={t_general('lastname')}
                                     onUpdate={handleUpdateField}
                                 />
 
@@ -192,17 +196,17 @@ const EmployeeProfile = () => {
                                 <UpdatableInput
                                     name="gender"
                                     type="select"
-                                    options={[{ label: "Male", value: "0" }, { label: "Female", value: "1" }]}
+                                    options={[{ label: t_general('male'), value: "0" }, { label: t_general('female'), value: "1" }]}
                                     defaultValue={data.gender === "0" ? "Male" : "Female"}
                                     editmode={editmode}
-                                    label={"Gender"}
+                                    label={t_general('gender')}
                                     onUpdate={handleUpdateField}
                                 />
                                 <UpdatableInput
                                     name="birthday"
                                     type="date"
                                     defaultValue={moment(data.birthday).format("YYYY-MM-DD")}
-                                    editmode={editmode} label={"Birthday"}
+                                    editmode={editmode} label={t_general('birthday')}
                                     onUpdate={handleUpdateField}
                                 />
                             </div>
@@ -216,20 +220,20 @@ const EmployeeProfile = () => {
                             type="input"
                             defaultValue={data.username}
                             editmode={editmode}
-                            label={"Username"}
+                            label={t_employee("username")}
                             onUpdate={handleUpdateField}
                         />
 
                         <UpdatableInput
                             name="role"
                             type="select"
-                            options={[{ label: "Manager", value: "manager" }, { label: "Staff", value: "staff" }, { value: "chef", label: "Chef" }]}
+                            options={[{ label: t_employee("manager"), value: "manager" }, { label: t_employee("staff"), value: "staff" }, { value: t_employee("chef"), label: "Chef" }]}
                             defaultValue={data.role}
                             editmode={editmode}
-                            label={"Role"}
+                            label={t_employee("role")}
                             onUpdate={handleUpdateField}
                         />
-                        <Form.Item name="isActive" label="Active">
+                        <Form.Item name="isActive" label={t_employee("active")}>
                             <Checkbox defaultChecked={data.isActive} disabled={!editmode}/>
                         </Form.Item>
                         <UpdatableInput
@@ -237,7 +241,7 @@ const EmployeeProfile = () => {
                             type="input"
                             defaultValue={data.email}
                             editmode={editmode}
-                            label={"Email"}
+                            label={t_general('email')}
                             onUpdate={handleUpdateField}
                         />
                         <UpdatableInput
@@ -245,7 +249,7 @@ const EmployeeProfile = () => {
                             type="input"
                             defaultValue={data.phone}
                             editmode={editmode}
-                            label={"Phone"}
+                            label={t_general('phone')}
                             onUpdate={handleUpdateField}
                         />
                     </div>
@@ -253,7 +257,7 @@ const EmployeeProfile = () => {
 
                 <div className="bg-white p-2">
                     <header>
-                        <b>Activities</b>
+                        <b>{t_general('activities')}</b>
                     </header>
 
                     <div >

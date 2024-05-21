@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { DatePicker, Flex } from "antd";
+import { useLocale, useTranslations } from "next-intl";
 const { RangePicker } = DatePicker;
 import { Radio } from "antd";
 type Option = {
@@ -10,17 +11,18 @@ type Option = {
 };
 const TimeBar = ({ option, setOption, setComponent }: { option: Option; setOption: any; setComponent: any }) => {
     const [type, setType] = useState<string>("MONTHLY")
+    const t_report: any = useTranslations("Report")
     const options = [
         {
-            label: "This month",
+            label: t_report('this_month'),
             value: "MONTHLY",
         },
         {
-            label: "This year",
+            label: t_report('this_year'),
             value: "YEARLY",
         },
         {
-            label: "Custom",
+            label: t_report('custom'),
             value: "CUSTOM",
         },
     ];

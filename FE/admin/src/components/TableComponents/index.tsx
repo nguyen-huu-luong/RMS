@@ -460,8 +460,8 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, ...props 
 
                         {filterItems.length > 0 && <Form.Item>
                             <Space className="mt-2">
-                                <Button htmlType="submit">Apply</Button>
-                                <Button onClick={handleClearFilter}>Clear filters</Button>
+                                <Button htmlType="submit">{t_general('apply')}</Button>
+                                <Button onClick={handleClearFilter}>{t_general('clear_filter')}</Button>
                             </Space>
                         </Form.Item>}
                     </Form>}
