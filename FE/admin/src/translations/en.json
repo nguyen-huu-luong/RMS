@@ -70,7 +70,8 @@
 		"report": "Report",
 		"crm-report": "CRM Report",
 		"bussiness-report": "Bussiness report",
-		"chat-center": "Chat center"
+		"chat-center": "Chat center",
+		"chef": "Kitchen Display"
 	},
 	"Chat": {
 		"all": "All customers",

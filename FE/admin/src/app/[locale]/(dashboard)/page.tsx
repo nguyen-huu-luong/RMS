@@ -1,15 +1,17 @@
-import { getCurrentUser } from "@/lib/session";
+import { getSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 export default async function Index() {
-    //   const session = await getCurrentUser()
+    // const session = await getSession();
 
-    //   if (!session) redirect("/signin")
+    // if (!session) redirect("/signin");
 
-    //   console.log("session", session)
-    //   if (session.role && session.role === "chef") {
-    //      redirect("/chef")
-    //   } else if  (session.role === "manager" || session.role==="employee") {
-    //      redirect("/overview")
-    //   }
+    // if (session.user?.role && session.user?.role === "chef") {
+    //     redirect("/chef");
+    // } else if (
+    //     session.user?.role === "manager" ||
+    //     session.user?.role === "employee"
+    // ) {
+    //     redirect("/overview");
+    // }
     return <></>;
 }

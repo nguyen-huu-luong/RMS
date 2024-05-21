@@ -1,33 +1,34 @@
 "use client";
 import { LockOutlined, MailOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Button, Checkbox, ConfigProvider, Form, Input, message } from "antd";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
-import { useState } from "react";
-import { useLocale } from "next-intl";
+import { useEffect, useState } from "react";
 import variables from "@/app/variables.module.scss";
 
 export const LoginForm: React.FC = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const [loading, setLoading] = useState<boolean>();
     const router = useRouter();
-    const locale = useLocale();
+    const { data: session } = useSession();
+    useEffect(() => {
+        if (session) {
+            setLoading(false)
+            router.push(session?.user.role == "chef" ? "/chef" : "/overview");
+        }
+    }, [session]);
     const onFinish = async (values: any) => {
         setLoading(true);
         let result = await signIn("credentials", {
             ...values,
             redirect: false,
         });
-        setLoading(false);
         if (result && !result.ok) {
             if (result.error) {
                 const error = JSON.parse(result.error);
                 showError(`${error?.name}: ${error.message}`);
                 console.log(error);
             }
-        } else {
-            router.push("/");
-            router.push("/");
         }
     };
 
