@@ -10,6 +10,7 @@ import useModal from "antd/es/modal/useModal";
 import TextArea from "antd/es/input/TextArea";
 import { AxiosError } from "axios";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 
 
 export interface ICreateModal {
@@ -22,6 +23,8 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
     const [modal] = useModal()
     const [errorMsg, setErrorMsg] = useState("")
     const [boxInformation, setBoxInformation] = useState<ReactNode>(<></>)
+    const t_general: any = useTranslations("General")
+	const t_lead: any = useTranslations("Lead")
     const showModal = () => {
         setOpen(true);
     };
@@ -80,22 +83,22 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
     }
 
     return <main className="ms-auto">
-        <Button className="bg-white" onClick={showModal}>New</Button>
+        <Button className="bg-white" onClick={showModal}>{t_general('new')}</Button>
         <CustomModal
             open={open}
-            title="Add new lead"
+            title={t_lead('add_new_lead')}
             okType="primary"
             okButtonProps={{ className: "bg-primary" }}
             onCancel={handleCancel}
             onOk={handleOk}
-            okText={!errorMsg ? "Create" : "Try again"}
+            okText={!errorMsg ? t_general("confirm") : "Try again"}
             width={800}
             confirmLoading={loading}
             destroyOnClose
             footer={(_, { OkBtn, CancelBtn }) => (
                 <>
                     <Popconfirm title="Are you sure to reset all data?" onConfirm={handleCancel}>
-                        <Button>Cancel</Button>
+                        <Button>{t_general('cancel')}</Button>
                     </Popconfirm>
                     <OkBtn />
                 </>
@@ -105,7 +108,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                 <div className="flex space-x-2">
                     <div className='w-full'>
                         <Form.Item
-                            label='Firstname'
+                            label={t_general('firstname')}
                             name='firstname'
                             required
                             rules={[
@@ -120,7 +123,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                     </div>
                     <div className='w-full'>
                         <Form.Item
-                            label='Lastname'
+                            label={t_general('lastname')}
                             name='lastname'
                             required
                             rules={[
@@ -142,7 +145,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                 <div className="flex space-x-2">
                     <div className='w-full'>
                         <Form.Item
-                            label='Phone'
+                            label={t_general('phone')}
                             name='phone'
                             rules={[
                                 {
@@ -157,7 +160,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                     </div>
                     <div className='w-full'>
                         <Form.Item
-                            label='Email'
+                            label={t_general('email')}
                             name='email'
                             required
                             rules={[
@@ -179,13 +182,13 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
 
                 <div className="flex space-x-2">
                     <div className='w-full'>
-                        <Form.Item label="Birthday" name="birthday">
+                        <Form.Item label={t_general('birthday')} name="birthday">
                             <RMSDatePicker className='w-full' />
                         </Form.Item>
                     </div>
                     <div className="w-full">
                         <Form.Item
-                            label='Source'
+                            label={t_general('source')}
                             name='source'
                             required
                             rules={[
@@ -214,7 +217,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                 </div>
 
                 <div className='w-full'>
-                    <Form.Item label="Address" name="address">
+                    <Form.Item label={t_general('address')} name="address">
                         <TextArea placeholder='Description about this custome' />
                     </Form.Item>
                 </div>

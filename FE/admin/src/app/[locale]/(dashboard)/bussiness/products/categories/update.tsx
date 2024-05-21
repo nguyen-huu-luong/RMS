@@ -5,10 +5,13 @@ import type { UploadProps } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadImage } from '@/app/api/upload';
 import fetchClient from '@/lib/fetch-client';
+import { useLocale, useTranslations } from "next-intl";
 
 const UpdateCategory = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data }: { isUpdate: any, setIsUpdate: any, setIsReFetch: any,  currentItem:any,data: any }) => {
 
     const [form_update_category] = Form.useForm();
+    const t_product: any = useTranslations("Product")
+    const t_general: any = useTranslations("General")
     const real_name = currentItem?.name
     
     form_update_category.setFields([{name: "category_name", value: currentItem?.name}, {name: "description", value: currentItem?.description }])
@@ -90,13 +93,13 @@ const UpdateCategory = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data
     return (
         <>
 
-            <Modal title="Category Information Detail" open={isUpdate} onCancel={handleCancel} destroyOnClose={true} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
+            <Modal title={t_product('category_information')} open={isUpdate} onCancel={handleCancel} destroyOnClose={true} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
                 <Form form={form_update_category} name="basic"  onFinish={handleUpdate}>
                     <div className='relative'>
                         <div className='flex justify-between'>
                             <div style={{ width: "48%" }}>
                                 <p>
-                                    Name
+                                {t_general('name')}
                                 </p>
                                 <Form.Item
                                     name="category_name"
@@ -118,7 +121,7 @@ const UpdateCategory = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data
                             </div>
                             <div style={{ width: "48%" }}>
                                 <p>
-                                    Description
+                                {t_general('description')}
                                 </p>
                                 <Form.Item
                                     name="description"
@@ -136,7 +139,7 @@ const UpdateCategory = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data
                                     maxCount={1}
                                     onRemove={handleRemove}
                                 >
-                                    <Button icon={<UploadOutlined />}>Upload Icon</Button>
+                                    <Button icon={<UploadOutlined />}>{t_product('upload_icon')}</Button>
                                 </Upload>
                             </Form.Item>
                         </div>
@@ -151,10 +154,10 @@ const UpdateCategory = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data
                         <Form.Item >
                             <div className='flex justify-end mt-3' style={{ width: "100%" }}>
                                 <div className='pr-3'>
-                                    <Button style={{ backgroundColor: "#989898", color: "white" }} htmlType="button" onClick={handleCancel}>CANCEL</Button>
+                                    <Button style={{ backgroundColor: "#989898", color: "white" }} htmlType="button" onClick={handleCancel}>{t_general('cancel').toUpperCase()}</Button>
                                 </div>
                                 <div>
-                                    <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">CHANGE</Button>
+                                    <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">{t_general('change').toUpperCase()}</Button>
                                 </div>
                             </div>
                         </Form.Item>

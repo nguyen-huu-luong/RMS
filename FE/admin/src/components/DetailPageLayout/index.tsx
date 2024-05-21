@@ -1,6 +1,7 @@
 import { ArrowRightOutlined, CalendarOutlined } from "@ant-design/icons"
 import TimeFormatter from "../TimeFormatter"
 import { ConfigProvider } from "antd"
+import { useLocale, useTranslations } from "next-intl";
 
 interface IDetailPageLayoutProps {
     dataCreatedAt?: string,
@@ -10,6 +11,7 @@ interface IDetailPageLayoutProps {
 
 
 export const DetailPageLayout: React.FC<IDetailPageLayoutProps> = (props) => {
+    const t_general: any = useTranslations("General")
     return (
         <ConfigProvider
             theme={{
@@ -25,7 +27,7 @@ export const DetailPageLayout: React.FC<IDetailPageLayoutProps> = (props) => {
                 <div className="col-span-2">{props.children}</div>
                 <div className="col-span-1">
                     <div className="bg-white pl-3 py-2 shadow rounded">
-                        <p style={{ color: "#666666" }}>Created at</p>
+                        <p style={{ color: "#666666" }}>{t_general('created_at')}</p>
                         <div className="">
                             <CalendarOutlined style={{ color: "#4A58EC" }} />
                             {props.dataCreatedAt ? <TimeFormatter className="ms-2" time={props.dataCreatedAt} /> : "Unknown "}
@@ -33,7 +35,7 @@ export const DetailPageLayout: React.FC<IDetailPageLayoutProps> = (props) => {
                         </div>
                         {/* <p className="ml-5 mt-2" style={{ color: "#666666" }}><button><ArrowRightOutlined /> View all history </button></p> */}
                         <div>
-                            <p className="mt-1" style={{ color: "#666666" }}>Last modified</p>
+                            <p className="mt-1" style={{ color: "#666666" }}>{t_general('last_modified')}</p>
                             <p><CalendarOutlined style={{ color: "#4A58EC" }} />
                                 {props.dataCreatedAt ? <TimeFormatter time={props.dataCreatedAt}  className="ms-2"/> : "Unknown "}
                                 {/* <span style={{ color: "#4A58EC" }}>Minh Vuong</span> */}

@@ -30,6 +30,7 @@ import { useSession } from "next-auth/react";
 import moment from "moment";
 import Link from "next-intl/link";
 import { useRouter } from "next-intl/client";
+import { useLocale, useTranslations } from "next-intl";
 const CustomerProfile = () => {
     const editStyle = {
         outline: "0",
@@ -50,6 +51,9 @@ const CustomerProfile = () => {
     const router = useRouter();
     const { data: session, status } = useSession();
     const params = useParams<{ locale: string; cid: string }>();
+
+	const t_general: any = useTranslations("General")
+	const t_customer: any = useTranslations("Customer")
 
     const [tabStyle, setTabStyle] = useState(tabStyle_);
     const [tab, setTab] = useState(0);
@@ -318,7 +322,7 @@ const CustomerProfile = () => {
 
     const users_activity: TableProps<CustomerHistoryDataType>["columns"] = [
         {
-            title: "Action",
+            title: t_general('action'),
             dataIndex: "action",
             key: "action",
             render: (text) => (
@@ -328,7 +332,7 @@ const CustomerProfile = () => {
             ),
         },
         {
-            title: "Reference",
+            title: t_general('reference'),
             key: "reference",
             render: (_, record) => (
                 <a
@@ -341,7 +345,7 @@ const CustomerProfile = () => {
             ),
         },
         {
-            title: "Date",
+            title: t_general('date'),
             dataIndex: "date",
             key: "date",
             render: (_, record) => (
@@ -365,7 +369,7 @@ const CustomerProfile = () => {
             ),
         },
         {
-            title: "Status",
+            title: t_general('status'),
             key: "status",
             dataIndex: "status",
             render: (_, { status }) => (
@@ -386,13 +390,13 @@ const CustomerProfile = () => {
             ),
         },
         {
-            title: "Amount",
+            title: t_customer('amount'),
             dataIndex: "amount",
             key: "amount",
             render: (text) => <p>{text} VND</p>,
         },
         {
-            title: "Created at",
+            title: t_general('created_at'),
             dataIndex: "create_at",
             key: "create_at",
             render: (text) => (
@@ -457,7 +461,7 @@ const CustomerProfile = () => {
                                 id='bt1'
                             >
                                 {" "}
-                                <EditOutlined /> Edit
+                                <EditOutlined /> {t_general('edit')}
                             </button>
                             <button
                                 className='p-1 px-1'
@@ -490,7 +494,7 @@ const CustomerProfile = () => {
                                     id='bt2'
                                     onClick={() => setChecker(1)}
                                 >
-                                    Save
+                                    {t_general('save')}
                                 </button>
                                 <button
                                     className='p-1 px-1'
@@ -502,7 +506,7 @@ const CustomerProfile = () => {
                                     }}
                                     onClick={() => setChecker(0)}
                                 >
-                                    Cancel
+                                    {t_general('cancel')}
                                 </button>
                                 <button
                                     className='p-1 px-1'
@@ -522,7 +526,7 @@ const CustomerProfile = () => {
                         <div className='mt-3 grid grid-cols-3 gap-4'>
                             <div className='col-span-2'>
                                 <div className='bg-white pl-3 py-2'>
-                                    <h1 className='font-bold'>Overview</h1>
+                                    <h1 className='font-bold'>{t_customer('overview')}</h1>
                                     <div className='mt-3 grid grid-cols-5 gap-4'>
                                         <div
                                             className='relative'
@@ -580,7 +584,7 @@ const CustomerProfile = () => {
                                             </div>
                                         </div>
                                         <div>
-                                            <p className='font-bold'>Name</p>
+                                            <p className='font-bold'>{t_general('name')}</p>
                                             <input
                                                 className='rounded-md py-1.5 w-40'
                                                 defaultValue={userInfo.name}
@@ -590,7 +594,7 @@ const CustomerProfile = () => {
                                             ></input>
                                         </div>
                                         <div className='ml-5 pl-4'>
-                                            <p className='font-bold '>Gender</p>
+                                            <p className='font-bold '>{t_general('gender')}</p>
                                             <select
                                                 className='rounded-md py-1.5'
                                                 defaultValue={
@@ -603,10 +607,10 @@ const CustomerProfile = () => {
                                                 name='gender'
                                             >
                                                 <option value={"false"}>
-                                                    Female
+                                                {t_general('female')}
                                                 </option>
                                                 <option value={"true"}>
-                                                    Male
+                                                {t_general('male')}
                                                 </option>
                                                 <option value={"none"}>
                                                     None
@@ -615,7 +619,7 @@ const CustomerProfile = () => {
                                         </div>
                                         <div>
                                             <p className='font-bold'>
-                                                Birthday
+                                            {t_general('birthday')}
                                             </p>
                                             <div>
                                                 <input
@@ -634,7 +638,7 @@ const CustomerProfile = () => {
                                         </div>
 
                                         <div>
-                                            <p className='font-bold '>Source</p>
+                                            <p className='font-bold '>{t_general('source')}</p>
                                             <select
                                                 className='rounded-md py-1.5'
                                                 defaultValue={
@@ -666,7 +670,7 @@ const CustomerProfile = () => {
                                     </div>
                                     <div className='mt-3 grid grid-cols-4 gap-12'>
                                         <div>
-                                            <p className='font-bold'>Email</p>
+                                            <p className='font-bold'>{t_general('email')}</p>
                                             <div>
                                                 <input
                                                     type='text'
@@ -688,7 +692,7 @@ const CustomerProfile = () => {
                                         </div>
 
                                         <div>
-                                            <p className='font-bold'>Phone</p>
+                                            <p className='font-bold'>{t_general('phone')}</p>
                                             <div>
                                                 <input
                                                     type='phone'
@@ -705,7 +709,7 @@ const CustomerProfile = () => {
                                             </div>
                                         </div>
                                         <div className='col-span-2 pr-2'>
-                                            <p className='font-bold'>Address</p>
+                                            <p className='font-bold'>{t_general('address')}</p>
                                             <textarea
                                                 rows={2}
                                                 className='w-full rounded-md py-1 resize-none'
@@ -723,9 +727,9 @@ const CustomerProfile = () => {
                                 </div>
 
                                 <div className='bg-white pl-3 py-2 mt-3'>
-                                    <h1 className='font-bold'>Details</h1>
+                                    <h1 className='font-bold'>{t_general('detail')}</h1>
                                     <div className='mt-3'>
-                                        <p className='font-bold mb-1'>Group</p>
+                                        <p className='font-bold mb-1'>{t_general('group')}</p>
                                         <div>
                                             {customerInfo.group.length > 0 ? (
                                                 <Tooltip
@@ -776,7 +780,7 @@ const CustomerProfile = () => {
                                     <div className='mt-3 grid grid-cols-3 gap-2'>
                                         <div>
                                             <p className='font-bold'>
-                                                Total orders
+                                            {t_customer('total_orders')}
                                             </p>
                                             <p>
                                                 {customerInfo.orderInfo.length}
@@ -784,13 +788,13 @@ const CustomerProfile = () => {
                                         </div>
 
                                         <div>
-                                            <p className='font-bold'>Paid</p>
+                                            <p className='font-bold'>{t_customer('paid')}</p>
                                             <p style={{ color: "#54B435" }}>
                                                 {totalCost} VND
                                             </p>
                                         </div>
                                         <div>
-                                            <p className='font-bold'>Score</p>
+                                            <p className='font-bold'>{t_general('score')}</p>
                                             <p style={{ color: "#54B435" }}>
                                                 {userInfo.score
                                                     ? userInfo.score
@@ -800,7 +804,7 @@ const CustomerProfile = () => {
                                     </div>
 
                                     <div className='mt-3 pr-2'>
-                                        <p className='font-bold'>Description</p>
+                                        <p className='font-bold'>{t_general('description')}</p>
                                         <div>
                                             <textarea
                                                 rows={2}
@@ -828,7 +832,7 @@ const CustomerProfile = () => {
                                                         handelTabClick(0)
                                                     }
                                                 >
-                                                    Orders
+                                                    {t_customer('orders')}
                                                 </button>
                                             </li>
                                             <li className='me-2'>
@@ -841,7 +845,7 @@ const CustomerProfile = () => {
                                                         handelTabClick(1)
                                                     }
                                                 >
-                                                    Activities
+                                                     {t_general('activities')}
                                                 </button>
                                             </li>
                                         </ul>
@@ -876,7 +880,7 @@ const CustomerProfile = () => {
                             <div>
                                 <div className='bg-white pl-3 py-2'>
                                     <p style={{ color: "#666666" }}>
-                                        Created at
+                                    {t_general('created_at')}
                                     </p>
                                     <p>
                                         <CalendarOutlined
@@ -896,7 +900,7 @@ const CustomerProfile = () => {
                                         className='mt-1'
                                         style={{ color: "#666666" }}
                                     >
-                                        Last modified
+                                        {t_general('last_modified')}
                                     </p>
                                     <p>
                                         <CalendarOutlined
@@ -910,7 +914,7 @@ const CustomerProfile = () => {
 
                                 <div className='bg-white px-3 py-2 mt-3 '>
                                     <h2 className='font-bold'>
-                                        Recent Activities
+                                    {t_general('recent_activities')}
                                     </h2>
                                     <div className='mt-4'>
                                         <div className='flex flex-col justify-between gap-2'>
@@ -937,7 +941,7 @@ const CustomerProfile = () => {
                                                                         {item.action ===
                                                                         "view_item" ? (
                                                                             <>
-                                                                                View{" "}
+                                                                                {t_general('view')}{" "}
                                                                                 <Link
                                                                                     style={{
                                                                                         color: "#4A58EC",
@@ -952,7 +956,7 @@ const CustomerProfile = () => {
                                                                         ) : item.action ===
                                                                           "add_to_cart" ? (
                                                                             <>
-                                                                                Add{" "}
+                                                                                 {t_general('add')}{" "}
                                                                                 <Link
                                                                                     style={{
                                                                                         color: "#4A58EC",
@@ -963,12 +967,12 @@ const CustomerProfile = () => {
                                                                                         item.name
                                                                                     }
                                                                                 </Link>{" "}
-                                                                                to
-                                                                                cart
+                                                                              {t_customer('to_cart')}
                                                                             </>
                                                                         ) : item.action ===
                                                                           "order" ? (
-                                                                            "Order food"
+                                                                            <>
+                                                                            {t_customer('order_food')}</>
                                                                         ) : (
                                                                             ""
                                                                         )}

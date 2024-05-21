@@ -27,6 +27,7 @@ import { useFormatter } from "next-intl";
 import { FilterItem } from "../TableComponents/FilterItems";
 import { FaEllipsisV } from "react-icons/fa";
 import { AxiosError } from "axios";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -88,6 +89,7 @@ const TableOrderRender = <T extends AnyObject>({
     const [loading, setLoading] = useState(false);
     const [isSelectedRows, setIsSelectedRows] = useState(false);
     const [filterItems, setFilterItems] = useState<FilterItemType[]>([]);
+    const t_general: any = useTranslations("General")
     const [error, setError] = useState<ErrorType>({
         isError: false,
         message: "",
@@ -466,7 +468,7 @@ const TableOrderRender = <T extends AnyObject>({
                     onSelected.render()}
                 <div className='border bg-white shadow p-3 my-2 rounded'>
                     <div className='flex items-center gap-2'>
-                        <p>Sort by: </p>
+                        <p>{t_general('sort')}: </p>
                         <Select
                             // style={{ width: '20%' }}
                             placeholder='Columns'
@@ -484,7 +486,7 @@ const TableOrderRender = <T extends AnyObject>({
                             style={{ minWidth: 120 }}
                         />
 
-                        <p>Order: </p>
+                        <p>{t_general('order')} </p>
 
                         <Button
                             onClick={handleToggleSorter}
@@ -538,7 +540,7 @@ const TableOrderRender = <T extends AnyObject>({
                         pagination={{
                             className: "bg-white rounded px-4 py-2",
                             showTotal: (total: number) =>
-                                `Total ${total} items`,
+                            `${t_general("total")} ${total} ${t_general("item")}`,
                             position: ["bottomCenter", "bottomRight"],
                             showSizeChanger: true,
                             showQuickJumper: true,

@@ -144,7 +144,7 @@ const CustomerListPages: React.FC = () => {
 		},
 		{
 			key: "3",
-			title: t_general("phone"),
+			title: t_general("email"),
 			fieldName: "email",
 			type: "input"
 		},

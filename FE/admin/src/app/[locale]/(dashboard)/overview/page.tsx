@@ -8,6 +8,7 @@ import LeadChart from "@/components/Statistics/LeadChart";
 import SegmentationOverview from "@/components/Statistics/SegmentationOverview";
 import TabNav from "@/components/Statistics/TabNav";
 import SegmentationChart from "@/components/Statistics/SegmentationChart";
+import { useLocale, useTranslations } from "next-intl";
 type Option = {
     type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM";
     beginDate?: Date;
@@ -31,6 +32,8 @@ function Overview() {
 
     const [reportType, setReportType] = useState<any>("1")
     const [customerLoading, setCustomerLoading] = useState<any>("Sumarize")
+    const t_report: any = useTranslations("Report")
+    const t_general: any = useTranslations("General")
 
     return (
         <div className='w-full h-auto overflow-scroll p-4 flex flex-col gap-4 justify-start items-center'>
@@ -57,7 +60,7 @@ function Overview() {
                     <div className='w-full flex flex-row gap-5 justify-start '>
                         {component.topProducts && (
                             <TopChart
-                                name={"Top products"}
+                                name={t_report('top_product')}
                                 type={"products"}
                                 option={option}
                                 setComponent={setComponent}
@@ -66,7 +69,7 @@ function Overview() {
                         )}
                         {component.topCustomers && (
                             <TopChart
-                                name={"Top customers"}
+                                name={t_report('top_customer')}
                                 type={"customers"}
                                 option={option}
                                 setComponent={setComponent}

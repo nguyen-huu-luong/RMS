@@ -17,6 +17,7 @@ import fetchClient from "@/lib/fetch-client";
 import Loading from "@/components/loading";
 import useSocket from "@/socket";
 import { message, notification } from "antd";
+import { useLocale, useTranslations } from "next-intl";
 import moment from "moment";
 
 function Home() {
@@ -43,6 +44,8 @@ function Home() {
     const [currentPage, setCurrentPage] = useState(1);
     const [loadingButton, setLoadingButton] = useState(false)
     const [api_notification, contextHolder] = notification.useNotification();
+    const t_general: any = useTranslations("General")
+	const t_reservation: any = useTranslations("Reservation")
     const [category, setCategory] = useState<string>(
         currentCategory !== null ? currentCategory : "Pizza"
     );
@@ -327,8 +330,8 @@ function Home() {
                     className='w-full bg-white flex flex-row justify-between items-center rounded pr-2 gap-5'
                     style={{ height: "40px" }}
                 >
-                    <div className='w-auto flex items-center rounded h-full'>
-                        <div className='inline-block ml-3'>
+                    <div className='w-full flex items-center rounded h-full'>
+                        <div className='w-full ml-3'>
                             {table.status == "Free" ? (
                                 <button
                                     type='button'
@@ -339,7 +342,7 @@ function Home() {
                                     }}
                                     onClick={handleUpdateTable}
                                 >
-                                    Use
+                                    {t_reservation('use')}
                                 </button>
                             ) : (
                                 <button
@@ -351,7 +354,7 @@ function Home() {
                                         backgroundColor: "#EA6A12",
                                     }}
                                 >
-                                    Free
+                                    {t_reservation('free')}
                                 </button>
                             )}
                         </div>
@@ -398,7 +401,7 @@ function Home() {
                                     name='first_name'
                                     label={
                                         <span className='whitespace-nowrap font-bold text-md'>
-                                            First Name
+                                            {t_general('firstname')}
                                         </span>
                                     }
                                     rules={[
@@ -419,7 +422,7 @@ function Home() {
                                     name='last_name'
                                     label={
                                         <span className='whitespace-nowrap font-bold text-md'>
-                                            Last Name
+                                            {t_general('lastname')}
                                         </span>
                                     }
                                     rules={[
@@ -442,7 +445,7 @@ function Home() {
                                     name='birthday'
                                     label={
                                         <span className='whitespace-nowrap font-bold text-md'>
-                                            Birthday
+                                            {t_general('birthday')}
                                         </span>
                                     }
                                     rules={[
@@ -466,7 +469,7 @@ function Home() {
                                     name='phone_number'
                                     label={
                                         <span className='whitespace-nowrap font-bold text-md'>
-                                            Phone number
+                                            {t_general('phone')}
                                         </span>
                                     }
                                     rules={[
@@ -490,7 +493,7 @@ function Home() {
                                     name='email'
                                     label={
                                         <span className='whitespace-nowrap font-bold text-md'>
-                                            Email
+                                            {t_general('phone')}
                                         </span>
                                     }
                                     rules={[
@@ -522,7 +525,7 @@ function Home() {
                             name='paymentMethod'
                             label={
                                 <span className='whitespace-nowrap font-bold text-md'>
-                                    Payment Method
+                                    {t_reservation('payment_method')}
                                 </span>
                             }
                             rules={[
@@ -577,7 +580,7 @@ function Home() {
                                             htmlType='button'
                                             onClick={() => setOpen(false)}
                                         >
-                                            Cancel
+                                            {t_general('cancel')}
                                         </Button>
                                     </div>
                                     <div>
@@ -588,7 +591,7 @@ function Home() {
                                             }}
                                             htmlType='submit'
                                         >
-                                            Confirm
+                                            {t_general('confirm')}
                                         </Button>
                                     </div>
                                 </div>
@@ -646,7 +649,7 @@ function Home() {
                                 </>
                             ) : (
                                 <div className='text-black'>
-                                    You have not added any product!
+                                    {t_reservation('un_order')}
                                 </div>
                             )}
                         </>
@@ -688,13 +691,13 @@ function Home() {
                                     className='px-2 py-1 rounded bg-red-600 text-white'
                                     onClick={handleCancelOrder}
                                 >
-                                    Cancel
+                                    {t_general('cancel')}
                                 </button>
                                 <Button
                                     className='bg-menu px-1 py-1 border-t-menu rounded  text-white ml-4'
                                     onClick={addItem}
                                 >
-                                    Order
+                                    {t_reservation('order')}
                                 </Button>
                             </div>
                         </div>
@@ -703,14 +706,14 @@ function Home() {
                     {cart_items && cart_items.items?.length != 0 && (
                         <div className='h-auto flex flex-col gap-2 justify-between'>
                             <div className='font-bold text-md py-2 border-t-menu border-t-2'>
-                                Total: {getTotalAmount()}VNĐ
+                                {t_general('total')}: {getTotalAmount()}VNĐ
                             </div>
                             <div>
                                 <div
                                     onClick={showModal}
                                     className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-menu hover:bg-orange-400 text-white transition-all duration-300  flex justify-center tex-md font-bold cursor-pointer'
                                 >
-                                    Make payment
+                                    {t_reservation('make_payment')}
                                 </div>
                             </div>
                         </div>

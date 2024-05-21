@@ -20,6 +20,7 @@ import Loading from "@/components/loading";
 import moment from "moment";
 import Link from "next-intl/link";
 import { useRouter } from "next-intl/client";
+import { useLocale, useTranslations } from "next-intl";
 
 const LeadProfile = () => {
     const router = useRouter()
@@ -48,6 +49,8 @@ const LeadProfile = () => {
     const [checker, setChecker] = useState(0);
     const [history, setHistory] = useState<any>([]);
     const [historyPage, setHistoryPage] = useState(1);
+    const t_general: any = useTranslations("General")
+	const t_customer: any = useTranslations("Customer")
     const onChange: PaginationProps["onChange"] = (page) => {
         setHistoryPage(page);
     };
@@ -276,7 +279,7 @@ const LeadProfile = () => {
                                 id='bt1'
                             >
                                 {" "}
-                                <EditOutlined /> Edit
+                                <EditOutlined /> {t_general('edit')}
                             </button>
                             <button
                                 className='p-1 px-1'
@@ -309,7 +312,7 @@ const LeadProfile = () => {
                                     id='bt2'
                                     onClick={() => setChecker(1)}
                                 >
-                                    Save
+                                    {t_general('save')}
                                 </button>
                                 <button
                                     className='p-1 px-1'
@@ -321,7 +324,7 @@ const LeadProfile = () => {
                                     }}
                                     onClick={() => setChecker(0)}
                                 >
-                                    Cancel
+                                    {t_general('cancel')}
                                 </button>
                                 <button
                                     className='p-1 px-1'
@@ -341,7 +344,7 @@ const LeadProfile = () => {
                         <div className='mt-3 grid grid-cols-3 gap-4'>
                             <div className='col-span-2'>
                                 <div className='bg-white pl-3 py-2'>
-                                    <h1 className='font-bold'>Overview</h1>
+                                    <h1 className='font-bold'>{t_customer('overview')}</h1>
                                     <div className='mt-3 grid grid-cols-5 gap-4'>
                                         <div
                                             style={{
@@ -356,7 +359,7 @@ const LeadProfile = () => {
                                             />
                                         </div>
                                         <div>
-                                            <p className='font-bold'>Name</p>
+                                            <p className='font-bold'>{t_general('name')}</p>
                                             <input
                                                 className='rounded-md py-1.5 w-40'
                                                 defaultValue={userInfo.name}
@@ -366,7 +369,7 @@ const LeadProfile = () => {
                                             ></input>
                                         </div>
                                         <div className='ml-5 pl-4'>
-                                            <p className='font-bold '>Gender</p>
+                                            <p className='font-bold '>{t_general('gender')}</p>
                                             <select
                                                 className='rounded-md py-1.5'
                                                 defaultValue={
@@ -379,10 +382,10 @@ const LeadProfile = () => {
                                                 name='gender'
                                             >
                                                 <option value={"false"}>
-                                                    Female
+                                                {t_general('female')}
                                                 </option>
                                                 <option value={"true"}>
-                                                    Male
+                                                {t_general('male')}
                                                 </option>
                                                 <option value={"none"}>
                                                     None
@@ -391,7 +394,7 @@ const LeadProfile = () => {
                                         </div>
                                         <div>
                                             <p className='font-bold'>
-                                                Birthday
+                                            {t_general('birthday')}
                                             </p>
                                             <div>
                                                 <input
@@ -410,7 +413,7 @@ const LeadProfile = () => {
                                         </div>
 
                                         <div>
-                                            <p className='font-bold '>Source</p>
+                                            <p className='font-bold '>{t_general('source')}</p>
                                             <select
                                                 className='rounded-md py-1.5'
                                                 defaultValue={
@@ -442,7 +445,7 @@ const LeadProfile = () => {
                                     </div>
                                     <div className='mt-3 grid grid-cols-4 gap-12'>
                                         <div>
-                                            <p className='font-bold'>Email</p>
+                                            <p className='font-bold'>{t_general('email')}</p>
                                             <div>
                                                 <input
                                                     type='text'
@@ -459,7 +462,7 @@ const LeadProfile = () => {
                                         </div>
 
                                         <div>
-                                            <p className='font-bold'>Phone</p>
+                                            <p className='font-bold'>{t_general('phone')}</p>
                                             <div>
                                                 <input
                                                     type='phone'
@@ -476,7 +479,7 @@ const LeadProfile = () => {
                                             </div>
                                         </div>
                                         <div className='col-span-2 pr-2'>
-                                            <p className='font-bold'>Address</p>
+                                            <p className='font-bold'>{t_general('address')}</p>
                                             <textarea
                                                 rows={2}
                                                 className='w-full rounded-md py-1 resize-none'
@@ -496,7 +499,7 @@ const LeadProfile = () => {
                             <div>
                                 <div className='bg-white pl-3 py-2'>
                                     <p style={{ color: "#666666" }}>
-                                        Created at
+                                    {t_general('created_at')}
                                     </p>
                                     <p>
                                         <CalendarOutlined
@@ -516,7 +519,7 @@ const LeadProfile = () => {
                                         className='mt-1'
                                         style={{ color: "#666666" }}
                                     >
-                                        Last modified
+                                        {t_general('last_modified')}
                                     </p>
                                     <p>
                                         <CalendarOutlined
@@ -530,7 +533,7 @@ const LeadProfile = () => {
 
                                 <div className='bg-white px-3 py-2 mt-3 '>
                                     <h2 className='font-bold'>
-                                        Recent Activities
+                                    {t_general('recent_activities')}
                                     </h2>
                                     <div className='mt-4'>
                                         <div className='flex flex-col justify-between gap-2'>
@@ -557,7 +560,7 @@ const LeadProfile = () => {
                                                                         {item.action ===
                                                                         "view_item" ? (
                                                                             <>
-                                                                                View{" "}
+                                                                                {t_general('view')}{" "}
                                                                                 <Link
                                                                                     style={{
                                                                                         color: "#4A58EC",
@@ -572,7 +575,7 @@ const LeadProfile = () => {
                                                                         ) : item.action ===
                                                                           "add_to_cart" ? (
                                                                             <>
-                                                                                Add{" "}
+                                                                               {t_general('add')}{" "}
                                                                                 <Link
                                                                                     style={{
                                                                                         color: "#4A58EC",
@@ -583,12 +586,11 @@ const LeadProfile = () => {
                                                                                         item.name
                                                                                     }
                                                                                 </Link>{" "}
-                                                                                to
-                                                                                cart
+                                                                                {t_customer('to_cart')}
                                                                             </>
                                                                         ) : item.action ===
                                                                           "order" ? (
-                                                                            "Order food"
+                                                                            <>{t_customer('order_food')}</>
                                                                         ) : (
                                                                             ""
                                                                         )}

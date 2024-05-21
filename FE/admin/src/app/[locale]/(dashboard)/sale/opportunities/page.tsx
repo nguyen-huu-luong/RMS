@@ -20,6 +20,7 @@ import type {
 import { Modal } from "antd";
 import { useRouter } from "next-intl/client";;
 import fetchClient from "@/lib/fetch-client";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -69,6 +70,8 @@ const Opportunities: React.FC = () => {
     const [cartItems, setCartItems] = useState<any>();
     const [loading, setLoading] = useState(false);
     const [isModalCart, setIsModalCart] = useState(false)
+    const t_general: any = useTranslations("General")
+    const t_order: any = useTranslations("Order")
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -77,7 +80,7 @@ const Opportunities: React.FC = () => {
         },
         filters: {},
         sorter: {
-            field: "amount",
+            field: 'amount',
             order: "ascend",
         },
     });
@@ -85,15 +88,15 @@ const Opportunities: React.FC = () => {
     const list_sort = [
         {
             key: "fullname",
-            title: "Fullname"
+            title: t_general('fullname')
         },
         {
             key: "amount",
-            title: "Amount"
+            title: t_general('amount')
         },
         {
             key: "type",
-            title: "Type"
+            title: t_general('type')
         },
     ]
     const [error, setError] = useState<ErrorType>({
@@ -115,29 +118,29 @@ const Opportunities: React.FC = () => {
 
     const columns: ColumnsType<DataType> = [
         {
-            title: "ID",
+            title: t_general('id'),
             dataIndex: "id",
             key: "id"
         },
         {
-            title: "Fullname",
+            title: t_general('fullname'),
             dataIndex: "fullname",
             key: "fullname",
             render: (text, row) => <a style={{ color: "#4A58EC" }} href={`${link_ref[row.type]}/${row.id}`}>{text}</a>
         },
         {
-            title: "Amount",
+            title: t_general('amount'),
             dataIndex: "amount",
             key: "amount",
             render: (text, row) => <p>{text} VND</p>
         },
         {
-            title: "Type",
+            title: t_general('type'),
             dataIndex: "type",
             key: "type",
         },
         {
-            title: "Action",
+            title: t_general('action'),
             dataIndex: "action",
             key: "action",
             render: (text, row, index) => <Button color="primary" onClick={() => handleOpenModalCart(index, row.fullname, row.amount)}>View cart</Button>
@@ -146,23 +149,23 @@ const Opportunities: React.FC = () => {
 
     const items_columns: ColumnsType<DataType> = [
         {
-            title: "Name",
+            title: t_general('name'),
             dataIndex: "name",
             key: "name",
         },
         {
-            title: "Quantity",
+            title: t_general('quantity'),
             dataIndex: "quantity",
             key: "quantity",
         },
         {
-            title: "Amount",
+            title: t_general('amount'),
             dataIndex: "amount",
             key: "amount",
             render: (text, row) => <p>{text} VND</p>
         },
         {
-            title: "Update Time",
+            title: t_general('date'),
             dataIndex: "update_time",
             key: "update_timeaction",
         }];
@@ -399,7 +402,7 @@ const Opportunities: React.FC = () => {
                             pagination={{
                                 className: "bg-white rounded px-4 py-2",
                                 showTotal: (total: number) =>
-                                    `Total ${total} items`,
+                                `${t_general("total")} ${total} ${t_general("item")}`,
                                 position: ["bottomCenter", "bottomRight"],
                                 showSizeChanger: true,
                                 showQuickJumper: true,

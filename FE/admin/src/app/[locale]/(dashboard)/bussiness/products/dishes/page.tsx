@@ -26,7 +26,8 @@ import { useRouter } from "next-intl/client";;
 import fetchClient from "@/lib/fetch-client";
 import CreateProduct from "./create";
 import DeleteItem from "./delete";
- import UpdateProduct from "./update";
+import UpdateProduct from "./update";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -77,6 +78,8 @@ const Dish = () => {
     const [isCreate, setIsCreate] = useState(false)
     const [isDelete, setIsDelete] = useState(false)
     const [isUpdate, setIsUpdate] = useState(false)
+    const t_product: any = useTranslations("Product")
+    const t_general: any = useTranslations("General")
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -95,19 +98,19 @@ const Dish = () => {
     const list_sort = [
         {
             key: "id",
-            title: "ID"
+            title: t_general('id')
         },
         {
             key: "name",
-            title: "Name"
+            title: t_general('name')
         },
         {
             key: "price",
-            title: "Price"
+            title: t_general('price')
         },
         {
             key: "categoryId",
-            title: "Category"
+            title: t_general('category')
         },
     ]
     const [error, setError] = useState<ErrorType>({
@@ -128,44 +131,44 @@ const Dish = () => {
 
     const columns: ColumnsType<DataType> = [
         {
-            title: "ID",
+            title:t_general('id'),
             dataIndex: "id",
             key: "id",
         },
         {
-            title: "Name",
+            title: t_general('name'),
             dataIndex: "name",
             key: "name",
         },
         {
-            title: "Description",
+            title: t_general('description'),
             dataIndex: "description",
             key: "description",
 
         },
         {
-            title: "Price",
+            title: t_general('price'),
             dataIndex: "price",
             key: "price",
             render: (text) => <>{text} VND</>
 
         },
         {
-            title: "Category",
+            title: t_product('category'),
             dataIndex: "category",
             key: "category",
             render: (_, record) => <a style={{ color: "#4A58EC" }}  href="./categories">{record.Category.name}</a>
 
         },
         {
-            title: "Icon",
+            title: t_product("icon"),
             dataIndex: "thumbnails",
             key: "thumbnails",
             render: (text, row) => <>{ <img style={{width: "40px", height: "40px"}} src={text ? text : ""} />}</>
 
         },
         {
-            title: "Action",
+            title: t_general("action"),
             dataIndex: "action",
             key: "action",
             render: (_, record) => <>
@@ -337,7 +340,7 @@ const Dish = () => {
                                 style={{ marginBottom: 0 }}
                                 className='flex items-center gap-2'
                             >
-                                <p>Sort by: </p>
+                                <p>{t_general('sort')}: </p>
                                 <Select
                                     // style={{ width: '20%' }}
                                     placeholder='Columns'
@@ -352,7 +355,7 @@ const Dish = () => {
                                     }))}
                                 />
 
-                                <p>Order: </p>
+                                <p>{t_general('order')}: </p>
 
                                 <Button
                                     onClick={handleToggleSorter}
@@ -365,13 +368,13 @@ const Dish = () => {
                                     }
                                 />
                                 <Button onClick={handleClearAll}>
-                                    Clear sorters
+                                {t_general('clear_filter')}
                                 </Button>
                             </div>
 
                             <div>
                                 <Button icon={<PlusCircleOutlined />} onClick={() => setIsCreate(true)}>
-                                    New
+                                {t_general('new')}
                                 </Button>
                             </div>
                         </div>
@@ -385,7 +388,7 @@ const Dish = () => {
                             pagination={{
                                 className: "bg-white rounded px-4 py-2",
                                 showTotal: (total: number) =>
-                                    `Total ${total} items`,
+                                `${t_general("total")} ${total} ${t_general("item")}`,
                                 position: ["bottomCenter", "bottomRight"],
                                 showSizeChanger: true,
                                 showQuickJumper: true,

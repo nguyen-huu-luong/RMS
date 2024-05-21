@@ -34,7 +34,7 @@ import fetchClient from "@/lib/fetch-client";
 import useSocket from "@/socket";
 import TableRender, { FilterItemType } from "@/components/TableComponents";
 import TableOrderRender from "@/components/TableOrder";
-
+import { useLocale, useTranslations } from "next-intl";
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
     "my-modal-mask": {},
@@ -89,6 +89,8 @@ const Order: React.FC = () => {
     const [items, setItems] = useState<any>([]);
     const [reload, setReload] = useState(false);
     const socket = useSocket();
+    const t_general: any = useTranslations("General")
+    const t_order: any = useTranslations("Order")
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -109,24 +111,24 @@ const Order: React.FC = () => {
 
     const item_columns = [
         {
-            title: "Name",
+            title: t_general('name'),
             dataIndex: "name",
             key: "name",
         },
         {
-            title: "Quantity",
+            title: t_general('quantity'),
             dataIndex: "OrderItem",
             key: "quantity",
             render: (record: any) => <span>{record.quantity}</span>,
         },
         {
-            title: "Price",
+            title: t_general('price'),
             dataIndex: "price",
             key: "price",
             render: (record: any) => <span>{record}</span>,
         },
         {
-            title: "Amount",
+            title: t_general('amount'),
             dataIndex: "OrderItem",
             key: "amount",
             render: (record: any) => <span>{record.amount}</span>,
@@ -212,7 +214,7 @@ const Order: React.FC = () => {
 
     const columns: ColumnsType<DataType> = [
         {
-            title: "ID",
+            title: t_general('id'),
             dataIndex: "id",
             key: "id",
             render: (_, record) => (
@@ -228,7 +230,7 @@ const Order: React.FC = () => {
             ),
         },
         {
-            title: "Fullname",
+            title: t_general('fullname'),
             dataIndex: "fullname",
             key: "fullname",
             render: (_, record) => (
@@ -241,7 +243,7 @@ const Order: React.FC = () => {
             ),
         },
         {
-            title: "Status",
+            title: t_general('status'),
             dataIndex: "status",
             key: "status",
             render: (_, record) => {
@@ -276,12 +278,12 @@ const Order: React.FC = () => {
             },
         },
         {
-            title: "Amount",
+            title: t_general('amount'),
             dataIndex: "amount",
             key: "amount",
         },
         {
-            title: "Created At",
+            title: t_general('created_at'),
             dataIndex: "createdAt",
             key: "createdAt",
             render: (text, record) => {
@@ -289,7 +291,7 @@ const Order: React.FC = () => {
             },
         },
         {
-            title: "Action",
+            title: t_general('action'),
             key: "action",
             render: (_, record) => (
                 <Space size='middle'>
@@ -298,14 +300,14 @@ const Order: React.FC = () => {
                             <a
                                 onClick={() => {
                                     Modal.confirm({
-                                        title: "Accept this order",
+                                        title: t_order('accept_this_order'),
                                         autoFocusButton: null,
                                         okButtonProps: {
                                             style: {
                                                 backgroundColor: "#2b60ff",
                                             },
                                         },
-                                        okText: "Accept",
+                                        okText: t_order('acccept'),
                                         onOk: async () => {
                                             await handleAcceptOrder(record);
                                         },
@@ -319,20 +321,22 @@ const Order: React.FC = () => {
                                 }}
                                 className='text-green-700 hover:text-green-600'
                             >
-                                Accept
+                                {
+                                     t_order('acccept')
+                                }
                             </a>
                             {record.paymentMethod != "MOMO" && (
                                 <a
                                     onClick={() => {
                                         Modal.confirm({
-                                            title: "Reject this order",
+                                            title:  t_order('reject_this_order'),
                                             autoFocusButton: null,
                                             okButtonProps: {
                                                 style: {
                                                     backgroundColor: "#f7454e",
                                                 },
                                             },
-                                            okText: "Reject",
+                                            okText: t_order('reject'),
                                             onOk: async () =>
                                                 await handleRejectOrder(record),
                                             footer: (
@@ -348,7 +352,7 @@ const Order: React.FC = () => {
                                     }}
                                     className='text-red-700 hover:text-red-600'
                                 >
-                                    Reject
+                                    {t_order('reject')}
                                 </a>
                             )}
                         </>
@@ -359,14 +363,14 @@ const Order: React.FC = () => {
                         <a
                             onClick={() => {
                                 Modal.confirm({
-                                    title: "Deliver this order",
+                                    title: t_order('deliver_this_order'),
                                     autoFocusButton: null,
                                     okButtonProps: {
                                         style: {
                                             backgroundColor: "#2b60ff",
                                         },
                                     },
-                                    okText: "Deliver",
+                                    okText: t_order('deliver'),
                                     onOk: async () => await handleDeliverOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
@@ -378,20 +382,22 @@ const Order: React.FC = () => {
                             }}
                             className='text-blue-700 hover:text-blue-600'
                         >
-                            Deliver
+                            {
+                                t_order('deliver')
+                            }
                         </a>
                     ) : record.status == "Delivering" ? (
                         <a
                             onClick={() => {
                                 Modal.confirm({
-                                    title: "Finish delivering this order",
+                                    title: t_order('finish_delivering_this_order'),
                                     autoFocusButton: null,
                                     okButtonProps: {
                                         style: {
                                             backgroundColor: "#2b60ff",
                                         },
                                     },
-                                    okText: "Finish",
+                                    okText: t_order('finish'),
                                     onOk: async () => await handleDoneOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
@@ -403,7 +409,9 @@ const Order: React.FC = () => {
                             }}
                             className='text-blue-700 hover:text-blue-600'
                         >
-                            Done
+                            {
+                                t_order('done')
+                            }
                         </a>
                     ) : (
                         ""
@@ -526,7 +534,7 @@ const Order: React.FC = () => {
             <Modal
                 classNames={classNames}
                 styles={modalStyles}
-                title='Order Information'
+                title={t_order('order_information')}
                 open={open}
                 onOk={handleOk}
                 okType='primary'
@@ -537,26 +545,26 @@ const Order: React.FC = () => {
                 width={800}
             >
                 <Descriptions>
-                    <Descriptions.Item label='Order Id'>
+                    <Descriptions.Item label={t_order('order_id')}>
                         {modalData.id}
                     </Descriptions.Item>
-                    <Descriptions.Item label='Customer'>
+                    <Descriptions.Item label={t_order('customer')}>
                         {modalData.fullname}
                     </Descriptions.Item>
-                    <Descriptions.Item label='Description'>
+                    <Descriptions.Item label={t_general('description')}>
                         {modalData.descriptions}
                     </Descriptions.Item>
-                    <Descriptions.Item label='Payment Method'>
+                    <Descriptions.Item label={t_order('payment_method')}>
                         {modalData.paymentMethod}
                     </Descriptions.Item>
-                    <Descriptions.Item label='Status'>
+                    <Descriptions.Item label={t_general('status')}>
                         {modalData.status}
                     </Descriptions.Item>
-                    <Descriptions.Item label='Date'>
+                    <Descriptions.Item label={t_general('date')}>
                         {modalData.createdAt}
                     </Descriptions.Item>
                 </Descriptions>{" "}
-                <Descriptions title='Items'> </Descriptions>
+                <Descriptions title={t_order('item')}> </Descriptions>
                 <Table
                     columns={item_columns}
                     dataSource={[...items]}
