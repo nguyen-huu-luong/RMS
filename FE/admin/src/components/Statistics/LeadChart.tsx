@@ -19,6 +19,7 @@ import {
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
 import moment from "moment";
+import { useTranslations } from "next-intl";
 ChartJS.register(
     LinearScale,
     CategoryScale,
@@ -33,7 +34,7 @@ ChartJS.register(
 
 const LeadChart = ({ option, component, setComponent }: { option: any, component: any, setComponent: any }) => {
     const [data, setData] = useState<any>(null);
-
+    const t = useTranslations('Overview');
     const {
         data: chartData,
         error: chartError,
@@ -86,7 +87,7 @@ const LeadChart = ({ option, component, setComponent }: { option: any, component
                 datasets: [
                     {
                         type: "line",
-                        label: "New leads",
+                        label: t('new-leads'),
                         borderColor: "rgb(233, 101, 45)",
                         borderWidth: 2,
                         data:
@@ -103,7 +104,7 @@ const LeadChart = ({ option, component, setComponent }: { option: any, component
                     },
                     {
                         type: "line",
-                        label: "New customers",
+                        label: t('new-customers'),
                         backgroundColor: "rgb(14, 156, 255)",
                         data:
                             (option.type == "YEARLY" ||
@@ -127,7 +128,7 @@ const LeadChart = ({ option, component, setComponent }: { option: any, component
     return (
         <div className='flex flex-col gap-2 justify-start w-full shadow-md h-auto rounded-xl bg-white'>
             <div className='p-7 font-bold text-xl text-black flex flex-row justify-between items-center w-full h-auto bg-white rounded-xl -mb-5'>
-                <span>Conversion Chart</span>
+                <span>{t('conversion-chart')}</span>
             </div>
             <div className='p-7 w-full h-[450px]'>
                 <Chart

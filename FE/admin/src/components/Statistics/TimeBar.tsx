@@ -3,6 +3,7 @@ import { useState } from "react";
 import { DatePicker, Flex } from "antd";
 const { RangePicker } = DatePicker;
 import { Radio } from "antd";
+import { useTranslations } from "next-intl";
 type Option = {
     type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM";
     beginDate?: Date;
@@ -10,17 +11,18 @@ type Option = {
 };
 const TimeBar = ({ option, setOption, setComponent }: { option: Option; setOption: any; setComponent: any }) => {
     const [type, setType] = useState<string>("MONTHLY")
+    const t = useTranslations('Overview')
     const options = [
         {
-            label: "This month",
+            label: t('this-month'),
             value: "MONTHLY",
         },
         {
-            label: "This year",
+            label: t('this-year'),
             value: "YEARLY",
         },
         {
-            label: "Custom",
+            label: t('custom'),
             value: "CUSTOM",
         },
     ];

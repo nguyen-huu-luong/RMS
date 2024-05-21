@@ -19,6 +19,7 @@ import {
 import React, { useState } from "react";
 import { createStyles, useTheme } from "antd-style";
 import { AddVoucherForm } from "./AddVoucherForm";
+import { useTranslations } from "next-intl";
 
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
@@ -36,7 +37,7 @@ interface VoucherActionBarProps {
 export const VoucherActionBar: React.FC<VoucherActionBarProps> = (props) => {
     const [open, setOpen] = useState(false);
     const { styles } = useStyle();
-
+    const t = useTranslations('Voucher')
     const showModal = () => {
         setOpen(true);
     };
@@ -83,10 +84,11 @@ export const VoucherActionBar: React.FC<VoucherActionBarProps> = (props) => {
         <main className='bg-white w-full py-2 px-3 rounded-md border'>
             <Flex>
                 {props.dataSelected && props.dataSelected?.length > 0 ? (
-                    <Space>
-                        <p>Selected {props.dataSelected?.length} vouchers</p>
-                        <Button icon={<EllipsisOutlined />} />
-                    </Space>
+                    // <Space>
+                    //     <p>Selected {props.dataSelected?.length} vouchers</p>
+                    //     <Button icon={<EllipsisOutlined />} />
+                    // </Space>
+                    <></>
                 ) : (
                     <Space>
                         <Input
@@ -101,7 +103,7 @@ export const VoucherActionBar: React.FC<VoucherActionBarProps> = (props) => {
 
                 <Space className='ms-auto'>
                     <Button icon={<PlusCircleOutlined />} onClick={showModal}>
-                        New
+                        {t('new')}
                     </Button>
                 </Space>
             </Flex>
@@ -109,7 +111,7 @@ export const VoucherActionBar: React.FC<VoucherActionBarProps> = (props) => {
             <Modal
                 classNames={classNames}
                 styles={modalStyles}
-                title='Add new voucher'
+                title={t('add-new-voucher')}
                 open={open}
                 onOk={handleOk}
                 okType='primary'

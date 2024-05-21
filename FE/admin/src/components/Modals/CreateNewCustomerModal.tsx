@@ -14,7 +14,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 
 export interface ICreateModal {
-    formControl: FormInstance<any>
+    formControl: FormInstance<any> 
     onCreate: (values: any) => Promise<void>,
 }
 export const CreateNewCustomerModal: React.FC<ICreateModal> = ({ formControl, ...props }) => {

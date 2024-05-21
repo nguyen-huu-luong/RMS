@@ -8,6 +8,7 @@ import { message } from "antd";
 import { Tag } from "antd";
 import fetchClient from "@/lib/fetch-client";
 import Avatar from "@/images/avatar.png";
+import { useTranslations } from "next-intl";
 const TimeDisplay = (time: any) => {
     const momentDate = moment(time);
     const isToday = momentDate.isSame(moment(), "day");
@@ -39,6 +40,7 @@ function User({
     staffId: any;
     channelStatus: any;
 }) {
+    const t = useTranslations('Chat')
     useEffect(() => {
         const handleClientMessage = (
             channelId: any,
@@ -167,14 +169,14 @@ function User({
                 .emitWithAck("staff:channel:join", params.channel.id, staffId);
             if (response.status == "0") {
                 message.warning(
-                    `There is other staff in ${params.userName}'s channel!`
+                    `${t('other-1')} ${params.userName}${t('other-2')}`
                 );
             } else {
                 setChannel(params.channel.id);
                 viewMessage();
                 setIndex(1);
                 message.success(
-                    `Join ${params.userName}'s channel successfully!`
+                    `${t('join-1')} ${params.userName}${t('join-2')}`
                 );
             }
         } catch (e) {
@@ -226,7 +228,7 @@ function User({
                 <div> </div>
             </div>
             {params.channel.id in channelStatus ? (
-                <Tag color='#87d068'>Active</Tag>
+                <Tag color='#87d068'>{t('active')}</Tag>
             ) : (
                 <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'>
                     {TimeDisplay(params.latestMessage.createdAt)}
@@ -260,7 +262,7 @@ function User({
                 <div> </div>
             </div>
             {params.channel.id in channelStatus ? (
-                <Tag color='#87d068'>Active</Tag>
+                <Tag color='#87d068'>{t('active')}</Tag>
             ) : (
                 <div className='text-sm w-20 overflow-ellipsis whitespace-nowrap overflow-hidden'></div>
             )}

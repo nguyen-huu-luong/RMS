@@ -15,6 +15,7 @@ import fetchClient from "@/lib/fetch-client";
 import Loading from "../loading";
 import Link from "next-intl/link";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 interface AssignVoucherFormProps {
     voucherId: number;
     form: FormInstance;
@@ -22,14 +23,13 @@ interface AssignVoucherFormProps {
 }
 
 export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
-    const [clients, setClients] = useState<any[]>([]);
     const [voucherClients, setVoucherClients] = useState<any[]>([]);
-    const [selectedClients, setSelectedClients] = useState<number[]>([]);
     const [selectedProfit, setSelectedProfit] = useState<number | null>(null);
     const [customProfit, setCustomProfit] = useState<string>("");
     const [showCustomInput, setShowCustomInput] = useState<boolean>(true);
     const { Option } = Select;
     const params = useParams<{ locale: string }>();
+    const t = useTranslations('Voucher')
 
     useEffect(() => {
         fetchVoucherClients();
@@ -37,7 +37,7 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
 
     const columns = [
         {
-            title: "Full Name",
+            title: t('name'),
             dataIndex: "fullname",
             key: "fullname",
             render: (text: any, record: any) => (
@@ -47,7 +47,7 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
             ),
         },
         {
-            title: "Status",
+            title: t('status'),
             dataIndex: "status",
             key: "status",
         },
@@ -87,21 +87,21 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
                     data_return: true,
                 });
                 if (response === "Success") {
-                    message.success("Assign voucher successfully");
+                    message.success(t('assign-success'));
                 } else if (response === "Already assigned") {
                     message.warning(
-                        "All chosen clients have already got this voucher"
+                        t('all')
                     );
                 } else {
                     Modal.confirm({
-                        title: `There is not enough vouchers, add ${response.more} vouchers?`,
+                        title: `${t('not-enough-1')} ${response.more} ${t('not-enough-2')}`,
                         autoFocusButton: null,
                         okButtonProps: {
                             style: {
                                 backgroundColor: "#2b60ff",
                             },
                         },
-                        okText: "Finish",
+                        okText: t('finish'),
                         onOk: () => handleAddMore(response.more),
                         footer: (_, { OkBtn, CancelBtn }) => (
                             <>
@@ -138,7 +138,7 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
     return (
         <div className='flex flex-col justify-start gap-2'>
             <div>
-                Select profit or customer:
+                {t('select')}
                 <Select
                     style={{ width: "100%" }}
                     placeholder='Please select'
@@ -152,12 +152,12 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
                     <Option value={500000}>{">"} 500,000</Option>
                     <Option value={1000000}>{">"} 1,000,000</Option>
                     <Option value={2000000}>{">"} 2,000,000</Option>
-                    <Option value={null}>Custom</Option>
+                    <Option value={null}>{t('custom')}</Option>
                 </Select>
                 {showCustomInput && (
                     <Input
                         style={{ marginTop: "8px" }}
-                        placeholder='Enter custom profit'
+                        placeholder={t('select-custom')}
                         value={customProfit}
                         onChange={handleCustomInputChange}
                         type='number'
@@ -165,13 +165,13 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
                 )}
             </div>
             {selectedProfit || customProfit ? (
-                <Button onClick={handleAssign}>Assign</Button>
+                <Button onClick={handleAssign}>{t('assign')}</Button>
             ) : (
                 ""
             )}
             <div>
                 {voucherClients.length === 0 ? (
-                    <Empty description='No voucher clients yet' />
+                    <Empty description={t('empty')} />
                 ) : (
                     <Table
                         columns={columns}
@@ -180,8 +180,8 @@ export const AssignVoucherForm: React.FC<AssignVoucherFormProps> = (props) => {
                             id: client.id,
                             fullname: `${client.firstname} ${client.lastname}`,
                             status: client.ClientVoucher.status
-                                ? "Used"
-                                : "Available",
+                                ? t('used')
+                                : t('available'),
                         }))}
                         pagination={{ pageSize: 5 }}
                     />
