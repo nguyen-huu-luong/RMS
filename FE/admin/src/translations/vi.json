@@ -84,6 +84,9 @@
 		"deliver_this_order": "Giao đơn hàng",
 		"finish_delivering_this_order": "Hoàn thành đơn hàng",
 		"order_information": "Thông tin đơn hàng",
+		"cart_information": "Thông tin giỏ hàng",
+		"total_amount": "Tổng tiền", 
+		"view_cart": "Xem giỏ hàng",
 		"acccept": "Chấp nhận",
 		"reject": "Từ chối",
 		"deliver": "Giao hàng",
@@ -128,7 +131,8 @@
 		"payment_method": "Phương thức thanh toán",
 		"make_payment": "Thanh toán",
 		"success_payment": "THANH TOÁN THÀNH CÔNG",
-		"go_to_reservation_management_page": "ĐẾN TRANG QUẢN LÝ ĐẶT BÀN"
+		"go_to_reservation_management_page": "ĐẾN TRANG QUẢN LÝ ĐẶT BÀN",
+		"notification": "Thông báo"
 	},
 	"Product": {
 		"product_management": "Quản lý sản phẩm",

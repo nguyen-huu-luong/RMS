@@ -548,7 +548,7 @@ function Home() {
                             }}
                         >
                             <Drawer
-                                title='Notification'
+                                title={t_reservation('notification')}
                                 placement='right'
                                 closable={false}
                                 onClose={onClose}
