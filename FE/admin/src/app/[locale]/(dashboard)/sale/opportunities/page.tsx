@@ -143,7 +143,7 @@ const Opportunities: React.FC = () => {
             title: t_general('action'),
             dataIndex: "action",
             key: "action",
-            render: (text, row, index) => <Button color="primary" onClick={() => handleOpenModalCart(index, row.fullname, row.amount)}>View cart</Button>
+            render: (text, row, index) => <Button color="primary" onClick={() => handleOpenModalCart(index, row.fullname, row.amount)}>{t_order('view_cart')}</Button>
         }];
 
 
@@ -361,7 +361,7 @@ const Opportunities: React.FC = () => {
                             style={{ marginBottom: 0 }}
                             className='flex items-center gap-2'
                         >
-                            <p>Sort by: </p>
+                            <p>{t_general('sort')}: </p>
                             <Select
                                 // style={{ width: '20%' }}
                                 placeholder='Columns'
@@ -376,7 +376,7 @@ const Opportunities: React.FC = () => {
                                 }))}
                             />
 
-                            <p>Order: </p>
+                            <p>{t_general('order')}: </p>
 
                             <Button
                                 onClick={handleToggleSorter}
@@ -389,7 +389,7 @@ const Opportunities: React.FC = () => {
                                 }
                             />
                             <Button onClick={handleClearAll}>
-                                Clear sorters
+                            {t_general('clear_filter')}
                             </Button>
                         </div>
                     </div>
@@ -417,19 +417,19 @@ const Opportunities: React.FC = () => {
                 </div>
             </ConfigProvider>
 
-            <Modal title="Cart Information" open={isModalCart} onCancel={handleCloseModalCart} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
+            <Modal title={t_order('cart_information')} open={isModalCart} onCancel={handleCloseModalCart} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
                 {
                     cartItems &&
                     <div>
                         <div className="flex justify-between">
                             <div>
-                                <p className="font-semibold">Full Name</p>
+                                <p className="font-semibold">{t_general('fullname')}</p>
                                 <p>
                                     {cartItems.username}
                                 </p>
                             </div>
                             <div>
-                                <p className="font-semibold">Total amount</p>
+                                <p className="font-semibold">{t_order('total_amount')}</p>
                                 <p>
                                     {cartItems.amount} VND
                                 </p>

@@ -239,7 +239,8 @@ function Home() {
     };
 
     const getCustomerInfo = async () => {
-        const email = form.getFieldValue('email')
+        let email = form.getFieldValue('email')
+        email = email.trim()
         if (email == "") {}
         else {
             const data: any = await  fetchClient({url: `/customers/all?email=${email}`, data_return: true})
@@ -299,7 +300,7 @@ function Home() {
                 }}
             >
                 <Drawer
-                    title='Notification'
+                    title={t_reservation('notification')}
                     placement='right'
                     closable={false}
                     onClose={onClose}
@@ -388,7 +389,7 @@ function Home() {
                 style={{ height: "100%", paddingTop: "10px" }}
             >
                 <Modal
-                    title='Make payment'
+                    title={t_reservation('make_payment')}
                     open={open}
                     confirmLoading={confirmLoading}
                     footer={(_, { OkBtn, CancelBtn }) => <></>}
@@ -493,7 +494,7 @@ function Home() {
                                     name='email'
                                     label={
                                         <span className='whitespace-nowrap font-bold text-md'>
-                                            {t_general('phone')}
+                                            {t_general('email')}
                                         </span>
                                     }
                                     rules={[

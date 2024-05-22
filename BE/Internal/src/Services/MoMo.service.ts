@@ -30,7 +30,7 @@ export class MoMoService {
         var redirectUrl = `http://${process.env.USER_HOST}:${process.env.USER_PORT}/en/payment?method=MOMO`;
         var ipnUrl = `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api/order/momo`;
         var requestType = "payWithMethod";
-        var amount = req.body["discountAmount"];
+        var amount = req.body["discountAmount"] + req.body["shippingCost"];
         
         if (req.body["voucherId"] === 0) {
             amount = cart.amount + req.body["shippingCost"]
