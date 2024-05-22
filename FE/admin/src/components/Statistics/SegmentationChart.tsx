@@ -20,6 +20,7 @@ import { Chart } from "react-chartjs-2";
 import Loading from "../loading";
 import fetchClient from "@/lib/fetch-client";
 import { FilterDate } from "../TableComponents/FilterItems/FilterDate";
+import { useLocale, useTranslations } from "next-intl";
 
 ChartJS.register(
     LinearScale,
@@ -36,18 +37,18 @@ ChartJS.register(
 const SegmentationChart = () => {
 
     const dateFormat = "YYYY-MM-DD";
-
+    const t_report: any = useTranslations("Report")
     const options = [
         {
-            label: "Monthly",
+            label: t_report('month'),
             value: "Month",
         },
         {
-            label: "Yearly",
+            label: t_report('year'),
             value: "Year",
         },
         {
-            label: "Custom",
+            label: t_report('custom'),
             value: "Custom",
         },
     ];
@@ -189,7 +190,7 @@ const SegmentationChart = () => {
                     : (
                         <div className='flex flex-col gap-2 justify-start w-full shadow-md h-auto rounded-xl bg-white'>
                             <div className='p-7 font-bold text-xl text-black flex flex-row justify-between items-center w-full h-auto bg-white rounded-xl -mb-5'>
-                                <span>Cusomer Group Chart</span>
+                                <span>{t_report('cusomer_group_chart')}</span>
                             </div>
                             <div className='p-7 w-full h-[450px]'>
                                 <Chart

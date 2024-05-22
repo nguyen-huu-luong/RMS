@@ -308,6 +308,7 @@ const Order: React.FC = () => {
                                             },
                                         },
                                         okText: t_order('acccept'),
+                                        cancelText: t_general('cancel'),
                                         onOk: async () => {
                                             await handleAcceptOrder(record);
                                         },
@@ -337,6 +338,7 @@ const Order: React.FC = () => {
                                                 },
                                             },
                                             okText: t_order('reject'),
+                                            cancelText: t_general('cancel'),
                                             onOk: async () =>
                                                 await handleRejectOrder(record),
                                             footer: (
@@ -371,6 +373,7 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: t_order('deliver'),
+                                    cancelText: t_general('cancel'),
                                     onOk: async () => await handleDeliverOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
@@ -398,6 +401,7 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: t_order('finish'),
+                                    cancelText: t_general('cancel'),
                                     onOk: async () => await handleDoneOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>

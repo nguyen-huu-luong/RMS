@@ -167,7 +167,24 @@
 		"order_chart": "Biểu đồ đơn hàng",
 		"conversion_chart": "Biểu đồ chuyển đổi",
 		"new_leads": "Khách hàng tiềm năng mới",
-		"new_customers": "Khách hàng mới"
+		"new_customers": "Khách hàng mới",
+		"customer_group_overview": "Tổng quan phân khúc khách hàng",
+		"group_name": "Tên nhóm",
+		"popular_gender": "Giới tính phổ biến",
+		"popular_source": "Nguồn phổ biên",
+		"month": "Tháng",
+		"year": "Năm",
+		"cusomer_group_chart": "Biểu đồ phân khúc khách hàng"
+	},
+	"Chef": {
+		"date_order": "Ngày đặt",
+		"time_order": "Thời gian đặt",
+		"note": "Ghi chú",
+		"to_do": "Cần làm",
+		"processing": "Đang làm",
+		"done": "Hoàn thành",
+		"order": "Đơn hàng",
+		"pos_table": "Bàn"
 	},
 	"Sidebar": {
 		"overview": "Tổng quan",
