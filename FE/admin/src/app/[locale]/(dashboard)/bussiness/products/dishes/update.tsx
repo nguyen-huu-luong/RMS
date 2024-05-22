@@ -5,11 +5,14 @@ import type { UploadProps } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadImage } from '@/app/api/upload';
 import fetchClient from '@/lib/fetch-client';
+import { useLocale, useTranslations } from "next-intl";
 
 const UpdateProduct = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data, category }: { isUpdate: any, setIsUpdate: any, setIsReFetch: any, currentItem: any, data: any, category: any }) => {
 
     const [form_update_product] = Form.useForm();
     const real_name = currentItem?.name
+    const t_product: any = useTranslations("Product")
+    const t_general: any = useTranslations("General")
 
     form_update_product.setFields([{ name: "product_name", value: currentItem?.name }, { name: "description", value: currentItem?.description },
                                      { name: "category", value: currentItem?.categoryId }, { name: "price", value: currentItem?.price }])
@@ -93,13 +96,13 @@ const UpdateProduct = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data,
     return (
         <>
 
-            <Modal title="Product Information" open={isUpdate} onCancel={handleCancel} destroyOnClose={true} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
+            <Modal title={t_product('product_information')} open={isUpdate} onCancel={handleCancel} destroyOnClose={true} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
                 <Form form={form_update_product} name="basic" onFinish={handleUpdate} >
                     <div className='relative'>
                         <div className='flex justify-between'>
                             <div style={{ width: "48%" }}>
                                 <p>
-                                    Name
+                                {t_general('name')}
                                 </p>
                                 <Form.Item
                                     name="product_name"
@@ -121,7 +124,7 @@ const UpdateProduct = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data,
                             </div>
                             <div style={{ width: "48%" }}>
                                 <p>
-                                    Category
+                                {t_product('category')}
                                 </p>
                                 <Form.Item
                                     name="category"
@@ -136,7 +139,7 @@ const UpdateProduct = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data,
                         </div>
                         <div>
                             <p>
-                                Description
+                                {t_general('description')}
                             </p>
                             <Form.Item name="description"
                                 rules={[{ required: true, message: 'Please input the product description !' }]}>
@@ -147,7 +150,7 @@ const UpdateProduct = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data,
                         <div className='flex justify-between'>
                             <div style={{ width: "48%" }}>
                                 <p>
-                                    Icon
+                                {t_product('icon')}
                                 </p>
                                 <Form.Item name="upload">
                                     <Upload
@@ -158,13 +161,13 @@ const UpdateProduct = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data,
                                         onRemove={handleRemove}
                                     >
 
-                                        <Button style={{ width: "100% !important" }} icon={<UploadOutlined />}>Upload Icon</Button>
+                                        <Button style={{ width: "100% !important" }} icon={<UploadOutlined />}>{t_product('upload_icon')}</Button>
                                     </Upload>
                                 </Form.Item>
                             </div>
                             <div style={{ width: "48%" }}>
                                 <p>
-                                    Price
+                                {t_general('price')}
                                 </p>
                                 <Form.Item
                                     name="price"
@@ -186,10 +189,10 @@ const UpdateProduct = ({ isUpdate, setIsUpdate, setIsReFetch, currentItem, data,
                         <Form.Item >
                             <div className='flex justify-end mt-3' style={{ width: "100%" }}>
                                 <div className='pr-3'>
-                                    <Button style={{ backgroundColor: "#989898", color: "white" }} htmlType="button" onClick={handleCancel}>CANCEL</Button>
+                                    <Button style={{ backgroundColor: "#989898", color: "white" }} htmlType="button" onClick={handleCancel}>{t_general('cancel').toUpperCase()}</Button>
                                 </div>
                                 <div>
-                                    <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">CONFIRM</Button>
+                                    <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">{t_general('change').toUpperCase()}</Button>
                                 </div>
                             </div>
                         </Form.Item>

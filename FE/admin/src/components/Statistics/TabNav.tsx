@@ -1,9 +1,10 @@
 import React from 'react';
 import { ReconciliationOutlined, PieChartOutlined } from '@ant-design/icons';
 import { Tabs } from 'antd';
-
+import { useLocale, useTranslations } from "next-intl";
 const TabNav = ({setReportType}: {setReportType: any}) => {
-    const title = ["Business operation", "Customer group"]
+    const t_report: any = useTranslations("Report")
+    const title = [t_report('business_operation'), t_report('customer_group')]
 
     const tabClickHandle = (key: any) => {
         setReportType(key)

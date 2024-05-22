@@ -6,6 +6,7 @@ import { Modal, Descriptions, message } from "antd";
 import { createStyles } from "antd-style";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
+import { useLocale, useTranslations } from "next-intl";
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
     "my-modal-mask": {},
@@ -42,6 +43,8 @@ function Item({
         content: styles["my-modal-content"],
     };
     const [open, setOpen] = useState(false);
+    const t_chef: any = useTranslations("Chef")
+    const t_general: any = useTranslations("General")
     const modalStyles = {
         header: {
             borderRadius: 0,
@@ -125,7 +128,7 @@ function Item({
                         : item.CartItem.cartId}
                 </span>
                 <span className='flex justify-start items-center font-bold text-black text-md'>
-                    Quantity:{" "}
+                    {t_general('quantity')}:{" "}
                     {item.OrderItem
                         ? item.OrderItem.quantity
                         : item.CartItem.quantity}
@@ -151,8 +154,8 @@ function Item({
                 styles={modalStyles}
                 title={`${
                     item.OrderItem
-                        ? "Order #" + item.OrderItem.orderId
-                        : "POS Table #" + item.CartItem.cartId
+                        ? t_chef('order') + item.OrderItem.orderId
+                        : t_chef('pos_table') + ' #' + item.CartItem.cartId
                 }`}
                 open={open}
                 onOk={handleOk}
@@ -164,13 +167,13 @@ function Item({
                 width={800}
             >
                 <Descriptions layout='vertical'>
-                    <Descriptions.Item label='Date order'>
+                    <Descriptions.Item label={t_chef('date_order')}>
                         {moment(order.createdAt).format("DD-MM-YYYY")}
                     </Descriptions.Item>
-                    <Descriptions.Item label='Time order'>
+                    <Descriptions.Item label={t_chef('time_order')}>
                         {moment(order.createdAt).format("hh:mm")}
                     </Descriptions.Item>
-                    <Descriptions.Item label='Note'>
+                    <Descriptions.Item label={t_chef('note')}>
                         {order.descriptions}
                     </Descriptions.Item>
                 </Descriptions>

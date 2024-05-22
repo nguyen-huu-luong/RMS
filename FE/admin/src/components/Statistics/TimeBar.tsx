@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import { DatePicker, Flex } from "antd";
+import { useLocale, useTranslations } from "next-intl";
 const { RangePicker } = DatePicker;
 import { Radio } from "antd";
-import { useTranslations } from "next-intl";
 type Option = {
     type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM";
     beginDate?: Date;

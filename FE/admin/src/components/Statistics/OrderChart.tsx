@@ -3,6 +3,7 @@ import fetchClient from "@/lib/fetch-client";
 import Card from "@/components/Statistics/Card";
 import useSWR from "swr";
 import Loading from "../loading";
+import { useLocale, useTranslations } from "next-intl";
 
 import {
     Chart as ChartJS,
@@ -19,7 +20,6 @@ import {
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
 import moment from "moment";
-import { useTranslations } from "next-intl";
 ChartJS.register(
     LinearScale,
     CategoryScale,

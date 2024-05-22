@@ -7,6 +7,7 @@ import { message } from "antd";
 import useSocket from "@/socket";
 import fetchClient from "@/lib/fetch-client";
 import Loading from "@/components/loading";
+import { useLocale, useTranslations } from "next-intl";
 
 function Chef() {
     const router = useRouter();
@@ -16,6 +17,7 @@ function Chef() {
     const [doneItems, setDoneItems] = useState<any>(null);
     const [refetch, setRefetch] = useState<boolean>(false);
     const { data: session, status } = useSession();
+    const t_chef: any = useTranslations("Chef")
     const socket = useSocket();
     useEffect(() => {
         if (!socket) return;
@@ -144,7 +146,7 @@ function Chef() {
     return (
         <div className='flex flex-row justify-between gap-10 w-full h-[680px] p-5'>
             <Column
-                name={"To do"}
+                name={t_chef('to_do')}
                 items={preparingItems}
                 refetch={setRefetch}
                 orders={orders}
@@ -154,7 +156,7 @@ function Chef() {
                 socket={socket}
             />
             <Column
-                name={"Processing"}
+                name={t_chef('processing')}
                 items={cookingItems}
                 refetch={setRefetch}
                 orders={orders}
@@ -164,7 +166,7 @@ function Chef() {
                 socket={socket}
             />
             <Column
-                name={"Done"}
+                name={t_chef('done')}
                 items={doneItems}
                 refetch={setRefetch}
                 orders={orders}

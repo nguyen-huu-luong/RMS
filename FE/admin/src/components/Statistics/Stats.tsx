@@ -3,13 +3,14 @@ import fetchClient from "@/lib/fetch-client";
 import Card from "@/components/Statistics/Card";
 import useSWR from "swr";
 import Loading from "../loading";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 type Option = {
     type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM";
     beginDate?: Date;
     endDate?: Date;
 };
+
 
 const Stats = ({
     option,
@@ -32,7 +33,6 @@ const Stats = ({
         async (url: string) =>
             await fetchClient({ url: url, data_return: true })
     );
-
     useEffect(() => {
         if (!statsLoading) {
             if (option.type === "DAILY") {
