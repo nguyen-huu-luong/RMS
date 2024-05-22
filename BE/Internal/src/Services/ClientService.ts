@@ -12,6 +12,7 @@ import { Op, where } from 'sequelize';
 import * as dotenv from 'dotenv';
 import Sequelize from 'sequelize';
 import { sequelize } from '../Configs';
+import { IChannelRepository } from '../Repositories/IChannelRepository';
 const axios = require('axios').default;
 
 
@@ -34,7 +35,7 @@ export class ClientService {
         private cartRepository = container.get<ICartRepository>(TYPES.ICartRepository),
         private productRepository = container.get<IProductRepository>(TYPES.IProductRepository),
         private groupRepository = container.get<IGroupRepository>(TYPES.IGroupRepository),
-
+        private channelRepository = container.get<IChannelRepository>(TYPES.IChannelRepository)
     ) { }
 
     public async getAll(options?: QueryOptions) {
@@ -62,13 +63,21 @@ export class ClientService {
         if (user) {
             throw new CustomError(HttpStatusCode.Conflict, ErrorName.CONFLICT, `User existss with id=<${user.id}>`)
         }
-
+ 
         if (!type && typeof type === "string") {
             data.type = "lead"
         } else if (type.toLocaleLowerCase() === "customer") {
             data.type = "customer"
         }
-        return await this.clientRepository.create(data)
+        const client = await this.clientRepository.create(data)
+        await client.createChannel()
+        const channel = await client.getChannel();
+        await client.createMessage({
+            content: "Welcome to home cuisine!",
+            employeeId: 1,
+            channelId: channel.getDataValue("id"),
+        });
+        return client;
     }
 
     public async update(id: number, data: any) {

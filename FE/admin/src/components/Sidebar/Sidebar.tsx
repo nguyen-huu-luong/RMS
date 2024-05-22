@@ -9,7 +9,8 @@ import {
 	LineChartOutlined,
 	PicRightOutlined,
 	DeliveredProcedureOutlined,
-	HomeOutlined 
+	HomeOutlined, 
+	FireOutlined
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { Button } from "antd";
@@ -131,24 +132,30 @@ export default function Sidebar() {
 				}
 			],
 		},
-
 		{
 			title: t("chat-center"),
 			itemId: "/chat",
 			navigateTo: "/chat",
 			icon: <UserAddOutlined />,
 		},
+		{
+			title: t("chef"),
+			itemId: "/chef",
+			navigateTo: "/chef",
+			icon: <FireOutlined />,
+		},
 	]
 
 	const employeeTabs = ["/overview", "/customers", "/leads", "/sale", "/chat" ]
-	const chefTab = []
+	const chefTab = ["/chef"]
 
 	let items:INavItemProps[] = []
-	console.log(role)
 	if (role === "manager") {
-		items = allItems
+		items = allItems.filter(item => item.itemId !== "/chef")
 	} else if (role === "employee") {
 		items = allItems.filter(item => employeeTabs.includes(item.itemId))
+	} else if (role === "chef"){
+		items = allItems.filter(item => chefTab.includes(item.itemId))
 	}
 	
 	

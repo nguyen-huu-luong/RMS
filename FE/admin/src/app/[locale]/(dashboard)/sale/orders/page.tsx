@@ -1,27 +1,14 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    Button,
-    ConfigProvider,
     InputRef,
     Table,
-    Input,
     Space,
-    Select,
-    Alert,
     Descriptions,
     Tag,
 } from "antd";
 import { TableProps, GetProp, TableColumnType } from "antd";
-import { variables } from "@/app";
-import {
-    SearchOutlined,
-    SortAscendingOutlined,
-    SortDescendingOutlined,
-} from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import type {
-    FilterConfirmProps,
     Key,
     SortOrder,
 } from "antd/es/table/interface";
@@ -32,9 +19,9 @@ import moment from "moment";
 import { message } from "antd";
 import fetchClient from "@/lib/fetch-client";
 import useSocket from "@/socket";
-import TableRender, { FilterItemType } from "@/components/TableComponents";
 import TableOrderRender from "@/components/TableOrder";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
     "my-modal-mask": {},
@@ -78,57 +65,32 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const Order: React.FC = () => {
-    const [checker, setChecker] = useState(true);
-    const [searchText, setSearchText] = useState("");
-    const [searchedColumn, setSearchedColumn] = useState("");
-    const searchInput = useRef<InputRef>(null);
-    const [data, setData] = useState<DataType[]>();
-    const [loading, setLoading] = useState(false);
-    const [selectedOrders, setSelectedOrders] = useState<DataType[]>();
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState<any>([]);
     const [reload, setReload] = useState(false);
     const socket = useSocket();
-    const t_general: any = useTranslations("General")
-    const t_order: any = useTranslations("Order")
-    const [tableParams, setTableParams] = useState<TableParams>({
-        pagination: {
-            current: 1,
-            pageSize: 10,
-            total: 0,
-        },
-        filters: {},
-        sorter: {
-            field: "id",
-            order: "ascend",
-        },
-    });
-    const [error, setError] = useState<ErrorType>({
-        isError: false,
-        message: "",
-        title: "",
-    });
+    const t_order = useTranslations('Order')
 
     const item_columns = [
         {
-            title: t_general('name'),
+            title: t_order('name'),
             dataIndex: "name",
             key: "name",
         },
         {
-            title: t_general('quantity'),
+            title: t_order('quantity'),
             dataIndex: "OrderItem",
             key: "quantity",
             render: (record: any) => <span>{record.quantity}</span>,
         },
         {
-            title: t_general('price'),
+            title: t_order('price'),
             dataIndex: "price",
             key: "price",
             render: (record: any) => <span>{record}</span>,
         },
         {
-            title: t_general('amount'),
+            title: t_order('amount'),
             dataIndex: "OrderItem",
             key: "amount",
             render: (record: any) => <span>{record.amount}</span>,
@@ -151,15 +113,15 @@ const Order: React.FC = () => {
     useEffect(() => {
         if (!socket) return;
         socket.on("order:finish:fromChef", async (orderId: any) => {
-            message.success(`Finish order #${orderId}! Ready to deliver!`);
+            message.success(`${t_order('finish-1')} #${orderId}${t_order('finish-2')}`);
             setReload((prev) => !prev)
         });
         socket.on("cancelOrder:fromClient", async (orderId: any) => {
-            message.warning(`Order #${orderId} is cancel by client!`);
+            message.warning(`${t_order('cancel-1')} #${orderId} ${t_order('cancel-2')}`);
             setReload((prev) => !prev)
         });
         socket.on("newOrder:fromClient", async (name: any) => {
-            message.success(`New order from client ${name}!`);
+            message.success(`${t_order('new-order')} ${name}!`);
             setReload((prev) => !prev)
         });
         return () => {
@@ -214,7 +176,7 @@ const Order: React.FC = () => {
 
     const columns: ColumnsType<DataType> = [
         {
-            title: t_general('id'),
+            title: "ID",
             dataIndex: "id",
             key: "id",
             render: (_, record) => (
@@ -230,7 +192,7 @@ const Order: React.FC = () => {
             ),
         },
         {
-            title: t_general('fullname'),
+            title: t_order('fullname'),
             dataIndex: "fullname",
             key: "fullname",
             render: (_, record) => (
@@ -243,7 +205,7 @@ const Order: React.FC = () => {
             ),
         },
         {
-            title: t_general('status'),
+            title: t_order('status'),
             dataIndex: "status",
             key: "status",
             render: (_, record) => {
@@ -251,39 +213,69 @@ const Order: React.FC = () => {
                 switch (record.status) {
                     case "Cancel":
                         color = "red";
+                        return (
+                            <Space size='small'>
+                                <Tag color={color}>{t_order('cancel')}</Tag>
+                            </Space>
+                        );
                         break;
                     case "Pending":
                         color = "blue";
+                        return (
+                            <Space size='small'>
+                                <Tag color={color}>{t_order('pending')}</Tag>
+                            </Space>
+                        );
                         break;
                     case "Preparing":
                         color = "green";
+                        return (
+                            <Space size='small'>
+                                <Tag color={color}>{t_order('preparing')}</Tag>
+                            </Space>
+                        );
                         break;
                     case "Ready":
                         color = "orange";
+                        return (
+                            <Space size='small'>
+                                <Tag color={color}>{t_order('ready')}</Tag>
+                            </Space>
+                        );
                         break;
                     case "Delivering":
                         color = "yellow";
+                        return (
+                            <Space size='small'>
+                                <Tag color={color}>{t_order('delivering')}</Tag>
+                            </Space>
+                        );
                         break;
                     case "Done":
                         color = "purple";
+                        return (
+                            <Space size='small'>
+                                <Tag color={color}>{t_order('done')}</Tag>
+                            </Space>
+                        );
                         break;
                     default:
                         break;
                 }
                 return (
                     <Space size='small'>
-                        <Tag color={color}>{record.status.toUpperCase()}</Tag>
+                        <Tag color={color}>Default</Tag>
                     </Space>
                 );
             },
         },
         {
-            title: t_general('amount'),
+            title: t_order('amount'),
             dataIndex: "amount",
             key: "amount",
         },
         {
-            title: t_general('created_at'),
+            title: t_order('created-at'),
             dataIndex: "createdAt",
             key: "createdAt",
             render: (text, record) => {
@@ -291,7 +283,7 @@ const Order: React.FC = () => {
             },
         },
         {
-            title: t_general('action'),
+            title: t_order('action'),
             key: "action",
             render: (_, record) => (
                 <Space size='middle'>
@@ -300,15 +292,14 @@ const Order: React.FC = () => {
                             <a
                                 onClick={() => {
                                     Modal.confirm({
-                                        title: t_order('accept_this_order'),
+                                        title: t_order('accept-this-order'),
                                         autoFocusButton: null,
                                         okButtonProps: {
                                             style: {
                                                 backgroundColor: "#2b60ff",
                                             },
                                         },
-                                        okText: t_order('acccept'),
-                                        cancelText: t_general('cancel'),
+                                        okText: t_order('accept'),
                                         onOk: async () => {
                                             await handleAcceptOrder(record);
                                         },
@@ -322,15 +313,13 @@ const Order: React.FC = () => {
                                 }}
                                 className='text-green-700 hover:text-green-600'
                             >
-                                {
-                                     t_order('acccept')
-                                }
+                                {t_order('accept')}
                             </a>
                             {record.paymentMethod != "MOMO" && (
                                 <a
                                     onClick={() => {
                                         Modal.confirm({
-                                            title:  t_order('reject_this_order'),
+                                            title: t_order('reject-this-order'),
                                             autoFocusButton: null,
                                             okButtonProps: {
                                                 style: {
@@ -338,7 +327,6 @@ const Order: React.FC = () => {
                                                 },
                                             },
                                             okText: t_order('reject'),
-                                            cancelText: t_general('cancel'),
                                             onOk: async () =>
                                                 await handleRejectOrder(record),
                                             footer: (
@@ -365,7 +353,7 @@ const Order: React.FC = () => {
                         <a
                             onClick={() => {
                                 Modal.confirm({
-                                    title: t_order('deliver_this_order'),
+                                    title: t_order('deliver-this-order'),
                                     autoFocusButton: null,
                                     okButtonProps: {
                                         style: {
@@ -373,7 +361,6 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: t_order('deliver'),
-                                    cancelText: t_general('cancel'),
                                     onOk: async () => await handleDeliverOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
@@ -385,15 +372,13 @@ const Order: React.FC = () => {
                             }}
                             className='text-blue-700 hover:text-blue-600'
                         >
-                            {
-                                t_order('deliver')
-                            }
+                            {t_order('deliver')}
                         </a>
                     ) : record.status == "Delivering" ? (
                         <a
                             onClick={() => {
                                 Modal.confirm({
-                                    title: t_order('finish_delivering_this_order'),
+                                    title: t_order('finish-delivering-this-order'),
                                     autoFocusButton: null,
                                     okButtonProps: {
                                         style: {
@@ -401,7 +386,6 @@ const Order: React.FC = () => {
                                         },
                                     },
                                     okText: t_order('finish'),
-                                    cancelText: t_general('cancel'),
                                     onOk: async () => await handleDoneOrder(record),
                                     footer: (_, { OkBtn, CancelBtn }) => (
                                         <>
@@ -413,9 +397,7 @@ const Order: React.FC = () => {
                             }}
                             className='text-blue-700 hover:text-blue-600'
                         >
-                            {
-                                t_order('done')
-                            }
+                            {t_order('done')}
                         </a>
                     ) : (
                         ""
@@ -514,20 +496,6 @@ const Order: React.FC = () => {
         }
         setReload((prev) => !prev)
     };
-    // const filterItems: FilterItemType[] = [
-    //     {
-    //         key: "1",
-    //         title: "Status",
-    //         fieldName: "status",
-    //         type: "input",
-    //     },
-    //     {
-    //         key: "6",
-    //         title: "CreatedAt",
-    //         fieldName: "createdAt",
-    //         type: "date",
-    //     },
-    // ];
     return (
         <>
             <TableOrderRender<DataType>
@@ -538,37 +506,37 @@ const Order: React.FC = () => {
             <Modal
                 classNames={classNames}
                 styles={modalStyles}
-                title={t_order('order_information')}
+                title={t_order('order-information')}
                 open={open}
                 onOk={handleOk}
                 okType='primary'
                 okButtonProps={{ className: "bg-primary" }}
-                cancelText='Cancel'
+                cancelText={t_order('cancel')}
                 onCancel={handleCancel}
                 footer={null}
                 width={800}
             >
                 <Descriptions>
-                    <Descriptions.Item label={t_order('order_id')}>
+                    <Descriptions.Item label={t_order('order-id')}>
                         {modalData.id}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t_order('customer')}>
+                    <Descriptions.Item label={t_order('fullname')}>
                         {modalData.fullname}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t_general('description')}>
+                    <Descriptions.Item label={t_order('description')}>
                         {modalData.descriptions}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t_order('payment_method')}>
+                    <Descriptions.Item label={t_order('payment-method')}>
                         {modalData.paymentMethod}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t_general('status')}>
+                    <Descriptions.Item label={t_order('status')}>
                         {modalData.status}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t_general('date')}>
+                    <Descriptions.Item label={t_order('date')}>
                         {modalData.createdAt}
                     </Descriptions.Item>
                 </Descriptions>{" "}
-                <Descriptions title={t_order('item')}> </Descriptions>
+                <Descriptions title={t_order('items')}> </Descriptions>
                 <Table
                     columns={item_columns}
                     dataSource={[...items]}

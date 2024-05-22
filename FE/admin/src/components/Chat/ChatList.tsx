@@ -3,6 +3,7 @@ import User from "./User";
 import fetchClient from "@/lib/fetch-client";
 import { fetchData } from "next-auth/client/_utils";
 import Loading from "../loading";
+import { useTranslations } from "next-intl";
 
 const ChatList = ({
     id,
@@ -23,6 +24,7 @@ const ChatList = ({
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [searchParams, setSearchParams] = useState<string>("");
     const [channelStatus, setChannelStatus] = useState<any>({});
+    const t = useTranslations('Chat');
     const fetchChannels = useCallback(async () => {
         try {
             const fetchedData = await fetchClient({
@@ -144,7 +146,7 @@ const ChatList = ({
                 className='header h-10 items-center align-middle w-full text-lg font-bold flex flex-row 
             justify-center border-b-2 border-primary border-opacity-10 shadow-sm'
             >
-                <p>All customers</p>
+                <p>{t('all')}</p>
             </div>
             <div
                 className='z-0 search h-14 items-center align-middle w-full text-base font-medium flex flex-row 
@@ -153,7 +155,7 @@ const ChatList = ({
                 <input
                     id='search'
                     type='text'
-                    placeholder={"Enter name"}
+                    placeholder={t('enter')}
                     className='rounded-full border-gray-100 font-normal
                                         border-2 text-placeholder pl-2 p-1 focus:bg-primary-white
                                         focus:cursor-text focus:border-primary outline-none focus:pr-2

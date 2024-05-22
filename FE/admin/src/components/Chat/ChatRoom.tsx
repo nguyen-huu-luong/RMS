@@ -27,6 +27,7 @@ import { uploadImage } from "@/app/api/upload";
 import { CreateNewLeadForm } from "../Lead/AddLeadForm";
 import { useSession } from "next-auth/react";
 import SendStatus from "./send_status";
+import { useTranslations } from "next-intl";
 
 const ChatBox = ({
     channel,
@@ -46,6 +47,7 @@ const ChatBox = ({
     const [sending, setSending] = useState<boolean>(false);
     const [data, setData] = useState<any>(null);
     const [inputFocused, setInputFocused] = useState(false);
+    const t = useTranslations('Chat')
     const [action, setAction] = useState<string>("Default");
     const messageContainerRef = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -237,7 +239,7 @@ const ChatBox = ({
                 session?.user.id
             );
             if (!response.status) {
-                message.error("Sending message failed!");
+                message.error(t('text-fail'));
             }
             setSending(false);
             setAction("Scroll");
@@ -276,7 +278,7 @@ const ChatBox = ({
                 session?.user.id
             );
             if (!response.status) {
-                message.error("Sending message failed!");
+                message.error(t('text-fail'));
             }
             setSending(false);
             setAction("Scroll");
@@ -289,9 +291,9 @@ const ChatBox = ({
         customRequest: handleUpload,
         onChange(info) {
             if (info.file.status === "done") {
-                message.success(`Send image successfully`);
+                message.success(t('image'));
             } else if (info.file.status === "error") {
-                message.error(`Send image failed.`);
+                message.error(t('image-fail'));
             }
         },
     };
@@ -317,14 +319,12 @@ const ChatBox = ({
 
     // HANDLE SCROLL FOR LOADING MORE
     const loadMore = () => {
-        console.log("Load more1");
         if (loading || isAllLoaded) return;
         setLoading(true);
         setIndex((prevIndex: number) => prevIndex + 1);
     };
 
     const handleScroll = () => {
-        console.log("Load more2");
         const container = messageContainerRef.current;
         if (container) {
             if (container.scrollTop === 0) {
@@ -360,7 +360,7 @@ const ChatBox = ({
             className={` bg-white relative border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full z-50`}
         >
             <Drawer
-                title='Create new lead'
+                title={t('create-lead')}
                 placement='top'
                 closable={false}
                 onClose={onClose}
@@ -370,13 +370,13 @@ const ChatBox = ({
                 maskClosable={false}
                 extra={
                     <Space>
-                        <Button onClick={onClose}>Cancel</Button>
+                        <Button onClick={onClose}>{t('Cancel')}</Button>
                         <Button
                             type='default'
                             style={{ backgroundColor: "white" }}
                             onClick={handleSubmit}
                         >
-                            Create
+                            {t('create')}
                         </Button>
                     </Space>
                 }
@@ -468,7 +468,7 @@ const ChatBox = ({
                         e.key === "Enter" ? await send(e) : {}
                     }
                     className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
-                    placeholder='Enter text'
+                    placeholder={t('enter-text')}
                 />
                 <span className='text-primary'>
                     <Upload

@@ -21,6 +21,7 @@ const Stats = ({
     component: any;
     setComponent: any;
 }) => {
+    const t = useTranslations('Overview')
     const {
         data: stats,
         error: statsError,
@@ -32,7 +33,6 @@ const Stats = ({
         async (url: string) =>
             await fetchClient({ url: url, data_return: true })
     );
-    const t_report: any = useTranslations("Report")
     useEffect(() => {
         if (!statsLoading) {
             if (option.type === "DAILY") {
@@ -47,14 +47,14 @@ const Stats = ({
 
     return (
         <div className='flex flex-row justify-between w-full gap-4'>
-            <Card name={t_report('orders')} before={stats.orders.before} current={stats.orders.now} />
+            <Card name={t('orders')} before={stats.orders.before} current={stats.orders.now} />
             <Card
-                name={t_report('profit')}
+                name={t('profits')}
                 before={stats.profit.before}
                 current={stats.profit.now}
             />
-            <Card name={t_report('customers')} before={stats.clients.before} current={stats.clients.now} />
-            <Card name={t_report('emails')} before={150000} current={100000} />
+            <Card name={t('customers')} before={stats.clients.before} current={stats.clients.now} />
+            <Card name={t('emails')} before={150000} current={100000} />
         </div>
     );
 };

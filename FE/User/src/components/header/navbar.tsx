@@ -11,21 +11,119 @@ import {
     ShoppingCartOutlined,
     UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Dropdown, Popover } from "antd";
-import type { MenuProps } from "antd";
+import { AutoComplete, Avatar, Dropdown, Popover } from "antd";
+import type { MenuProps, SelectProps } from "antd";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
 import Notification from "./notification/notification";
+import publicFetcher from "@/lib/public-fetcher";
+import FoodDetail from "../menu/foodDetail";
 const NavBar = () => {
     const locale = useLocale();
     const router = useRouter();
     const { data: session, status } = useSession();
     const [click, setClick] = useState(false);
-    const [search, setSearch] = useState(true);
-    const handleSearchItem = (text: string) => {
-
+    const [options, setOptions] = useState<
+        {
+            name: string;
+            thumbnails: string;
+            price: number;
+            id: number;
+            description: string;
+            categoryId: string;
+        }[]
+    >([]);
+    const [modal, setModal] = useState<boolean>(false);
+    const [detail, setDetail] = useState<{
+        id: number;
+        name: string;
+        thumbnails: string;
+        description: string;
+        price: number;
+        categoryId: string;
+    }>({
+        id: 0,
+        name: "",
+        thumbnails: "",
+        description: "",
+        price: 0,
+        categoryId: "",
+    });
+    const openModal = async (item: any) => {
+        setDetail(item);
+        setModal(true);
     };
+    const closeModal = () => {
+        setModal(false);
+    };
+    const [search, setSearch] = useState(true);
+    const [value, setValue] = useState("");
+    const [products, setProducts] = useState([]);
+    const getPanelValue = async (searchText: string) => {
+        if (!searchText) {
+            setOptions([]);
+        }
+        if (products.length == 0) {
+            const product = await publicFetcher({
+                url: `/products/all`,
+                data_return: true,
+            });
+            setProducts(
+                product.map((item: any) => ({
+                    name: item.name,
+                    thumbnails: item.thumbnails,
+                    price: item.price,
+                    id: item.id,
+                    description: item.description,
+                    categoryId: item.categoryId,
+                }))
+            );
+            const filteredProducts = product
+                .filter((product: any) =>
+                    product.name
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase())
+                )
+                .slice(0, 10);
+            setOptions(
+                filteredProducts.map((item: any) => ({
+                    name: item.name,
+                    thumbnails: item.thumbnails,
+                    price: item.price,
+                    id: item.id,
+                    description: item.description,
+                    categoryId: item.categoryId,
+                }))
+            );
+        } else {
+            const filteredProducts = products
+                .filter((product: any) =>
+                    product.name
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase())
+                )
+                .slice(0, 10);
+            setOptions(
+                filteredProducts.map((item: any) => ({
+                    name: item.name,
+                    thumbnails: item.thumbnails,
+                    price: item.price,
+                    id: item.id,
+                    description: item.description,
+                    categoryId: item.categoryId,
+                }))
+            );
+        }
+    };
+
+    const onSelect = (data: string) => {
+        const selectedProduct = options.find(option => option.name === data);
+        if (selectedProduct) {
+            openModal(selectedProduct);
+        }
+    };
+
     const t = useTranslations("NavBar");
     const MENU_LISTS =
         status === "authenticated"
@@ -97,6 +195,7 @@ const NavBar = () => {
     return (
         <>
             <nav className='sticky top-0 w-full h-16 shadow-md z-50 bg-primary-white'>
+                {modal && <FoodDetail food={detail} closeModal={closeModal} />}
                 <Container>
                     <div className='w-full h-full flex flex-row font-bold'>
                         {/* Left header */}
@@ -188,26 +287,45 @@ const NavBar = () => {
                             </div>
 
                             {!search && (
-                                <div
-                                    className={`w-full pl-5 flex justify-center `}
-                                >
-                                    <input
-                                        id='search'
-                                        type='text'
-                                        placeholder={t("Search-placeholder")}
-                                        className='rounded-full border-gray-100 font-normal
-                                        border-2 text-placeholder  pl-4 p-2 w-24 focus:bg-primary-white
+                                <div className={`w-full flex justify-center `}>
+                                    <AutoComplete
+                                        popupClassName='certain-category-search-dropdown'
+                                        popupMatchSelectWidth={false}
+                                        style={{ width: "40%" }}
+                                        onSelect={onSelect}
+                                        options={options.map((option) => ({
+                                            value: option.name,
+                                            label: (
+                                                <div className='flex items-center'>
+                                                    <img
+                                                        src={option.thumbnails}
+                                                        alt='Product Thumbnail'
+                                                        className='w-14 h-14 mr-6 rounded-md'
+                                                    />
+                                                    <span>
+                                                        {option.name}{" "}-{" "}{option.price}VND
+                                                    </span>
+                                                </div>
+                                            ),
+                                        }))}
+                                        size='large'
+                                        onSearch={(text) => getPanelValue(text)}
+                                    >
+                                        <input
+                                            id='search'
+                                            type='text'
+                                            placeholder={t(
+                                                "Search-placeholder"
+                                            )}
+                                            className='rounded-full border-gray-100 font-normal
+                                        border-2 text-placeholder pl-4 p-2 w-24 focus:bg-primary-white
                                         focus:cursor-text focus:border-orange-300 outline-none focus:pr-4
                                         transition-all duration-500 transform focus:w-full focus:lg:w-3/5
                                         '
-                                        onBlur={toggleSearch}
-                                        autoFocus
-                                        onKeyDown={(e: any) =>
-                                            e.key == "Enter"
-                                                ? handleSearchItem(e.target.value)
-                                                : {}
-                                        }
-                                    />
+                                            onBlur={toggleSearch}
+                                            autoFocus
+                                        />
+                                    </AutoComplete>
                                 </div>
                             )}
 

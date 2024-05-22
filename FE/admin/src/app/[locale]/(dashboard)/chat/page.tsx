@@ -11,7 +11,6 @@ function Chat() {
     const [channel, setChannel] = useState(-1);
     const [index, setIndex] = useState<number>(1);
     const { data: session, status } = useSession();
-    const [messageApi, contextHolder] = message.useMessage();
     const socket = useSocket();
     const searchParams = useSearchParams();
     const id = searchParams.get("id");

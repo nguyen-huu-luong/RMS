@@ -146,6 +146,12 @@ export class AuthService {
 					clientId: user.getDataValue('id')
 				})
 				await user.createChannel()
+				const channel = await user.getChannel();
+				await user.createMessage({
+					content: "Welcome to home cuisine!",
+					employeeId: 1,
+					channelId: channel.getDataValue("id"),
+				});
 				this.sendToken(res, user);
 			} else {
 				const hashedPassword = await Password.hash(password);
@@ -164,7 +170,12 @@ export class AuthService {
 					clientId: user.getDataValue('id')
 				})
 				await user.createChannel()
-				
+				const channel = await user.getChannel();
+				await user.createMessage({
+					content: "Welcome to home cuisine!",
+					employeeId: 1,
+					channelId: channel.getDataValue("id"),
+				});
 				this.sendToken(res, user);
 			}
 		} catch (err) {

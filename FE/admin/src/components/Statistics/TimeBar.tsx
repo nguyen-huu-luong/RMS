@@ -11,18 +11,18 @@ type Option = {
 };
 const TimeBar = ({ option, setOption, setComponent }: { option: Option; setOption: any; setComponent: any }) => {
     const [type, setType] = useState<string>("MONTHLY")
-    const t_report: any = useTranslations("Report")
+    const t = useTranslations('Overview')
     const options = [
         {
-            label: t_report('this_month'),
+            label: t('this-month'),
             value: "MONTHLY",
         },
         {
-            label: t_report('this_year'),
+            label: t('this-year'),
             value: "YEARLY",
         },
         {
-            label: t_report('custom'),
+            label: t('custom'),
             value: "CUSTOM",
         },
     ];
