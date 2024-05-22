@@ -20,6 +20,7 @@ import type {
 import { Modal } from "antd";
 import { useRouter } from "next-intl/client";;
 import fetchClient from "@/lib/fetch-client";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -69,6 +70,8 @@ const Opportunities: React.FC = () => {
     const [cartItems, setCartItems] = useState<any>();
     const [loading, setLoading] = useState(false);
     const [isModalCart, setIsModalCart] = useState(false)
+    const t_general: any = useTranslations("General")
+    const t_order: any = useTranslations("Order")
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -77,7 +80,7 @@ const Opportunities: React.FC = () => {
         },
         filters: {},
         sorter: {
-            field: "amount",
+            field: 'amount',
             order: "ascend",
         },
     });
@@ -85,15 +88,15 @@ const Opportunities: React.FC = () => {
     const list_sort = [
         {
             key: "fullname",
-            title: "Fullname"
+            title: t_general('fullname')
         },
         {
             key: "amount",
-            title: "Amount"
+            title: t_general('amount')
         },
         {
             key: "type",
-            title: "Type"
+            title: t_general('type')
         },
     ]
     const [error, setError] = useState<ErrorType>({
@@ -115,54 +118,54 @@ const Opportunities: React.FC = () => {
 
     const columns: ColumnsType<DataType> = [
         {
-            title: "ID",
+            title: t_general('id'),
             dataIndex: "id",
             key: "id"
         },
         {
-            title: "Fullname",
+            title: t_general('fullname'),
             dataIndex: "fullname",
             key: "fullname",
             render: (text, row) => <a style={{ color: "#4A58EC" }} href={`${link_ref[row.type]}/${row.id}`}>{text}</a>
         },
         {
-            title: "Amount",
+            title: t_general('amount'),
             dataIndex: "amount",
             key: "amount",
             render: (text, row) => <p>{text} VND</p>
         },
         {
-            title: "Type",
+            title: t_general('type'),
             dataIndex: "type",
             key: "type",
         },
         {
-            title: "Action",
+            title: t_general('action'),
             dataIndex: "action",
             key: "action",
-            render: (text, row, index) => <Button color="primary" onClick={() => handleOpenModalCart(index, row.fullname, row.amount)}>View cart</Button>
+            render: (text, row, index) => <Button color="primary" onClick={() => handleOpenModalCart(index, row.fullname, row.amount)}>{t_order('view_cart')}</Button>
         }];
 
 
     const items_columns: ColumnsType<DataType> = [
         {
-            title: "Name",
+            title: t_general('name'),
             dataIndex: "name",
             key: "name",
         },
         {
-            title: "Quantity",
+            title: t_general('quantity'),
             dataIndex: "quantity",
             key: "quantity",
         },
         {
-            title: "Amount",
+            title: t_general('amount'),
             dataIndex: "amount",
             key: "amount",
             render: (text, row) => <p>{text} VND</p>
         },
         {
-            title: "Update Time",
+            title: t_general('date'),
             dataIndex: "update_time",
             key: "update_timeaction",
         }];
@@ -358,7 +361,7 @@ const Opportunities: React.FC = () => {
                             style={{ marginBottom: 0 }}
                             className='flex items-center gap-2'
                         >
-                            <p>Sort by: </p>
+                            <p>{t_general('sort')}: </p>
                             <Select
                                 // style={{ width: '20%' }}
                                 placeholder='Columns'
@@ -373,7 +376,7 @@ const Opportunities: React.FC = () => {
                                 }))}
                             />
 
-                            <p>Order: </p>
+                            <p>{t_general('order')}: </p>
 
                             <Button
                                 onClick={handleToggleSorter}
@@ -386,7 +389,7 @@ const Opportunities: React.FC = () => {
                                 }
                             />
                             <Button onClick={handleClearAll}>
-                                Clear sorters
+                            {t_general('clear_filter')}
                             </Button>
                         </div>
                     </div>
@@ -399,7 +402,7 @@ const Opportunities: React.FC = () => {
                             pagination={{
                                 className: "bg-white rounded px-4 py-2",
                                 showTotal: (total: number) =>
-                                    `Total ${total} items`,
+                                `${t_general("total")} ${total} ${t_general("item")}`,
                                 position: ["bottomCenter", "bottomRight"],
                                 showSizeChanger: true,
                                 showQuickJumper: true,
@@ -414,19 +417,19 @@ const Opportunities: React.FC = () => {
                 </div>
             </ConfigProvider>
 
-            <Modal title="Cart Information" open={isModalCart} onCancel={handleCloseModalCart} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
+            <Modal title={t_order('cart_information')} open={isModalCart} onCancel={handleCloseModalCart} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
                 {
                     cartItems &&
                     <div>
                         <div className="flex justify-between">
                             <div>
-                                <p className="font-semibold">Full Name</p>
+                                <p className="font-semibold">{t_general('fullname')}</p>
                                 <p>
                                     {cartItems.username}
                                 </p>
                             </div>
                             <div>
-                                <p className="font-semibold">Total amount</p>
+                                <p className="font-semibold">{t_order('total_amount')}</p>
                                 <p>
                                     {cartItems.amount} VND
                                 </p>

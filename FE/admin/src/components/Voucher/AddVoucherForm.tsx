@@ -10,6 +10,7 @@ import {
     message,
 } from "antd";
 import fetchClient from "@/lib/fetch-client";
+import { useTranslations } from "next-intl";
 
 interface AddVoucherFormProps {
     afterSubmit: () => void;
@@ -18,6 +19,7 @@ interface AddVoucherFormProps {
 
 export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
     const [form] = Form.useForm();
+    const t = useTranslations("Voucher");
 
     const onFinish = async (values: any) => {
         try {
@@ -29,7 +31,7 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                 body: { data: { ...values } },
                 method: "POST",
             });
-            message.success("Voucher added successfully");
+            message.success(t("success"));
             form.resetFields();
             props.afterSubmit();
         } catch (error) {
@@ -70,31 +72,31 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                 <div className='flex space-x-2'>
                     <div className='w-full'>
                         <Form.Item
-                            label='Name'
+                            label={t("name")}
                             name='name'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input the name!",
+                                    message: t("name-required"),
                                 },
                             ]}
                         >
-                            <Input placeholder='Name' />
+                            <Input placeholder={t("name")} />
                         </Form.Item>
                     </div>
 
                     <div className='w-full'>
                         <Form.Item
-                            label='Description'
+                            label={t("description")}
                             name='description'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input the description!",
+                                    message: t("description-required"),
                                 },
                             ]}
                         >
-                            <Input placeholder='Description' />
+                            <Input placeholder={t("description")} />
                         </Form.Item>
                     </div>
                 </div>
@@ -102,40 +104,43 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                 <div className='flex space-x-2'>
                     <div className='w-full'>
                         <Form.Item
-                            label='Can Redeem'
+                            label={t("can-redeem")}
                             name='can_redeem'
                             rules={[
                                 {
                                     required: true,
-                                    message:
-                                        "Please select whether it can be redeemed or not!",
+                                    message: t("can-redeem-required"),
                                 },
                             ]}
                         >
-                            <Select placeholder='Select can redeem'>
-                                <Select.Option value={true}>Yes</Select.Option>
-                                <Select.Option value={false}>No</Select.Option>
+                            <Select placeholder={t("can-redeem")}>
+                                <Select.Option value={true}>
+                                    {t("yes")}
+                                </Select.Option>
+                                <Select.Option value={false}>
+                                    {t("no")}
+                                </Select.Option>
                             </Select>
                         </Form.Item>
                     </div>
 
                     <div className='w-full'>
                         <Form.Item
-                            label='Type'
+                            label={t("type")}
                             name='type'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please select the type!",
+                                    message: t("type-required"),
                                 },
                             ]}
                         >
-                            <Select placeholder='Select type'>
+                            <Select placeholder={t("type")}>
                                 <Select.Option value='fixed'>
-                                    Fixed
+                                    {t("fixed")}
                                 </Select.Option>
                                 <Select.Option value='percentage'>
-                                    Percentage
+                                    {t("percentage")}
                                 </Select.Option>
                             </Select>
                         </Form.Item>
@@ -145,12 +150,12 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                 <div className='flex space-x-2'>
                     <div className='w-full'>
                         <Form.Item
-                            label='Amount'
+                            label={t("amount")}
                             name='amount'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input the amount!",
+                                    message: t("amount-required"),
                                 },
                                 ({ getFieldValue }) => ({
                                     validator(_, value) {
@@ -159,15 +164,13 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                                             if (type === "percentage") {
                                                 if (value > 100) {
                                                     return Promise.reject(
-                                                        "Amount for percentage can not be over 100%!"
+                                                        t("over-100")
                                                     );
                                                 }
                                             }
                                             return Promise.resolve();
                                         }
-                                        return Promise.reject(
-                                            "Please input a positive number!"
-                                        );
+                                        return Promise.reject(t("positve"));
                                     },
                                 }),
                             ]}
@@ -178,7 +181,7 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
 
                     <div className='w-full'>
                         <Form.Item
-                            label='Maximum Reduce'
+                            label={t("maximum-reduction")}
                             name='maximum_reduce'
                             rules={[
                                 ({ getFieldValue }) => ({
@@ -187,21 +190,22 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                                         if (type === "fixed") {
                                             return Promise.resolve();
                                         } else if (value <= 0) {
-                                            return Promise.reject(
-                                                "Please input a positive number!"
-                                            );
+                                            return Promise.reject(t("positve"));
                                         }
                                         if (value) {
                                             return Promise.resolve();
                                         }
                                         return Promise.reject(
-                                            "Please input the maximum reduce!"
+                                            t("maximum-reduction-required")
                                         );
                                     },
                                 }),
                             ]}
                         >
-                            <Input type='number' placeholder='Maximum Reduce' />
+                            <Input
+                                type='number'
+                                placeholder={t("maximum-reduction")}
+                            />
                         </Form.Item>
                     </div>
                 </div>
@@ -209,51 +213,47 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                 <div className='flex space-x-2'>
                     <div className='w-full'>
                         <Form.Item
-                            label='Quantity'
+                            label={t("quantity")}
                             name='quantity'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input the quantity!",
+                                    message: t("quantity-required"),
                                 },
                                 ({ getFieldValue }) => ({
                                     validator(_, value) {
                                         if (value > 0) {
                                             return Promise.resolve();
                                         }
-                                        return Promise.reject(
-                                            "Please input a positive number!"
-                                        );
+                                        return Promise.reject(t("positve"));
                                     },
                                 }),
                             ]}
                         >
-                            <Input type='number' placeholder='Quantity' />
+                            <Input type='number' placeholder={t("quantity")} />
                         </Form.Item>
                     </div>
 
                     <div className='w-full'>
                         <Form.Item
-                            label='Minimum Paid'
+                            label={t("minimum-paid")}
                             name='minimum_paid'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input the minimum paid!",
+                                    message: t("minimum-paid-required"),
                                 },
                                 ({ getFieldValue }) => ({
                                     validator(_, value) {
                                         if (value > 0) {
                                             return Promise.resolve();
                                         }
-                                        return Promise.reject(
-                                            "Please input a positive number!"
-                                        );
+                                        return Promise.reject(t("positve"));
                                     },
                                 }),
                             ]}
                         >
-                            <Input type='number' placeholder='Minimum Paid' />
+                            <Input type='number' placeholder={t('minimum-paid')} />
                         </Form.Item>
                     </div>
                 </div>
@@ -261,12 +261,12 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                 <div className='flex space-x-2'>
                     <div className='w-full'>
                         <Form.Item
-                            label='Begin Date'
+                            label={t('begin-date')}
                             name='begin_date'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please select the begin date!",
+                                    message: t('begin-date-required'),
                                 },
                                 ({ getFieldValue }) => ({
                                     validator(_, value) {
@@ -280,7 +280,7 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                                             return Promise.resolve();
                                         }
                                         return Promise.reject(
-                                            "Begin date must be before end date!"
+                                            t('begin-date-before-end-date')
                                         );
                                     },
                                 }),
@@ -292,12 +292,12 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
 
                     <div className='w-full'>
                         <Form.Item
-                            label='End Date'
+                            label={t('end-date')}
                             name='end_date'
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please select the end date!",
+                                    message: t('end-date-required'),
                                 },
                                 ({ getFieldValue }) => ({
                                     validator(_, value) {
@@ -311,7 +311,7 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                                             return Promise.resolve();
                                         }
                                         return Promise.reject(
-                                            "End date must be after begin date!"
+                                            t('end-date-after-begin-date')
                                         );
                                     },
                                 }),
@@ -324,10 +324,10 @@ export const AddVoucherForm: React.FC<AddVoucherFormProps> = (props) => {
                 <Form.Item>
                     <div className='flex justify-end space-x-2'>
                         <Button type='default' htmlType='reset'>
-                            Cancel
+                            {t('cancel')}
                         </Button>
                         <Button type='primary' htmlType='submit'>
-                            Save
+                            {t('save')}
                         </Button>
                     </div>
                 </Form.Item>

@@ -3,12 +3,14 @@ import fetchClient from "@/lib/fetch-client";
 import Card from "@/components/Statistics/Card";
 import useSWR from "swr";
 import Loading from "../loading";
+import { useLocale, useTranslations } from "next-intl";
 
 type Option = {
     type: string | "DAILY" | "MONTHLY" | "YEARLY" | "CUSTOM";
     beginDate?: Date;
     endDate?: Date;
 };
+
 
 const Stats = ({
     option,
@@ -19,6 +21,7 @@ const Stats = ({
     component: any;
     setComponent: any;
 }) => {
+    const t = useTranslations('Overview')
     const {
         data: stats,
         error: statsError,
@@ -30,7 +33,6 @@ const Stats = ({
         async (url: string) =>
             await fetchClient({ url: url, data_return: true })
     );
-
     useEffect(() => {
         if (!statsLoading) {
             if (option.type === "DAILY") {
@@ -45,14 +47,14 @@ const Stats = ({
 
     return (
         <div className='flex flex-row justify-between w-full gap-4'>
-            <Card name={"Orders"} before={stats.orders.before} current={stats.orders.now} />
+            <Card name={t('orders')} before={stats.orders.before} current={stats.orders.now} />
             <Card
-                name={"Profits"}
+                name={t('profits')}
                 before={stats.profit.before}
                 current={stats.profit.now}
             />
-            <Card name={"Customers"} before={stats.clients.before} current={stats.clients.now} />
-            <Card name={"Emails"} before={150000} current={100000} />
+            <Card name={t('customers')} before={stats.clients.before} current={stats.clients.now} />
+            <Card name={t('emails')} before={150000} current={100000} />
         </div>
     );
 };

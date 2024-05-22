@@ -11,6 +11,7 @@ import { useForm } from "antd/es/form/Form";
 import moment from "moment";
 import { CreateaEmployeeModal } from "@/components/Modals/CreateNewEmployeeModal";
 import { AxiosError } from "axios";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 interface DataType {
@@ -28,16 +29,18 @@ const EmployeeListPages: React.FC = () => {
 	const [selectedRows, setSelectedRows] = useState<DataType[]>([])
 	const [reload, setReload] = useState(false)
 	const router = useRouter()
-
+	const t_general: any = useTranslations("General")
+	const t_customer: any = useTranslations("Customer")
+	const t_employee: any = useTranslations("Employee")
 	const [form_create] = useForm()
 	const columns: ColumnsType<DataType> = [
 		{
-			title: "ID",
+			title: t_general("id"),
 			dataIndex: "id",
 			key: "id",
 		},
 		{
-			title: "Fullname",
+			title: t_general("fullname"),
 			dataIndex: "fullname",
 			key: "fullname",
 			render(value, record, index) {
@@ -45,23 +48,23 @@ const EmployeeListPages: React.FC = () => {
 			},
 		},
 		{
-			title: "Phone number",
+			title: t_general("phone"),
 			dataIndex: "phone",
 			key: "phone",
 		},
 		{
-			title: "Email",
+			title: t_general("email"),
 			dataIndex: "email",
 			key: "email",
 		},
 
 		{
-			title: "Role",
+			title: t_employee('role'),
 			dataIndex: "role",
 			key: "role",
 		},
 		{
-			title: "CreatedAt",
+			title: t_general("created_at"),
 			dataIndex: "createdAt",
 			key: "createdAt",
 			render: (text) => moment(text).format("HH:mm DD:MM:YYYY")
@@ -71,37 +74,37 @@ const EmployeeListPages: React.FC = () => {
 	const filterItems: FilterItemType[] = [
 		{
 			key: "1",
-			title: "Firstname",
+			title: t_general("firstname"),
 			fieldName: "firstname",
 			type: "input"
 		},
 		{
 			key: "8",
-			title: "Lastname",
+			title: t_general("lastname"),
 			fieldName: "lastname",
 			type: "input"
 		},
 		{
 			key: "2",
-			title: "Phone number",
+			title: t_general("phone"),
 			fieldName: "phone",
 			type: "input"
 		},
 		{
 			key: "3",
-			title: "Email",
+			title: t_general("email"),
 			fieldName: "email",
 			type: "input"
 		},
 		{
 			key: "4",
-			title: "Birthday",
+			title: t_general("birthday"),
 			fieldName: "birthday",
 			type: "date"
 		},
 		{
 			key: "6",
-			title: "CreatedAt",
+			title: t_general("created_at"),
 			fieldName: "createdAt",
 			type: "date"
 		},
@@ -114,9 +117,9 @@ const EmployeeListPages: React.FC = () => {
 				<Flex>
 					{(selectedRows && selectedRows.length > 0) ?
 						<Space>
-							<p>Selected {selectedRows.length} Employees</p>
+							<p>{t_general("selected")} {selectedRows.length} {t_employee('employee')}</p>
 							{/* <Button icon={<EllipsisOutlined />} /> */}
-							<Button danger onClick={handleDeleteEmployees}>Delete {selectedRows.length} records</Button>
+							<Button danger onClick={handleDeleteEmployees}>{t_general("delete")} {selectedRows.length} {t_employee('employee')}</Button>
 						</Space>
 						:
 						<Space>

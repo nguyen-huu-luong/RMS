@@ -30,7 +30,7 @@ import dayjs from "dayjs";
 import useSocket from "@/socket";
 import { message, ConfigProvider, Drawer } from "antd";
 import Loading from "@/components/loading";
-
+import { useLocale, useTranslations } from "next-intl";
 const Context = React.createContext({ name: "Default" });
 
 function Home() {
@@ -43,6 +43,8 @@ function Home() {
     const [notifications, setNotifications] = useState<any>()
     const [resInfo, setResInfo] = useState<any>()
     const [isLoading, setIsLoading] = useState(true)
+    const t_general: any = useTranslations("General")
+	const t_reservation: any = useTranslations("Reservation")
     const dateFormat = "YYYY-MM-DD";
     const timeFormat = "HH:mm";
     interface Dictionary {
@@ -546,7 +548,7 @@ function Home() {
                             }}
                         >
                             <Drawer
-                                title='Notification'
+                                title={t_reservation('notification')}
                                 placement='right'
                                 closable={false}
                                 onClose={onClose}
@@ -578,7 +580,7 @@ function Home() {
                         <div className='flex-1 pt-2 bg-white'>
                             <div>
                                 <h2 className='font-semibold text-lg text-center'>
-                                    Reservations
+                                    {t_reservation('reservations')}
                                 </h2>
                                 <div className=' w-4/5  m-auto px-3 mt-3'>
                                     <form
@@ -587,7 +589,7 @@ function Home() {
                                         <div className='flex mt-2 justify-between'>
                                             <div className='flex'>
                                                 <label className='pr-3 font-semibold text-sm'>
-                                                    From
+                                                {t_reservation('from')}
                                                 </label>
                                                 <input
                                                     type='date'
@@ -598,7 +600,7 @@ function Home() {
                                             </div>
                                             <div className='flex'>
                                                 <label className='pr-3 font-semibold text-sm'>
-                                                    To
+                                                {t_reservation('to')}
                                                 </label>
                                                 <input
                                                     type='date'
@@ -618,7 +620,7 @@ function Home() {
                                                             "#4A58EC",
                                                     }}
                                                 >
-                                                    Search
+                                                    {t_reservation('search')}
                                                 </button>
                                                 <button
                                                     type="reset"
@@ -629,7 +631,7 @@ function Home() {
                                                             "#4A58EC",
                                                     }}
                                                 >
-                                                    Reset
+                                                    {t_reservation('reset')}
                                                 </button>
                                             </div>
                                             <div className='flex'>
@@ -640,14 +642,14 @@ function Home() {
                                                     defaultValue={""}
                                                 >
                                                     <option value={""} hidden>
-                                                        Table
+                                                    {t_reservation('table')}
                                                     </option>
                                                     {resInfo.tables.map(
                                                         (item: any) => (
                                                             <option
                                                                 value={item.id}
                                                             >
-                                                                Table{" "}
+                                                                {t_reservation('table')}{" "}
                                                                 {item.name}
                                                             </option>
                                                         )
@@ -668,7 +670,7 @@ function Home() {
                                     >
                                         <Modal
                                             destroyOnClose={true}
-                                            title='Reservation information detail'
+                                            title={t_reservation('reservation_information_detail')}
                                             open={isModalReservationDetail}
                                             onCancel={
                                                 handleCanceModalReservationDetail
@@ -692,7 +694,7 @@ function Home() {
                                                                 width: "48%",
                                                             }}
                                                         >
-                                                            <p>Customer name</p>
+                                                            <p>{t_reservation('customer_name')}</p>
                                                             <Form.Item<FieldType>
                                                                 name='customer_name'
                                                                 rules={[
@@ -712,7 +714,7 @@ function Home() {
                                                                 width: "48%",
                                                             }}
                                                         >
-                                                            <p>Phone number</p>
+                                                            <p>{t_reservation('phone')}</p>
                                                             <Form.Item<FieldType>
                                                                 name='phone_number'
                                                                 rules={[
@@ -730,7 +732,7 @@ function Home() {
                                                     </div>
                                                     <div className='flex justify-between'>
                                                         <div>
-                                                            <p>Date</p>
+                                                            <p>{t_reservation('date')}</p>
                                                             <Form.Item
                                                                 name='date_reserve'
                                                                 rules={[
@@ -750,7 +752,7 @@ function Home() {
                                                             </Form.Item>
                                                         </div>
                                                         <div>
-                                                            <p>Start time</p>
+                                                            <p>{t_reservation('start_time')}</p>
                                                             <Form.Item
                                                                 name='start_time'
                                                                 rules={[
@@ -770,7 +772,7 @@ function Home() {
                                                             </Form.Item>
                                                         </div>
                                                         <div>
-                                                            <p>End time</p>
+                                                            <p>{t_reservation('end_time')}</p>
                                                             <Form.Item
                                                                 name='end_time'
                                                                 rules={[
@@ -796,7 +798,7 @@ function Home() {
                                                                 width: "48%",
                                                             }}
                                                         >
-                                                            <p>Quantity</p>
+                                                            <p>{t_reservation('quantity')}</p>
                                                             <Form.Item
                                                                 name='quantity'
                                                                 rules={[
@@ -822,7 +824,7 @@ function Home() {
                                                                 width: "48%",
                                                             }}
                                                         >
-                                                            <p>Status</p>
+                                                            <p>{t_general('status')}</p>
                                                             <Form.Item
                                                                 name='status'
                                                                 rules={[
@@ -851,7 +853,7 @@ function Home() {
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <p>Table</p>
+                                                        <p>{t_reservation('table')}</p>
                                                         <Form.Item
                                                             name='table_reservation'
                                                             rules={[
@@ -886,7 +888,7 @@ function Home() {
                                                         </Form.Item>
                                                     </div>
                                                     <div>
-                                                        <p>Note</p>
+                                                        <p>{t_reservation('note')}</p>
                                                         <Form.Item<FieldType> name='note'>
                                                             <Input />
                                                         </Form.Item>
@@ -930,7 +932,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='submit'
                                                                 >
-                                                                    CHANGE
+                                                                    {t_reservation('change').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                             <div>
@@ -945,7 +947,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='button'
                                                                 >
-                                                                    DELETE
+                                                                    {t_reservation('delete').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -1087,7 +1089,7 @@ function Home() {
                                                                                                     </div>
                                                                                                     <div>
                                                                                                         <p>
-                                                                                                            Customer:{" "}
+                                                                                                            {t_reservation('customer')}:{" "}
                                                                                                             {
                                                                                                                 item.customerName
                                                                                                             }
@@ -1188,11 +1190,11 @@ function Home() {
                                         }}
                                         onClick={showModalReservation}
                                     >
-                                        Reserve
+                                        {t_reservation('reserve')}
                                     </button>
                                     <Modal
                                         destroyOnClose={true}
-                                        title='Reservation information form'
+                                        title={t_reservation('reservation_information_form')}
                                         open={isModalReservation}
                                         onCancel={handleCanceModalReservation}
                                         footer={(_, { OkBtn, CancelBtn }) => (
@@ -1209,7 +1211,7 @@ function Home() {
                                                     <div
                                                         style={{ width: "48%" }}
                                                     >
-                                                        <p>Customer name</p>
+                                                        <p>{t_reservation('customer_name')}</p>
                                                         <Form.Item<FieldType>
                                                             name='customer_name'
                                                             rules={[
@@ -1227,7 +1229,7 @@ function Home() {
                                                     <div
                                                         style={{ width: "48%" }}
                                                     >
-                                                        <p>Phone number</p>
+                                                        <p>{t_reservation('phone')}</p>
                                                         <Form.Item<FieldType>
                                                             name='phone_number'
                                                             rules={[
@@ -1245,7 +1247,7 @@ function Home() {
                                                 </div>
                                                 <div className='flex justify-between'>
                                                     <div>
-                                                        <p>Date</p>
+                                                        <p>{t_reservation('date')}</p>
                                                         <Form.Item
                                                             name='date_reserve'
                                                             rules={[
@@ -1265,7 +1267,7 @@ function Home() {
                                                         </Form.Item>
                                                     </div>
                                                     <div>
-                                                        <p>Start time</p>
+                                                        <p>{t_reservation('start_time')}</p>
                                                         <Form.Item
                                                             name='start_time'
                                                             rules={[
@@ -1285,7 +1287,7 @@ function Home() {
                                                         </Form.Item>
                                                     </div>
                                                     <div>
-                                                        <p>End time</p>
+                                                        <p>{t_reservation('end_time')}</p>
                                                         <Form.Item
                                                             name='end_time'
                                                             rules={[
@@ -1309,7 +1311,7 @@ function Home() {
                                                     <div
                                                         style={{ width: "48%" }}
                                                     >
-                                                        <p>Quantity</p>
+                                                        <p>{t_reservation('quantity')}</p>
                                                         <Form.Item
                                                             name='quantity'
                                                             rules={[
@@ -1332,7 +1334,7 @@ function Home() {
                                                     <div
                                                         style={{ width: "48%" }}
                                                     >
-                                                        <p>Table</p>
+                                                        <p>{t_reservation('table')}</p>
                                                         <Form.Item
                                                             name='table_reservation'
                                                             rules={[
@@ -1368,7 +1370,7 @@ function Home() {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <p>Note</p>
+                                                    <p>{t_reservation('note')}</p>
                                                     <Form.Item<FieldType> name='note'>
                                                         <Input />
                                                     </Form.Item>
@@ -1405,7 +1407,7 @@ function Home() {
                                                                     handleCanceModalReservation
                                                                 }
                                                             >
-                                                                CANCEL
+                                                                {t_general('cancel').toUpperCase()}
                                                             </Button>
                                                         </div>
                                                         <div>
@@ -1417,7 +1419,7 @@ function Home() {
                                                                 }}
                                                                 htmlType='submit'
                                                             >
-                                                                CONFIRM
+                                                                 {t_general('confirm').toUpperCase()}
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -1436,12 +1438,12 @@ function Home() {
                                             backgroundColor: "#4A58EC",
                                         }}
                                     >
-                                        Create floor
+                                        {t_reservation('create_floor')}
                                     </button>
 
                                     <Modal
                                         destroyOnClose={true}
-                                        title='Floor'
+                                        title={t_reservation('floor')}
                                         open={isModalFloorOpen}
                                         onCancel={handleCanceModalFloor}
                                         footer={(_, { OkBtn, CancelBtn }) => (
@@ -1467,7 +1469,7 @@ function Home() {
                                                                 top: "5%",
                                                             }}
                                                         >
-                                                            Floor name:
+                                                            {t_reservation('floor_name')}:
                                                         </p>
                                                     </div>
                                                     <div
@@ -1527,7 +1529,7 @@ function Home() {
                                                                         handleCanceModalFloor
                                                                     }
                                                                 >
-                                                                    CANCEL
+                                                                   {t_general('cancel').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                             <div>
@@ -1539,7 +1541,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='submit'
                                                                 >
-                                                                    CONFIRM
+                                                                    {t_general('confirm').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -1559,11 +1561,11 @@ function Home() {
                                             backgroundColor: "#DB3A34",
                                         }}
                                     >
-                                        Delete
+                                        {t_reservation('delete')}
                                     </button>
                                     <Modal
                                         destroyOnClose={true}
-                                        title='Item option'
+                                        title={t_reservation('item_option')}
                                         open={isModalDeleteOpen}
                                         onCancel={handleCanceModalDelete}
                                         footer={(_, { OkBtn, CancelBtn }) => (
@@ -1589,7 +1591,7 @@ function Home() {
                                                                 top: "5%",
                                                             }}
                                                         >
-                                                            Item type:
+                                                            {t_reservation('item_type')}:
                                                         </p>
                                                     </div>
                                                     <div
@@ -1616,10 +1618,10 @@ function Home() {
                                                                 }
                                                             >
                                                                 <Select.Option value='floor'>
-                                                                    Floor
+                                                                {t_reservation('floor')}
                                                                 </Select.Option>
                                                                 <Select.Option value='table'>
-                                                                    Table
+                                                                {t_reservation('table')}
                                                                 </Select.Option>
                                                             </Select>
                                                         </Form.Item>
@@ -1641,7 +1643,7 @@ function Home() {
                                                                 top: "5%",
                                                             }}
                                                         >
-                                                            Name:
+                                                            {t_reservation('name')}:
                                                         </p>
                                                     </div>
                                                     <div
@@ -1700,7 +1702,7 @@ function Home() {
                                                                         handleCanceModalDelete
                                                                     }
                                                                 >
-                                                                    CANCEL
+                                                                    {t_general('cancel').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                             <div>
@@ -1712,7 +1714,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='submit'
                                                                 >
-                                                                    CONFIRM
+                                                                    {t_general('confirm').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -1734,7 +1736,7 @@ function Home() {
                                 <>
                                     <Modal
                                         destroyOnClose={true}
-                                        title='Table'
+                                        title={t_reservation('table')}
                                         open={isModalTableOpen}
                                         onCancel={handleCanceModalTable}
                                         footer={(_, { OkBtn, CancelBtn }) => (
@@ -1762,7 +1764,7 @@ function Home() {
                                                                 top: "5%",
                                                             }}
                                                         >
-                                                            Table name:
+                                                            {t_reservation('table_name')}:
                                                         </p>
                                                     </div>
                                                     <div
@@ -1836,7 +1838,7 @@ function Home() {
                                                                         handleCanceModalTable
                                                                     }
                                                                 >
-                                                                    CANCEL
+                                                                    {t_general('cancel').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                             <div>
@@ -1848,7 +1850,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='submit'
                                                                 >
-                                                                    CONFIRM
+                                                                    {t_general('confirm').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                         </div>

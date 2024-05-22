@@ -5,6 +5,7 @@ import { Pie } from 'react-chartjs-2';
 import { Table, Tooltip as Tooltip_antd } from 'antd';
 import type { TableProps } from 'antd';
 import useSWR from 'swr'; { }
+import { useLocale, useTranslations } from "next-intl";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -17,6 +18,7 @@ const SegmentationOverview = () => {
         source: string;
         avg_convert_day: number;
     }
+    const t_report: any = useTranslations("Report")
 
     const backgroundColor = ["rgb(233, 101, 45)",
         "rgb(14, 156, 255)",
@@ -83,19 +85,19 @@ const SegmentationOverview = () => {
 
     const group_columns: TableProps<GroupSumarize>['columns'] = [
         {
-            title: 'Group name',
+            title: t_report('group_name'),
             dataIndex: 'name',
             key: 'name',
             render: (text, record) => <Tooltip_antd placement="top" title={record.description} ><p style={{ color: `${chartDataTemp.columnStyle[record.name]}` }}>{text}</p></Tooltip_antd>
         },
         {
-            title: 'Popular Gender',
+            title: t_report('popular_gender'),
             dataIndex: 'gender',
             key: 'gender',
             render: (text, record) => <p style={{ color: `${chartDataTemp.columnStyle[record.name]}` }}>{text}</p>
         },
         {
-            title: 'Popular Source',
+            title: t_report('popular_source'),
             dataIndex: 'source',
             key: 'source',
             render: (text, record) => <p style={{ color: `${chartDataTemp.columnStyle[record.name]}` }}>{text}</p>
@@ -119,7 +121,7 @@ const SegmentationOverview = () => {
     return (
         <div className='flex flex-col gap-2 justify-start w-full shadow-md h-auto rounded-xl bg-white'>
             <div className='p-7 font-bold text-xl text-black flex flex-row justify-between items-center w-full h-auto bg-white rounded-xl -mb-5'>
-                <span>Customer Group Overview</span>
+                <span>{t_report('customer_group_overview')}</span>
             </div>
             <div className='flex pb-5'>
                 <div className='flex-1' >

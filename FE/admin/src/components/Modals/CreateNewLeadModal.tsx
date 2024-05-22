@@ -10,6 +10,7 @@ import useModal from "antd/es/modal/useModal";
 import TextArea from "antd/es/input/TextArea";
 import { AxiosError } from "axios";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 
 export interface ICreateModal {
@@ -17,6 +18,9 @@ export interface ICreateModal {
     onCreate: (values: any) => Promise<void>,
 }
 export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...props }) => {
+    const t_general = useTranslations("General")
+    const t_customer = useTranslations("Customer")
+    
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false)
     const [modal] = useModal()
@@ -83,7 +87,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
         <Button className="bg-white" onClick={showModal}>New</Button>
         <CustomModal
             open={open}
-            title="Add new lead"
+            title={t_customer("add_new_lead")}
             okType="primary"
             okButtonProps={{ className: "bg-primary" }}
             onCancel={handleCancel}
@@ -95,7 +99,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
             footer={(_, { OkBtn, CancelBtn }) => (
                 <>
                     <Popconfirm title="Are you sure to reset all data?" onConfirm={handleCancel}>
-                        <Button>Cancel</Button>
+                        <Button>{t_general("cancel")}</Button>
                     </Popconfirm>
                     <OkBtn />
                 </>
@@ -105,7 +109,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                 <div className="flex space-x-2">
                     <div className='w-full'>
                         <Form.Item
-                            label='Firstname'
+                            label={t_general('firstname')}
                             name='firstname'
                             required
                             rules={[
@@ -115,12 +119,12 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                                 },
                             ]}
                         >
-                            <RMSInput placeholder='Firstname' />
+                            <RMSInput placeholder={t_general('firstname')} />
                         </Form.Item>
                     </div>
                     <div className='w-full'>
                         <Form.Item
-                            label='Lastname'
+                            label={t_general('lastname')}
                             name='lastname'
                             required
                             rules={[
@@ -130,7 +134,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                                 },
                             ]}
                         >
-                            <RMSInput placeholder='Lastname' />
+                            <RMSInput placeholder={t_general('lastname')} />
                         </Form.Item>
                     </div>
                 </div>
@@ -142,7 +146,7 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                 <div className="flex space-x-2">
                     <div className='w-full'>
                         <Form.Item
-                            label='Phone'
+                            label={t_general('phone')}
                             name='phone'
                             rules={[
                                 {
@@ -152,12 +156,12 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                                 },
                             ]}
                         >
-                            <RMSInput placeholder='Phone' />
+                            <RMSInput placeholder={t_general('phone')} />
                         </Form.Item>
                     </div>
                     <div className='w-full'>
                         <Form.Item
-                            label='Email'
+                            label={t_general('email')}
                             name='email'
                             required
                             rules={[
@@ -172,20 +176,20 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                                 },
                             ]}
                         >
-                            <RMSInput placeholder='Email' />
+                            <RMSInput placeholder={t_general('email')} />
                         </Form.Item>
                     </div>
                 </div>
 
                 <div className="flex space-x-2">
                     <div className='w-full'>
-                        <Form.Item label="Birthday" name="birthday">
+                        <Form.Item label={t_general("birthday")} name="birthday">
                             <RMSDatePicker className='w-full' />
                         </Form.Item>
                     </div>
                     <div className="w-full">
                         <Form.Item
-                            label='Source'
+                            label={t_general("source")}
                             name='source'
                             required
                             rules={[
@@ -214,8 +218,8 @@ export const CreateNewLeadModal: React.FC<ICreateModal> = ({ formControl, ...pro
                 </div>
 
                 <div className='w-full'>
-                    <Form.Item label="Address" name="address">
-                        <TextArea placeholder='Description about this custome' />
+                    <Form.Item label={t_general("address")} name="address">
+                        <TextArea placeholder='Description about this lead' />
                     </Form.Item>
                 </div>
             </Form>

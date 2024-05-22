@@ -30,6 +30,7 @@ import fetchClient from "@/lib/fetch-client";
 import { VoucherActionBar } from "@/components/Voucher/VoucherActionBar";
 import { EditVoucherForm } from "@/components/Voucher/EditVoucherForm";
 import { AssignVoucherForm } from "@/components/Voucher/AssignVoucher";
+import { useTranslations } from "next-intl";
 
 const useStyle = createStyles(({ token }) => ({
     "my-modal-body": {},
@@ -80,7 +81,7 @@ interface TableParams {
 type DataIndex = keyof DataType;
 
 const Voucher: React.FC = () => {
-    const router = useRouter()
+    const router = useRouter();
     const [checker, setChecker] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
@@ -89,9 +90,7 @@ const Voucher: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [selectedVouchers, setSelectedVouchers] = useState<DataType[]>();
     const [open, setOpen] = useState(false);
-    const [items, setItems] = useState<any>([]);
     const [voucher, setVoucher] = useState<number>(0);
-    const [refetch, setRefetch] = useState<number>(1);
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -110,7 +109,8 @@ const Voucher: React.FC = () => {
         title: "",
     });
 
-    const { styles } = useStyle();
+    const t = useTranslations("Voucher");
+    const t_general = useTranslations("General");
 
     const fetchData = async () => {
         setLoading(true);
@@ -222,7 +222,7 @@ const Voucher: React.FC = () => {
                         size='small'
                         style={{ width: 90 }}
                     >
-                        Search
+                        {t_general("search")}
                     </Button>
                     <Button
                         onClick={() =>
@@ -231,7 +231,7 @@ const Voucher: React.FC = () => {
                         size='small'
                         style={{ width: 90 }}
                     >
-                        Reset
+                        {t_general("reset")}
                     </Button>
                     <Button
                         type='link'
@@ -242,7 +242,7 @@ const Voucher: React.FC = () => {
                             setSearchedColumn(dataIndex);
                         }}
                     >
-                        Filter
+                        {t_general("filter")}
                     </Button>
                     <Button
                         type='link'
@@ -251,7 +251,7 @@ const Voucher: React.FC = () => {
                             close();
                         }}
                     >
-                        close
+                        {t_general("close")}
                     </Button>
                 </Space>
             </div>
@@ -297,7 +297,7 @@ const Voucher: React.FC = () => {
     const handleAssignModal = (id: number) => {
         setVoucher(id);
         setOpen(true);
-    }
+    };
 
     const columns: ColumnsType<DataType> = [
         {
@@ -305,43 +305,48 @@ const Voucher: React.FC = () => {
             dataIndex: "id",
             key: "id",
             render: (text, record) => (
-                <span className="text-blue-600 cursor-pointer" onClick={() => router.push(`vouchers/${record.id.toString()}`)}>
+                <span
+                    className='text-blue-600 cursor-pointer'
+                    onClick={() =>
+                        router.push(`vouchers/${record.id.toString()}`)
+                    }
+                >
                     {text}
                 </span>
             ),
         },
         {
-            title: "Name",
+            title: t('name'),
             dataIndex: "name",
             key: "name",
         },
         {
-            title: "Descriptions",
+            title: t('description'),
             dataIndex: "description",
             key: "description",
         },
         {
-            title: "Promotion code",
+            title: t('promo-code'),
             dataIndex: "promo_code",
             key: "promo_code",
         },
         {
-            title: "Type",
+            title: t('type'),
             dataIndex: "type",
             key: "type",
         },
         {
-            title: "Amount",
+            title: t('amount'),
             dataIndex: "amount",
             key: "amount",
         },
         {
-            title: "Maximum",
+            title: t('maximum'),
             dataIndex: "maximum_reduce",
             key: "maximum_reduce",
         },
         {
-            title: "Quantity",
+            title: t('quantity'),
             dataIndex: "quantity",
             key: "quantity",
             render: (text, record) => (
@@ -352,13 +357,13 @@ const Voucher: React.FC = () => {
             ...getColumnSearchProps("quantity"),
         },
         {
-            title: "Minimum paid",
+            title: t('minimum-paid'),
             dataIndex: "minimum_paid",
             key: "minimum_paid",
             ...getColumnSearchProps("minimum_paid"),
         },
         {
-            title: "Begin",
+            title: t('begin'),
             dataIndex: "begin_date",
             key: "begin_date",
             render: (text, record) => {
@@ -367,7 +372,7 @@ const Voucher: React.FC = () => {
             ...getColumnSearchProps("begin_date"),
         },
         {
-            title: "End",
+            title: t('end'),
             dataIndex: "end_date",
             key: "end_date",
             render: (text, record) => {
@@ -472,7 +477,10 @@ const Voucher: React.FC = () => {
                 }}
             >
                 <div className='w-full flex flex-col justify-start gap-5'>
-                    <VoucherActionBar dataSelected={selectedVouchers} fetchData={fetchData}/>
+                    <VoucherActionBar
+                        dataSelected={selectedVouchers}
+                        fetchData={fetchData}
+                    />
                     {error.isError && (
                         <Alert
                             message={error.title}
@@ -485,7 +493,7 @@ const Voucher: React.FC = () => {
                     )}
                     <div className='border bg-white shadow p-3 w-full'>
                         <div className='flex items-center gap-2'>
-                            <p>Sort by: </p>
+                            <p>{t_general('sort')}: </p>
                             <Select
                                 placeholder='Columns'
                                 value={
@@ -505,7 +513,7 @@ const Voucher: React.FC = () => {
                                     }))}
                             />
 
-                            <p>Order: </p>
+                            <p>{t_general('order')}: </p>
 
                             <Button
                                 onClick={handleToggleSorter}
@@ -517,12 +525,6 @@ const Voucher: React.FC = () => {
                                     )
                                 }
                             />
-                            <Button onClick={handleClearFilter}>
-                                Clear filters
-                            </Button>
-                            <Button onClick={handleClearAll}>
-                                Clear filters and sorters
-                            </Button>
                         </div>
                     </div>
                     <div className='w-full h-auto'>

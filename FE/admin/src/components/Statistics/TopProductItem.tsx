@@ -6,7 +6,10 @@ import {
     CrownTwoTone,
     MinusOutlined,
 } from "@ant-design/icons";
+import { useLocale, useTranslations } from "next-intl";
+
 const TopProductItem = ({ item, index }: { item: any; index: number }) => {
+    const t_report: any = useTranslations("Report")
     return (
         <div className='h-32 w-full rounded-xl border-slate-200 flex flex-row justify-start gap-2 border-2 hover:bg-slate-100 p-2 transition-all duration-300'>
             <div className='font-bold text-lg w-full h-full flex flex-row justify-between items-center gap-5 p-2 px-4'>
@@ -39,7 +42,7 @@ const TopProductItem = ({ item, index }: { item: any; index: number }) => {
                 </span>
                 <div className='h-full w-full flex flex-col justify-around '>
                     <span>{item.product.name}</span>
-                    <span>Total sales: {item.quantity}</span>
+                    <span>{t_report('total_sales')}: {item.quantity}</span>
                 </div>
                 {item.indexChange !== undefined && (
                     <div

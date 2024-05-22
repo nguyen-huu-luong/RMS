@@ -1,25 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import {
-    Button,
-    Upload,
-    DatePicker,
-    Form,
-    Input,
-    Radio,
-    message,
-    Select,
-    type FormProps,
-} from "antd";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next-intl/client";
+import { Button, DatePicker, Form, Input, Select, type FormProps } from "antd";
 import Loading from "@/components/loading";
 import useSWR from "swr";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
 import { useParams } from "next/navigation";
 import { AssignVoucherForm } from "@/components/Voucher/AssignVoucher";
+import { useTranslations } from "next-intl";
 type FieldType = {
     firstname?: string;
     lastname?: string;
@@ -33,6 +21,7 @@ const Voucher = () => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState<boolean>(false);
     const params = useParams<{ locale: string; vid: string }>();
+    const t = useTranslations("Voucher");
     const {
         data: voucher,
         error: voucherError,
@@ -65,7 +54,7 @@ const Voucher = () => {
         setLoading(false);
         console.log("Failed:", errorInfo);
     };
-    if (voucherError) return <div>Failed to load</div>;
+    if (voucherError) return <Loading />;
     if (voucherLoading) return <Loading />;
     if (!voucher) return <Loading />;
     return (
@@ -81,7 +70,7 @@ const Voucher = () => {
                                 }}
                                 loading={loading}
                             >
-                                Save
+                                {t("save")}
                             </Button>
                             <Button
                                 onClick={() => {
@@ -89,7 +78,7 @@ const Voucher = () => {
                                     form.resetFields();
                                 }}
                             >
-                                Cancel
+                                {t("cancel")}
                             </Button>
                         </>
                     ) : (
@@ -98,7 +87,7 @@ const Voucher = () => {
                                 setEdit(false);
                             }}
                         >
-                            Edit information
+                            {t("edit")}
                         </Button>
                     )}
                 </div>
@@ -115,55 +104,53 @@ const Voucher = () => {
                         <div className='flex justify-between gap-6 w-full'>
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Name'
+                                    label={t("name")}
                                     name='name'
                                     initialValue={voucher.name}
                                     rules={[
                                         {
                                             required: true,
-                                            message: "Please input the name!",
+                                            message: t("name-required"),
                                         },
                                     ]}
                                 >
-                                    <Input placeholder='Name' />
+                                    <Input placeholder={t("name")} />
                                 </Form.Item>
                             </div>
 
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Description'
+                                    label={t("description")}
                                     name='description'
                                     initialValue={voucher.description}
                                     rules={[
                                         {
                                             required: true,
-                                            message:
-                                                "Please input the description!",
+                                            message: t("description-required"),
                                         },
                                     ]}
                                 >
-                                    <Input placeholder='Description' />
+                                    <Input placeholder={t("description")} />
                                 </Form.Item>
                             </div>
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Can Redeem'
+                                    label={t("can-redeem")}
                                     name='can_redeem'
                                     initialValue={voucher.can_redeem}
                                     rules={[
                                         {
                                             required: true,
-                                            message:
-                                                "Please select whether it can be redeemed or not!",
+                                            message: t("can-redeem-required"),
                                         },
                                     ]}
                                 >
-                                    <Select placeholder='Select can redeem'>
+                                    <Select placeholder={t("can-redeem")}>
                                         <Select.Option value={true}>
-                                            Yes
+                                            {t("yes")}
                                         </Select.Option>
                                         <Select.Option value={false}>
-                                            No
+                                            {t("no")}
                                         </Select.Option>
                                     </Select>
                                 </Form.Item>
@@ -172,35 +159,35 @@ const Voucher = () => {
                         <div className='flex justify-between gap-6 w-full'>
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Type'
+                                    label={t("type")}
                                     name='type'
                                     initialValue={voucher.type}
                                     rules={[
                                         {
                                             required: true,
-                                            message: "Please select the type!",
+                                            message: t("type-required"),
                                         },
                                     ]}
                                 >
-                                    <Select placeholder='Select type'>
+                                    <Select placeholder={t("type")}>
                                         <Select.Option value='fixed'>
-                                            Fixed
+                                            {t("fixed")}
                                         </Select.Option>
                                         <Select.Option value='percentage'>
-                                            Percentage
+                                            {t("percentage")}
                                         </Select.Option>
                                     </Select>
                                 </Form.Item>
                             </div>
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Amount'
+                                    label={t("amount")}
                                     name='amount'
                                     initialValue={voucher.amount}
                                     rules={[
                                         {
                                             required: true,
-                                            message: "Please input the amount!",
+                                            message: t("amount-required"),
                                         },
                                         ({ getFieldValue }) => ({
                                             validator(_, value) {
@@ -212,7 +199,7 @@ const Voucher = () => {
                                                     value > 100
                                                 ) {
                                                     return Promise.reject(
-                                                        "Percentage amount cannot exceed 100!"
+                                                        t("over-100")
                                                     );
                                                 }
                                                 return Promise.resolve();
@@ -226,7 +213,7 @@ const Voucher = () => {
 
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Maximum Reduce'
+                                    label={t("maximum-reduction")}
                                     name='maximum_reduce'
                                     initialValue={voucher.maximum_reduce}
                                     rules={[
@@ -238,14 +225,16 @@ const Voucher = () => {
                                                     return Promise.resolve();
                                                 } else if (value <= 0) {
                                                     return Promise.reject(
-                                                        "Please input a positive number!"
+                                                        t("positve")
                                                     );
                                                 }
                                                 if (value) {
                                                     return Promise.resolve();
                                                 }
                                                 return Promise.reject(
-                                                    "Please input the maximum reduce!"
+                                                    t(
+                                                        "maximum-reduction-required"
+                                                    )
                                                 );
                                             },
                                         }),
@@ -253,7 +242,7 @@ const Voucher = () => {
                                 >
                                     <Input
                                         type='number'
-                                        placeholder='Maximum Reduce'
+                                        placeholder={t("maximum-reduction")}
                                     />
                                 </Form.Item>
                             </div>
@@ -262,14 +251,13 @@ const Voucher = () => {
                         <div className='flex justify-between gap-6 w-full'>
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Quantity'
+                                    label={t("quantity")}
                                     name='quantity'
                                     initialValue={voucher.quantity}
                                     rules={[
                                         {
                                             required: true,
-                                            message:
-                                                "Please input the quantity!",
+                                            message: t("quantity-required"),
                                         },
                                         ({ getFieldValue }) => ({
                                             validator(_, value) {
@@ -277,7 +265,7 @@ const Voucher = () => {
                                                     return Promise.resolve();
                                                 }
                                                 return Promise.reject(
-                                                    "Please input a positive number!"
+                                                    t("positve")
                                                 );
                                             },
                                         }),
@@ -285,40 +273,32 @@ const Voucher = () => {
                                 >
                                     <Input
                                         type='number'
-                                        placeholder='Quantity'
+                                        placeholder={t("quantity")}
                                     />
                                 </Form.Item>
                             </div>
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Redeemed Number'
+                                    label={t("redeem")}
                                     name='redeemedNumber'
                                     initialValue={voucher.redeemedNumber}
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message:
-                                                "Please input the quantity!",
-                                        },
-                                    ]}
                                 >
                                     <Input
                                         disabled
                                         type='number'
-                                        placeholder='Quantity'
+                                        placeholder={t("redeem")}
                                     />
                                 </Form.Item>
                             </div>
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Minimum Paid'
+                                    label={t("minimum-paid")}
                                     name='minimum_paid'
                                     initialValue={voucher.minimum_paid}
                                     rules={[
                                         {
                                             required: true,
-                                            message:
-                                                "Please input the minimum paid!",
+                                            message: t("minimum-paid-required"),
                                         },
                                         ({ getFieldValue }) => ({
                                             validator(_, value) {
@@ -326,7 +306,7 @@ const Voucher = () => {
                                                     return Promise.resolve();
                                                 }
                                                 return Promise.reject(
-                                                    "Please input a positive number!"
+                                                    t("positve")
                                                 );
                                             },
                                         }),
@@ -334,7 +314,7 @@ const Voucher = () => {
                                 >
                                     <Input
                                         type='number'
-                                        placeholder='Minimum Paid'
+                                        placeholder={t("minimum-paid")}
                                     />
                                 </Form.Item>
                             </div>
@@ -343,14 +323,13 @@ const Voucher = () => {
                         <div className='flex space-x-2'>
                             <div className='w-full'>
                                 <Form.Item
-                                    label='Begin Date'
+                                    label={t("begin-date")}
                                     name='begin_date'
                                     initialValue={moment(voucher.begin_date)}
                                     rules={[
                                         {
                                             required: true,
-                                            message:
-                                                "Please select the begin date!",
+                                            message: t("begin-date-required"),
                                         },
                                         ({ getFieldValue }) => ({
                                             validator(_, value) {
@@ -364,7 +343,9 @@ const Voucher = () => {
                                                     return Promise.resolve();
                                                 }
                                                 return Promise.reject(
-                                                    "Begin date must be before end date!"
+                                                    t(
+                                                        "begin-date-before-end-date"
+                                                    )
                                                 );
                                             },
                                         }),
@@ -375,14 +356,13 @@ const Voucher = () => {
                             </div>
                             <div className='w-full'>
                                 <Form.Item
-                                    label='End Date'
+                                    label={t("end-date")}
                                     name='end_date'
                                     initialValue={moment(voucher.end_date)}
                                     rules={[
                                         {
                                             required: true,
-                                            message:
-                                                "Please select the end date!",
+                                            message: t("end-date-required"),
                                         },
                                         ({ getFieldValue }) => ({
                                             validator(_, value) {
@@ -396,7 +376,9 @@ const Voucher = () => {
                                                     return Promise.resolve();
                                                 }
                                                 return Promise.reject(
-                                                    "End date must be after begin date!"
+                                                    t(
+                                                        "end-date-after-begin-date"
+                                                    )
                                                 );
                                             },
                                         }),

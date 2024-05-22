@@ -16,6 +16,7 @@ const TablePayment = () => {
     const resultCode = searchParams.get('resultCode')
     const tableId = searchParams.get('tid')
     const router = useRouter()
+    const t_reservation: any = useTranslations("Reservation")
 
     const updateOrder = async (orderInfoJS: any) => {
         console.log(orderInfoJS)
@@ -57,14 +58,14 @@ const TablePayment = () => {
                             />
                         </div>
                         <h3 className="font-extrabold text-xl" >
-                            MAKE PAYMENT SUCCESSFULLY
+                            {t_reservation('success_payment')}
                         </h3>
                         <Link
                             href={"/sale/reservations/"}
                             className='p-2 text-white px-10 w-auto h-auto rounded-lg  text-lg border-orange-500 border-2 hover:bg-primary-400 text-item-white transition-all duration-300 flex justify-center'
                             style={{backgroundColor: "#EA6A12"}}
                         >
-                            GO TO RESERVATION MANAGEMENT PAGE
+                            {t_reservation('go_to_reservation_management_page')}
                         </Link>
                     </div>
         </div>

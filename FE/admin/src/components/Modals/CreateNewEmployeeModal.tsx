@@ -5,6 +5,7 @@ import RMSInput from "../inputs/RMSInput"
 import RMSDatePicker from "../inputs/RMSDatePicker"
 import useModal from "antd/es/modal/useModal";
 import styled from "styled-components";
+import { useLocale, useTranslations } from "next-intl";
 
 
 export interface ICreateModal {
@@ -42,6 +43,9 @@ const FormItemHorizontal = styled(Form.Item)`
 `
 
 export const CreateaEmployeeModal: React.FC<ICreateModal> = ({ formControl, ...props }) => {
+    const t_general: any = useTranslations("General")
+    const t_customer: any = useTranslations("Customer")
+    const t_employee: any = useTranslations("Employee")
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false)
     const [modal] = useModal()
@@ -70,21 +74,21 @@ export const CreateaEmployeeModal: React.FC<ICreateModal> = ({ formControl, ...p
     }
 
     return <main className="ms-auto">
-        <Button onClick={showModal}>New</Button>
+        <Button onClick={showModal}>{t_general("new")}</Button>
         <CustomModal
             open={open}
-            title="Add new Employee"
+            title={t_employee("add_new_employee")}
             okType="primary"
             okButtonProps={{ className: "bg-primary" }}
             onCancel={handleCancel}
             onOk={handleOk}
             width={800}
-
+            okText={t_general("confirm")}
             confirmLoading={loading}
             footer={(_, { OkBtn, CancelBtn }) => (
                 <>
                     <Popconfirm title="Are you sure to reset all data?" onConfirm={handleCancel}>
-                        <Button>Cancel</Button>
+                        <Button>{t_general("cancel")}</Button>
                     </Popconfirm>
                     <OkBtn />
                 </>
@@ -95,14 +99,14 @@ export const CreateaEmployeeModal: React.FC<ICreateModal> = ({ formControl, ...p
                 <div className="flex space-x-2">
                     <div className='w-full'>
                         <Form.Item 
-                            label="Username" name="username" required 
+                            label={t_employee("username")} name="username" required 
                             rules={[{ required: true, message: 'Please input your username!' }]}
                         >
                             <RMSInput />
                         </Form.Item>
                         <div className="w-full">
                             <Form.Item
-                                label='Role'
+                                label={t_employee("role")}
                                 name='role'
                                 required
                                 rules={[
@@ -114,13 +118,13 @@ export const CreateaEmployeeModal: React.FC<ICreateModal> = ({ formControl, ...p
                             >
                                 <Select className="border-[#ccc]">
                                     <Select.Option value='manager'>
-                                        Manager
+                                    {t_employee("manager")}
                                     </Select.Option>
                                     <Select.Option value='staff'>
-                                        Staff
+                                    {t_employee("staff")}
                                     </Select.Option>
                                     <Select.Option value='chef'>
-                                        Chef
+                                    {t_employee("chef")}
                                     </Select.Option>
                                 </Select>
                             </Form.Item>
@@ -130,7 +134,7 @@ export const CreateaEmployeeModal: React.FC<ICreateModal> = ({ formControl, ...p
                     <div className="w-full">
                         <Form.Item
                             name="password"
-                            label="Password"
+                            label={t_employee("password")}
                             rules={[
                                 {
                                     required: true,
@@ -144,7 +148,7 @@ export const CreateaEmployeeModal: React.FC<ICreateModal> = ({ formControl, ...p
 
                         <Form.Item
                             name="confirm"
-                            label="Confirm Password"
+                            label={t_employee("confirm_password")}
                             dependencies={['password']}
                             hasFeedback
                             rules={[
@@ -168,12 +172,12 @@ export const CreateaEmployeeModal: React.FC<ICreateModal> = ({ formControl, ...p
                 </div>
                 <div className="flex space-x-2">
                     <div className='w-full'>
-                        <Form.Item label="Firstname" name="firstname" required>
+                        <Form.Item label={t_general('firstname')} name="firstname" required>
                             <RMSInput placeholder='Firstname' />
                         </Form.Item>
                     </div>
                     <div className='w-full'>
-                        <Form.Item label="Lastname" name="lastname" required>
+                        <Form.Item label={t_general('lastname')} name="lastname" required>
                             <RMSInput placeholder='Lastname' />
                         </Form.Item>
                     </div>
@@ -181,12 +185,12 @@ export const CreateaEmployeeModal: React.FC<ICreateModal> = ({ formControl, ...p
 
                 <div className="flex space-x-2">
                     <div className='w-full'>
-                        <Form.Item label="Phone" name="phone" required>
+                        <Form.Item label={t_general('phone')} name="phone" required>
                             <RMSInput placeholder='Phone' />
                         </Form.Item>
                     </div>
                     <div className='w-full'>
-                        <Form.Item label="Email" name="email" required>
+                        <Form.Item label={t_general('email')} name="email" required>
                             <RMSInput placeholder='Email' />
                         </Form.Item>
                     </div>
@@ -194,12 +198,12 @@ export const CreateaEmployeeModal: React.FC<ICreateModal> = ({ formControl, ...p
 
                 <div className="flex space-x-2 items-end">
                     <div className='w-full'>
-                        <Form.Item label="Birthday" name="birthday">
+                        <Form.Item label={t_general('birthday')} name="birthday">
                             <DatePicker className='w-full border-[#ccc]' />
                         </Form.Item>
                     </div>
                     <div className="w-full">
-                        <FormItemHorizontal label="Active" labelAlign="left" name="isActive">
+                        <FormItemHorizontal label={t_employee('active')} labelAlign="left" name="isActive">
                             <Checkbox />
                         </FormItemHorizontal>
                     </div>

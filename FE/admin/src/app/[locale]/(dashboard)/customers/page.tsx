@@ -116,7 +116,7 @@ const CustomerListPages: React.FC = () => {
 			key: "createdAt",
 			render: (text) => moment(text).format("HH:mm DD-MM-YYYY")
 		},
-	];
+	]; 
 	const getColor = (num: number) => {
 		const color = ["#FF69B4", "#1E90FF", "#FFD700", "#00FF00", "#FF4500", "#9400D3", 
 		"#FF69B4", "#1E90FF", "#FFD700", "#00FF00", "#FF4500", "#9400D3"]
@@ -144,7 +144,7 @@ const CustomerListPages: React.FC = () => {
 		},
 		{
 			key: "3",
-			title: t_general("phone"),
+			title: t_general("email"),
 			fieldName: "email",
 			type: "input"
 		},
