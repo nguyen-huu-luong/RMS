@@ -173,11 +173,11 @@ function Home() {
     const handleOrder = async (values: any) => {
         try {
             let data_body = {
-                email: values.email,
-                firstname: values.first_name,
-                lastname: values.last_name,
+                email: values.email.trim(),
+                firstname: values.first_name.trim(),
+                lastname: values.last_name.trim(),
                 pay_method: values.paymentMethod,
-                phone: values.phone_number,
+                phone: values.phone_number.trim(),
                 birthday: values.birthday.format("YYYY-MM-DD"),
                 type: "customer"
             };

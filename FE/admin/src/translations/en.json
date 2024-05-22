@@ -160,7 +160,24 @@
 		"order_chart": "Order Chart",
 		"conversion_chart": "Conversion Chart",
 		"new_leads": "New leads",
-		"new_customers": "New customers"
+		"new_customers": "New customers",
+		"customer_group_overview": "Customer Group Overview",
+		"group_name": "Group name",
+		"popular_gender": "Popular gender",
+		"popular_source": "Popular source",
+		"month": "Monthly",
+		"year": "Yearly",
+		"cusomer_group_chart": "Cusomer Group Chart"
+	},
+	"Chef": {
+		"date_order": "Date order",
+		"time_order": "Time order",
+		"note": "Note",
+		"to_do": "To do",
+		"processing": "Processing",
+		"done": "Done",
+		"order": "Order",
+		"pos_table": "POS Table"
 	},
 	"Header": {
 		"chat-center": "Chat center",

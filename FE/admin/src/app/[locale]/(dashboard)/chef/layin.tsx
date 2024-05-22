@@ -4,11 +4,12 @@ import { Header } from "@/components/Header";
 import "../../../globals.css";
 import Colors from "@/app/variables.module.scss";
 import { ReactNode } from "react";
-import { NextIntlClientProvider, useLocale, useMessages } from "next-intl";
+import { NextIntlClientProvider, useMessages } from "next-intl";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { variables } from "@/app";
 import Provider from "@/components/SessionProvider/SessionProvider";
+import { useLocale, useTranslations } from "next-intl";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ interface LocaleLayoutProps {
 export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
     const header = headers();
     const localeHeader = header.get("x-next-intl-locale");
+    const t_chef: any = useTranslations("Chef")
     if (localeHeader === null) {
         notFound();
     }
