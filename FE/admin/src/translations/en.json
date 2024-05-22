@@ -118,7 +118,8 @@
 		"payment_method": "Payment method",
 		"make_payment": "Make payment",
 		"success_payment": "MAKE PAYMENT SUCCESSFULLY",
-		"go_to_reservation_management_page": "GO TO RESERVATION MANAGEMENT PAGE"
+		"go_to_reservation_management_page": "GO TO RESERVATION MANAGEMENT PAGE",
+		"notification": "Notification"
 	},
 	"Product": {
 		"product_management": "Product Management",
