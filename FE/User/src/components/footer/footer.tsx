@@ -18,9 +18,9 @@ const Footer = () => {
         event.preventDefault()
         
         const data_body = {
-            name: event.target.name.value,
-            email: event.target.email.value,
-            phone: event.target.phone.value,
+            name: event.target.name.value.trim(),
+            email: event.target.email.value.trim(),
+            phone: event.target.phone.value.trim(),
             type: "lead"
         } 
         const data = await fetchGeneral({method: "POST", url: '/subscribers', body: data_body, data_return: true})
