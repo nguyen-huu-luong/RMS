@@ -30,7 +30,7 @@ function Chef() {
         socket.on("table:prepare:fromStaff", (tableId: any) => {
             message.info(`New order from table #${tableId}`);
             setRefetch((pre: any) => !pre);
-        });
+        }); 
 
         return () => {
             socket.off("order:prepare:fromStaff");

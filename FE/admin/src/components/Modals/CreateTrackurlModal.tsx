@@ -6,6 +6,7 @@ import TextArea from "antd/es/input/TextArea";
 import { CSSProperties } from "styled-components";
 import { ChooseTemplateModal } from "./ChooseTemplateModal";
 import { useForm } from "antd/es/form/Form";
+import { useTranslations } from "next-intl";
 
 interface ICreateTrackUrlModalProps {
     onOk: (values: any) => Promise<void>,
@@ -15,6 +16,8 @@ interface ICreateTrackUrlModalProps {
 
 }
 export const CreateTrackUrlModal: React.FC<ICreateTrackUrlModalProps> = ({ onOk, ...props }) => {
+    const t: any = useTranslations("Marketing.Campaign")
+    const t_general = useTranslations("General")
     const [open, setOpen] = useState(false);
     const showModal = () => {
         setOpen(true);
@@ -33,7 +36,7 @@ export const CreateTrackUrlModal: React.FC<ICreateTrackUrlModalProps> = ({ onOk,
         <Button className={props.triggerBtnClasseNames} icon={<PlusOutlined />} onClick={showModal} />
         <CustomModal
             open={open}
-            title={"Create track url"}
+            title={t_general("add-new-resource", {resource: "track-url"})}
             okButtonProps={{ className: "bg-primary" }}
             footer={null}
             width={600}
@@ -46,12 +49,12 @@ export const CreateTrackUrlModal: React.FC<ICreateTrackUrlModalProps> = ({ onOk,
                 style={{ maxWidth: 1000 }}
                 onFinish={handleOk}
             >
-                <Form.Item label="Name" name="name" required rules={[{ required: true, message: 'Please input the name of track url !' }]}>
-                    <Input placeholder='Group name' />
+                <Form.Item label={t("name")} name="name" required rules={[{ required: true, message: 'Please input the name of track url !' }]}>
+                    <Input />
                 </Form.Item>
 
                 <Form.Item 
-                    label="Redirect Url" 
+                    label={t("campaignDetail.redirect-url")}
                     name="redirectUrl" required 
                     rules={[
                         { required: true, message: 'Please input the url!', validateTrigger: ["onBlur"]  },
@@ -63,10 +66,10 @@ export const CreateTrackUrlModal: React.FC<ICreateTrackUrlModalProps> = ({ onOk,
                 <Form.Item>
                     <Space align="end">
                         <Button type="default" htmlType="reset" onClick={handleCancel}>
-                            Cancel
+                            {t_general("cancel")}
                         </Button>
                         <Button type="primary" htmlType="submit" style={{ backgroundColor: "#4A58EC", color: "white" }}>
-                            Save
+                            {t_general("save")}
                         </Button>
                     </Space>
                 </Form.Item>

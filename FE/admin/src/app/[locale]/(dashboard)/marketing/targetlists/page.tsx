@@ -53,6 +53,11 @@ const TargetList: React.FC = () => {
             key: "description",
         },
         {
+            title: "Type",
+            dataIndex: "type",
+            key: "type",
+        },
+        {
             title: "CreatedAt",
             dataIndex: "createdAt",
             key: "createdAt",
