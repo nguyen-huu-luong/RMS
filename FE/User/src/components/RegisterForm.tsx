@@ -32,7 +32,8 @@ const RegistrationForm = () => {
                 firstname,
                 lastname,
                 birthday,
-                gender: gender === "male" ? 1 : 0,
+                gender,
+                source: "Website"
             });
             if (result) {
                 console.log(result.data);
@@ -111,8 +112,8 @@ const RegistrationForm = () => {
                         ]}
                     >
                         <Radio.Group>
-                            <Radio value='male'>{t('Male')}</Radio>
-                            <Radio value='female'>{t('Female')}</Radio>
+                            <Radio value={true}>{t('Male')}</Radio>
+                            <Radio value={false}>{t('Female')}</Radio>
                         </Radio.Group>
                     </Form.Item>
                     <Form.Item
@@ -205,7 +206,7 @@ const RegistrationForm = () => {
                         htmlType='submit'
                         className='bg-primary w-full mt-2'
                     >
-                        {t('Login')}
+                        {t('Signup')}
                     </Button>
                 </Form.Item>
             </Form>

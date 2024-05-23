@@ -141,7 +141,7 @@ const TargetListDetail = () => {
             dataIndex: "email",
             key: "email",
         },
-        
+
     ];
 
     const handleUpdateTargetlistInfo = async (values: any) => {
@@ -196,7 +196,6 @@ const TargetListDetail = () => {
     if (!data) return ""
     return (
         <DetailPageLayout dataCreatedAt={data.createdAt} dataUpdatedAt={data.updatedAt}>
-
             <Space direction="vertical" className="w-full">
                 <Form
                     layout="vertical"
@@ -204,37 +203,39 @@ const TargetListDetail = () => {
                     form={form}
                     className="w-full bg-white rounded-lg border py-3 px-4"
                 >
-                    {editmode ?
-                        (<Form.Item className="flex">
-                            <Button
-                                className="p-1 px-1 text-white"
-                                style={{
-                                    border: "1px solid #DADAD9",
-                                    borderRadius: "4px 0px 0px 4px",
-                                    backgroundColor: "#4A58EC"
-                                }}
-                                htmlType="submit"
-                            >
-                                Save
-                            </Button>
-                            <Popconfirm title="Your change will not save. Are you sure?">
-                                <Button
-                                    className="p-1 px-1"
-                                    style={{
-                                        borderWidth: "1px 0px 1px 0px", borderBlockColor: "#DADAD9",
-                                        borderStyle: "solid", backgroundColor: "#F9FAFB"
-                                    }}
-                                    onClick={handleCancelChange}
-                                >
-                                    Cancel
-                                </Button>
-                            </Popconfirm>
-                            <button className="p-1 px-1" type="button" style={{ borderWidth: "1px 1px 1px 1px", borderBlockColor: "#DADAD9", borderStyle: "solid", borderRadius: "0px 4px 4px 0px", backgroundColor: "#F9FAFB" }}>
-                                <EllipsisOutlined />
-                            </button>
-                        </Form.Item>) :
+                    {
+                        data.type === "default" ? <Button disabled>View only</Button> :
+                            editmode ?
+                                (<Form.Item className="flex">
+                                    <Button
+                                        className="p-1 px-1 text-white"
+                                        style={{
+                                            border: "1px solid #DADAD9",
+                                            borderRadius: "4px 0px 0px 4px",
+                                            backgroundColor: "#4A58EC"
+                                        }}
+                                        htmlType="submit"
+                                    >
+                                        Save
+                                    </Button>
+                                    <Popconfirm title="Your change will not save. Are you sure?">
+                                        <Button
+                                            className="p-1 px-1"
+                                            style={{
+                                                borderWidth: "1px 0px 1px 0px", borderBlockColor: "#DADAD9",
+                                                borderStyle: "solid", backgroundColor: "#F9FAFB"
+                                            }}
+                                            onClick={handleCancelChange}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </Popconfirm>
+                                    <button className="p-1 px-1" type="button" style={{ borderWidth: "1px 1px 1px 1px", borderBlockColor: "#DADAD9", borderStyle: "solid", borderRadius: "0px 4px 4px 0px", backgroundColor: "#F9FAFB" }}>
+                                        <EllipsisOutlined />
+                                    </button>
+                                </Form.Item>) :
 
-                        <Button onClick={() => setEditmode(true)}>Edit</Button>
+                                <Button onClick={() => setEditmode(true)}>Edit</Button>
                     }
 
                     <div className="mt-2 grid grid-cols-2 gap-5 text-black ">
@@ -244,6 +245,7 @@ const TargetListDetail = () => {
                             defaultValue={data.name}
                             editmode={editmode} label={"Name"}
                             onUpdate={handleUpdateField}
+                            disabled={data.type === "default"}
                         />
 
                         <UpdatableInput
@@ -252,6 +254,7 @@ const TargetListDetail = () => {
                             defaultValue={data.description}
                             editmode={editmode} label={"Description"}
                             onUpdate={handleUpdateField}
+                            disabled={data.type === "default"}
                         />
                         <div>
                             <p>Count</p>
@@ -260,14 +263,14 @@ const TargetListDetail = () => {
                     </div>
                 </Form>
 
-                <div className="w-full bg-white rounded-lg border py-3 px-4">
+                {<div className="w-full bg-white rounded-lg border py-3 px-4">
                     <div>
                         <div className="flex justify-between items-center">
                             <h6>Customers</h6>
-                            <AddClientToTargetListModal type="customer" onOk={handleAddClientToTargetList} />
+                            {(data.type !== "default") && <AddClientToTargetListModal type="customer" onOk={handleAddClientToTargetList} />}
                         </div>
                         <div>
-                            <ClientTable<CustomerType>
+                            {customers && customers.length > 0 && <ClientTable<CustomerType>
                                 columns={customerColumns}
                                 dataSource={customers || []}
                                 onSelected={
@@ -277,19 +280,19 @@ const TargetListDetail = () => {
                                         }
                                     }
                                 }
-                            />
+                            />}
                         </div>
                     </div>
-                </div>
+                </div>}
 
                 <div className="w-full bg-white rounded-lg border py-3 px-4">
                     <div>
                         <div className="flex justify-between items-center">
                             <h6>Leads</h6>
-                            <AddClientToTargetListModal type="lead" onOk={handleAddClientToTargetList} />
+                            {(data.type !== "default") &&  <AddClientToTargetListModal type="lead" onOk={handleAddClientToTargetList} />}
                         </div>
                         <div>
-                            <ClientTable<LeadType>
+                            {leads && leads.length > 0 && <ClientTable<LeadType>
                                 columns={leadColumns}
                                 dataSource={leads || []}
                                 onSelected={
@@ -299,7 +302,7 @@ const TargetListDetail = () => {
                                         }
                                     }
                                 }
-                            />
+                            />}
                         </div>
                     </div>
                 </div>

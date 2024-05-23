@@ -26,6 +26,7 @@ import {
 import Token from "../Models/Token";
 import { ICartRepository } from "../Repositories";
 import { IEmployeeRepository, ITokenRepository } from "../Repositories";
+import { IMessageRepository } from "../Repositories/IMessageRepository";
 
 export class AuthService {
 	constructor(
@@ -43,6 +44,9 @@ export class AuthService {
 		),
         private tokenRepository = container.get<ITokenRepository>(
 			TYPES.ITokenRepository
+		),
+		private messageRepository = container.get<IMessageRepository>(
+			TYPES.IMessageRepository
 		)
 	) {} 
 
@@ -113,6 +117,8 @@ export class AuthService {
 						email, lastname, firstname,
 						avatar, 
 						type: "lead",
+						gender: true,
+						source: "Website",
 						password,
 						isRegistered: true
 					})
@@ -123,12 +129,21 @@ export class AuthService {
 						clientId: user.getDataValue('id')
 					})
 
+					await user.createChannel()
+					const channel = await user.getChannel();
+					await this.messageRepository.create({
+						content: "Welcome to home cuisine!",
+						employeeId: 1,
+						clientId: null,
+						channelId: channel.getDataValue("id"),
+					});
+					
 					this.sendToken(res, user);
 				}
 
 				return ;
 			}
-			const { firstname, lastname, email, password, birthday, gender } = req.body;
+			const { firstname, lastname, email, password, birthday, gender, source } = req.body;
 			let user = await this.clientRepository.findByEmail(email);
 			if (user) {
 				if (user.isRegistered) {
@@ -139,7 +154,7 @@ export class AuthService {
 					);
 				}
 				const hashedPassword = await Password.hash(password);
-				user = await user.update({ isRegistered: true, firstname, lastname, email, hashedPassword, birthday});
+				user = await user.update({ isRegistered: true, firstname, lastname, email, hashedPassword, birthday, gender, source });
 				const cart = await this.cartRepository.create({
 					total: 0,
 					amount: 0,
@@ -147,9 +162,10 @@ export class AuthService {
 				})
 				await user.createChannel()
 				const channel = await user.getChannel();
-				await user.createMessage({
+				await this.messageRepository.create({
 					content: "Welcome to home cuisine!",
 					employeeId: 1,
+					clientId: null,
 					channelId: channel.getDataValue("id"),
 				});
 				this.sendToken(res, user);
@@ -161,6 +177,8 @@ export class AuthService {
 					lastname,
 					hashedPassword,
 					birthday,
+					gender,
+					source,
 					isRegistered: true,
 					type: ClientType.LEAD,
 				});
@@ -171,9 +189,10 @@ export class AuthService {
 				})
 				await user.createChannel()
 				const channel = await user.getChannel();
-				await user.createMessage({
+				await this.messageRepository.create({
 					content: "Welcome to home cuisine!",
 					employeeId: 1,
+					clientId: null,
 					channelId: channel.getDataValue("id"),
 				});
 				this.sendToken(res, user);

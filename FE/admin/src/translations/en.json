@@ -46,7 +46,7 @@
 		"edit": "Edit",
 		"save": "Save",
 		"recent_activities": "Recent activities",
-		"view": "View", 
+		"view": "View",
 		"add": "Add",
 		"last_modified": "Last modified",
 		"quantity": "Quantity",
@@ -54,7 +54,14 @@
 		"amount": "Amount",
 		"apply": "Apply",
 		"clear_filter": "Clear filters",
-		"change": "Change"
+		"change": "Change",
+		"add-new-resource": "Add New {resource}",
+		"input": "input",
+		"select": "select",
+		"created-at": "Created At",
+		"updated-at": "Updated at",
+		"last-modified-at": "Last modified at"
+
 	},
 	"Customer": {
 		"customer": "customers",
@@ -206,7 +213,7 @@
 	"Chat": {
 		"all": "All customers",
 		"enter": "Enter name",
-		"enter-text": "Enter text", 
+		"enter-text": "Enter text",
 		"seen": "Seen",
 		"not-seen": "Not seen",
 		"active": "Active",
@@ -226,7 +233,7 @@
 	"Voucher": {
 		"name": "Name",
 		"description": "Descriptions",
-		"promo-code": "Promotion code", 
+		"promo-code": "Promotion code",
 		"type": "Type",
 		"amount": "Amount",
 		"maximum": "Maximum",
@@ -258,8 +265,8 @@
 		"select": "Select profit",
 		"custom": "Custom",
 		"select-custom": "Enter custom profit",
-		"fullname":"Full Name",
-		"status":"Status",
+		"fullname": "Full Name",
+		"status": "Status",
 		"used": "Used",
 		"available": "Available",
 		"not-enough-1": "There is not enough vouchers, add",
@@ -271,8 +278,8 @@
 		"success": "Voucher added successfully",
 		"over-100": "Amount for percentage can not be over 100%!",
 		"cancel": "Cancel",
- 		"save": "Save",
-		"redeem" :"Redeem Number",
+		"save": "Save",
+		"redeem": "Redeem Number",
 		"assign-success": "Assign voucher successfully",
 		"finish": "Finish",
 		"assign": "Assign",
@@ -312,7 +319,10 @@
 		"finish-2": "! Ready to deliver!",
 		"cancel-1": "Order",
 		"cancel-2": "is canceled by client!",
-		"new-order": "New order from client"
+		"new-order": "New order from client",
+		"cart_information": "Cart information",
+		"total_amount": "Total amount", 
+		"view_cart": "View cart"
 	},
 	"Overview": {
 		"orders": "Orders",
@@ -330,5 +340,56 @@
 		"conversion-chart": "Conversion Chart",
 		"new-customers": "New customers",
 		"new-leads": "New leads"
+	},
+	"Marketing": {
+		"Targetlist": {},
+		"Campaign": {
+			"name": "Name",
+			"campaign": "Campaign",
+			"targetlists": "Targetlists",
+			"campaign-name": "Campaign name",
+			"type": "Type",
+			"status": "Status",
+			"start-date": "Start date",
+			"end-date": "End date",
+			"search-placeholder": "Enter keywrork to search....",
+			"delete-n-campaigns": "Delete {n} campaigns",
+			"email": "Email",
+			"newsletter": "Bảng tin",
+			"planning": "Đang lên kế hoạch",
+			"active": "Hoạt động",
+			"send-to": "Send to",
+			"subject": "Subject",
+			"template": "Tempalte",
+			"are-you-sure": "Are you sure ?",
+			"add": "Add",
+			"campaignStatus": {
+				"planning": "Planning",
+				"active": "Active"
+			},
+			"campaignType": {
+				"email": "Email",
+				"newsletter": "Newsletter"
+			},
+			"createForm": {
+				"validate-message": "Please {action} the campaign's {field}"
+			},
+			"campaignDetail": {
+				"update-canpaign-success-msg": "Update campaign successfully",
+				"delete-email-campaign-success-msg": "Delete email campaign successfully",
+				"delete-strack-url-success-msg": "Create track url successfully",
+				"overview": "Overview",
+				"email-marketing": "Email marketing",
+				"actions": "Hành động",
+				"redirect-url": "Redirect Url",
+				"code-to-insert": "Code to inserted instead of link",
+				"statistic": "Statistic",
+				"opened": "Opened",
+				"clicked": "Clicked",
+				"sent": "Sent",
+				"lead-convert": "Lead converts"
+			}
+		},
+		"MessageTemplate": {}
 	}
 }

@@ -30,6 +30,7 @@ export type CampaignData = {
     endDate?: number;
     budget?: number;
     targetlists?: AssociationWithResourceType;
+    targetlistIds?: number [];
     emailCampaigns?: AssociationWithResourceType;
     trackUrls?: number[];
 };
@@ -92,9 +93,9 @@ export class CampaignService {
     }
 
     public async create(data: CampaignData) {
-        const { name, type, status, startDate, endDate, budget } = data;
+        const { name, type, status, startDate, endDate, budget, targetlistIds } = data;
 
-        return await this.campaignRepository.create({
+        const campaign =  await this.campaignRepository.create({
             name,
             type,
             status,
@@ -102,6 +103,12 @@ export class CampaignService {
             endDate,
             budget,
         });
+
+        if (targetlistIds) {
+            await campaign.addTargetLists(targetlistIds)
+        } 
+
+        return campaign 
     }
 
     public async update(id: number, data: CampaignData) {

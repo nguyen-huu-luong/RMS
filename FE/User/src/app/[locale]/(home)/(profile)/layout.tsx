@@ -87,7 +87,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <span className='whitespace-nowrap font-bold text-base'>
                             {profile.firstname}  {profile.lastname}
                         </span>
-                        <span className='font-bold text-sky-500'>Ơ Points</span>
                     </div>
                     <div className='w-full h-auto p-5 flex flex-col justify-start gap-1 items-center'>
                         <ConfigProvider

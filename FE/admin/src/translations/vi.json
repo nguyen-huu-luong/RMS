@@ -54,7 +54,13 @@
 		"amount": "Tổng tiền",
 		"apply": "Áp dụng",
 		"clear_filter": "Xóa bộ lọc",
-		"change": "Thay đổi"
+		"change": "Thay đổi",
+		"add-new-resource": "Thêm Mới {resource}",
+		"input": "nhập",
+		"select": "chọn",
+		"created-at": "Ngày tạo",
+		"updated-at": "Lần cuối cập nhật",
+		"last-modified-at": "Lần cuối chỉnh sửa"
 	},
 	"Customer": {
 		"customer": "khách hàng",
@@ -312,7 +318,10 @@
 		"finish-2": "! Sẵn sàng để vận chuyển!",
 		"cancel-1": "Đơn hàng",
 		"cancel-2": "đã bị hủy bởi khách hàng!",
-		"new-order": "Đơn hàng mới đến từ khách hàng"
+		"new-order": "Đơn hàng mới đến từ khách hàng",
+		"cart_information": "Thông tin giỏ hàng",
+		"total_amount": "Tổng tiền", 
+		"view_cart": "Xem giỏ hàng"
 	},
 	"Overview": {
 		"orders": "Đơn hàng",
@@ -330,5 +339,69 @@
 		"conversion-chart": "Biểu đồ chuyển đổi",
 		"new-customers": "Khách hàng mới",
 		"new-leads": "Khách hàng tiềm năng mới"
+	},
+
+	"Marketing": {
+		"Targetlist": {
+
+		},
+
+		"Campaign": {
+			"campaign": "Chiến dịch",
+			"targetlists": "Danh sách mục tiêu",
+			"name": "Tên",
+			"campaign-name": "Tên chiến dịch",
+			"type": "Loại",
+			"status":"Trạng thái",
+			"start-date": "Ngày bắt đầu",
+			"end-date": "Ngày kết thúc",
+			"search-placeholder": "Nhập từ khoá để tìm kiếm....",
+			"delete-n-campaigns": "Xoá {n} chiến dịch",
+			"email": "Email",
+			"newsletter": "Bảng tin",
+			"planning": "Đang lên kế hoạch",
+			"active": "Hoạt động",
+			"send-to": "Gửi cho",
+			"subject": "Tiêu đề",
+			"template": "Mẫu",
+			"are-you-sure": "Bạn chắc chắn chứ ?",
+			"add": "Thêm",
+			"campaignStatus": {
+				"planning": "Đang lên kế hoạch",
+				"active": "Hoạt động"
+			},
+			"campaignType": {
+				"email": "Email",
+				"newsletter": "Bảng tin"
+			},
+			"createForm": {
+				"validate-message": "Vui lòng {action} {field} của chiến dịch"
+			},
+
+			"campaignDetail": {
+				"update-canpaign-success-msg": "Cập nhật thông tin chiến dịch thành công", 
+				"delete-email-campaign-success-msg": "Xóa email tiếp thị thành công",
+				"delete-strack-url-success-msg": "Tạo liên kết theo dõi thành công",
+				"overview": "Thông tin chung",
+				"emal-marketing": "Email tiếp thị",
+				"actions": "Hành động",
+				"redirect-url": "Liên kết chuyển tiếp",
+				"code-to-insert": "Mã để chèn thay cho liên kết",
+				"statistic": "Thống kê chiến dịch",
+				"opened": "Số lượng mở",
+				"clicked": "Số lượng click",
+				"sent": "Số email đã gửi",
+				"lead-convert": "Số lead chuyển đổi"
+			}
+
+
+
+
+		}, 
+
+		"MessageTemplate": {
+
+		}
+
 	}
 }

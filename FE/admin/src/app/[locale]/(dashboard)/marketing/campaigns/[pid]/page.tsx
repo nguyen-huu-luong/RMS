@@ -16,6 +16,7 @@ import { CampaignTrackUrl } from "@/components/CampaignComponents/CampaignTrackU
 import { CampaignHistoryAndStatistic } from "@/components/CampaignComponents/CampaignHistoryAndStatistic";
 import fetchClient from "@/lib/fetch-client";
 import { AxiosError } from "axios";
+import { useTranslations } from "next-intl";
 
 
 type CampaignData = {
@@ -38,6 +39,8 @@ const CampaignDetail = () => {
     const [editmode, setEditmode] = useState(false)
     const [loading, setLoading] = useState(false);
     const [campaignData, setCampaignData] = useState<CampaignData>()
+    const t : any= useTranslations("Marketing.Campaign")
+    const t_general: any = useTranslations("General")
 
     const params = useParams<{ locale: string; pid: string }>()
 
@@ -158,7 +161,7 @@ const CampaignDetail = () => {
             if (result) {
                 const newEmailCampaigns = campaignData.emailCampaigns.filter(item => item.id !== id)
                 setCampaignData(prev => (prev && { ...prev, emailCampaigns: newEmailCampaigns }))
-                message.success("Delete email campaign successfully")
+                message.success(t("delete-email-campaign-success-msg"))
             }
         } catch (error) {
             message.error("Faild to delete email campaign")
@@ -252,7 +255,7 @@ const CampaignDetail = () => {
                         isEditmode={editmode}
                         trackUrls={trackUrls || []} />
                 </div>
-                <CampaignHistoryAndStatistic campaignId={params.pid} statisticInfo={statisticInfo} />
+                <CampaignHistoryAndStatistic createdAt={campaignData.createdAt} updatedAt={campaignData.updatedAt} campaignId={params.pid} statisticInfo={statisticInfo} />
             </div>
         </ConfigProvider>
 

@@ -33,6 +33,7 @@ import Message from "./Message";
 import Notification from "./Notification";
 import ClientHistory from "./ClientHistory";
 import Group from "./Group";
+import Subscriber from "./Subscriber";
 
 class Client extends Person {
 	declare getOrders: HasManyGetAssociationsMixin<Order>;
@@ -74,6 +75,14 @@ class Client extends Person {
 		});
 
 		Client.hasOne(Cart, {
+			foreignKey: {
+				name: "clientId",
+				allowNull: true,
+			},
+			sourceKey: "id",
+		});
+
+		Client.hasOne(Subscriber, {
 			foreignKey: {
 				name: "clientId",
 				allowNull: true,
