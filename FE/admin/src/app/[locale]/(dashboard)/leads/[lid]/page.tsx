@@ -8,9 +8,10 @@ import {
     UserOutlined,
     CloseCircleFilled,
     MessageOutlined,
-} from "@ant-design/icons";
-import { Pagination, Space, Table, Tag } from "antd";
-import type { PaginationProps, TableProps } from "antd";
+    UploadOutlined,
+} from "@ant-design/icons"; 
+import { Pagination, Space, Table, Tag, Upload, message } from "antd";
+import type { PaginationProps, TableProps, UploadProps } from "antd";
 import { Empty } from "antd";
 import useSWR from "swr";
 import { useParams } from "next/navigation";
@@ -21,6 +22,7 @@ import moment from "moment";
 import Link from "next-intl/link";
 import { useRouter } from "next-intl/client";
 import { useLocale, useTranslations } from "next-intl";
+import { uploadImage } from "@/app/api/upload";
 
 const LeadProfile = () => {
     const router = useRouter()
@@ -49,6 +51,8 @@ const LeadProfile = () => {
     const [checker, setChecker] = useState(0);
     const [history, setHistory] = useState<any>([]);
     const [historyPage, setHistoryPage] = useState(1);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [creator, setCreator] = useState("")
     const t_general: any = useTranslations("General")
 	const t_customer: any = useTranslations("Customer")
     const onChange: PaginationProps["onChange"] = (page) => {
@@ -85,6 +89,13 @@ const LeadProfile = () => {
                             return item;
                         })
                     );
+                    if (leadInfo.creatorId){
+                        const creator = await fetchClient({
+                            url: `/employees/${leadInfo.creatorId}`,
+                            data_return: true,
+                        }); 
+                        setCreator(creator.firstname + " " + creator.lastname) 
+                    }
                     setHistory(newResponse);
                 } catch (error) {
                     console.error("Error fetching data:", error);
@@ -93,6 +104,7 @@ const LeadProfile = () => {
         };
         fetchData();
     }, [leadInfo]);
+
     if (leadInfoLoading) {
         return (
             <>
@@ -100,7 +112,6 @@ const LeadProfile = () => {
             </>
         );
     } else {
-        console.log(leadInfo);
         if (leadInfo) {
             userInfo = {
                 name: leadInfo.firstname + " " + leadInfo.lastname,
@@ -118,6 +129,33 @@ const LeadProfile = () => {
             };
         }
     }
+
+    const handleUpload = async ({
+        file,
+        onSuccess,
+    }: {
+        file?: any;
+        onSuccess?: any;
+    }) => {
+        const data = await uploadImage(file, "Dish");
+        if (data.url) {
+            setImageUrl(data.url);
+        }
+        onSuccess("ok");
+    };
+
+    const props: UploadProps = {
+        name: "image",
+        customRequest: handleUpload,
+        onChange(info) {
+            if (info.file.status === "done") {
+                message.success(`Upload avatar successfully`);
+            } else if (info.file.status === "error") {
+                message.error(`Change avatar failed.`);
+            }
+        },
+    };
+
     const handelTabClick = (num: number) => {
         setTab(num);
     };
@@ -150,6 +188,7 @@ const LeadProfile = () => {
             event.target.address.value = userInfo.address
                 ? userInfo.address
                 : "None";
+            setImageUrl(leadInfo.avatar);
         } else {
             let name = event.target.username.value.split(" ");
             let first_name = name[0];
@@ -184,6 +223,7 @@ const LeadProfile = () => {
                         : event.target.birthday.value,
                 firstname: first_name,
                 lastname: last_name.trim(),
+                avatar: imageUrl,
             };
             await fetchClient({
                 url: `/customers/${params.lid}`,
@@ -346,17 +386,60 @@ const LeadProfile = () => {
                                 <div className='bg-white pl-3 py-2'>
                                     <h1 className='font-bold'>{t_customer('overview')}</h1>
                                     <div className='mt-3 grid grid-cols-5 gap-4'>
-                                        <div
+                                    <div
+                                            className='relative'
                                             style={{
                                                 width: "120px",
                                                 height: "120px",
                                             }}
-                                            className='overflow-hidden aspect-square rounded-full'
                                         >
-                                            <img
-                                                src={leadInfo.avatar}
-                                                alt='user avatar'
-                                            />
+                                            <div
+                                                style={{
+                                                    width: "120px",
+                                                    height: "120px",
+                                                }}
+                                            >
+                                                <img
+                                                    style={{
+                                                        width: "120px",
+                                                        height: "120px",
+                                                    }}
+                                                    src={imageUrl ? imageUrl : leadInfo.avatar}
+                                                    className='rounded'
+                                                />
+                                            </div>
+                                            <div>
+                                                <Upload
+                                                    {...props}
+                                                    accept='image/*'
+                                                    showUploadList={false}
+                                                    listType='picture'
+                                                    maxCount={1}
+                                                >
+                                                    {!editFlag && (
+                                                        <button
+                                                            type='button'
+                                                            className='absolute'
+                                                            style={{
+                                                                top: "80%",
+                                                                left: "50%",
+                                                                transform:
+                                                                    "translateX(-50%)",
+                                                            }}
+                                                        >
+                                                            <UploadOutlined
+                                                                style={{
+                                                                    fontWeight:
+                                                                        "20px",
+                                                                    fontSize:
+                                                                        "20px",
+                                                                    color: "gray",
+                                                                }}
+                                                            />
+                                                        </button>
+                                                    )}
+                                                </Upload>
+                                            </div>
                                         </div>
                                         <div>
                                             <p className='font-bold'>{t_general('name')}</p>
@@ -510,8 +593,8 @@ const LeadProfile = () => {
                                         )}{" "}
                                         by{" "}
                                         <span style={{ color: "#4A58EC" }}>
-                                            {userInfo.creatorId
-                                                ? "Staff"
+                                            {leadInfo.creatorId
+                                                ? creator
                                                 : userInfo.name}
                                         </span>
                                     </p>

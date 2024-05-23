@@ -7,7 +7,7 @@ import {
     ArrowRightOutlined,
     UserOutlined,
     CloseCircleFilled,
-    MessageOutlined,
+    MessageOutlined, 
 } from "@ant-design/icons";
 import {
     Space,
@@ -67,6 +67,7 @@ const CustomerProfile = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [customerHistory, setCustomerHistory] = useState<any>([]);
     const [recentHistory, setRecentHistory] = useState([]);
+    const [creator, setCreator] = useState("")
     const historyTitle: any = {
         add_to_cart: {
             title: "Add To Cart",
@@ -116,6 +117,13 @@ const CustomerProfile = () => {
                 return item;
             })
         );
+        if (data.creatorId){
+            const creator = await fetchClient({
+                url: `/employees/${data.creatorId}`,
+                data_return: true,
+            }); 
+            setCreator(creator.firstname + " " + creator.lastname) 
+        }
         setCustomerInfo(data);
         setCustomerHistory(newResponse);
         setImageUrl(data.avatar);
@@ -892,7 +900,7 @@ const CustomerProfile = () => {
                                         by{" "}
                                         <span style={{ color: "#4A58EC" }}>
                                             {userInfo.creatorId
-                                                ? "Staff"
+                                                ? creator
                                                 : userInfo.name}
                                         </span>
                                     </p>

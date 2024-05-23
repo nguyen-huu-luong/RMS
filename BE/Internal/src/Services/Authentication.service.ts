@@ -26,6 +26,7 @@ import {
 import Token from "../Models/Token";
 import { ICartRepository } from "../Repositories";
 import { IEmployeeRepository, ITokenRepository } from "../Repositories";
+import { IMessageRepository } from "../Repositories/IMessageRepository";
 
 export class AuthService {
 	constructor(
@@ -43,6 +44,9 @@ export class AuthService {
 		),
         private tokenRepository = container.get<ITokenRepository>(
 			TYPES.ITokenRepository
+		),
+		private messageRepository = container.get<IMessageRepository>(
+			TYPES.IMessageRepository
 		)
 	) {} 
 
@@ -123,6 +127,15 @@ export class AuthService {
 						clientId: user.getDataValue('id')
 					})
 
+					await user.createChannel()
+					const channel = await user.getChannel();
+					await this.messageRepository.create({
+						content: "Welcome to home cuisine!",
+						employeeId: 1,
+						clientId: null,
+						channelId: channel.getDataValue("id"),
+					});
+					
 					this.sendToken(res, user);
 				}
 
@@ -147,9 +160,10 @@ export class AuthService {
 				})
 				await user.createChannel()
 				const channel = await user.getChannel();
-				await user.createMessage({
+				await this.messageRepository.create({
 					content: "Welcome to home cuisine!",
 					employeeId: 1,
+					clientId: null,
 					channelId: channel.getDataValue("id"),
 				});
 				this.sendToken(res, user);
@@ -171,9 +185,10 @@ export class AuthService {
 				})
 				await user.createChannel()
 				const channel = await user.getChannel();
-				await user.createMessage({
+				await this.messageRepository.create({
 					content: "Welcome to home cuisine!",
 					employeeId: 1,
+					clientId: null,
 					channelId: channel.getDataValue("id"),
 				});
 				this.sendToken(res, user);
