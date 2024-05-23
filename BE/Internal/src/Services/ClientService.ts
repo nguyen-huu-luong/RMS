@@ -394,7 +394,6 @@ export class ClientService {
             //                                                         GROUP BY groups.name, groups.id
             //                                                         ORDER BY groups.name ASC
             // `);
-
                 let temp_groups = []
                 for (let idx in gender) {
                     let temp_gender: any = gender[idx]

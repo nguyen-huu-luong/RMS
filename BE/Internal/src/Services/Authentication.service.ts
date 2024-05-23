@@ -117,6 +117,8 @@ export class AuthService {
 						email, lastname, firstname,
 						avatar, 
 						type: "lead",
+						gender: true,
+						source: "Website",
 						password,
 						isRegistered: true
 					})
@@ -141,7 +143,7 @@ export class AuthService {
 
 				return ;
 			}
-			const { firstname, lastname, email, password, birthday, gender } = req.body;
+			const { firstname, lastname, email, password, birthday, gender, source } = req.body;
 			let user = await this.clientRepository.findByEmail(email);
 			if (user) {
 				if (user.isRegistered) {
@@ -152,7 +154,7 @@ export class AuthService {
 					);
 				}
 				const hashedPassword = await Password.hash(password);
-				user = await user.update({ isRegistered: true, firstname, lastname, email, hashedPassword, birthday});
+				user = await user.update({ isRegistered: true, firstname, lastname, email, hashedPassword, birthday, gender, source });
 				const cart = await this.cartRepository.create({
 					total: 0,
 					amount: 0,
@@ -175,6 +177,8 @@ export class AuthService {
 					lastname,
 					hashedPassword,
 					birthday,
+					gender,
+					source,
 					isRegistered: true,
 					type: ClientType.LEAD,
 				});

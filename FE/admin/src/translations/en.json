@@ -312,7 +312,10 @@
 		"finish-2": "! Ready to deliver!",
 		"cancel-1": "Order",
 		"cancel-2": "is canceled by client!",
-		"new-order": "New order from client"
+		"new-order": "New order from client",
+		"cart_information": "Cart information",
+		"total_amount": "Total amount", 
+		"view_cart": "View cart"
 	},
 	"Overview": {
 		"orders": "Orders",

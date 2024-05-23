@@ -312,7 +312,10 @@
 		"finish-2": "! Sẵn sàng để vận chuyển!",
 		"cancel-1": "Đơn hàng",
 		"cancel-2": "đã bị hủy bởi khách hàng!",
-		"new-order": "Đơn hàng mới đến từ khách hàng"
+		"new-order": "Đơn hàng mới đến từ khách hàng",
+		"cart_information": "Thông tin giỏ hàng",
+		"total_amount": "Tổng tiền", 
+		"view_cart": "Xem giỏ hàng"
 	},
 	"Overview": {
 		"orders": "Đơn hàng",
