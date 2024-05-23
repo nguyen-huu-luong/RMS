@@ -3,6 +3,7 @@ import { QueryOptions, TYPES } from "../Types/type";
 import { IClientRepository, ISubscriberRepository } from "../Repositories";
 import { Request, Response, NextFunction } from "express";
 import { Op, where } from "sequelize";
+import { ITargetListRepository } from "../Repositories/ITargetListRepository";
 
 export class SubscriberService {
   constructor(
@@ -11,6 +12,9 @@ export class SubscriberService {
       ),
       private subscriberRepository = container.get<ISubscriberRepository>(
         TYPES.ISubscriberRepository
+      ),
+      private targetlistRepository = container.get<ITargetListRepository>(
+        TYPES.ITargetListRepository
       )
   ) {}
     
@@ -40,36 +44,28 @@ export class SubscriberService {
 
             if (lead.length == 0) {
                 const {name, ...customInfo} = req.body
-                await this.clientRepository.create({...customInfo, firstname: firstname, lastname: lastname})
+                lead = await this.clientRepository.create({...customInfo, firstname: firstname, lastname: lastname})
             }
 
-            lead = await this.clientRepository.findByCond({
-                where: {
-                    [Op.or]: {
-                        email: req.body.email,
-                        phone: req.body.phone
-                    }
-                }
-            })
+            // lead = await this.clientRepository.findByCond({
+            //     where: {
+            //         [Op.or]: {
+            //             email: req.body.email,
+            //             phone: req.body.phone
+            //         }
+            //     }
+            // })
 
             const lead_id = lead[0].id
 
-            let subscriber = await this.subscriberRepository.findByCond({
-                where: {
-                    [Op.or]: {
-                        email: req.body.email,
-                        phone: req.body.phone
-                    }
-                }
-            })
+            let subscriber = await this.targetlistRepository.getSubscriber(lead_id)
 
-            if (subscriber.length > 0) {
+            if (subscriber) {
                 return {status: "Failed", message: "This email or phone existed"}
             }
 
-            const {name, ...customInfo} = req.body
-            await this.subscriberRepository.create({...customInfo, firstname: firstname, lastname: lastname, clientId: lead_id})
-
+            // const {name, ...customInfo} = req.body
+            await this.targetlistRepository.addSubscriber(lead_id)
             return {status: "Success"}
         }
         catch(err){
