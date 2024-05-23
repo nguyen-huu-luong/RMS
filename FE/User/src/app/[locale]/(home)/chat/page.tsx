@@ -103,6 +103,8 @@ export default function Chat() {
                     "anonymousclient:message:send",
                     value,
                     Cookies.get("socketId")
+                        ? Cookies.get("socketId")
+                        : socket.id
                 );
                 if (!response.status) {
                     message.error("Sending message failed!");

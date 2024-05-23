@@ -13,6 +13,7 @@ import { AxiosError } from "axios";
 import moment from "moment";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 interface DataType {
@@ -50,7 +51,7 @@ const CustomerListPages: React.FC = () => {
 	const [selectedRows, setSelectedRows] = useState<DataType[]>([])
 	const [reload, setReload] = useState(false)
 	const router = useRouter()
-
+	const {data} = useSession()
 	const [form_create] = useForm()
 	const columns: ColumnsType<DataType> = [
 		{
@@ -240,7 +241,8 @@ const CustomerListPages: React.FC = () => {
 					data: {
 						...values,
 						convertDate: new Date(),
-                        type: "lead"
+                        type: "lead",
+						creatorId: data?.user.id
 					}
 				}
 			})

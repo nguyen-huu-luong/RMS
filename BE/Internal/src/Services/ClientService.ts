@@ -13,6 +13,7 @@ import * as dotenv from 'dotenv';
 import Sequelize from 'sequelize';
 import { sequelize } from '../Configs';
 import { IChannelRepository } from '../Repositories/IChannelRepository';
+import { IMessageRepository } from '../Repositories/IMessageRepository';
 const axios = require('axios').default;
 
 
@@ -33,9 +34,8 @@ export class ClientService {
             TYPES.IOrderRepository
         ),
         private cartRepository = container.get<ICartRepository>(TYPES.ICartRepository),
-        private productRepository = container.get<IProductRepository>(TYPES.IProductRepository),
         private groupRepository = container.get<IGroupRepository>(TYPES.IGroupRepository),
-        private channelRepository = container.get<IChannelRepository>(TYPES.IChannelRepository)
+        private messageRepository = container.get<IMessageRepository>(TYPES.IMessageRepository),
     ) { }
 
     public async getAll(options?: QueryOptions) {
@@ -72,9 +72,10 @@ export class ClientService {
         const client = await this.clientRepository.create(data)
         await client.createChannel()
         const channel = await client.getChannel();
-        await client.createMessage({
+        await this.messageRepository.create({
             content: "Welcome to home cuisine!",
             employeeId: 1,
+            clientId: null,
             channelId: channel.getDataValue("id"),
         });
         return client;

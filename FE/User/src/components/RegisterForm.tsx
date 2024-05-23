@@ -206,7 +206,7 @@ const RegistrationForm = () => {
                         htmlType='submit'
                         className='bg-primary w-full mt-2'
                     >
-                        {t('Login')}
+                        {t('Signup')}
                     </Button>
                 </Form.Item>
             </Form>

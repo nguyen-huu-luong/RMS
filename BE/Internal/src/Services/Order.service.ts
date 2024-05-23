@@ -314,22 +314,10 @@ export class OrderService {
                     });
                     if (client.getDataValue("type") == "lead") {
                         await client.update({ type: "customer" });
-                        await client.update({ convertDate: new Date(), lastPurchase: new Date() });
-                        // await this.emailService.sendEmail({
-                        //     from: `${process.env.GMAIL_USER}`,
-                        //     to: client.getDataValue("email"),
-                        //     subject: `Your first order with Home Cuisine!`,
-                        //     html: `<p>Hello <i>${client.getDataValue(
-                        //         "firstname"
-                        //     )} ${client.getDataValue("lastname")}</i>,</p>
-                        //     <p>We are delighted to inform you that your first order with Home Cuisine has been successfully completed!</p>
-                        //     <p style="padding-top: px;">We hope you enjoyed your meal and had a wonderful dining experience with us.</p>
-                        //     <p style="padding-top: px;">Thank you for choosing us, we have a gift for you, please find your voucher code below:</p>
-                        //     <p style="padding-top: 10px; padding-bottom: 10px;">Voucher Code:<strong>HICUSTOMER</strong></p>
-                        //     <p>If you have any questions or feedback, feel free to contact us. We're always here to assist you.</p>
-                        //     <p style="padding-top: 10px;">Best regards,</p>
-                        //     <p>Home Cuisine Restaurant</p>`,
-                        // });
+                        await client.update({
+                            convertDate: new Date(),
+                            lastPurchase: new Date(),
+                        });
                     }
                     await client.save();
                 } else if (status.status == "Cancel") {
@@ -352,22 +340,22 @@ export class OrderService {
                 const client = await this.clientRepository.findById(
                     order.getDataValue("clientId")
                 );
-                // await this.emailService.sendEmail({
-                //     from: `${process.env.GMAIL_USER}`,
-                //     to: client.getDataValue("email"),
-                //     subject: `Your order #${orderId} has been ${status.status.toLowerCase()}`,
-                //     html: ` <p>Hello <i>${client.getDataValue(
-                //         "firstname"
-                //     )} ${client.getDataValue("lastname")}</i>,</p>
-                //             <p style="padding-top: px;">To view the order detail, click <a href="http://localhost:3001/en/myorder/${orderId}" target="_blank">here</a></p> 
-                //             ${
-                //                 status.status === "Done"
-                //                     ? `<p style="padding-top: px;">Enjoy your meal!</p>`
-                //                     : ""
-                //             }
-                //             <p style="padding-top: 6px;">Best regards,</p>
-                //             <p>Home Cuisine restaurant.</p>`,
-                // });
+                if (status.status === "Done"){
+                    await this.emailService.sendEmail({
+                        from: `${process.env.GMAIL_USER}`,
+                        to: client.getDataValue("email"),
+                        subject: `Your order with Home Cuisine!`,
+                        html: `<p>Hello <i>${client.getDataValue(
+                            "firstname"
+                        )} ${client.getDataValue("lastname")}</i>,</p>
+                                <p>We are delighted to inform you that your first order with Home Cuisine has been successfully completed!</p>
+                                <p>We hope you enjoyed your meal and had a wonderful dining experience with us.</p>
+                                <p>To view the order detail, click <a href="${process.env.USER_HOST}:${process.env.USER_PORT}/en/myorder/${orderId}" target="_blank">here</a></p>
+                                <p>If you have any questions or feedback, feel free to contact us. We're always here to assist you.</p>
+                                <p style="padding-top: 10px;">Best regards,</p>
+                                <p>Home Cuisine Restaurant</p>`,
+                    });
+                }
                 await this.orderRepository.updateStatus(data);
             } else throw new UnauthorizedError();
 
