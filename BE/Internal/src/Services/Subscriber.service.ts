@@ -1,6 +1,6 @@
 import { container } from "../Configs";
 import { QueryOptions, TYPES } from "../Types/type";
-import { IClientRepository } from "../Repositories";
+import { IClientRepository, ISubscriberRepository } from "../Repositories";
 import { Request, Response, NextFunction } from "express";
 import { Op, where } from "sequelize";
 
@@ -8,6 +8,9 @@ export class SubscriberService {
   constructor(
     private clientRepository = container.get<IClientRepository>(
         TYPES.IClientRepository
+      ),
+      private subscriberRepository = container.get<ISubscriberRepository>(
+        TYPES.ISubscriberRepository
       )
   ) {}
     
@@ -26,7 +29,7 @@ export class SubscriberService {
                 lastname = " "
             }
 
-            const subscribers = await this.clientRepository.findByCond({
+            let lead = await this.clientRepository.findByCond({
                 where: {
                     [Op.or]: {
                         email: req.body.email,
@@ -35,13 +38,38 @@ export class SubscriberService {
                 }
             })
 
-            if (subscribers.length > 0) {
+            if (lead.length == 0) {
+                const {name, ...customInfo} = req.body
+                await this.clientRepository.create({...customInfo, firstname: firstname, lastname: lastname})
+            }
+
+            lead = await this.clientRepository.findByCond({
+                where: {
+                    [Op.or]: {
+                        email: req.body.email,
+                        phone: req.body.phone
+                    }
+                }
+            })
+
+            const lead_id = lead[0].id
+
+            let subscriber = await this.subscriberRepository.findByCond({
+                where: {
+                    [Op.or]: {
+                        email: req.body.email,
+                        phone: req.body.phone
+                    }
+                }
+            })
+
+            if (subscriber.length > 0) {
                 return {status: "Failed", message: "This email or phone existed"}
             }
 
             const {name, ...customInfo} = req.body
+            await this.subscriberRepository.create({...customInfo, firstname: firstname, lastname: lastname, clientId: lead_id})
 
-            await this.clientRepository.create({...customInfo, firstname: firstname, lastname: lastname})
             return {status: "Success"}
         }
         catch(err){
