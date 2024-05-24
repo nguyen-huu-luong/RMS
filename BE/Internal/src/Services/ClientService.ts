@@ -39,14 +39,14 @@ export class ClientService {
     ) { }
 
     public async getAll(options?: QueryOptions) {
-        const result = await this.clientRepository.all({...options, associations: ["Group"]} as QueryOptions);
+        const result = await this.clientRepository.all({ ...options, associations: ["Group"] } as QueryOptions);
         return {
             ...result
         }
     }
-    
+
     public async getById(id: number) {
-        let customerInfo: any = await this.clientRepository.findById(id);   
+        let customerInfo: any = await this.clientRepository.findById(id);
         let group = await this.groupRepository.findByCond({
             where: {
                 id: customerInfo.groupId
@@ -63,7 +63,7 @@ export class ClientService {
         if (user) {
             throw new CustomError(HttpStatusCode.Conflict, ErrorName.CONFLICT, `User existss with id=<${user.id}>`)
         }
- 
+
         if (!type && typeof type === "string") {
             data.type = "lead"
         } else if (type.toLocaleLowerCase() === "customer") {
@@ -91,11 +91,11 @@ export class ClientService {
 
     public async delete(id: number) {
         return await this.clientRepository.delete(id);
-    } 
+    }
 
     public async deleteMany(ids: number[]) {
         return await this.clientRepository.deleteManyClients(ids)
-    } 
+    }
 
     public getOpportunityCustomer = async (sort_factor: any, order: any) => {
         let carts: any
@@ -216,10 +216,10 @@ export class ClientService {
             )
         }
         else {
-            for(let i = 0; i < group_info.length; i++) {
+            for (let i = 0; i < group_info.length; i++) {
                 let client: any = await this.clientRepository.findById(group_info[i].id)
                 let segmentDate = client.createdAt
-                segmentDate.setDate(segmentDate.getDate() + Math.floor(Math.random()*30))
+                segmentDate.setDate(segmentDate.getDate() + Math.floor(Math.random() * 30))
                 await this.clientRepository.update(client.id, {
                     groupId: group_info[i].groupId + 1,
                     segmentDate: segmentDate
@@ -256,7 +256,7 @@ export class ClientService {
 
     public segmentCustomer = async (id_: number) => {
         try {
-            let customer = await this.clientRepository.findByCond({
+            let customer: any = await this.clientRepository.findByCond({
                 attributes: ['id', 'birthday', 'profit', 'total_items', 'lastPurchase'],
                 where: {
                     id: id_,
@@ -389,11 +389,11 @@ export class ClientService {
                                                                     ORDER BY groups.name ASC
                                                                 `);
 
-            //     const [avg_convert_time, metadata_avg_convert_time] = await sequelizeObj.query(`SELECT groups.name, avg(DATE_PART('day', "Clients"."createdAt"::timestamp - "segmentDate"::timestamp)) as avg_convert_date
-            //                                                         FROM "Clients" JOIN "Groups" as groups ON "groupId" = groups.id
-            //                                                         GROUP BY groups.name, groups.id
-            //                                                         ORDER BY groups.name ASC
-            // `);
+                //     const [avg_convert_time, metadata_avg_convert_time] = await sequelizeObj.query(`SELECT groups.name, avg(DATE_PART('day', "Clients"."createdAt"::timestamp - "segmentDate"::timestamp)) as avg_convert_date
+                //                                                         FROM "Clients" JOIN "Groups" as groups ON "groupId" = groups.id
+                //                                                         GROUP BY groups.name, groups.id
+                //                                                         ORDER BY groups.name ASC
+                // `);
                 let temp_groups = []
                 for (let idx in gender) {
                     let temp_gender: any = gender[idx]
@@ -411,7 +411,7 @@ export class ClientService {
                 }
                 groups = temp_groups
             }
-            
+
             return groups
         }
         catch (err) {

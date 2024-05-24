@@ -348,9 +348,9 @@ export class OrderService {
                         html: `<p>Hello <i>${client.getDataValue(
                             "firstname"
                         )} ${client.getDataValue("lastname")}</i>,</p>
-                                <p>We are delighted to inform you that your first order with Home Cuisine has been successfully completed!</p>
+                                <p>We are delighted to inform you that your order with Home Cuisine has been successfully completed!</p>
                                 <p>We hope you enjoyed your meal and had a wonderful dining experience with us.</p>
-                                <p>To view the order detail, click <a href="${process.env.USER_HOST}:${process.env.USER_PORT}/en/myorder/${orderId}" target="_blank">here</a></p>
+                                <p>To view the order detail, click <a href="http://${process.env.USER_HOST}:${process.env.USER_PORT}/en/myorder/${orderId}" target="_blank">here</a></p>
                                 <p>If you have any questions or feedback, feel free to contact us. We're always here to assist you.</p>
                                 <p style="padding-top: 10px;">Best regards,</p>
                                 <p>Home Cuisine Restaurant</p>`,
