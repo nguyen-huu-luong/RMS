@@ -6,7 +6,7 @@ import {
 import useEmailStore from "@/store/email";
 import { CSSProperties } from "styled-components";
 import HoverInfo from "./ItemOnHover";
-import TextEditor from "@/components/TextEditor";
+import TextEditor from "@/components/EmailTextEditor/TextEditor";
 import TestTextEditor from "../RightSidebar/TextAttributes/TestTextEditor";
 
 interface ITextPreview {

@@ -266,6 +266,10 @@
 		"select-custom": "Nhập lợi nhuận tùy chỉnh",
 		"fullname": "Họ và tên",
 		"status": "Trạng thái",
+		"_status": {
+			"can-use": "Có sẵn",
+			"expired": "Hết hạn"
+		},
 		"used": "Đã sử dụng",
 		"available": "Có sẵn",
 		"not-enough-1": "Không đủ mã giảm giá, thêm",

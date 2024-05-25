@@ -7,18 +7,18 @@ import "./style.scss"
 import { registerLicense } from '@syncfusion/ej2-base';
 import useEmailDataStore from '@/store/email';
 import React, { useRef, useState } from 'react';
-import MergeFieldText from './MergeFieldText';
-import { Button } from 'antd';
+import MergeFieldText from '../EmailTemplateComponents/RightSidebar/TextAttributes/MergeFieldText';
 
 registerLicense(process.env.NEXT_PUBLIC_SYNCFUSION_LICENCSE || "");
 
 interface ITextEditorProps {
-    content?: string
+    content?: string,
+    onContentChange?: (newContent: string) => void
 }
-const TestTextEditor: React.FC<ITextEditorProps> = (props) => {
-    const { activeNode, updateContent, } = useEmailDataStore()
-    const [content, setContent] = useState((activeNode && activeNode.section.content) || "")
+const EmailTextEditor: React.FC<ITextEditorProps> = (props) => {
+    // const { activeNode, updateContent, } = useEmailDataStore()
     const richTextEditorRef = useRef<RichTextEditorComponent>(null);
+    const [content, setContent] = useState(props.content || "")
 
     let toolbarSettings: ToolbarSettingsModel = {
         items: ['Bold', 'Italic', 'Underline', 'StrikeThrough',
@@ -33,10 +33,7 @@ const TestTextEditor: React.FC<ITextEditorProps> = (props) => {
     };
 
     const handleEditorChange = (newContent: any) => {
-        console.log("Update nooij dung", newContent)
-        console.log(activeNode)
-        setContent(newContent.value);
-        updateContent(newContent.value, activeNode.path)
+        props.onContentChange && props.onContentChange(newContent.value)
     };
     let rteObj: RichTextEditorComponent;
     function created(): void {
@@ -53,22 +50,6 @@ const TestTextEditor: React.FC<ITextEditorProps> = (props) => {
         //     }
         // });
     }
-
-    // const addTextToCursor = (text:any) => {
-    //     if (typeof window !== 'undefined' && quillRef.current) { 
-    //         quillRef.current.focus()
-    //         const quill = quillRef.current.getEditor();
-    //         const selection = quill.getSelection();
-            
-    //         console.log(selection)
-    //         if (selection) {
-    //             quill.insertText(selection.index, text);
-    //         } else {
-    //             quill.insertText(0, text);
-    //         }
-    //     }
-    // };
-
     const addTextToCursor = (text :string) => {
         const rteObj = richTextEditorRef && richTextEditorRef.current
         if (rteObj) {
@@ -82,7 +63,7 @@ const TestTextEditor: React.FC<ITextEditorProps> = (props) => {
         }
       }
     return (
-        <>
+        <div className='lg:flex space-x-3 w-full'>
             <RichTextEditorComponent
                 ref={richTextEditorRef} created={created}
                 // height={300}
@@ -91,16 +72,16 @@ const TestTextEditor: React.FC<ITextEditorProps> = (props) => {
                 // onChange={handleEditorChange}
                 change={handleEditorChange}
                 iframeSettings={{
-                    enable: true
+                    enable: false
                 }}
-                value={content}
+                value={content || ""}
             >
                 {/* {content} */}
                 <Inject services={[Toolbar, Image, Link, HtmlEditor, QuickToolbar]} />
             </RichTextEditorComponent>
             <MergeFieldText onSelectField={(text:string) => addTextToCursor(text)}/>
             {/* <Button type="primary" className="bg-primary" onClick={handleApplyChange}>Apply Change</Button> */}
-        </>
+        </div>
     );
 }
-export default TestTextEditor;
+export default EmailTextEditor;

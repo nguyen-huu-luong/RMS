@@ -267,6 +267,10 @@
 		"select-custom": "Enter custom profit",
 		"fullname": "Full Name",
 		"status": "Status",
+		"_status": {
+			"can-use": "Active",
+			"expired": "Expired"
+		},
 		"used": "Used",
 		"available": "Available",
 		"not-enough-1": "There is not enough vouchers, add",
@@ -342,7 +346,21 @@
 		"new-leads": "New leads"
 	},
 	"Marketing": {
-		"Targetlist": {},
+		"search-placeholder": "Enter keywrork to search....",
+		"description": "Description",
+		"name": "Name",
+		"created-at": "Created At",
+		"updated-at": "Updated At",
+
+		"Targetlist": {
+			"name": "Name",
+			"description": "Description",
+			"type": "Type",
+			"created-at": "Created At",
+			"updated-at": "Updated At",
+			"count": "Count",
+			"fullname": "Full Name"
+		},
 		"Campaign": {
 			"name": "Name",
 			"campaign": "Campaign",
@@ -390,6 +408,8 @@
 				"lead-convert": "Lead converts"
 			}
 		},
-		"MessageTemplate": {}
+		"MessageTemplate": {
+			
+		}
 	}
 }

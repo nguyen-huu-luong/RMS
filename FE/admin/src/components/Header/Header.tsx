@@ -16,8 +16,13 @@ import variables from "@/app/variables.module.scss";
 import { DynamicBreadcrumb } from "..";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { User } from "next-auth";
 
-export default function Header() {
+
+interface IHeaderContainerProps {
+	user: User
+}
+export default function HeaderContainer(props: IHeaderContainerProps) {
 	const t = useTranslations("Header");
 	const router = useRouter()
 	const items: MenuProps["items"] = [
@@ -72,13 +77,17 @@ export default function Header() {
 				<Dropdown menu={menuProps}>
 					<Button className="flex items-center py-3 ms-4 border-white hover:border hover:bg-secondary">
 						<img
-							src="https://cdn-icons-png.flaticon.com/256/163/163801.png"
+							src={props.user.image || "https://cdn-icons-png.flaticon.com/256/163/163801.png"}
 							alt="avatar"
-							width={30}
-							height={30}
+							// width={30}
+							// height={30}
+							style={{
+								height: 30,
+								width: 30
+							}}
 							className="rounded-full me-2"
 						/>
-						<span>Admin</span>
+						<span>{props.user.name}</span>
 						<DownOutlined className="ms-2 text-xs" />
 					</Button>
 				</Dropdown>

@@ -106,36 +106,22 @@ export const getDefaultTags = (tagName: string) => {
     }
     case "mj-carousel": {
       return {
-        tagName: "mj-section",
+        tagName,
         attributes: {},
         children: [
           {
-            tagName: "mj-column",
-            attributes: {},
-            children: [
-              {
-                tagName,
-                attributes: {},
-                children: [
-                  {
-                    tagName: "mj-carousel-image",
-                    id: uuidv4(),
-                    attributes: {
-                      src: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2783&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                    },
-                  },
-                  {
-                    tagName: "mj-carousel-image",
-                    id: uuidv4(),
-                    attributes: {
-                      src: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                    },
-                  },
-                ],
-                id: uuidv4(),
-              },
-            ],
+            tagName: "mj-carousel-image",
             id: uuidv4(),
+            attributes: {
+              src: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2783&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            },
+          },
+          {
+            tagName: "mj-carousel-image",
+            id: uuidv4(),
+            attributes: {
+              src: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            },
           },
         ],
         id: uuidv4(),

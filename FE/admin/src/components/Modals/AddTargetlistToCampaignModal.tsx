@@ -52,7 +52,7 @@ export const AddTargetlistToCampaignModal: React.FC<IAddTargetlistToCampaignModa
             title: "Name",
             dataIndex: "name",
             key: "name",
-            render: (text, row, record) => <Link href={`/targetlists/${row.id}`}>{text}</Link>
+            render: (text, row, record) => <Link href={`/marketing/targetlists/${row.id}`}>{text}</Link>
         },
         {
             title: "Description",

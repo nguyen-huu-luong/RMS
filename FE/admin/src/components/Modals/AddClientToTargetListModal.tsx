@@ -120,16 +120,32 @@ export const AddClientToTargetListModal: React.FC<IAddClientToTargetListModal> =
 			type: "select",
 			options: [
 				{
-					label: "Group 1",
+					label: "Group 0",
 					value: 1
 				},
 				{
-					label: "Group 2",
+					label: "Group 1",
 					value: 2
 				},
 				{
-					label: "Group ",
+					label: "Group 2",
 					value: 3
+				},
+				{
+					label: "Group 3",
+					value: 4
+				},
+				{
+					label: "Group 4",
+					value: 5
+				},
+				{
+					label: "Group 5",
+					value: 6
+				},
+				{
+					label: "Group 6",
+					value: 7
 				},
 			]
 		},

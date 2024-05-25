@@ -29,7 +29,7 @@ export const authOptions: AuthOptions = {
 
                     // console.log(response.data)
 
-                    const data: { accessToken: string; user: User } = response.data;
+                    const data: { accessToken: string; user: any } = response.data;
 
                     if (!data.accessToken || !data.user) {
                         throw response;
@@ -37,6 +37,8 @@ export const authOptions: AuthOptions = {
 
                     return {
                         ...data.user,
+                        image: data.user.avatar,
+                        name: data.user.firstname + " " + data.user.lastname, 
                         accessToken: data.accessToken,
                     };
                 } catch (error: any) {

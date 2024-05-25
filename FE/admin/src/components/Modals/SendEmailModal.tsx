@@ -42,6 +42,7 @@ export const SendEmailModal: React.FC<ISendEmailModal> = ({ emailLists }) => {
             onCancel={handleCancel}
             footer={null}
             width={1200}
+            destroyOnClose
         >
             <SendEmailForm customerEmailLists={emailLists} closeModal={() => setOpen(false)} />
         </CustomModal>

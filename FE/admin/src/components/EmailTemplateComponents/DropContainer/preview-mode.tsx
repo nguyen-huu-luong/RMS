@@ -3,7 +3,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
 const PreviewMode = ({ isMobile }: { isMobile: boolean }) => {
-  const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+  const backend_api = `http://${process.env.NEXT_PUBLIC_NEXT_HOST}:${process.env.NEXT_PUBLIC_NEXT_PORT}/api`
   const [loadingPreview, setPreviewStatus] = useState(false);
   const { emailData, setActiveNode } = useEmailStore();
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
