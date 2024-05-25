@@ -91,7 +91,7 @@ const Setting = () => {
         <Flex className="border px-2 py-1 w-full rounded items-center">
             <b className="me-2 whitespace-nowrap">Background Image</b>
             <Input
-                name="background-url"
+                name="backgroundUrl"
                 placeholder="https://example.com"
                 value={formData.backgroundUrl}
                 onChange={handleChange}

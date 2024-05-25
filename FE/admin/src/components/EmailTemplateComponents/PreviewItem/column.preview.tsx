@@ -11,6 +11,7 @@ import TextPreview from "./text.preview";
 import { CSSProperties } from "styled-components";
 import ButtonPreview from "./button.preview";
 import ImagePreview from "./image.preview";
+import CaroselPreview from "./carousel.preview";
 
 interface ITextPreview {
     section: any;
@@ -38,7 +39,7 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const [{ isOver, canDrop }, drop] = useDrop(() => ({
-        accept: ["mj-image", "mj-text", "mj-button"],
+        accept: ["mj-image", "mj-text", "mj-button", "mj-carousel"],
         drop: (item: any, monitor) => {
             if (!monitor.didDrop()) {
                 const nestedPath = `${path}.children`;
@@ -92,6 +93,17 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
                         section={pSection}
                         imageIndex={tindex}
                         columnIndex={columnIndex}
+                        index={index}
+                        key={index}
+                        path={`${path}.children.${tindex}`}
+                    />
+                );
+            }
+            
+            case "mj-carousel": {
+                return (
+                    <CaroselPreview
+                        section={pSection}
                         index={index}
                         key={index}
                         path={`${path}.children.${tindex}`}

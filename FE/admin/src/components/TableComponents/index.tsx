@@ -48,7 +48,8 @@ interface ITableRenderProps<T> {
     reload?: boolean,
     filterItems?: FilterItemType[]
     excludeDataHasIds?: number[],
-    createModalTitle? : string
+    createModalTitle? : string,
+    rowSelection?: boolean
 }
 
 type SorterParams = {
@@ -470,9 +471,9 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, ...props 
 
                 <div className="mt-2">
                     <Table<T>
-                        rowSelection={{
+                        rowSelection={(!(typeof props.rowSelection === 'boolean') || props.rowSelection) ? {
                             ...rowSelection,
-                        }}
+                        }: undefined}
                         columns={columns}
                         pagination={{
                             className: "bg-white rounded px-4 py-2",

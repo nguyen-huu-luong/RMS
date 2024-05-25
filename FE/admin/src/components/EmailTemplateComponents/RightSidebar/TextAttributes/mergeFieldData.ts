@@ -54,9 +54,14 @@ export const mergeFieldData: IMergeFieldData = {
     "Voucher": {
       key: 4,
       fields: [
-        { key: 1, value: "voucher.<replace with voucherID>.name", label: "Name" },
-        { key: 2, value: "voucher.<replace with voucherID>.description", label: "Description" },
-        { key: 3, value: "voucher.<replace with voucherID>.expirationDate", label: "Expiration Date" },
+        { key: 1, value: "voucher.<id>.name", label: "Name" },
+        { key: 2, value: "voucher.<id>.description", label: "Description" },
+        { key: 3, value: "voucher.<id>.promo_code", label: "Promote Code" },
+        { key: 4, value: "voucher.<id>.type", label: "Type" },
+        { key: 5, value: "voucher.<id>.amount", label: "Amount" },
+        { key: 6, value: "voucher.<id>.minimum_paid", label: "Minimum Paid" },
+        { key: 7, value: "voucher.<id>.begin_date", label: "Begin Date" },
+        { key: 8, value: "voucher.<id>.end_date", label: "Expiration Date" },
       ],
     },
 
