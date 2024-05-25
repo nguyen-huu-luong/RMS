@@ -9,7 +9,7 @@ const nextConfig = {
     },
     experimental: {
         serverComponentsExternalPackages: ["mjml"],
-        // serverActions: true,
+        serverActions: true,
       },
       env: {
         BASE_URL: backend_api
