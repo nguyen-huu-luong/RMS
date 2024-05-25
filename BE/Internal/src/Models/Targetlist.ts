@@ -48,6 +48,11 @@ TargetList.init(
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
+		type: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			defaultValue: "custom"
+		},
 		description: {
 			type: DataTypes.STRING,
 		},

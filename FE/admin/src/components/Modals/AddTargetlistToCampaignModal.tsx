@@ -100,10 +100,10 @@ export const AddTargetlistToCampaignModal: React.FC<IAddTargetlistToCampaignModa
             title="Add targetlist to campaign"
             open={open}
             okText="Select"
-            okButtonProps={{ className: "bg-primary" }}
+            okButtonProps={{ className: "bg-primary"}}
             onCancel={handleCancel}
             onOk={handleOk}
-            width={1200}
+            width={1000}
         >
             {open && <TableRender<DataType>
                 data={data}

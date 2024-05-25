@@ -5,6 +5,7 @@ import { CustomModal } from "./MyCustomModal";
 import TextArea from "antd/es/input/TextArea";
 import { CSSProperties } from "styled-components";
 import { FaBullseye } from "react-icons/fa";
+import { useTranslations } from "next-intl";
 
 interface ICreateTargetListModal {
     onOk: (values: any) => Promise<void>,
@@ -17,6 +18,7 @@ interface ICreateTargetListModal {
 }
 export const CreateTargetListModal: React.FC<ICreateTargetListModal> = ({ onOk, ...props }) => {
     const [open, setOpen] = useState(false);
+    const t_general = useTranslations("General")
     const [loading, setLoading] = useState(false)
     const showModal = () => {
         setOpen(true);
@@ -40,7 +42,7 @@ export const CreateTargetListModal: React.FC<ICreateTargetListModal> = ({ onOk, 
     };
 
     return <main style={props.style} className={props.className}>
-        <Button className={props.triggerBtnClasseNames} icon={props.showIcon && <PlusOutlined />} onClick={showModal}>{props.triggerText || ""}</Button>
+        <Button className={`${props.triggerBtnClasseNames}`} icon={props.showIcon && <PlusOutlined />} onClick={showModal}>{props.triggerText || t_general("new")}</Button>
         <CustomModal
             open={open}
             okButtonProps={{ className: "bg-primary" }}

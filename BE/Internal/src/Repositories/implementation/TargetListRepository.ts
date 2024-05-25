@@ -79,6 +79,47 @@ export class TargetListRepository
 			throw error
 		}
     }
+
+	public async getSubscriber(id: number) {
+		let subscripbers =  await this._model.findOne({
+			where: {
+				type: "default",
+				name: "Subscriber",
+				
+			}
+		})
+
+		if (!subscripbers) {
+			subscripbers = await this._model.create({
+				type: "default",
+				name: "Subscriber",
+				description: "This is the default targetlist was created to store subscriber list"
+			})
+		} 
+
+		const result = await subscripbers.getClients({
+			where: {
+				id
+			}
+		})
+
+		return result.length > 0 ? result[0] : null;
+	}
+
+	/**
+	 * addSubscriber
+id: number | string	 */
+	public async addSubscriber(id: number) {
+		let subscripbers =  await this._model.findOne({
+			where: {
+				type: "default",
+				name: "Subscriber",
+				
+			}
+		})
+
+		return await subscripbers?.addClient(id)
+	}
 	
 
 	private async updateClientsInTargetlist(targetlistInstance: TargetList, action: string, ids: number[], t?: Transaction) {
@@ -92,9 +133,5 @@ export class TargetListRepository
 		}
 	}
 
-
-
-
-
-
+	
 }

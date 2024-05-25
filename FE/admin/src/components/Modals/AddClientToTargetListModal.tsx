@@ -1,10 +1,11 @@
-import { Button, Form, Input, Modal, Space } from "antd"
+import { Button, Form, Input, Modal, Space, Tooltip } from "antd"
 import { useState } from "react";
 import { CustomModal } from "./MyCustomModal";
 import TextArea from "antd/es/input/TextArea";
 import Table, { ColumnsType } from "antd/es/table";
 import Link from "next/link";
 import TableRender, { FilterItemType } from "../TableComponents";
+import { CreateNewCustomerModal } from "./CreateNewCustomerModal";
 
 interface IAddClientToTargetListModal {
     excludeIds?: number[],
@@ -19,7 +20,11 @@ interface DataType {
     lastname: string;
     email: string;
     phone: string;
-    group: number;
+    Group: {
+		id: number,
+		name: string,
+		description: string
+	}
     createdAt: string
 }
 
@@ -65,8 +70,23 @@ export const AddClientToTargetListModal: React.FC<IAddClientToTargetListModal> =
             dataIndex: "phone",
             key: "phone",
             align: "center"
+        },
+        {
+            title: "Group",
+            dataIndex: "group",
+            key: "group",
+			render: (text, row) => row.Group ? (<Tooltip title={row.Group.description || ""}>
+				<span className="px-2 py-1 rounded-xl text-white" style={{background: getColor(row.Group.id)}}>{row.Group.name}</span>
+			</Tooltip>) : "Unknown"
         }
     ];
+
+    const getColor = (num: number) => {
+		const color = ["#FF69B4", "#1E90FF", "#FFD700", "#00FF00", "#FF4500", "#9400D3", 
+		"#FF69B4", "#1E90FF", "#FFD700", "#00FF00", "#FF4500", "#9400D3"]
+		
+		return color[num]
+	}
 
     const filterItems: FilterItemType[] = [
 		{
@@ -100,16 +120,32 @@ export const AddClientToTargetListModal: React.FC<IAddClientToTargetListModal> =
 			type: "select",
 			options: [
 				{
-					label: "Group 1",
+					label: "Group 0",
 					value: 1
 				},
 				{
-					label: "Group 2",
+					label: "Group 1",
 					value: 2
 				},
 				{
-					label: "Group ",
+					label: "Group 2",
 					value: 3
+				},
+				{
+					label: "Group 3",
+					value: 4
+				},
+				{
+					label: "Group 4",
+					value: 5
+				},
+				{
+					label: "Group 5",
+					value: 6
+				},
+				{
+					label: "Group 6",
+					value: 7
 				},
 			]
 		},
@@ -138,24 +174,15 @@ export const AddClientToTargetListModal: React.FC<IAddClientToTargetListModal> =
             width={1200}
         >
            {open && <TableRender<DataType>
-                columns={columns}
-                url="/customers"
-                queryStr={`type=${props.type}`}
-                onSelected={onSelectedRows}
-                // excludeDataHasIds={}
-                filterItems={filterItems}
-                
-                // formCreateElement={
-                //     <>
-                //         <Form.Item label="Name" name="name" required rules={[{ required: true, message: 'Please input the group name !' }]}>
-                //             <Input placeholder='Group name' />
-                //         </Form.Item>
-                //         <Form.Item label="Description" name="description" required rules={[{ required: true, message: 'Please input the group description !' }]}>
-                //             <TextArea placeholder='Group description' />
-                //         </Form.Item>
-                //     </>
-                // }
-            />}
+			columns={columns}
+			url="/customers"
+			// createModalTitle="Add new customer"
+			// reload={reload}
+			onSelected={onSelectedRows}
+			// createModal={<CreateNewCustomerModal formControl={form_create} onCreate={handleCreateCustomer} />}
+			filterItems={filterItems}
+		/>
+           }
         </CustomModal>
     </ >
 }
