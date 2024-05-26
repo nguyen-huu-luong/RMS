@@ -29,7 +29,6 @@ import type {
 	SorterResult,
 } from "antd/es/table/interface";
 import { CustomerActionBar, CustomerFilterBar } from "@/components";
-import Link from "next/link";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<

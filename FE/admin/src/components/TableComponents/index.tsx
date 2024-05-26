@@ -21,7 +21,6 @@ import type {
 import {SearchOutlined, SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons";
 import fetchClient from "@/lib/fetch-client";
 import { AnyObject } from "antd/es/_util/type";
-import { CreateModal } from "./CreateModal";
 import { useFormatter } from "next-intl";
 import { FilterItem } from "./FilterItems";
 import { FaEllipsisV } from "react-icons/fa";
@@ -477,6 +476,9 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, ...props 
                         columns={columns}
                         pagination={{
                             className: "bg-white rounded px-4 py-2",
+                            style: {
+                                padding: "8px 16px"
+                            },
                             showTotal: (total: number) => `${t_general("total")} ${total} ${t_general("item")}`,
                             position: ["bottomCenter", "bottomRight"],
                             showSizeChanger: true,

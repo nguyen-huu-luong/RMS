@@ -60,8 +60,12 @@
 		"select": "select",
 		"created-at": "Created At",
 		"updated-at": "Updated at",
-		"last-modified-at": "Last modified at"
-
+		"last-modified-at": "Last modified at",
+		"total-n-items": "Total {n} items",
+		"sth-wrong": "Something went wrong!",
+		"update": "Update",
+		"yes": "Yes",
+		"no": "No"
 	},
 	"Customer": {
 		"customer": "customers",
@@ -381,6 +385,7 @@
 			"template": "Tempalte",
 			"are-you-sure": "Are you sure ?",
 			"add": "Add",
+			"validate-message": "Please {action} the campaign's {field}",
 			"campaignStatus": {
 				"planning": "Planning",
 				"active": "Active"
@@ -406,10 +411,22 @@
 				"clicked": "Clicked",
 				"sent": "Sent",
 				"lead-convert": "Lead converts"
-			}
+			},
+			"completed": "Completed",
+			"inprogress": "In Progress",
+			"pendding": "Pendding"
 		},
 		"MessageTemplate": {
-			
+			"delete-success-msg": "Delete email template successfully",
+			"delete-faild-msg": "Failed to delete Email template",
+			"name": "Name",
+			"description": "Description",
+			"type": "Type",
+			"created-at": "Created At",
+			"updated-at": "Updated At",
+			"action": "Action",
+			"delele-confirm-title": "Delete the template?",
+			"delete-confirm-msg": "Are you sure to delete this task?"
 		}
 	}
 }

@@ -7,6 +7,7 @@ import useEmailDataStore from "@/store/email";
 import { Button, Form, Input, Select, Space, message } from "antd";
 import { useForm } from "antd/es/form/Form";
 import TextArea from "antd/es/input/TextArea";
+import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -21,6 +22,8 @@ const EmailTemplate: React.FC = () => {
     const [form] = useForm()
     const [editorType, setEditorType] = useState(emailInfo?.type)
     const [content, setContent] = useState(emailInfo?.type === "text" ? emailInfo.content : "")
+
+    const t:any = useTranslations("Marketing.Campaign")
 
     const params = useParams<{ locale: string; id: string }>()
 
@@ -121,8 +124,8 @@ const EmailTemplate: React.FC = () => {
                 <div className="bg-white w-full py-2 px-3 rounded-md border mb-2 space-y-2">
                     <div className="flex items-start space-x-2">
                         <Form.Item
-                            name="name"
-                            label={"Name"}
+                            label={t("name")}
+                            name={"name"}
                             rules={[{ required: true, message: 'Please input the name of email!' }]}
                             className="m-0"
                             initialValue={emailInfo?.name || ""}
@@ -130,7 +133,7 @@ const EmailTemplate: React.FC = () => {
                             <Input disabled={!editMode} placeholder="Enter the email name..." style={{ minWidth: 200 }} defaultValue={emailInfo?.description} />
                         </Form.Item>
                         <Form.Item
-                            label="Description"
+                            label={t("description")}
                             name="description"
                             className="m-0"
                             initialValue={emailInfo?.description || ""}

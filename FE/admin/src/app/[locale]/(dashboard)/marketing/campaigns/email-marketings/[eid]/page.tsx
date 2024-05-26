@@ -11,7 +11,6 @@ import { useForm } from "antd/es/form/Form"
 import { TableProps } from "antd/es/table"
 import { AxiosError } from "axios"
 import { useTranslations } from "next-intl"
-import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 

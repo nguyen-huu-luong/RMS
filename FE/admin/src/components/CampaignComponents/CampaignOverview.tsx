@@ -9,6 +9,7 @@ import { AddTargetlistToCampaignModal } from "../Modals/AddTargetlistToCampaignM
 import fetchClient from "@/lib/fetch-client";
 import { AxiosError } from "axios";
 import { useTranslations } from "next-intl";
+import LinkWithRef from "next-intl/link";
 
 export interface ICampaignOverview {
     editmode: boolean,
@@ -181,7 +182,7 @@ export const CampaignOverview: React.FC<ICampaignOverview> = ({ editmode, setEdi
                                 tempTargetlist?.map((item: any, index: number) => {
                                     return (
                                         <Tag className="px-2 py-1 bg-bgsecondary rounded" color={getRandomColor()}>
-                                            <Link href={`/marketing/targetlists/${item.id}`}>{item.name}</Link>
+                                            <LinkWithRef href={`/marketing/targetlists/${item.id}`}>{item.name}</LinkWithRef>
                                             {editmode && <CloseCircleFilled
                                                 className="ms-3 hover:text-red-500 cursor-pointer"
                                                 onClick={() => handleDeleteTargetlist(item.id)}

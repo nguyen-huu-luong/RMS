@@ -9,7 +9,7 @@ import { EllipsisOutlined } from "@ant-design/icons"
 import { Button, ConfigProvider, Form, Input, Popconfirm, Space, message } from "antd"
 import { useForm } from "antd/es/form/Form"
 import { TableProps } from "antd/es/table"
-import Link from "next/link"
+import LinkWithRef from "next-intl/link"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -100,7 +100,7 @@ const TargetListDetail = () => {
             title: "Fullname",
             dataIndex: "fullname",
             key: "fullname",
-            render: (text, row) => <Link style={{ color: "#4A58EC" }} href={`/customers/${row.id}`}>{text}</Link>,
+            render: (text, row) => <LinkWithRef style={{ color: "#4A58EC" }} href={`/customers/${row.id}`}>{text}</LinkWithRef>,
         },
         {
             title: "Phone number",
@@ -134,7 +134,7 @@ const TargetListDetail = () => {
             title: "Fullname",
             dataIndex: "fullname",
             key: "fullname",
-            render: (text, row, record) => <Link href={`/customers/${row.id}`}>{text}</Link>
+            render: (text, row, record) => <LinkWithRef href={`/customers/${row.id}`}>{text}</LinkWithRef>
         },
         {
             title: "email",
@@ -267,7 +267,7 @@ const TargetListDetail = () => {
                     <div>
                         <div className="flex justify-between items-center">
                             <h6>Customers</h6>
-                            {(data.type !== "default") && <AddClientToTargetListModal type="customer" onOk={handleAddClientToTargetList} />}
+                            {   (data.type !== "default") && <AddClientToTargetListModal type="customer" onOk={handleAddClientToTargetList} />}
                         </div>
                         <div>
                             {customers && customers.length > 0 && <ClientTable<CustomerType>
