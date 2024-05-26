@@ -72,7 +72,7 @@ const EmailTextEditor: React.FC<ITextEditorProps> = (props) => {
                 // onChange={handleEditorChange}
                 change={handleEditorChange}
                 iframeSettings={{
-                    enable: false
+                    enable: true
                 }}
                 value={content || ""}
             >
