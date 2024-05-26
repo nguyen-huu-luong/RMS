@@ -22,6 +22,7 @@ import fetchClient from "@/lib/fetch-client";
 import { CreateCampaignModal } from "@/components/Modals/CreateCampaignModal";
 import { useTranslations } from "next-intl";
 import TimeFormatter from "@/components/TimeFormatter";
+import LinkWithRef from "next-intl/link";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -107,7 +108,7 @@ const Campaign: React.FC = () => {
             title: t("name"),
             dataIndex: "name",
             key: "name",
-            render: (text, row) => <a style={{ color: "#4A58EC" }} href={`./campaigns/${row.id}`}>{text}</a>
+            render: (text, row) => <LinkWithRef style={{ color: "#4A58EC" }} href={`./campaigns/${row.id}`}>{text}</LinkWithRef>
         },
         {
             title: t('type'),

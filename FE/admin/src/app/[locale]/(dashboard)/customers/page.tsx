@@ -11,8 +11,8 @@ import { useForm } from "antd/es/form/Form";
 import { CreateNewCustomerModal } from "@/components/Modals/CreateNewCustomerModal";
 import { AxiosError } from "axios";
 import moment from "moment";
-import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
+import LinkWithRef from "next-intl/link";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 interface DataType {
@@ -66,7 +66,7 @@ const CustomerListPages: React.FC = () => {
 			title: t_general("fullname"),
 			dataIndex: "fullname",
 			key: "fullname",
-			render: (text, row) => <Link style={{ color: "#4A58EC" }} href={`/customers/${row.id}`}>{text}</Link>,
+			render: (text, row) => <LinkWithRef style={{ color: "#4A58EC" }} href={`/customers/${row.id}`}>{text}</LinkWithRef>,
 			// ...getColumnSearchProps("fullname"),
 		},
 		{

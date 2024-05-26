@@ -18,7 +18,8 @@ interface DataType {
     status: String,
     type: string,
     amount: number,
-    begin: string
+    begin: string,
+    end_date: string
 }
 
 interface IChooseVoucherModal {
@@ -83,7 +84,7 @@ export const ChooseVoucherModal: React.FC<IChooseVoucherModal> = (props) => {
             // dataIndex: "",
             // key: ""
             render: (text, row) => {
-                if (new Date(row.begin).getTime() - new Date().getTime() > 0) {
+                if (new Date(row.end_date).getTime() - new Date().getTime() > 0) {
                     return t("_status.can-use")
                 } 
                 return t("_status.expired")

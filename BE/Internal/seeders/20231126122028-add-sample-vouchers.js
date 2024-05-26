@@ -56,16 +56,35 @@ module.exports = {
         // Convert voucher
         const convertVoucher = [
             {
-                name: "CUSTOMERS",
-                description: "For new lead to customer",
+                name: "Welome customers",
+                description: "For new leads",
                 promo_code: "HICUSTOMER",
-                type: "fixed",
-                amount: 30000,
+                type: "percentage",
+                amount: 15,
                 maximum_reduce: 30000,
-                minimum_paid: 30000,
+                minimum_paid: 35000,
                 quantity: 100000,
                 begin_date: new Date(),
-                end_date: new Date(2030),
+                end_date: new Date(2030, 1, 1),
+                can_redeem: true,
+                redeemedNumber: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ];
+
+        const loyaltyVoucher = [
+            {
+                name: "Discount for committed customers",
+                description: "for committed customers",
+                promo_code: "HICUSTOMER",
+                type: "percentage",
+                amount: 25,
+                maximum_reduce: 50000,
+                minimum_paid: 60000,
+                quantity: 100000,
+                begin_date: new Date(),
+                end_date: new Date(2030, 1, 1),
                 can_redeem: true,
                 redeemedNumber: 0,
                 createdAt: new Date(),
@@ -81,15 +100,15 @@ module.exports = {
             let voucherAmount =
                 voucherType === "percentage"
                     ? faker.datatype.number({
-                          min: 10,
-                          max: 25,
-                          precision: 5,
-                      })
+                        min: 10,
+                        max: 25,
+                        precision: 5,
+                    })
                     : faker.datatype.number({
-                          min: 20000,
-                          max: 50000,
-                          precision: 5000,
-                      });
+                        min: 20000,
+                        max: 50000,
+                        precision: 5000,
+                    });
             return {
                 name: faker.random.arrayElement(voucherNames),
                 description: faker.random.arrayElement(voucherDescriptions),
@@ -112,7 +131,7 @@ module.exports = {
                     precision: 5,
                 }),
                 begin_date: new Date(),
-                end_date: faker.date.future(),
+                end_date: new Date(2030, 1, 1),
                 can_redeem: true,
                 redeemedNumber: 0,
                 createdAt: new Date(),
@@ -126,7 +145,7 @@ module.exports = {
             `,
             { type: queryInterface.sequelize.QueryTypes.SELECT }
         );
-        
+
         const clientVouchers = [];
         for (let client of clients) {
             clientVouchers.push({
@@ -139,6 +158,7 @@ module.exports = {
         }
 
         await queryInterface.bulkInsert("Vouchers", convertVoucher);
+        await queryInterface.bulkInsert("Vouchers", loyaltyVoucher);
         await queryInterface.bulkInsert("Vouchers", vouchers);
         await queryInterface.bulkInsert("ClientVouchers", clientVouchers);
     },

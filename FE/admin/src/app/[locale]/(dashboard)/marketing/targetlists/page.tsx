@@ -10,13 +10,12 @@ import {
 } from "antd";
 import type { TableProps } from "antd";
 
-import Link from "next/link";
 import TableRender, { FilterItemType } from "@/components/TableComponents";
-import TextArea from "antd/es/input/TextArea";
 import TimeFormatter from "@/components/TimeFormatter";
 import { useRouter } from "next/navigation";
 import fetchClient from "@/lib/fetch-client";
 import { CreateTargetListModal } from "@/components/Modals/CreateTargetListModal";
+import LinkWithRef from "next-intl/link";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 
@@ -45,7 +44,7 @@ const TargetList: React.FC = () => {
             title: "Name",
             dataIndex: "name",
             key: "name",
-            render: (text, row, record) => <Link href={`targetlists/${row.id}`}>{text}</Link>
+            render: (text, row, record) => <LinkWithRef href={`targetlists/${row.id}`}>{text}</LinkWithRef>
         },
         {
             title: "Description",

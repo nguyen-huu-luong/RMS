@@ -266,11 +266,11 @@ export class EmailService {
                     ...message,
                     html: `${mjml2html(newHtml).html}\n${imgTag}`,
                 });
-            }
+            }       
             const result = await mailler.sendEmail({ ...message, html: newHtml });
             return true;
             
-        } catch (error) {
+        } catch (error) {       
             console.log(error)
         }
     }
