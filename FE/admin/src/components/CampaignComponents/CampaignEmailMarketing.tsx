@@ -20,7 +20,7 @@ export interface ICampaignEmailMarketing {
     targetlists: Array<any>
     isEditmode: boolean,
     handleDelete: (ids: number) => Promise<void>,
-    handleCreate: (values: any) => Promise<void>
+            handleCreate: (values: any) => Promise<void>
 }
 
 export const CampaignMarketing: React.FC<ICampaignEmailMarketing> = ({ emails = [], targetlists = [], isEditmode, ...props }) => {
@@ -40,7 +40,7 @@ export const CampaignMarketing: React.FC<ICampaignEmailMarketing> = ({ emails = 
         id: item.id,
         name: item.name,
         status: item.status,
-        startDate: item.startDate,
+        startDate: item.startDate,  
     }))
     const columns: TableProps<DataType>['columns'] = [
         {

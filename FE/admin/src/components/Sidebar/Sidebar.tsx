@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Navigation from "./Navigation";
 import {
 	UserAddOutlined,
@@ -18,22 +18,12 @@ import { getSession, useSession } from "next-auth/react";
 import { INavItemProps } from "./NavItem";
 
 
-
-export default function Sidebar() {
-	const [role, setRole] = useState("")
+interface ISideBarProps {
+	role: string
+}
+export const SidebarContainer: React.FC<ISideBarProps>  = ({role}) => {
 	const t = useTranslations("Sidebar");
 	const t_general = useTranslations("General");
-	useEffect(() => {
-		const setSessionRole = async () => {
-			const session = await getSession();
-			if (session) {
-				console.log(session)
-				setRole(session.user.role)
-			}
-		}
-		setSessionRole()
-	}, [])
-
 
 	const allItems = [
 		{

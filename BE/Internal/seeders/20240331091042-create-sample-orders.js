@@ -4,7 +4,8 @@ const faker = require("faker");
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         let orders = [];
-        const currentDate = new Date();
+        const yesterday = new Date()
+        const currentDate = new Date(yesterday.getDate() - 1);
         const twoYearsAgo = new Date(
             currentDate.getFullYear() - 1,
             currentDate.getMonth(),

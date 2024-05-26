@@ -46,7 +46,7 @@
 		"edit": "Chỉnh sửa",
 		"save": "Lưu",
 		"recent_activities": "Hoạt động gần đây",
-		"view": "Xem", 
+		"view": "Xem",
 		"add": "Thêm",
 		"last_modified": "Lần cuối chỉnh sửa",
 		"quantity": "Số lượng",
@@ -60,7 +60,12 @@
 		"select": "chọn",
 		"created-at": "Ngày tạo",
 		"updated-at": "Lần cuối cập nhật",
-		"last-modified-at": "Lần cuối chỉnh sửa"
+		"last-modified-at": "Lần cuối chỉnh sửa",
+		"total-n-items": "Tổng cộng {n} bản ghi",
+		"sth-wrong": "Đã xảy ra lỗi!",
+		"update": "Cập nhật",
+		"yes": "Có",
+		"no": "Không"
 	},
 	"Customer": {
 		"customer": "khách hàng",
@@ -282,7 +287,7 @@
 		"over-100": "Phầm trăm không thể quá 100!",
 		"cancel": "Hủy",
 		"save": "Lưu",
-		"redeem" :"Số người nhận",
+		"redeem": "Số người nhận",
 		"assign-success": "Gửi mã giảm giá cho khách hàng thành công!",
 		"finish": "Hoàn thành",
 		"assign": "Gửi mã giảm giá",
@@ -324,7 +329,7 @@
 		"cancel-2": "đã bị hủy bởi khách hàng!",
 		"new-order": "Đơn hàng mới đến từ khách hàng",
 		"cart_information": "Thông tin giỏ hàng",
-		"total_amount": "Tổng tiền", 
+		"total_amount": "Tổng tiền",
 		"view_cart": "Xem giỏ hàng"
 	},
 	"Overview": {
@@ -344,19 +349,15 @@
 		"new-customers": "Khách hàng mới",
 		"new-leads": "Khách hàng tiềm năng mới"
 	},
-
 	"Marketing": {
-		"Targetlist": {
-
-		},
-
+		"Targetlist": {},
 		"Campaign": {
 			"campaign": "Chiến dịch",
 			"targetlists": "Danh sách mục tiêu",
 			"name": "Tên",
 			"campaign-name": "Tên chiến dịch",
 			"type": "Loại",
-			"status":"Trạng thái",
+			"status": "Trạng thái",
 			"start-date": "Ngày bắt đầu",
 			"end-date": "Ngày kết thúc",
 			"search-placeholder": "Nhập từ khoá để tìm kiếm....",
@@ -370,6 +371,9 @@
 			"template": "Mẫu",
 			"are-you-sure": "Bạn chắc chắn chứ ?",
 			"add": "Thêm",
+			"validate-message": "Vui lòng {action} {field} của chiến dịch",
+			"description": "Mô tả",
+			"editor-type": "Kiểu hỉnh sửa",
 			"campaignStatus": {
 				"planning": "Đang lên kế hoạch",
 				"active": "Hoạt động"
@@ -381,13 +385,13 @@
 			"createForm": {
 				"validate-message": "Vui lòng {action} {field} của chiến dịch"
 			},
-
 			"campaignDetail": {
-				"update-canpaign-success-msg": "Cập nhật thông tin chiến dịch thành công", 
+				"update-canpaign-success-msg": "Cập nhật thông tin chiến dịch thành công",
 				"delete-email-campaign-success-msg": "Xóa email tiếp thị thành công",
 				"delete-strack-url-success-msg": "Tạo liên kết theo dõi thành công",
 				"overview": "Thông tin chung",
 				"emal-marketing": "Email tiếp thị",
+				"email-marketing": "Email tiếp thị",
 				"actions": "Hành động",
 				"redirect-url": "Liên kết chuyển tiếp",
 				"code-to-insert": "Mã để chèn thay cho liên kết",
@@ -396,16 +400,22 @@
 				"clicked": "Số lượng click",
 				"sent": "Số email đã gửi",
 				"lead-convert": "Số lead chuyển đổi"
-			}
-
-
-
-
-		}, 
-
+			},
+			"completed": "Hoàn thành",
+			"inprogress": "Đang gửi",
+			"pendding": "Đang trong hàng đợi"
+		},
 		"MessageTemplate": {
-
+			"delete-success-msg": "Xóa mẫu email thành công!",
+			"delete-faild-msg": "Xóa mẫu email thất bại, đã có lỗi xảy ra!",
+			"name": "Tên",
+			"description": "Mô tả",
+			"type": "Loại",
+			"created-at": "Ngày tạo",
+			"updated-at": "Ngày cập nhật",
+			"action": "Hành động",
+			"delele-confirm-title": "Xác nhận xóa mẫu email?",
+			"delete-confirm-msg": "Bạn có chắc chắn muốn xóa chứ?"
 		}
-
 	}
 }
