@@ -27,7 +27,7 @@ export type CampaignData = {
     type?: string;
     status?: string;
     startDate?: Date;
-    endDate?: number;
+    endDate?: Date;
     budget?: number;
     targetlists?: AssociationWithResourceType;
     targetlistIds?: number [];

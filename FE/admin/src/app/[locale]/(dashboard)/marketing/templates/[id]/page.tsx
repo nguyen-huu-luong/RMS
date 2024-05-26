@@ -24,6 +24,7 @@ const EmailTemplate: React.FC = () => {
     const [content, setContent] = useState(emailInfo?.type === "text" ? emailInfo.content : "")
 
     const t:any = useTranslations("Marketing.Campaign")
+    const t_general = useTranslations("General")
 
     const params = useParams<{ locale: string; id: string }>()
 
@@ -112,13 +113,13 @@ const EmailTemplate: React.FC = () => {
                 <Space>
                     <Form.Item className="m-0">
                         {
-                            editMode ? <Button type="primary" loading={btnLoading} className="bg-primary" htmlType="submit">Save</Button> :
-                                <Button onClick={handleClick}>Edit</Button>
+                            editMode ? <Button type="primary" loading={btnLoading} className="bg-primary" htmlType="submit">{t_general("save")}</Button> :
+                                <Button onClick={handleClick}>{t_general("edit")}</Button>
                         }
                     </Form.Item>
 
                     {editMode && <Form.Item className="m-0">
-                        <Button htmlType="reset" onClick={handleCancel}>Cancel</Button>
+                        <Button htmlType="reset" onClick={handleCancel}>{t_general("cancel")}</Button>
                     </Form.Item>}
                 </Space>
                 <div className="bg-white w-full py-2 px-3 rounded-md border mb-2 space-y-2">
@@ -142,7 +143,7 @@ const EmailTemplate: React.FC = () => {
                         </Form.Item>
                     </div>
                     <div className="flex">
-                        <Form.Item label="Editor type" initialValue={editorType} className="m-0">
+                        <Form.Item label={t("editor-type")} initialValue={editorType} className="m-0">
                             <Select
                                 style={{ maxWidth: 300 }} disabled={!editMode}
                                 value={editorType}
