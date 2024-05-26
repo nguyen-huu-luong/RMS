@@ -385,9 +385,12 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, ...props 
                     <div className="flex">
                         <div className="flex-1 flex space-x-2 items-center">
                             <Input
-                                placeholder="Enter keywork to search...."
+                                placeholder="Enter keywork to search....    "
                                 prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
                                 className="flex items-center w-2/5"
+                                style={{
+                                    width: "40%"
+                                }}
                             />
                             {props.filterItems &&
                                 <Dropdown

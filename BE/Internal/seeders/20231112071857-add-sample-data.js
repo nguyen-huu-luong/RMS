@@ -132,7 +132,6 @@ module.exports = {
             currentDate.getDate()
         );
         const clients = [];
-
         // CREATE 1000 CUSTOMERS
         for (let i = 0; i < newData.length; i++) {
             const [firstName, middleName, lastName, birthday, address, email] =
@@ -226,6 +225,32 @@ module.exports = {
             }
             clients.push(client);
         }
+        clients.push({
+            email: "homecuisine.rms.global@gmail.com",
+            phone: faker.phone.phoneNumber(),
+            firstname: 'Default',
+            lastname: "Client",
+            gender: false,
+            birthday: randomDate(
+                new Date(1980, 0, 1),
+                new Date(2000, 0, 1)
+            ),
+            avatar: avatar[0],
+            score: 0,
+            address: faker.address.streetAddress(true),
+            source: sources[Math.floor(Math.random() * sources.length)],
+            type: "lead",
+            hashedPassword: clientPassword,
+            isRegistered: true,
+            isActive: true,
+            language: "vi",
+            profit: 0,
+            average: 0,
+            total_items: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        })
+        
         const firstnames = [
             "Nguyễn",
             "Trần",
