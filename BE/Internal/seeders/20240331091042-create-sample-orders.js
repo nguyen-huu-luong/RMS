@@ -5,7 +5,8 @@ module.exports = {
     up: async (queryInterface, Sequelize) => {
         let orders = [];
         const yesterday = new Date()
-        const currentDate = new Date(yesterday.getDate() - 1);
+        let currentDate = new Date()
+        currentDate.setDate(currentDate.getDate()-1)
         const twoYearsAgo = new Date(
             currentDate.getFullYear() - 1,
             currentDate.getMonth(),
