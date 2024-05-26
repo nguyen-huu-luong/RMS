@@ -15,7 +15,7 @@ import { RootStyleRegistry } from "@/components/RootStyleRegistry";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Home cruise - CRM",
+    title: "Home Cuisine - CRM",
     description: "Restaurent management system",
     icons: {
         icon: "../../favicon.ico"
