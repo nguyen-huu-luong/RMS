@@ -372,6 +372,8 @@
 			"are-you-sure": "Bạn chắc chắn chứ ?",
 			"add": "Thêm",
 			"validate-message": "Vui lòng {action} {field} của chiến dịch",
+			"description": "Mô tả",
+			"editor-type": "Kiểu hỉnh sửa",
 			"campaignStatus": {
 				"planning": "Đang lên kế hoạch",
 				"active": "Hoạt động"
@@ -389,6 +391,7 @@
 				"delete-strack-url-success-msg": "Tạo liên kết theo dõi thành công",
 				"overview": "Thông tin chung",
 				"emal-marketing": "Email tiếp thị",
+				"email-marketing": "Email tiếp thị",
 				"actions": "Hành động",
 				"redirect-url": "Liên kết chuyển tiếp",
 				"code-to-insert": "Mã để chèn thay cho liên kết",

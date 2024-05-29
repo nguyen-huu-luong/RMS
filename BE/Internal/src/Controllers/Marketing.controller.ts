@@ -122,7 +122,7 @@ class MarketingController {
 
 		if (!campaignId) {
 			if (campaignName) {
-				const campaign = await this.campaignService.create({name: campaignName})
+				const campaign = await this.campaignService.create({name: campaignName, type: "email", status: "active", startDate: new Date(), endDate: new Date()})
 				campaignId = campaign.getDataValue("id")
 			}
 			// CREATE EMAIL CAMPAIGN

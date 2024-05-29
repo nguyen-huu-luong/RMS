@@ -115,8 +115,12 @@ export class QueueService {
                                 templateId
                             );
                             html = template.getDataValue("content");
-                            type = "mjml";
+                            if ( template.getDataValue("type") === "dnd") {
+                                type = "mjml"
+                            }
                         }
+                            
+                        console.log(html, type)
 
                         if (job.data.finalEmail) {
                             console.log("Final: ", job.data.to);

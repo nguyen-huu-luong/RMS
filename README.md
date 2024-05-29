@@ -36,7 +36,7 @@ local branch -> dev branch -> production branch <br />
 
 ### Admin server
 - VM name: rms-system-admin
-- Host: 34.87.138.76
+- Host: 35.240.185.145
 - Port: 3000
 - Container name: rms-frontend_admin-1
 
