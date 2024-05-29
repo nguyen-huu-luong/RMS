@@ -23,9 +23,10 @@ import {
 	CartItemRepository,
 	INotificationRepository,
 	NotificationRepository,
-	ClientHistoryRepository
-,
-	Pos_notificationRepository
+	ClientHistoryRepository,
+	Pos_notificationRepository,
+	GroupRepository,
+	IGroupRepository
 } from "../Repositories";
 import { ClientRepository,  } from "../Repositories";
 import { IPermissionRepository } from "../Repositories/IPermissionRepository";
@@ -50,6 +51,10 @@ import { TargetListRepository } from "../Repositories/implementation/TargetListR
 import { IClientHistoryRepository } from "../Repositories";
 import { ISubscriberRepository, SubscriberRepository } from "../Repositories";
 import { IOrderItemRepository, OrderItemRepository } from "../Repositories";
+import { IEmailCampaignRepository } from "../Repositories/IEmailCampaignRepository";
+import { EmailCampaignRepository } from "../Repositories/implementation/EmailCampaignRepository";
+import { ITrackUrlRepository } from "../Repositories/IITrackUrlRepository";
+import { TrackUrlRepository } from "../Repositories/implementation/TrackUrlRepository";
 
 import { IPos_notificationRepository } from "../Repositories/IPos_notificationRepository";
 class InversifyContainer {
@@ -106,8 +111,10 @@ class InversifyContainer {
 		this.container.bind<ITargetListRepository>(TYPES.ITargetListRepository).to(TargetListRepository);
 		this.container.bind<IClientHistoryRepository>(TYPES.IClientHistoryRepository).to(ClientHistoryRepository)
 		this.container.bind<ISubscriberRepository>(TYPES.ISubscriberRepository).to(SubscriberRepository)
+		this.container.bind<IEmailCampaignRepository>(TYPES.IEmailCampaignRepository).to(EmailCampaignRepository)
+		this.container.bind<ITrackUrlRepository>(TYPES.ITrackUrlRepository).to(TrackUrlRepository)
 		this.container.bind<IPos_notificationRepository>(TYPES.IPos_notificationRepository).to(Pos_notificationRepository)
-
+		this.container.bind<IGroupRepository>(TYPES.IGroupRepository).to(GroupRepository)
 	}
 }
 

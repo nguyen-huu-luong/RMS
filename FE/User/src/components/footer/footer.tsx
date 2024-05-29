@@ -16,10 +16,12 @@ const Footer = () => {
     const [notiSub, setNotiSub] = useState('')
     const handleCreateSubscriber = async (event: any) => {
         event.preventDefault()
+        
         const data_body = {
-            name: event.target.name.value,
-            email: event.target.email.value,
-            phone: event.target.phone.value
+            name: event.target.name.value.trim(),
+            email: event.target.email.value.trim(),
+            phone: event.target.phone.value.trim(),
+            type: "lead"
         } 
         const data = await fetchGeneral({method: "POST", url: '/subscribers', body: data_body, data_return: true})
         if (data.status == 'Success') {
@@ -139,7 +141,7 @@ const Footer = () => {
                             </div>
                             <div className='w-auto h-auto py-2 font-thin'>
                                 <Link
-                                    href={`/account`}
+                                    href={`/profile`}
                                     locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
@@ -157,7 +159,7 @@ const Footer = () => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/order`}
+                                    href={`/myorder`}
                                     locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >
@@ -166,7 +168,7 @@ const Footer = () => {
                             </div>
                             <div className='w-auto h-auto py-2'>
                                 <Link
-                                    href={`/feedback`}
+                                    href={`/`}
                                     locale={locale}
                                     className='transition-all ease-in-out duration-200'
                                 >

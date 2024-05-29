@@ -1,330 +1,201 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import {
-	Button,
-	ConfigProvider,
-	Table,
-	Space,
-	Select,
-	Alert,
-} from "antd";
-import type { TableProps, GetProp, TableColumnType } from "antd";
-import { variables } from "@/app";
-import {
-	SortAscendingOutlined,
-	SortDescendingOutlined,
-} from "@ant-design/icons";
-import type {
-	Key,
-	SortOrder,
-} from "antd/es/table/interface";
-import { EmployeeActionBar } from "@/components/EmployeeActionBar";
-import Link from "antd/es/typography/Link";
+import React, { useState } from "react";
+import { type TableProps, type GetProp, Form, Upload, Button, Select, message, Flex, Space, Input } from "antd";
+import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
+import TableRender, { FilterItemType } from "@/components/TableComponents";
 import fetchClient from "@/lib/fetch-client";
+import { SendEmailModal } from "@/components/Modals/SendEmailModal";
+import { CreateTargetListModal } from "@/components/Modals/CreateTargetListModal";
+import { useRouter } from "next/navigation";
+import { useForm } from "antd/es/form/Form";
+import moment from "moment";
+import { CreateaEmployeeModal } from "@/components/Modals/CreateNewEmployeeModal";
+import { AxiosError } from "axios";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
-type TablePaginationConfig = Exclude<
-	GetProp<TableProps, "pagination">,
-	boolean
->;
-
 interface DataType {
 	key: React.Key;
 	id: number;
 	fullname: string;
 	phone: string;
 	email: string;
-	createdAt: string;
 	role: string;
+	createdAt: string;
 }
 
-type ErrorType = {
-	isError: boolean;
-	title: string;
-	message: string;
-};
 
-type SorterParams = {
-	field?: Key | readonly Key[];
-	order?: SortOrder;
-};
-
-interface TableParams {
-	pagination?: TablePaginationConfig;
-	sorter?: SorterParams;
-	filters?: Parameters<GetProp<TableProps, "onChange">>[1];
-}
-
-type DataIndex = keyof DataType;
-
-const EmailTemplate: React.FC = () => {
-	const [data, setData] = useState<DataType[]>();
-	const [loading, setLoading] = useState(false);
-	const [selectedCustomers, setSelectedCustomers] = useState<DataType[]>();
-	const [tableParams, setTableParams] = useState<TableParams>({
-		pagination: {
-			current: 1,
-			pageSize: 10,
-			total: 0,
-		},
-		filters: {},
-		sorter: {
-			field: "id",
-			order: "ascend",
-		},
-	});
-	const [error, setError] = useState<ErrorType>({
-		isError: false,
-		message: "",
-		title: "",
-	});
-
-	// rowSelection object indicates the need for row selection
-	const rowSelection = {
-		onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-			console.log(
-				`selectedRowKeys: ${selectedRowKeys}`,
-				"selectedRows: ",
-				selectedRows
-			);
-			setSelectedCustomers(selectedRows)
-
-			console.log(selectedCustomers)
-		},
-		getCheckboxProps: (record: DataType) => ({
-			disabled: record.fullname === "", // Column configuration not to be checked
-			name: record.fullname,
-		}),
-	};
+const EmployeeListPages: React.FC = () => {
+	const [selectedRows, setSelectedRows] = useState<DataType[]>([])
+	const [reload, setReload] = useState(false)
+	const router = useRouter()
+	const t_general: any = useTranslations("General")
+	const t_customer: any = useTranslations("Customer")
+	const t_employee: any = useTranslations("Employee")
+	const [form_create] = useForm()
 	const columns: ColumnsType<DataType> = [
 		{
-			title: "ID",
+			title: t_general("id"),
 			dataIndex: "id",
 			key: "id",
 		},
 		{
-			title: "Fullname",
+			title: t_general("fullname"),
 			dataIndex: "fullname",
 			key: "fullname",
 			render(value, record, index) {
-				return <Link href={`./employees/${record.id}`}>{value}</Link>
+				return <span className="link cursor-pointer text-primary" onClick={() => router.push(`employees/${record.id}`)}>{value}</span>
 			},
 		},
 		{
-			title: "Phone number",
+			title: t_general("phone"),
 			dataIndex: "phone",
 			key: "phone",
 		},
 		{
-			title: "Email",
+			title: t_general("email"),
 			dataIndex: "email",
 			key: "email",
 		},
+
 		{
-			title: "CreatedAt",
+			title: t_employee('role'),
+			dataIndex: "role",
+			key: "role",
+		},
+		{
+			title: t_general("created_at"),
 			dataIndex: "createdAt",
 			key: "createdAt",
+			render: (text) => moment(text).format("HH:mm DD:MM:YYYY")
 		},
 	];
 
-	const fetchData = async () => {
-		setLoading(true);
+	const filterItems: FilterItemType[] = [
+		{
+			key: "1",
+			title: t_general("firstname"),
+			fieldName: "firstname",
+			type: "input"
+		},
+		{
+			key: "8",
+			title: t_general("lastname"),
+			fieldName: "lastname",
+			type: "input"
+		},
+		{
+			key: "2",
+			title: t_general("phone"),
+			fieldName: "phone",
+			type: "input"
+		},
+		{
+			key: "3",
+			title: t_general("email"),
+			fieldName: "email",
+			type: "input"
+		},
+		{
+			key: "4",
+			title: t_general("birthday"),
+			fieldName: "birthday",
+			type: "date"
+		},
+		{
+			key: "6",
+			title: t_general("created_at"),
+			fieldName: "createdAt",
+			type: "date"
+		},
+	];
+
+	const onSelectedRows = {
+		handle: (selecteds: DataType[]) => setSelectedRows(selecteds),
+		render: () => (
+			<main className="bg-white w-full py-2 px-3 my-2 rounded-md border">
+				<Flex>
+					{(selectedRows && selectedRows.length > 0) ?
+						<Space>
+							<p>{t_general("selected")} {selectedRows.length} {t_employee('employee')}</p>
+							{/* <Button icon={<EllipsisOutlined />} /> */}
+							<Button danger onClick={handleDeleteEmployees}>{t_general("delete")} {selectedRows.length} {t_employee('employee')}</Button>
+						</Space>
+						:
+						<Space>
+							<Input
+								placeholder="Enter keywork to search...."
+								prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
+								className="flex items-center"
+							/>
+						</Space>
+					}
+				</Flex>
+			</main >
+		)
+	}
+
+	const handleDeleteEmployees = async () => {
 		try {
-			let filterQueriesStr = "";
-			for (const key in tableParams.filters) {
-				filterQueriesStr = `${filterQueriesStr}&${key}=${tableParams.filters[key]}`;
-			}
-			let sortQueries =
-				tableParams.sorter?.field && tableParams.sorter?.order
-					? `&sort=${tableParams.sorter?.field}&order=${tableParams.sorter?.order === "ascend" ? "asc" : "desc"
-					}`
-					: "";
-			const results = await fetchClient({
-				url: `/employees/all?page=${tableParams.pagination?.current}
-			&pageSize=${tableParams.pagination?.pageSize}${sortQueries}`, data_return: true
+			const result = await fetchClient({
+				url: "/employees",
+				method: "DELETE",
+				body: {
+					ids: selectedRows.map(item => item.id)
+				}
 			})
-			const data = results.data.map((item: any) => ({
-				...item,
-				key: item.id,
-				fullname: `${item.firstname} ${item.lastname}`,
-			}));
-			setData(data);
-			setLoading(false);
-			setTableParams({
-				...tableParams,
-				pagination: {
-					...tableParams.pagination,
-					pageSize: results.pageSize,
-					current: results.page,
-					total: results.totalCount,
-					// 200 is mock data, you should read it from server
-					// total: data.totalCount,
-				},
-			});
-		} catch (error: any) {
-			console.log(error);
-			setError({
-				isError: true,
-				title: error?.name || "Something went wrong!",
-				message: error?.message || "Unknown error",
-			});
+
+			setReload(!reload)
+		} catch (error) {
+			message.error("Đã xảy ra lỗi")
+			throw error
 		}
-	};
+	}
 
-	useEffect(() => {
-		fetchData();
-	}, [JSON.stringify(tableParams)]);
-
-	const handleTableChange: TableProps["onChange"] = (
-		pagination,
-		filters,
-		sorter,
-		extra
-	) => {
-		console.log(pagination, filters, sorter, extra);
-		if (Array.isArray(sorter)) {
-			const firstSorter = sorter[0];
-			console.log("Sorter is array");
-			setTableParams(prev => ({
-				...prev,
-				pagination,
-				filters,
-				sorter: {
-					field: firstSorter?.field || prev.sorter?.field,
-					order: firstSorter?.order || prev.sorter?.order,
-				},
-			}));
-		} else {
-			console.log("Sorter is not an array");
-
-			setTableParams(prev => ({
-				pagination,
-				filters,
-				sorter: {
-					field: sorter?.field || prev.sorter?.field,
-					order: sorter?.order || prev.sorter?.order,
-				},
-			}));
+	const handleCreateEmployee = async (values: any) => {
+		try {
+			const  result = await fetchClient({
+				method: "POST",
+				url: "/employees", 
+				body: {
+					data: {
+						...values
+					}
+				}
+			})
+			setReload(!reload) ;
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				if (error.response)  {
+					const {code, name, message} = error?.response.data
+					if (name  === "Conflict") {
+						form_create.setFields([{name: "username", errors: ["Username đã tồn tại"]}])
+					} else {
+						message.error("From Server: ", message)
+					}
+				}
+				throw error
+			} else {
+				message.error("Đã xãy ra lỗi")
+				throw error
+			}
 		}
-	};
+	}	
 
-	const handleSortFieldChange = (key: string) => {
-		console.log(key, tableParams);
-		setTableParams((prev) => ({
-			...prev,
-			sorter: { ...prev.sorter, field: key },
-		}));
-		console.log(tableParams);
-	};
 
-	const handleToggleSorter = () => {
-		setTableParams((prev) => ({
-			...prev,
-			sorter: {
-				...prev.sorter,
-				order: prev.sorter?.order === "ascend" ? "descend" : "ascend",
-			},
-		}));
-	};
-
-	const handleClearFilter = () => { };
-
-	const handleClearAll = () => { };
-
-	const handleCloseError = () => {
-		console.log(error);
-		setError({ isError: false, title: "", message: "" });
-	};
 
 	return (
-		<ConfigProvider
-			theme={{
-				components: {
-					Table: {
-						headerBg: variables.backgroundSecondaryColor,
-						footerBg: "#fff",
-					},
-				},
-			}}
-		>
-			<Space direction="vertical" className="w-full">
-				{/* <CustomerFilterBar /> */}
-				<EmployeeActionBar dataSelected={selectedCustomers} />
-				{error.isError && (
-					<Alert
-						message={error.title}
-						description={error.message}
-						type="error"
-						showIcon
-						onClose={handleCloseError}
-						closeIcon
-					/>
-				)}
-				<div className="border bg-white shadow p-3">
-					<div style={{ marginBottom: 16 }} className="flex items-center gap-2">
-						<p>Sort by: </p>
-						<Select
-							// style={{ width: '20%' }}
-							placeholder="Columns"
-							value={tableParams.sorter?.field?.toString() || "id"}
-							onChange={handleSortFieldChange}
-							options={columns.map((item) => ({
-								value: item.key,
-								label: item.title,
-							}))}
-						/>
+		<TableRender<DataType>
+			columns={columns}
+			url="/employees"
+			createModalTitle="Add new employee"
+			createModal = {<CreateaEmployeeModal formControl={form_create} onCreate={handleCreateEmployee}/>}
+			reload={reload}
+			onSelected={onSelectedRows}
+			filterItems={filterItems}
+		/>
 
-						<p>Order: </p>
-
-						<Button onClick={handleToggleSorter} icon={tableParams.sorter?.order === "ascend" ? (
-							<SortAscendingOutlined />
-						) : (
-							<SortDescendingOutlined />
-						)} />
-						{/* 
-						<p>Filter: </p>
-						<Select
-							style={{ width: "20%" }}
-							placeholder="tags"
-							mode="multiple"
-							onChange={handleSortFieldChange}
-							options={columns.map((item) => ({
-								value: item.key,
-								label: item.title,
-							}))}
-						/> */}
-					</div>
-					<Space>
-						<Button onClick={handleClearFilter}>Clear filters</Button>
-						<Button onClick={handleClearAll}>Clear filters and sorters</Button>
-						{/* <Space className="ms-auto">
-							<input type="checkbox" name="apply-mode" id="apply-mode" />
-							<label htmlFor="apply-mode">Apply filters only in current page</label>
-						</Space> */}
-					</Space>
-				</div>
-
-				<Table
-					rowSelection={{
-						...rowSelection,
-					}}
-					columns={columns}
-					pagination={{
-						className: "bg-white rounded px-4 py-2",
-						showTotal: (total: number) => `Total ${total} items`,
-						position: ["bottomCenter", "bottomRight"],
-						showSizeChanger: true,
-						showQuickJumper: true,
-						total: tableParams.pagination?.total,
-						pageSize: tableParams.pagination?.pageSize,
-					}}
-					loading={loading}
-					dataSource={data}
-					onChange={handleTableChange}
-				/>
-			</Space>
-		</ConfigProvider>
 	);
 };
 
-export default EmailTemplate;
+export default EmployeeListPages;

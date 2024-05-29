@@ -1,12 +1,33 @@
-import { SendOutlined } from "@ant-design/icons";
+import {
+    ExclamationCircleOutlined,
+    FileImageOutlined,
+    SendOutlined,
+} from "@ant-design/icons";
 import TimeStamp from "./Timestamp";
 import Message from "./Message";
 import Status from "./Status";
 import { useState, useEffect, useCallback, useRef } from "react";
 import moment from "moment";
 import fetchClient from "@/lib/fetch-client";
-import { Spin } from "antd";
+import {
+    Button,
+    Drawer,
+    Space,
+    Spin,
+    Upload,
+    UploadProps,
+    message,
+} from "antd";
 import Loading from "../loading";
+import { variables } from "@/app";
+import { useRouter } from "next-intl/client";
+import { useForm } from "antd/es/form/Form";
+import { AxiosError } from "axios";
+import { uploadImage } from "@/app/api/upload";
+import { CreateNewLeadForm } from "../Lead/AddLeadForm";
+import { useSession } from "next-auth/react";
+import SendStatus from "./send_status";
+import { useTranslations } from "next-intl";
 
 const ChatBox = ({
     channel,
@@ -21,14 +42,68 @@ const ChatBox = ({
     setIndex: any;
     index: any;
 }) => {
+    const { data: session, status } = useSession();
     const [value, setValue] = useState("");
+    const [sending, setSending] = useState<boolean>(false);
     const [data, setData] = useState<any>(null);
     const [inputFocused, setInputFocused] = useState(false);
+    const t = useTranslations('Chat')
     const [action, setAction] = useState<string>("Default");
     const messageContainerRef = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [isAllLoaded, setIsAllLoaded] = useState<boolean>(false);
     const [initial, setInitial] = useState<boolean>(false);
+    const router = useRouter();
+    const [form_create] = useForm();
+    const [open, setOpen] = useState(false);
+    const showDrawer = () => {
+        setOpen(true);
+    };
+    const onClose = () => {
+        setOpen(false);
+    };
+    //CREATE LEAD
+    const handleCreateLead = async (values: any) => {
+        try {
+            const result = await fetchClient({
+                method: "POST",
+                url: "/customers",
+                body: {
+                    data: {
+                        ...values,
+                        convertDate: new Date(),
+                        type: "lead",
+                    },
+                },
+            });
+            onClose();
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                if (error.response) {
+                    const { code, name, message } = error?.response.data;
+                    if (name === "Conflict") {
+                        form_create.setFields([
+                            { name: "email", errors: ["Email đã tồn tại"] },
+                        ]);
+                    }
+                }
+                throw error;
+            } else {
+                message.error("Đã xãy ra lỗi");
+                throw error;
+            }
+        }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            form_create.submit();
+        } catch (error) {
+            message.error("Đã xãy ra lỗi");
+            throw error;
+        }
+    };
+
     // HANDLE SCROLL TO BOTTOM
     const scrollToBottom = () => {
         const container = messageContainerRef.current;
@@ -70,17 +145,21 @@ const ChatBox = ({
     }, [index, channel]);
 
     useEffect(() => {
-        setLoading(false)
-        setIsAllLoaded(false)
-        setInitial(false)
-        setValue("")
-        
-        setTimeout(() => scrollToBottom(), 1000)
+        form_create.resetFields();
+        onClose();
     }, [channel]);
 
     useEffect(() => {
-        
-        setTimeout(() => scrollToBottom(), 1000)
+        setLoading(false);
+        setIsAllLoaded(false);
+        setInitial(false);
+        setValue("");
+
+        setTimeout(() => scrollToBottom(), 1000);
+    }, [channel]);
+
+    useEffect(() => {
+        setTimeout(() => scrollToBottom(), 1000);
     }, [channel]);
     useEffect(() => {
         const handleNewMessage = (
@@ -139,15 +218,7 @@ const ChatBox = ({
         if (value == "") return;
         e.preventDefault();
         try {
-            await fetchClient({
-                url: `/channels/admin`,
-                method: "POST",
-                body: {
-                    content: value,
-                    channelId: channel,
-                    status: "Not seen",
-                },
-            });
+            setSending(true);
             setValue("");
             setData((prevData: any) => ({
                 ...prevData,
@@ -161,11 +232,70 @@ const ChatBox = ({
                     },
                 ],
             }));
-            socket.emit("staff:message:send", data.channel, value, value);
+            const response = await socket.emitWithAck(
+                "staff:message:send",
+                data.channel,
+                value,
+                session?.user.id
+            );
+            if (!response.status) {
+                message.error(t('text-fail'));
+            }
+            setSending(false);
             setAction("Scroll");
         } catch (error) {
             console.error("Error sending message:", error);
         }
+    };
+
+    const handleUpload = async ({
+        file,
+        onSuccess,
+    }: {
+        file?: any;
+        onSuccess?: any;
+    }) => {
+        const image = await uploadImage(file, "Chat");
+        if (image.url) {
+            setSending(true);
+            setValue("");
+            setData((prevData: any) => ({
+                ...prevData,
+                message: [
+                    ...prevData.message,
+                    {
+                        content: image.url,
+                        createdAt: new Date(),
+                        employeeId: "1",
+                        status: "Not seen",
+                    },
+                ],
+            }));
+            const response = await socket.emitWithAck(
+                "staff:message:send",
+                data.channel,
+                image.url,
+                session?.user.id
+            );
+            if (!response.status) {
+                message.error(t('text-fail'));
+            }
+            setSending(false);
+            setAction("Scroll");
+        }
+        onSuccess("ok");
+    };
+
+    const props: UploadProps = {
+        name: "image",
+        customRequest: handleUpload,
+        onChange(info) {
+            if (info.file.status === "done") {
+                message.success(t('image'));
+            } else if (info.file.status === "error") {
+                message.error(t('image-fail'));
+            }
+        },
     };
 
     const viewMessage = async () => {
@@ -174,7 +304,7 @@ const ChatBox = ({
             method: "PUT",
             body: { id: channel },
         });
-        socket.emit("staff:message:read", data.channel);
+        await socket.emit("staff:message:read", data.channel);
         setValue("");
         scrollToBottom();
     };
@@ -189,14 +319,12 @@ const ChatBox = ({
 
     // HANDLE SCROLL FOR LOADING MORE
     const loadMore = () => {
-        console.log("Load more1")
         if (loading || isAllLoaded) return;
         setLoading(true);
         setIndex((prevIndex: number) => prevIndex + 1);
     };
 
     const handleScroll = () => {
-        console.log("Load more2")
         const container = messageContainerRef.current;
         if (container) {
             if (container.scrollTop === 0) {
@@ -225,13 +353,71 @@ const ChatBox = ({
     }, [loading, isAllLoaded, initial]);
 
     if (channel === -1) return "Choose customer to chat";
-    if (!data) return <Loading/>;
+    if (!data) return <Loading />;
+
     return (
         <div
-            className={` bg-white border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full bottom-5 right-5 z-50`}
+            className={` bg-white relative border-primary rounded-md border-2 border-opacity-25 flex flex-col justify-between overflow-hidden shadow-lg w-full h-full z-50`}
         >
-            <div className='header h-10 w-full text-white bg-primary items-center flex flex-row justify-between p-2 font-bold border-b-white border-b-2'>
-                <span>Chat</span>
+            <Drawer
+                title={t('create-lead')}
+                placement='top'
+                closable={false}
+                onClose={onClose}
+                open={open}
+                getContainer={false}
+                mask={false}
+                maskClosable={false}
+                extra={
+                    <Space>
+                        <Button onClick={onClose}>{t('Cancel')}</Button>
+                        <Button
+                            type='default'
+                            style={{ backgroundColor: "white" }}
+                            onClick={handleSubmit}
+                        >
+                            {t('create')}
+                        </Button>
+                    </Space>
+                }
+            >
+                <CreateNewLeadForm
+                    formControl={form_create}
+                    onCreate={handleCreateLead}
+                />
+            </Drawer>
+            <div
+                style={{ backgroundColor: variables.backgroundSecondaryColor }}
+                className='header h-12 w-full text-white items-center flex flex-row justify-between p-4 font-bold border-b-white border-b-2'
+            >
+                <span className='font-semibold text-black'>{data.client}</span>
+                {data.type == "customer" || data.type == "lead" ? (
+                    <span
+                        className='font-semibold  text-black'
+                        onClick={() =>
+                            router.push(
+                                `${
+                                    data.type === "customer"
+                                        ? "/customers/"
+                                        : "/leads/"
+                                }${data.id}`
+                            )
+                        }
+                    >
+                        <ExclamationCircleOutlined
+                            style={{ fontSize: "1.4rem" }}
+                            className='hover:cursor-pointer'
+                        />
+                    </span>
+                ) : (
+                    <Button
+                        type='default'
+                        style={{ backgroundColor: "white" }}
+                        onClick={showDrawer}
+                    >
+                        Create Lead
+                    </Button>
+                )}
             </div>
             <div
                 ref={messageContainerRef}
@@ -269,6 +455,7 @@ const ChatBox = ({
                         </>
                     );
                 })}
+                {sending && <SendStatus />}
             </div>
             <div className='footer h-10 w-full bg-primary-100 items-center flex flex-row justify-between p-2 font-medium text-base'>
                 <input
@@ -281,8 +468,22 @@ const ChatBox = ({
                         e.key === "Enter" ? await send(e) : {}
                     }
                     className='chat bg-primary-100 w-full h-full border-0 focus:outline-none px-2 py-2'
-                    placeholder='Enter text'
+                    placeholder={t('enter-text')}
                 />
+                <span className='text-primary'>
+                    <Upload
+                        {...props}
+                        maxCount={1}
+                        showUploadList={false}
+                        accept='image/*'
+                        style={{ color: "aqua" }}
+                    >
+                        <FileImageOutlined
+                            style={{ fontSize: "1.4rem", color: "#4A58EC" }}
+                            className='hover:cursor-pointer'
+                        />
+                    </Upload>
+                </span>
                 <span className='text-primary' onClick={(e) => send(e)}>
                     <SendOutlined
                         style={{ fontSize: "1.4rem" }}

@@ -6,9 +6,12 @@ export interface IInputNumberProps {
     leftAddon: React.ReactNode | string,
     value: number,
     onChange: (key: string, value: number) => void
+    min?: number
+    max?: number,
+    classNames?: string
 }
 
-const InputNumber: React.FC<IInputNumberProps> = ({ cssProperty, leftAddon, value, onChange }) => {
+const InputNumber: React.FC<IInputNumberProps> = ({ cssProperty, leftAddon, value, onChange, ...props }) => {
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         onChange(cssProperty, Number(e.target.value))
     }
@@ -16,8 +19,9 @@ const InputNumber: React.FC<IInputNumberProps> = ({ cssProperty, leftAddon, valu
     console.log(value)
     return <Col span={12} className="flex items-center">
         <span className="px-2 py-2 bg-bgsecondary border w-16 rounded-s border-r-0">{leftAddon}</span>
-        <input className="border px-2 py-2 bg-white w-full rounded-e" type="number" defaultValue={value} onChange={handleChange}/>
+        <input min={props.min} max={props.max} className="border px-2 py-2 bg-white w-full rounded-e" type="number" defaultValue={value} onChange={handleChange}/>
     </Col>
+
 }
 
 export default InputNumber;

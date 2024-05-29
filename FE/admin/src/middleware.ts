@@ -8,6 +8,8 @@ const authRoutes = ["/", "/customers", "/bussiness", "/chat", "/leads",
                     "/marketing", "/organization", "/overview", "/profile", 
                     "/report", "/sale", "/setting"];
 
+// const staffRoutes = 
+
 const intlMiddleware = createIntlMiddleware({
     locales,
     localePrefix: "as-needed",
@@ -21,7 +23,6 @@ const authMiddleware = withAuth(
             secret: process.env.NEXTAUTH_SECRET,
         });
 
-
         if (!token) {
             const isAuthRoute = authRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
@@ -30,8 +31,7 @@ const authMiddleware = withAuth(
                 redirectUrl.searchParams.set("callbackUrl", request.nextUrl.href);
                 return NextResponse.redirect(redirectUrl);
             }
-        } 
-        
+        }
         return intlMiddleware(request);
         
     },
@@ -40,7 +40,7 @@ const authMiddleware = withAuth(
         callbacks: {
             authorized: (session) => {
                 console.log(session.token?.role)
-                return session.token?.role === "manager" ;
+                return session.token?.role === "manager" ||  session.token?.role === "employee" || session.token?.role === "chef";
             },
         },
         pages: {

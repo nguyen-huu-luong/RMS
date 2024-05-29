@@ -271,6 +271,30 @@
 				}
 			}
 		},
+		"/customers/group/all": {
+			"get": {
+				"tags": ["Customer"],
+				"summary": "Returns a list of all customers with groups",
+				"parameters":[  
+					{  
+					   "name":"groupIds",
+					   "in":"query",
+					   "description":"List of groups which users want to filter",
+					   "required": false,
+					   "type":"string",
+					   "example": "[1,2]"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "A JSON array of customers"
+					},
+					"400": {
+						"description": "Bad request from user"
+					}
+				}
+			}
+		},
 		"/products": {
 			"post": {
 				"security": [

@@ -8,16 +8,23 @@ import {
 	SettingOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, MenuProps, Tooltip } from "antd";
+import { Button, Dropdown, MenuProps, Space, Tooltip } from "antd";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { LocaleSwitcher } from "../LocaleSwitcher/";
-import variables from "@/app/variables.module.scss";
 import { DynamicBreadcrumb } from "..";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { User } from "next-auth";
+import Image from "next/image";
 
-export default function Header() {
+
+interface IHeaderContainerProps {
+	user: User
+}
+export default function HeaderContainer(props: IHeaderContainerProps) {
 	const t = useTranslations("Header");
+	const router = useRouter()
 	const items: MenuProps["items"] = [
 		{
 			label: <Link href="/profile">{t("profile")}</Link>,
@@ -44,42 +51,47 @@ export default function Header() {
 		items,
 	};
 	return (
-		<div
-			className="flex items-center justify-between bg-white py-2 px-10 space-x-2 border-b-2 fixed z-50 top-0 right-0 h-header"
-			style={{ width: `calc(100% - ${variables.sidebarWidth}` }}
-		>
-            <DynamicBreadcrumb />
+		<>
+			<DynamicBreadcrumb />
 			<div className="flex items-center">
-				<Tooltip title={t("chat-center")}>
-					<Button
-						className="border-0 ms-auto hover:border"
-						icon={<MessageOutlined className="align-middle" />}
-					/>
-				</Tooltip>
+				<Space>
+					<Tooltip title={t("chat-center")} >
+						<Button
+							className="border-0 ms-auto hover:border"
+							onClick={() => router.push("/chat")}
+							icon={<MessageOutlined className="align-middle" />}
+						/>
+					</Tooltip>
 	
-				<Tooltip title={t("notification")}>
-					<Button
-						className="border-0 ms-auto hover:border"
-						icon={<BellOutlined className="align-middle" />}
-					/>
-				</Tooltip>
+					<Tooltip title={t("notification")}>
+						<Button
+							className="border-0 ms-auto hover:border"
+							icon={<BellOutlined className="align-middle" />}
+						/>
+					</Tooltip>
 	
-				<LocaleSwitcher />
-	
+					<LocaleSwitcher />
+				</Space>
+
 				<Dropdown menu={menuProps}>
-					<Button className="flex items-center py-3 ms-4 border-white hover:border hover:bg-secondary">
-						<img
-							src="https://cdn-icons-png.flaticon.com/256/163/163801.png"
+					<div className="flex items-center border border-white text-black hover:text-primary hover:bg-slate-100 hover:border-primary px-2 py-1 cursor-pointer rounded ms-3">
+						<Image
+							src={props.user.image || "https://cdn-icons-png.flaticon.com/256/163/163801.png"}
 							alt="avatar"
 							width={30}
 							height={30}
+							style={{
+								width: 30,
+								height: 30
+							}}
 							className="rounded-full me-2"
 						/>
-						<span>Admin</span>
+						<p>{props.user.name}</p>
 						<DownOutlined className="ms-2 text-xs" />
-					</Button>
+					</div>
 				</Dropdown>
 			</div>
-		</div>
+		</>
+
 	);
 }

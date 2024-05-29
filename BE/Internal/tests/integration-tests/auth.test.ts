@@ -3,7 +3,6 @@ import { Server } from "../../src/app";
 import Loader from "../../src/Loaders";
 import Tables, { Employee } from "../../src/Models";
 import bcrypt from "bcrypt";
-import { mock } from "node:test";
 import { adminUser } from "../setup/mockDatas/mockUser";
 
 
@@ -25,8 +24,8 @@ describe("Authentication API", () => {
 
     afterAll(async () => {
         // Close the database connection after all tests
-        // await Loader.sequelize.close();
         await Loader.sequelize.sync({ force: true });
+        await Loader.sequelize.close();
     });
 
     it("should return a JWT token with valid credentials", async () => {

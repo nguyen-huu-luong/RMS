@@ -13,8 +13,6 @@ import { useSession } from "next-auth/react";
 import { addToCart } from "@/app/api/product/cart";
 import { useRouter } from "next-intl/client";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect } from "react";
-import fetchClient from "@/lib/fetch-client";
 
 const FoodDetail = ({
     food,
@@ -57,7 +55,7 @@ const FoodDetail = ({
     return (
         <>
             <div
-                className={`${styles.food__detail} shadow-xl fixed group top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 h-auto w-80 p-5 flex flex-col gap-3 justify-between rounded-xl bg-primary-white overflow-hidden`}
+                className={`${styles.food__detail} shadow-xl fixed group top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 h-auto w-80 p-5 flex flex-col gap-3 justify-between rounded-xl bg-primary-white overflow-hidden`}
             >
                 <div className='relative w-auto h-auto rounded-lg overflow-hidden cursor-pointer'>
                     <button

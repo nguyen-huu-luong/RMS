@@ -10,6 +10,7 @@ import { Op } from "sequelize";
 /// <reference path="./types/globle.d.ts" />
 import { IClientRepository, IEmployeeRepository } from "../Repositories";
 import moment from "moment";
+import { UnauthorizedError } from "../Errors";
 export class ChannelService {
     constructor(
         private channelRepository = container.get<IChannelRepository>(
@@ -63,7 +64,7 @@ export class ChannelService {
             response = {
                 channel: channel.getDataValue("id"),
                 message: message.slice(startIndex, endIndex).reverse(),
-                isAll: isAll
+                isAll: isAll,
             };
             Message.logMessage(req, status);
             if (res.headersSent) return;
@@ -179,6 +180,9 @@ export class ChannelService {
                 ? parseInt(req.query.channelId as string, 10)
                 : 0;
             const channel = await this.channelRepository.findById(channelId);
+            const client = await this.clientRepository.findById(
+                channel.getDataValue("clientId")
+            );
             message = await channel.getMessages({
                 order: [["createdAt", "DESC"]],
             });
@@ -193,7 +197,13 @@ export class ChannelService {
             response = {
                 channel: channel.getDataValue("id"),
                 message: message.slice(startIndex, endIndex).reverse(),
-                isAll: isAll
+                isAll: isAll,
+                client:
+                    client.getDataValue("lastname") +
+                    " " +
+                    client.getDataValue("firstname"),
+                type: client.getDataValue("type"),
+                id: client.getDataValue('id')
             };
             Message.logMessage(req, status);
             if (res.headersSent) return;
@@ -269,6 +279,38 @@ export class ChannelService {
             } else {
                 return res.status(status).send(statusMess.Success);
             }
+        } catch (err) {
+            console.log(err);
+            next(err);
+        }
+    }
+    public async getNotSeenMessage(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            const status: number = HttpStatusCode.Success;
+            let response: any;
+            if (req.role === "user") {
+                const client = await this.clientRepository.findById(req.userId);
+                const channel = await client.getChannel();
+                const notSeenMessages = await channel.getMessages({
+                    where: {
+                        employeeId: {
+                            [Op.not]: null,
+                        },
+                        status: "Not seen",
+                    },
+                });
+                response = {
+                    notSeenMessages: notSeenMessages.length,
+                };
+            } else {
+                throw new UnauthorizedError();
+            }
+            Message.logMessage(req, status);
+            return res.status(status).send(response);
         } catch (err) {
             console.log(err);
             next(err);

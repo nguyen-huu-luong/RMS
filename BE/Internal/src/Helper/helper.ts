@@ -4,15 +4,32 @@ import { QueryOptions } from "../Types/type";
 import { validationResult } from "express-validator";
 import { Op } from "sequelize";
 
-function parseRequesQueries(query: any): QueryOptions {
+/*
+return object like:
+ueryOptions: QueryOptions = {
+        filter: {
+            key: string,
+            key: {
+                <cond>: value
+            }
+        },
+        sort: { by: "", order: "asc" },
+        paginate: { page: 1, pageSize: 10 },
+    };
+
+*/
+
+function parseRequesQueries(
+    query: any,
+): QueryOptions {
     const queryOptions: QueryOptions = {
         filter: {},
         sort: { by: "", order: "asc" },
         paginate: { page: 1, pageSize: 10 },
-        type: "",
+        // type: "",
     };
 
-    const { page, pageSize, sort, order, type, ...filterOptions } = query;
+    const { page, pageSize, sort, order, ...filterOptions } = query;
 
     if (sort) {
         queryOptions.sort = { order: order || "asc", by: sort };
@@ -22,54 +39,52 @@ function parseRequesQueries(query: any): QueryOptions {
         queryOptions.paginate = { page, pageSize };
     }
 
-    if (type) {
-        queryOptions.type = type;
-    }
+    // if (type) {
+    //     queryOptions.type = type;
+    // }
+    const allowConds = [
+        "gt",
+        "lt",
+        "gte",
+        "lte",
+        "neq",
+        "like",
+        "notLike",
+        "startsWith",
+        "endsWith",
+        "contains",
+        "in",
+    ];
 
     console.log(filterOptions);
     for (const key in filterOptions) {
         console.log(key);
         if (filterOptions[key]) {
-            if (typeof filterOptions[key] === "string") {
-                const filterConditions = key.split("_");
-                const allowConds = [
-                    "gt",
-                    "lt",
-                    "gte",
-                    "lte",
-                    "neq",
-                    "like",
-                    "notLike",
-                    "startsWith",
-                    "endsWith",
-                    "contains",
-                    "in",
-                ];
-                // filterConditions format: [<field name>, <query cond>]
-                if (filterConditions.length === 2 ) {
-                    console.log(filterConditions,filterOptions[key])
-                    // Xử lý khi có thêm điều kiện query (format <field>_<query cond>= <value>)
-                    if (allowConds.includes(filterConditions[1]))
-                        if (!queryOptions.filter[filterConditions[0]]) {
-                            queryOptions.filter[filterConditions[0]] = {}
-                        }
-                        if (filterConditions[1] === "in") {
-                            queryOptions.filter[filterConditions[0]][filterConditions[1]] = filterOptions[key].split(";")
-                        } else {
-                            queryOptions.filter[filterConditions[0]][filterConditions[1]] = filterOptions[key]
-                        }
-                } else {
-                    // Xử lý khi không có thêm điều kiện (tương ứng với filter <key>=<value>)
-                    queryOptions.filter[key] = filterOptions[key];
+            const filterConditions = key.split("_");
+            // filterConditions format: [<field name>, <query cond>]
+            if (filterConditions.length === 2) {
+                console.log(filterConditions, filterOptions[key]);
+                // Xử lý khi có thêm điều kiện query (format <field>_<query cond>= <value>)
+                if (allowConds.includes(filterConditions[1])) {
+                    if (!queryOptions.filter[filterConditions[0]]) {
+                        queryOptions.filter[filterConditions[0]] = {};
+                    }
+                    if (filterConditions[1] === "in") {
+                        queryOptions.filter[filterConditions[0]][filterConditions[1]] =
+                            filterOptions[key].split(";");
+                    } else {
+                        queryOptions.filter[filterConditions[0]][filterConditions[1]] =
+                            filterOptions[key];
+                    }
                 }
-
             } else {
-              queryOptions.filter = {...queryOptions.filter, ...filterOptions.filter}   
-            }   
+                // Xử lý khi không có thêm điều kiện (tương ứng với filter <key>=<value>)
+                queryOptions.filter[key] = filterOptions[key];
+            }
         }
     }
 
-    console.log(queryOptions);
+    console.log("Parse quẻy", queryOptions);
 
     return queryOptions;
 }

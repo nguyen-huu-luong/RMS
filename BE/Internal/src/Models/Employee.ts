@@ -8,6 +8,8 @@ import Token from "./Token";
 import Message from "./Message";
 class Employee extends Person {
     createMessage: any;
+	declare username: string ;
+	declare email: string ;
 	public static associate() {
 		Employee.hasMany(Client, {
 			foreignKey: {
@@ -56,7 +58,7 @@ Employee.init(
 		},
 		email: {
 			type: DataTypes.STRING,
-			allowNull: false,
+			allowNull: false,	
 		},
 		phone: {
 			type: DataTypes.STRING,
@@ -72,15 +74,12 @@ Employee.init(
 		},
 		gender: {
 			type: DataTypes.BOOLEAN,
-			allowNull: false,
 		},
 		birthday: {
 			type: DataTypes.DATE,
-			allowNull: false,
 		},
 		avatar: {
 			type: DataTypes.BLOB,
-			allowNull: true,
 		},
 		role: {
 			type: DataTypes.STRING,
@@ -93,11 +92,20 @@ Employee.init(
 		isActive: {
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
+			defaultValue: false
 		},
 		language: {
 			type: DataTypes.STRING,
-			allowNull: false,
+			defaultValue: "en"
 		},
+		createdAt: {
+			type: DataTypes.DATE,
+			allowNull: false
+		},
+		updatedAt: {
+			type: DataTypes.DATE,
+			allowNull: false
+		}
 	},
 	{
 		sequelize: Loader.sequelize,

@@ -29,6 +29,10 @@ class ChannelController {
         this.channelService.getMessages(req, res, next);
     }
 
+    public getNotSeenMessages(req: Request, res: Response, next: NextFunction) {
+        this.channelService.getNotSeenMessage(req, res, next);
+    }
+
     public adminGetMessages(req: Request, res: Response, next: NextFunction) {
         this.channelService.adminGetMessage(req, res, next);
     }

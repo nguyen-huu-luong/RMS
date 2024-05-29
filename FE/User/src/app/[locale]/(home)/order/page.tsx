@@ -11,6 +11,7 @@ import { useCreateOrder } from "@/app/api/product/order";
 import { useRouter } from "next-intl/client";
 import Loading from "@/components/loading";
 import fetchClient from "@/lib/fetch-client";
+import useSocket from "@/socket";
 
 export default function Order() {
     const locale = useLocale();
@@ -19,7 +20,8 @@ export default function Order() {
     const { data: session, status } = useSession();
     const [amount, setAmount] = useState<number>(0);
     const [voucher, setVoucher] = useState<number>(0);
-    const [fee, setFee] = useState<any>(0);
+    const [fee, setFee] = useState<number>(0);
+    const socket = useSocket();
     useEffect(() => {
         if (status === "loading") return;
         if (status === "unauthenticated") {
@@ -32,6 +34,7 @@ export default function Order() {
         try {
             await form.validateFields();
             const formValues = form.getFieldsValue();
+
             const payMethod = formValues.paymentMethod;
             const dataBody = {
                 status: "Pending",
@@ -51,13 +54,17 @@ export default function Order() {
                 url: `/orders?method=${formValues.paymentMethod}`,
                 method: "POST",
                 body: dataBody,
-                data_return: true
+                data_return: true,
             });
+            await socket.emit(
+                "client:newOrder",
+                session?.user.firstname + " " + session?.user.lastname
+            );
             if (payMethod == "CASH") {
                 router.push("/payment?method=CASH");
             } else {
                 localStorage.setItem("orderInfo", "1");
-                console.log(data["payUrl"])
+                console.log(data["payUrl"]);
                 router.push(data["payUrl"]);
             }
         } catch (err) {
@@ -77,6 +84,7 @@ export default function Order() {
                 onPayOrder={handlePayOrder}
                 setAmount={setAmount}
                 setVoucherId={setVoucher}
+                voucherId={voucher}
                 fee={fee}
                 token={session?.user.accessToken}
             />

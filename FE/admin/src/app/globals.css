@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 
+:root {
+  --header-height: 48px;
+}
+
 html,
 body,
 label {

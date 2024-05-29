@@ -8,7 +8,7 @@ import { Pagination, ConfigProvider, Drawer } from "antd";
 import type { PaginationProps } from "antd";
 import PriceItem from "@/components/Product/price_item";
 import { Modal } from "antd";
-import { Radio, Form, Input, Button } from "antd";
+import { Radio, Form, Input, Button, DatePicker } from "antd";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next-intl/client";
@@ -16,8 +16,10 @@ import Link from "next-intl/link";
 import fetchClient from "@/lib/fetch-client";
 import Loading from "@/components/loading";
 import useSocket from "@/socket";
-import { message } from "antd";
+import { message, notification } from "antd";
+import { useLocale, useTranslations } from "next-intl";
 import moment from "moment";
+
 function Home() {
     const params = useParams<{ locale: string; tid: string }>();
     const [items, setItems] = useState<any>([]);
@@ -30,9 +32,24 @@ function Home() {
     const { data: session, status } = useSession();
     const [checker, setChecker] = useState(true);
     const [item_status, updateItemStaus] = useState(true);
+    const dateFormat = "YYYY-MM-DD";
     const router = useRouter();
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [notification, setNotification] = useState(null);
+    const [notifications, setNotifications] = useState<any>();
+    const [table, setTable] = useState<any>()
+    const [foods, setFood] = useState<any>()
+    const [cart_items, setCart_Items] = useState<any>()
+    const [categories, setCategories] = useState<any>()
+    const [isLoading, setIsLoading] = useState(true)
+    const [currentPage, setCurrentPage] = useState(1);
+    const [loadingButton, setLoadingButton] = useState(false)
+    const [api_notification, contextHolder] = notification.useNotification();
+    const t_general: any = useTranslations("General")
+	const t_reservation: any = useTranslations("Reservation")
+    const [category, setCategory] = useState<string>(
+        currentCategory !== null ? currentCategory : "Pizza"
+    );
+    const dishColor: any = { "Preparing": "text-yellow-500", "Cooking": "text-green-500", "Ready": "text-blue-500" }
 
     const socket = useSocket();
 
@@ -45,77 +62,95 @@ function Home() {
     };
 
     const showModal = () => {
-        setOpen(true);
+        const current_items = cart_items.items
+        console.log(current_items)
+        if (current_items.some((e: any) => e.status != "Ready")) {
+            api_notification.warning({
+                message: 'Order Warning',
+                description:
+                    'There are some items in processing',
+                onClick: () => {
+                    console.log('Notification Clicked!');
+                },
+            });
+        }
+        else {
+            setOpen(true);
+        }
     };
 
     const handleUpdateTable = async () => {
-        let table_status: string;
-        if (table.status == "Free") {
-            table_status = "Occupied";
-        } else {
-            table_status = "Free";
+        try {
+            let table_status: string;
+            if (table.status == "Free") {
+                table_status = "Occupied";
+            } else {
+                table_status = "Free";
+            }
+            setTable({ ...table, status: table_status })
+
+            await fetchClient({
+                method: "PUT",
+                url: `/tables/detail?id=${table.id}`,
+                body: { status: table_status },
+            });
+            setChecker((current_value) => !current_value);
         }
-        table.status = table_status;
-        await fetchClient({
-            method: "PUT",
-            url: `/tables?id=${table.id}`,
-            body: { status: table_status },
-        });
-        setChecker((current_value) => !current_value);
+        catch (err) {
+            console.log(err)
+        }
     };
 
-    const {
-        data: foods,
-        error: foodError,
-        isLoading: foodLoading,
-    } = useSWR([`/products/all`], ([url]) =>
-        fetchClient({ url: url, data_return: true })
-    );
-    const [category, setCategory] = useState<string>(
-        currentCategory !== null ? currentCategory : "Pizza"
-    );
-
-    const {
-        data: table,
-        error: tableError,
-        isLoading: tableLoading,
-    } = useSWR([params.tid], ([table_id]) =>
-        fetchClient({ url: `/tables?id=${table_id}`, data_return: true })
-    );
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const {
-        data: cart_items,
-        error: cart_itemsError,
-        isLoading: cart_itemsLoading,
-        mutate: cartMutate,
-    } = useSWR([`/tables/cart/${params.tid}`], ([url]) =>
-        fetchClient({ url: url, data_return: true })
-    );
-
-    const {
-        data: categories,
-        error: categoryError,
-        isLoading: categoryLoading,
-    } = useSWR([`/categories/all`], ([url]) =>
-        fetchClient({ url: url, data_return: true })
-    );
-
-    useEffect(() => {
-        if (!categoryLoading || !foodLoading || !tableLoading || !cart_itemsLoading) {
-            setReady(true);
+    const fetchFood = async () => {
+        try {
+            const data = await fetchClient({ url: `/products/all`, data_return: true })
+            setFood(data)
         }
-    }, [categoryLoading, tableLoading, foodLoading, cart_itemsLoading]);
+        catch (err) {
+            console.log(err)
+        }
+    }
 
-    const {
-        data: notifications,
-        error: notifications_error,
-        isLoading: notifications_loading,
-        mutate: notificationMutate,
-    } = useSWR(
-        ready ? [`/pos_notifications/all`] : null,
-        ready ? ([url]) => fetchClient({ url: url, data_return: true }) : null
-    );
+    const fetchTable = async () => {
+        try {
+            const data = await fetchClient({ url: `/tables/detail?id=${params.tid}`, data_return: true })
+            setTable(data)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    const fetchCartItems = async () => {
+        try {
+            const data = await fetchClient({ url: `/tables/cart/${params.tid}`, data_return: true })
+            console.log(data)
+            setCart_Items(data)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    const fetchCategory = async () => {
+        try {
+            const data = await fetchClient({ url: `/categories/all`, data_return: true })
+            setCategories(data)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    const fetchNotification = async () => {
+        try {
+            const data = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
+            setNotifications(data)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
 
     const onChange: PaginationProps["onChange"] = (page) => {
         setCurrentPage(page);
@@ -138,12 +173,15 @@ function Home() {
     const handleOrder = async (values: any) => {
         try {
             let data_body = {
-                email: values.email,
-                firstname: values.first_name,
-                lastname: values.last_name,
+                email: values.email.trim(),
+                firstname: values.first_name.trim(),
+                lastname: values.last_name.trim(),
                 pay_method: values.paymentMethod,
-                phone: values.phone_number,
+                phone: values.phone_number.trim(),
+                birthday: values.birthday.format("YYYY-MM-DD"),
+                type: "customer"
             };
+
             const data_return = await fetchClient({
                 method: "POST",
                 url: `/tables/order/${params.tid}`,
@@ -152,16 +190,17 @@ function Home() {
             });
             let table_status = "Free";
             if (data_body.pay_method == "CASH") {
-                table.status = table_status;
+                setTable({ ...table, status: table_status })
                 await fetchClient({
                     method: "PUT",
-                    url: `/tables?id=${table.id}`,
+                    url: `/tables/detail?id=${table.id}`,
                     body: { status: table_status },
                 });
                 router.push(
                     `/sale/reservations/payment?method=CASH?tid=${params.tid}`
                 );
             } else {
+                localStorage.setItem('orderInfo', "1")
                 router.push(data_return.payUrl);
             }
             setChecker((current_value) => !current_value);
@@ -173,10 +212,10 @@ function Home() {
     const addItem = async () => {
         try {
             if (table.status == "Free") {
-                table.status = "Occupied";
+                setTable({ ...table, status: "Occupied" })
                 await fetchClient({
                     method: "PUT",
-                    url: `/tables?id=${table.id}`,
+                    url: `/tables/detail?id=${table.id}`,
                     body: { status: "Occupied" },
                 });
             }
@@ -186,11 +225,10 @@ function Home() {
                 body: items,
                 data_return: true,
             });
-            cart_items.items = data.items;
-            cart_items.products = data.products;
+            setCart_Items({ ...cart_items, items: data.items, products: data.products })
             setItems([]);
             setChecker((current_value) => !current_value);
-            socket.emit("staff:table:prepare", params.tid);
+            await socket.emit("staff:table:prepare", params.tid);
         } catch (err) {
             console.log(err);
         }
@@ -199,33 +237,61 @@ function Home() {
     const handleCancelOrder = () => {
         setItems([]);
     };
-    useEffect(() => {
-        if (!socket) return;
-        socket.on(
-            "tableItem:finish:fromChef",
-            (tableId: string, name: string) => {
-                message.info(`Finish ${name} for table ${tableId}`);
-                // notificationMutate();
-                cartMutate();
+
+    const getCustomerInfo = async () => {
+        let email = form.getFieldValue('email')
+        email = email.trim()
+        if (email == "") {}
+        else {
+            const data: any = await  fetchClient({url: `/customers/all?email=${email}`, data_return: true})
+            if (data.data.length != 0) {
+                const customer: any = data.data[0]
+                console.log(customer)
+                form.setFieldsValue({"first_name": customer.firstname, "last_name": customer.lastname, "phone_number": customer.phone, "birthday": moment(customer.birthday)})
             }
-        );
-        return () => {
-            socket.off("tableItem:finish:fromChef");
-        };
+        }
+    }
+
+    useEffect(() => {
+        try {
+            if (!socket) return;
+            socket.on(
+                "tableItem:finish:fromChef",
+                async (tableId: string, name: string) => {
+                    await fetchCartItems()
+                    await fetchNotification()
+                    message.info(`Finish ${name} for table ${tableId}`);
+                }
+            );
+            return () => {
+                socket.off("tableItem:finish:fromChef");
+            };
+        }
+        catch (err) {
+            console.log(err)
+        }
     }, [socket]);
 
-    if (foodError) return <div>Failed to load</div>;
-    if (categoryError) return <div>Failed to load</div>;
-    if (
-        foodLoading ||
-        categoryLoading ||
-        tableLoading ||
-        cart_itemsLoading ||
-        notifications_loading
-    )
+    useEffect(() => {
+        setIsLoading(true)
+        const fetchData = async () => {
+            await fetchTable()
+            await fetchCategory()
+            await fetchFood()
+            await fetchCartItems()
+            await fetchNotification()
+        };
+    
+        fetchData();
+        setIsLoading(false)
+    }, [])
+
+    if (isLoading) {
         return <Loading />;
+    }
     return (
-        <div className='h-full relative overflow-hidden'>
+        <div className='h-full relative overflow-hidden pb-10' >
+            {contextHolder}
             <ConfigProvider
                 theme={{
                     token: {
@@ -234,7 +300,7 @@ function Home() {
                 }}
             >
                 <Drawer
-                    title='Notification'
+                    title={t_reservation('notification')}
                     placement='right'
                     closable={false}
                     onClose={onClose}
@@ -265,8 +331,8 @@ function Home() {
                     className='w-full bg-white flex flex-row justify-between items-center rounded pr-2 gap-5'
                     style={{ height: "40px" }}
                 >
-                    <div className='w-auto flex items-center rounded h-full'>
-                        <div className='inline-block ml-3'>
+                    <div className='w-full flex items-center rounded h-full'>
+                        <div className='w-full ml-3'>
                             {table.status == "Free" ? (
                                 <button
                                     type='button'
@@ -277,7 +343,7 @@ function Home() {
                                     }}
                                     onClick={handleUpdateTable}
                                 >
-                                    Use
+                                    {t_reservation('use')}
                                 </button>
                             ) : (
                                 <button
@@ -289,7 +355,7 @@ function Home() {
                                         backgroundColor: "#EA6A12",
                                     }}
                                 >
-                                    Free
+                                    {t_reservation('free')}
                                 </button>
                             )}
                         </div>
@@ -323,97 +389,144 @@ function Home() {
                 style={{ height: "100%", paddingTop: "10px" }}
             >
                 <Modal
-                    title='Make payment'
+                    title={t_reservation('make_payment')}
                     open={open}
                     confirmLoading={confirmLoading}
                     footer={(_, { OkBtn, CancelBtn }) => <></>}
                     onCancel={() => setOpen(false)}
                 >
                     <Form form={form} layout='vertical' onFinish={handleOrder}>
-                        <Form.Item
-                            name='first_name'
-                            label={
-                                <span className='whitespace-nowrap font-bold text-md'>
-                                    First Name
-                                </span>
-                            }
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input customer's name!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                placeholder='Name'
-                                style={{ marginTop: 8 }}
-                            />
-                        </Form.Item>
-                        <Form.Item
-                            name='last_name'
-                            label={
-                                <span className='whitespace-nowrap font-bold text-md'>
-                                    Last Name
-                                </span>
-                            }
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input customer's name!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                placeholder='Name'
-                                style={{ marginTop: 8 }}
-                            />
-                        </Form.Item>
-                        <Form.Item
-                            name='phone_number'
-                            label={
-                                <span className='whitespace-nowrap font-bold text-md'>
-                                    Phone number
-                                </span>
-                            }
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Please input customer's phone number!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                placeholder='Phone number'
-                                style={{ marginTop: 8 }}
-                            />
-                        </Form.Item>
+                        <div className="flex justify-between">
+                            <div style={{ width: "49%" }}>
+                                <Form.Item
+                                    name='first_name'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            {t_general('firstname')}
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "Please input customer's name!",
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        placeholder='First Name'
+                                        style={{ marginTop: 8 }}
+                                    />
+                                </Form.Item>
+                            </div>
+                            <div style={{ width: "49%" }}>
+                                <Form.Item
+                                    name='last_name'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            {t_general('lastname')}
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "Please input customer's name!",
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        placeholder='Last Name'
+                                        style={{ marginTop: 8 }}
+                                    />
+                                </Form.Item>
+                            </div>
+                        </div>
+                        <div className="flex justify-between">
+                            <div style={{ width: "49%" }}>
+                                <Form.Item
+                                    name='birthday'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            {t_general('birthday')}
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Please input customer's birthday!",
+                                        },
+                                    ]}
+                                >
+                                    <DatePicker
+                                        style={{ marginTop: 8, width: "100%" }}
+                                        format={
+                                            dateFormat
+                                        }
+                                    />
+                                </Form.Item>
+                            </div>
+                            <div style={{ width: "49%" }}>
+                                <Form.Item
+                                    name='phone_number'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            {t_general('phone')}
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Please input customer's phone number!",
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        placeholder='Phone number'
+                                        style={{ marginTop: 8 }}
+                                    />
+                                </Form.Item>
+                            </div>
+                        </div>
+                        <div className="flex justify-between">
+                        <div style={{width: "85%"}}>
+                                <Form.Item
+                                    name='email'
+                                    label={
+                                        <span className='whitespace-nowrap font-bold text-md'>
+                                            {t_general('email')}
+                                        </span>
+                                    }
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "Please input customer's email!",
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        placeholder='Email'
+                                        style={{ marginTop: 8 }}
+                                    />
+                                </Form.Item>
+                        </div>
 
-                        <Form.Item
-                            name='email'
-                            label={
-                                <span className='whitespace-nowrap font-bold text-md'>
-                                    Email
-                                </span>
-                            }
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input customer's email!",
-                                },
-                            ]}
-                        >
-                            <Input
-                                placeholder='Phone number'
-                                style={{ marginTop: 8 }}
-                            />
-                        </Form.Item>
-
+                        <div >
+                                <Form.Item>
+                                    <p style={{visibility: "hidden", marginTop: "16px"}}>Check</p>
+                                <Button  style={{
+                                        color: "white",
+                                        backgroundColor: "#EA6A12",
+                                        
+                                    }} className="flex-auto"  htmlType='button' onClick={getCustomerInfo}>Check</Button>
+                                </Form.Item>   
+                                </div>
+                                </div>
                         <Form.Item
                             name='paymentMethod'
                             label={
                                 <span className='whitespace-nowrap font-bold text-md'>
-                                    Payment Method
+                                    {t_reservation('payment_method')}
                                 </span>
                             }
                             rules={[
@@ -468,7 +581,7 @@ function Home() {
                                             htmlType='button'
                                             onClick={() => setOpen(false)}
                                         >
-                                            Cancel
+                                            {t_general('cancel')}
                                         </Button>
                                     </div>
                                     <div>
@@ -479,7 +592,7 @@ function Home() {
                                             }}
                                             htmlType='submit'
                                         >
-                                            Confirm
+                                            {t_general('confirm')}
                                         </Button>
                                     </div>
                                 </div>
@@ -499,68 +612,37 @@ function Home() {
                                         {cart_items.items.map((item: any) => {
                                             return (
                                                 <>
-                                                    {item.status ==
-                                                    "Preparing" ? (
-                                                        <div
-                                                            key={
-                                                                cart_items
-                                                                    .products[
-                                                                    item
-                                                                        .productId
-                                                                ].name
-                                                            }
-                                                            className='duration-300 transition-all ease-in-out w-auto  text-yellow-500'
-                                                        >
-                                                            <PriceItem
-                                                                params={{
-                                                                    food: {
-                                                                        name: cart_items
-                                                                            .products[
-                                                                            item
-                                                                                .productId
-                                                                        ].name,
-                                                                        price: cart_items
-                                                                            .products[
-                                                                            item
-                                                                                .productId
-                                                                        ].price,
-                                                                        quantity:
-                                                                            item.quantity,
-                                                                    },
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <div
-                                                            key={
-                                                                cart_items
-                                                                    .products[
-                                                                    item
-                                                                        .productId
-                                                                ].name
-                                                            }
-                                                            className='duration-300 transition-all ease-in-out w-auto text-blue-500'
-                                                        >
-                                                            <PriceItem
-                                                                params={{
-                                                                    food: {
-                                                                        name: cart_items
-                                                                            .products[
-                                                                            item
-                                                                                .productId
-                                                                        ].name,
-                                                                        price: cart_items
-                                                                            .products[
-                                                                            item
-                                                                                .productId
-                                                                        ].price,
-                                                                        quantity:
-                                                                            item.quantity,
-                                                                    },
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )}
+
+                                                    <div
+                                                        key={
+                                                            cart_items
+                                                                .products[
+                                                                item
+                                                                    .productId
+                                                            ].name
+                                                        }
+                                                        className={`duration-300 transition-all ease-in-out w-auto ${dishColor[item.status]}`}
+                                                    >
+                                                        <PriceItem
+                                                            params={{
+                                                                food: {
+                                                                    name: cart_items
+                                                                        .products[
+                                                                        item
+                                                                            .productId
+                                                                    ].name,
+                                                                    price: cart_items
+                                                                        .products[
+                                                                        item
+                                                                            .productId
+                                                                    ].price,
+                                                                    quantity:
+                                                                        item.quantity,
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+
                                                 </>
                                             );
                                         })}
@@ -568,7 +650,7 @@ function Home() {
                                 </>
                             ) : (
                                 <div className='text-black'>
-                                    You have not added any product!
+                                    {t_reservation('un_order')}
                                 </div>
                             )}
                         </>
@@ -610,14 +692,14 @@ function Home() {
                                     className='px-2 py-1 rounded bg-red-600 text-white'
                                     onClick={handleCancelOrder}
                                 >
-                                    Cancel
+                                    {t_general('cancel')}
                                 </button>
-                                <button
+                                <Button
                                     className='bg-menu px-1 py-1 border-t-menu rounded  text-white ml-4'
                                     onClick={addItem}
                                 >
-                                    Order
-                                </button>
+                                    {t_reservation('order')}
+                                </Button>
                             </div>
                         </div>
                     )}
@@ -625,13 +707,15 @@ function Home() {
                     {cart_items && cart_items.items?.length != 0 && (
                         <div className='h-auto flex flex-col gap-2 justify-between'>
                             <div className='font-bold text-md py-2 border-t-menu border-t-2'>
-                                Total: {getTotalAmount()}VNĐ
+                                {t_general('total')}: {getTotalAmount()}VNĐ
                             </div>
-                            <div
-                                onClick={showModal}
-                                className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-menu hover:bg-orange-400 text-white transition-all duration-300  flex justify-center tex-md font-bold cursor-pointer'
-                            >
-                                Make payment
+                            <div>
+                                <div
+                                    onClick={showModal}
+                                    className='p-2 w-full h-auto rounded-lg border-orange-500 border-2 bg-menu hover:bg-orange-400 text-white transition-all duration-300  flex justify-center tex-md font-bold cursor-pointer'
+                                >
+                                    {t_reservation('make_payment')}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -641,7 +725,7 @@ function Home() {
                     className='rounded-xl basis-3/4 h-full p-5 flex flex-row justify-start gap-5'
                 >
                     <div className='w-auto h-auto rounded-3xl bg-white py-2 flex flex-col justify-around'>
-                        {categories.map((item: any) => {
+                        {categories?.map((item: any) => {
                             return (
                                 <div
                                     key={`Category ${item.name}`}
@@ -649,11 +733,10 @@ function Home() {
                                         setCategory(item.name);
                                         setCurrentPage(1);
                                     }}
-                                    className={`font-bold cursor-pointer p-2 px-4${
-                                        category === item.name
-                                            ? " text-white bg-menu"
-                                            : " bg-none text-menu"
-                                    } transition-all duration-200`}
+                                    className={`font-bold cursor-pointer p-2 px-4${category === item.name
+                                        ? " text-white bg-menu"
+                                        : " bg-none text-menu"
+                                        } transition-all duration-200`}
                                 >
                                     {item.name}
                                 </div>
@@ -662,14 +745,13 @@ function Home() {
                     </div>
                     <div className='w-full h-full flex flex-col justify-between items-center gap-5'>
                         <div className='w-auto grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
-                            {foods
-                                .filter(
-                                    (item: any) =>
-                                        category ===
-                                        categories[
-                                            parseInt(item.categoryId) - 1
-                                        ]?.name
-                                )
+                            {foods?.filter(
+                                (item: any) =>
+                                    category ===
+                                    categories[
+                                        parseInt(item.categoryId) - 1
+                                    ]?.name
+                            )
                                 .slice((currentPage - 1) * 8, currentPage * 8)
                                 .map((item: any) => {
                                     return (
@@ -702,7 +784,7 @@ function Home() {
                                 current={currentPage}
                                 onChange={onChange}
                                 total={
-                                    foods.filter(
+                                    foods?.filter(
                                         (food: any) =>
                                             category ===
                                             categories[

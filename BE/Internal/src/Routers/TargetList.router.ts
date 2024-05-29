@@ -18,13 +18,15 @@ class TargetListRouter {
       targetListController.create.bind(targetListController)
     );
     targetlistRouter.put("/:id", targetListController.update.bind(targetListController));
+    targetlistRouter.delete("/", targetListController.deleteMany.bind(targetListController));
     targetlistRouter.delete("/:id", targetListController.delete.bind(targetListController));
 
     router.use("/targetlists", 
       AuthMiddleware.initialize, 
       Authorization.initialize, 
-      targetlistRouter.bind(targetListController)
+      targetlistRouter
     );
+    
   }
 }
 

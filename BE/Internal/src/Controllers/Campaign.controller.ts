@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { CampaignService } from "../Services";
 import { QueryOptions } from "../Types/type";
-import { parseRequesQueries } from "../Helper/helper";
+import { ensureDataIsValidated, ensurePermissionIsValid, parseRequesQueries } from "../Helper/helper";
 import { ForbiddenError } from "../Errors";
 import { AddTryCatchBlock, LogRequests } from "../Utils/decorators";
 
@@ -39,8 +39,8 @@ class CampaingController {
 		} else {
 			throw new ForbiddenError();
 		}
-	
 	}
+
 
 	public async createCampaign(req: Request, res: Response, next: NextFunction) {
 		// const errors = validationResult(req);
@@ -94,9 +94,92 @@ class CampaingController {
 		} else {
 			throw new ForbiddenError();
 		}
-	
 	}
 
+
+	public async getEmailCampaignDetails(req: Request, res: Response, next: NextFunction) {
+		ensurePermissionIsValid(req.action, "read:any");
+		const campaignId = req.params["campaignId"]
+		const emailId = req.params["emailId"]
+
+		const result = await this.campaignService.getEmailCampaign(Number(campaignId), Number(emailId));
+
+		res.send(result) ;
+
+	}
+
+
+	public async getAllJobs(req: Request, res: Response, next: NextFunction)  {
+		const campaignId = req.params["campaignId"]
+		const emailId = req.params["emailId"]
+		const status = req.query["status"] as string
+
+		if (status) {
+			const result = await this.campaignService.getAllJob(campaignId, emailId)
+			res.send(result)
+		} else {
+			const result = await this.campaignService.getAllJob(campaignId, emailId)
+			res.send(result)
+		}
+
+	}	
+
+
+	public async createEmailCampaing(req: Request, res: Response, next: NextFunction) {
+		ensureDataIsValidated(req) ;
+		ensurePermissionIsValid(req.action, "create:any");
+
+		const campaignId = req.params["campaignId"]
+		const data = req.body["data"] 
+
+		const result = await this.campaignService.createEmailCampaign(Number(campaignId), data)
+
+		res.send(result)
+	}
+
+
+	public async deleteEmailCampaing(req: Request, res: Response, next: NextFunction) {
+		ensureDataIsValidated(req) ;
+		ensurePermissionIsValid(req.action, "delete:any");
+
+		const campaignId = req.params["campaignId"]
+		const emailId = req.params["id"]
+
+		console.log(campaignId, emailId)
+
+		const result = await this.campaignService.deleteEmailCampaign(Number(campaignId), Number(emailId))
+
+		res.send(result)
+	}
+
+	public async createTrackUrl(req: Request, res: Response, next: NextFunction) {
+		ensureDataIsValidated(req) ;
+		ensurePermissionIsValid(req.action, "create:any")
+		const campaignId = Number(req.params["campaignId"])
+		const trackUrlData = req.body["data"];
+
+		const result = await this.campaignService.createTrackUrl(campaignId, trackUrlData)
+
+		res.send(result)
+	}
+
+	public async deleteTrackUrl(req: Request, res: Response, next: NextFunction) {
+		ensureDataIsValidated(req) ;
+		ensurePermissionIsValid(req.action, "delete:any")
+		const campaignId = Number(req.params["campaignId"])
+		const trackUrlId = Number(req.params["id"])
+		const result = await this.campaignService.deleteTrackUrl(campaignId, trackUrlId)
+
+		res.send(result)
+	}
+
+	public async getCampaignStatistic(req: Request, res: Response, next: NextFunction) {
+		ensurePermissionIsValid(req.action, "read:any")
+		const campaignId = req.params["id"]
+		const result = await this.campaignService.getCampaignStatisTic(Number(campaignId))
+
+		res.send(result)
+	}
 
 }
 

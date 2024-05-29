@@ -27,6 +27,7 @@ import fetchClient from "@/lib/fetch-client";
 import CreateCategory from "./create";
 import DeleteItem from "./delete";
 import UpdateCategory from "./update";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -71,6 +72,8 @@ const Category = () => {
     const [isCreate, setIsCreate] = useState(false)
     const [isDelete, setIsDelete] = useState(false)
     const [isUpdate, setIsUpdate] = useState(false)
+    const t_product: any = useTranslations("Product")
+    const t_general: any = useTranslations("General")
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -89,11 +92,11 @@ const Category = () => {
     const list_sort = [
         {
             key: "id",
-            title: "ID"
+            title: t_general('id')
         },
         {
             key: "name",
-            title: "Name"
+            title: t_general('name')
         },
     ]
     const [error, setError] = useState<ErrorType>({
@@ -114,30 +117,30 @@ const Category = () => {
 
     const columns: ColumnsType<DataType> = [
         {
-            title: "ID",
+            title: t_general('id'),
             dataIndex: "id",
             key: "id",
         },
         {
-            title: "Name",
+            title: t_general('name'),
             dataIndex: "name",
             key: "name",
         },
         {
-            title: "Description",
+            title: t_general('description'),
             dataIndex: "description",
             key: "description",
 
         },
         {
-            title: "Icon",
+            title: t_product("icon"),
             dataIndex: "thumnails",
             key: "thumnails",
             render: (text, row) => <>{ <img style={{width: "40px", height: "40px"}} src={text ? text : ""} />}</>
 
         },
         {
-            title: "Action",
+            title: t_general("action"),
             dataIndex: "action",
             key: "action",
             render: (text, row) => <>
@@ -306,7 +309,7 @@ const Category = () => {
                                 style={{ marginBottom: 0 }}
                                 className='flex items-center gap-2'
                             >
-                                <p>Sort by: </p>
+                                <p>{t_general('sort')}: </p>
                                 <Select
                                     // style={{ width: '20%' }}
                                     placeholder='Columns'
@@ -321,7 +324,7 @@ const Category = () => {
                                     }))}
                                 />
 
-                                <p>Order: </p>
+                                <p>{t_general('order')}: </p>
 
                                 <Button
                                     onClick={handleToggleSorter}
@@ -334,13 +337,13 @@ const Category = () => {
                                     }
                                 />
                                 <Button onClick={handleClearAll}>
-                                    Clear sorters
+                                {t_general('clear_filter')}
                                 </Button>
                             </div>
 
                             <div>
                                 <Button icon={<PlusCircleOutlined />} onClick={() => setIsCreate(true)}>
-                                    New
+                                {t_general('new')}
                                 </Button>
                             </div>
                         </div>
@@ -354,7 +357,7 @@ const Category = () => {
                             pagination={{
                                 className: "bg-white rounded px-4 py-2",
                                 showTotal: (total: number) =>
-                                    `Total ${total} items`,
+                                `${t_general("total")} ${total} ${t_general("item")}`,
                                 position: ["bottomCenter", "bottomRight"],
                                 showSizeChanger: true,
                                 showQuickJumper: true,

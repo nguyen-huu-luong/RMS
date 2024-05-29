@@ -1,6 +1,9 @@
 "use client";
 import axios from "axios";
 import { mutate } from "swr";
+
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 export const messageFetcher = async (url: string, token: any, index: any) => {
     try {
         const response = await axios.get(url, {
@@ -21,7 +24,7 @@ export const messageFetcher = async (url: string, token: any, index: any) => {
 export const sendMessage = async (token: any, requestBody: object) => {
     try {
         const response = await axios.post(
-            `${process.env.BASE_URL}/channels`,
+            `${backend_api}/channels`,
             requestBody,
             {
                 headers: {
@@ -30,7 +33,7 @@ export const sendMessage = async (token: any, requestBody: object) => {
                 },
             }
         );
-        mutate([`http://localhost:3003/api/channels/messages`, token]);
+        mutate([`${backend_api}/channels/messages`, token]);
         return response.data;
     } catch (error) {
         console.error("Error adding to cart:", error);
@@ -41,7 +44,7 @@ export const sendMessage = async (token: any, requestBody: object) => {
 export const seenMessage = async (token: any) => {
     try {
         const response = await axios.put(
-            `http://localhost:3003/api/channels`,
+            `${backend_api}/channels`,
             {},
             {
                 headers: {

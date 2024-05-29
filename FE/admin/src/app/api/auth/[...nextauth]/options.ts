@@ -1,9 +1,11 @@
 import fetchClient from "@/lib/fetch-client";
 import { jwt } from "@/lib/jwt";
 import axios, { Axios, AxiosError } from "axios";
-import type { AuthOptions, Awaitable, User } from "next-auth";
+import { getServerSession, type AuthOptions, type Awaitable, type User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -15,18 +17,19 @@ export const authOptions: AuthOptions = {
             },
             async authorize(credentials) {
                 try {
-                    const response = await fetchClient({
-                        url: `/users/admin/signin`,
+                    const response = await axios({
+                        // fix when deploy n production
+                        url: `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/users/admin/signin`,
                         method: "POST",
-                        body: {
+                        data: {
                             username: credentials?.username,
                             password: credentials?.password,
-                        },
+                        }
                     });
 
-                    console.log(response.data)
+                    // console.log(response.data)
 
-                    const data: { accessToken: string; user: User } = response.data;
+                    const data: { accessToken: string; user: any } = response.data;
 
                     if (!data.accessToken || !data.user) {
                         throw response;
@@ -34,6 +37,8 @@ export const authOptions: AuthOptions = {
 
                     return {
                         ...data.user,
+                        image: data.user.avatar,
+                        name: data.user.firstname + " " + data.user.lastname, 
                         accessToken: data.accessToken,
                     };
                 } catch (error: any) {
@@ -55,8 +60,9 @@ export const authOptions: AuthOptions = {
             session.accessToken = token.accessToken;
             session.user.username = token.username || "";
             session.user.role = token.role || ""; 
+            session.user.id = token.id || 0; 
 
-            console.log(session)
+            // console.log(session)
             return session;
         },
         async jwt({ token, user, trigger, session }) {
@@ -83,6 +89,16 @@ export const authOptions: AuthOptions = {
             return token;
 
         },
+        // async redirect({baseUrl, url}) {
+        //     const token = await getServerSession();
+        //     console.log("redicredcfdsf f", baseUrl, url)
+        //     console.log((token?.user))
+        //     if (!(token?.user.role === "chef")) {
+        //         return baseUrl
+        //     } 
+        //     return "/chef"
+
+        // }
        
     },
     pages: {
@@ -94,7 +110,7 @@ export const authOptions: AuthOptions = {
 async function refreshAccessToken(token: JWT) {
     try {
         const response = await axios({
-            url: `${process.env.NEXT_BACKEND_API_URL}/user/refresh`,
+            url: `${backend_api}/user/refresh`,
             method: "POST",
         });
 

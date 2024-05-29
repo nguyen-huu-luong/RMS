@@ -1,33 +1,31 @@
 "use client"
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Alert,
     Button,
     ConfigProvider,
     Dropdown,
-    Flex,
     Form,
     Input,
     Select,
     Space,
     Table,
+    message,
 } from "antd";
-import type { TableProps, GetProp, SelectProps, MenuProps } from "antd";
+import type { TableProps, GetProp, SelectProps } from "antd";
 import { variables } from "@/app";
 import type {
     Key,
     SortOrder,
 } from "antd/es/table/interface";
-import { EllipsisOutlined, SearchOutlined, SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons";
+import {SearchOutlined, SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons";
 import fetchClient from "@/lib/fetch-client";
 import { AnyObject } from "antd/es/_util/type";
-import { CreateModal } from "./CreateModal";
-import { FaEllipsisH, FaEllipsisV } from "react-icons/fa";
-import { FilterStringInput } from "./FilterItems/FilterString";
-import { FilterDate } from "./FilterItems/FilterDate";
-import { FilterSelect } from "./FilterItems/FilterSelect";
 import { useFormatter } from "next-intl";
 import { FilterItem } from "./FilterItems";
+import { FaEllipsisV } from "react-icons/fa";
+import { AxiosError } from "axios";
+import { useLocale, useTranslations } from "next-intl";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -36,17 +34,22 @@ type TablePaginationConfig = Exclude<
 >;
 interface ITableRenderProps<T> {
     // data: readonly Record<string, any>[];
+    data?: T[],  
+    setData?: React.Dispatch<React.SetStateAction<T[]>>,
     columns: ColumnsType<T>;
     url: string,
-    formCreateElement: React.ReactNode
+    queryStr?: string,
+    createModal?: React.ReactNode
     onSelected?: {
         handle?: (selecteds: T[]) => void,
         render?: () => React.ReactNode
     },
+    reload?: boolean,
     filterItems?: FilterItemType[]
-    excludeDataHasIds?: number[]
+    excludeDataHasIds?: number[],
+    createModalTitle? : string,
+    rowSelection?: boolean
 }
-
 
 type SorterParams = {
     field?: Key | readonly Key[];
@@ -74,7 +77,8 @@ export type FilterItemType = {
     options?: SelectProps['options']
 }
 
-const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreateElement, ...props }: ITableRenderProps<T>) => {
+const TableRender = <T extends AnyObject,>({ columns, url, onSelected, ...props }: ITableRenderProps<T>) => {
+    const t_general: any = useTranslations("General")
     const [checker, setChecker] = useState(true);
     const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(false);
@@ -119,7 +123,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
 
     useEffect(() => {
         fetchData();
-    }, [JSON.stringify(tableParams)]);
+    }, [JSON.stringify(tableParams), props.reload]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -132,7 +136,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                     : "";
             const respone = await fetchClient({
                 url: `${url}/all?page=${tableParams.pagination?.current}
-				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}${filterQueriesStr}`
+				&pageSize=${tableParams.pagination?.pageSize}${sortQueries}${filterQueriesStr}${props.queryStr ? `&${props.queryStr}`: ""}`
             })
 
             console.log(respone)
@@ -145,7 +149,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
             if (props.excludeDataHasIds) {
                 data = data.filter((item: any) => !props.excludeDataHasIds?.includes(item.id))
             }
-            setData(data);
+            props.setData ? props.setData(data) : setData(data);
             setLoading(false);
             setTableParams({
                 ...tableParams,
@@ -158,18 +162,20 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
             });
         } catch (error: any) {
             setLoading(false)
-            console.log(error);
-            setError({
-                isError: true,
-                title: error?.name || "Something went wrong!",
-                message: error?.message || "Unknown error",
-            });
+            if (error instanceof AxiosError && error.response) {
+                if(error.status === 404) {
+                    message.error("Vui lòng thao tác chậm lại!")
+                } else {
+                    console.log(error);
+                    setError({
+                        isError: true,
+                        title: (error.response && error.response.data.name) || error?.name || "Unknown error",
+                        message: (error.response && error.response.data.message) || error?.message || "Something went wrong!",
+                    });
+                }
+            }
         }
     };
-
-    useEffect(() => {
-        fetchData();
-    }, [JSON.stringify(tableParams)]);
 
     const handleTableChange: TableProps["onChange"] = (
         pagination,
@@ -245,7 +251,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
             } else if (["lastXDays"].includes(values[key].expr)) {
                 const timeQuery = timeConvert(values[key].expr, Number(values[key].value))
                 queryStr = values[key].value ? `${queryStr}&${key}_gt=${timeQuery}` : queryStr
-            } else if (["before", "after".includes(values[key].expr)]) {
+            } else if (["before", "after"].includes(values[key].expr)) {
                 queryStr = values[key].value ? `${queryStr}&${key}_gt=${values[key].value.toString()}` : queryStr
             } else if (values[key].expr === "in") {
                 let str = ""
@@ -254,8 +260,8 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                     for (let i = 0; i < array.length; i++) {
                         str += array[i]
                         if (i !== (array.length - 1)) {
-                            str += ","
-                        }
+                            str += ";"
+                        }   
                     }
                     queryStr = `${queryStr}&${key}_in=${str}`
 
@@ -312,16 +318,21 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
 
     const handleDeleteFilteritem = (key: string) => {
         if (props.filterItems) {
-            console.log(filterItems, key)
-            filterItems.filter(item => item.key !== key)
-            console.log(filterItems, key)
+            // console.log(filterItems, key)
+            // filterItems.filter(item => item.key !== key)
+            // console.log(filterItems, key)
+            const newFilterItems = filterItems.filter(item => item.key !== key)  ;
+            setFilterItems(prev => newFilterItems)
+            if (newFilterItems.length === 0) {
+                setTableParams(prev  => ({...prev, queryString: ""}))
+            }
 
-            setFilterItems(filterItems.filter(item => item.key !== key))
         }
     }
 
     const handleClearFilter = () => {
         setFilterItems([])
+        setTableParams(prev  => ({...prev, queryString: ""}))
     }
 
     const remainingFilterItems = props.filterItems ? props.filterItems.filter((item) => {
@@ -374,9 +385,12 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                     <div className="flex">
                         <div className="flex-1 flex space-x-2 items-center">
                             <Input
-                                placeholder="Enter keywork to search...."
+                                placeholder="Enter keywork to search....    "
                                 prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
                                 className="flex items-center w-2/5"
+                                style={{
+                                    width: "40%"
+                                }}
                             />
                             {props.filterItems &&
                                 <Dropdown
@@ -402,14 +416,14 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                                 </Dropdown>}
                         </div>
 
-                        <CreateModal afterCreated={() => fetchData()} createUrl={url} formElement={formCreateElement} />
+                        {props.createModal && props.createModal}
                     </div>
 
                 </div>
                 {onSelected && isSelectedRows && onSelected?.render && onSelected.render()}
-                <div className="border bg-white shadow p-3">
-                    <div style={{ marginBottom: 16 }} className="flex items-center gap-2">
-                        <p>Sort by: </p>
+                <div className="border bg-white shadow p-3 my-2 rounded">
+                    <div className="flex items-center gap-2">
+                        <p>{t_general("sort")}: </p>
                         <Select
                             // style={{ width: '20%' }}
                             placeholder="Columns"
@@ -419,9 +433,10 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                                 value: item.key,
                                 label: item.title,
                             }))}
+                            style={{minWidth: 120}}
                         />
 
-                        <p>Order: </p>
+                        <p>{t_general("order")}: </p>
 
                         <Button onClick={handleToggleSorter} icon={tableParams.sorter?.order === "ascend" ? (
                             <SortAscendingOutlined />
@@ -448,8 +463,8 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
 
                         {filterItems.length > 0 && <Form.Item>
                             <Space className="mt-2">
-                                <Button htmlType="submit">Apply</Button>
-                                <Button onClick={handleClearFilter}>Clear filters</Button>
+                                <Button htmlType="submit">{t_general('apply')}</Button>
+                                <Button onClick={handleClearFilter}>{t_general('clear_filter')}</Button>
                             </Space>
                         </Form.Item>}
                     </Form>}
@@ -458,13 +473,16 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
 
                 <div className="mt-2">
                     <Table<T>
-                        rowSelection={{
+                        rowSelection={(!(typeof props.rowSelection === 'boolean') || props.rowSelection) ? {
                             ...rowSelection,
-                        }}
+                        }: undefined}
                         columns={columns}
                         pagination={{
                             className: "bg-white rounded px-4 py-2",
-                            showTotal: (total: number) => `Total ${total} items`,
+                            style: {
+                                padding: "8px 16px"
+                            },
+                            showTotal: (total: number) => `${t_general("total")} ${total} ${t_general("item")}`,
                             position: ["bottomCenter", "bottomRight"],
                             showSizeChanger: true,
                             showQuickJumper: true,
@@ -472,7 +490,7 @@ const TableRender = <T extends AnyObject,>({ columns, url, onSelected, formCreat
                             pageSize: tableParams.pagination?.pageSize,
                         }}
                         loading={loading}
-                        dataSource={data}
+                        dataSource={props.data ? props.data : data}
                         onChange={handleTableChange}
                     />
                 </div>

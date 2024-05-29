@@ -4,8 +4,9 @@ import TextPreview from "../PreviewItem/text.preview";
 import SectionPreview from "../PreviewItem/section.preview";
 
 const EditMode = () => {
-  const { emailData } = useEmailStore();
-
+  const { emailData, setActiveNode } = useEmailStore();
+  
+  
   return (
     <div className="bg-white w-full">
       {emailData["children"].map((section: any, index: number) => {

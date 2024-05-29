@@ -7,11 +7,15 @@ import {
 	BelongsToManySetAssociationsMixin,
 	BelongsToManyRemoveAssociationMixin,
 	BelongsToManyRemoveAssociationsMixin,
+	BelongsToManyGetAssociationsMixinOptions,
+	BelongsToManyGetAssociationsMixin,
 } from "sequelize";
 import Loader from "../Loaders";
 import Client from "./Client";
-import { CampaignTargetList, Campaign, ClientTargetList } from ".";
+import { CampaignTargetList, Campaign, ClientTargetList, EmailCampaign } from ".";
+import EmailCampaignTargetList from "./EmailCampaignTargetlist";
 class TargetList extends Model {
+	declare getClients: BelongsToManyGetAssociationsMixin<Client>
 	declare setClients: BelongsToManySetAssociationsMixin<Client, Client["id"]>;
 	declare addClient:  BelongsToManyAddAssociationMixin<Client, Client["id"]> ;
 	declare addClients:   BelongsToManyAddAssociationsMixin<Client, Client["id"]> ;
@@ -30,6 +34,12 @@ class TargetList extends Model {
 			foreignKey: "targetListId",
 			otherKey: "campaignId",
 		});
+
+		TargetList.belongsToMany(EmailCampaign, {
+			through: EmailCampaignTargetList,
+			foreignKey: "targetListId",
+			otherKey: "emailId"
+		})
 	}
 }
 TargetList.init(
@@ -37,6 +47,11 @@ TargetList.init(
 		name: {
 			type: DataTypes.STRING,
 			allowNull: false,
+		},
+		type: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			defaultValue: "custom"
 		},
 		description: {
 			type: DataTypes.STRING,

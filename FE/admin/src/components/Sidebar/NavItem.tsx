@@ -1,7 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
 import styles from "./styles.module.scss";
 import { UpOutlined } from "@ant-design/icons";
+import { useRouter } from "next-intl/client";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 

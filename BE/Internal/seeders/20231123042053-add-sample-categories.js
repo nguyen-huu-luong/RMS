@@ -22,9 +22,20 @@ module.exports = {
       "Veggies": "Nhà hàng cung cấp rất đa dạng các món ăn từ rau củ."
     }
 
+    const thumbnails = {
+      "Pizza": "https://res.cloudinary.com/djdpobmlv/image/upload/v1715565119/Categories/Pizza-icon_g0i1o8.png",
+      "Drink": "https://res.cloudinary.com/djdpobmlv/image/upload/v1715565118/Categories/Drink-icon_sd0dul.png",
+      "Fruits": "https://res.cloudinary.com/djdpobmlv/image/upload/v1715565119/Categories/Fruits-icon_qybjkh.png",
+      "Hotdog": "https://res.cloudinary.com/djdpobmlv/image/upload/v1715565119/Categories/Hotdog-icon_zyzbvu.png",
+      "Snacks": "https://res.cloudinary.com/djdpobmlv/image/upload/v1715565118/Categories/Snacks-icon_mtiqqp.png",
+      "Burger": "https://res.cloudinary.com/djdpobmlv/image/upload/v1715565119/Categories/Burger-icon_xyhnw1.png",
+      "Veggies": "https://res.cloudinary.com/djdpobmlv/image/upload/v1715565119/Categories/Fruits-icon_qybjkh.png"
+    }
+
     const categories = categoriesData.map((name) => ({
       name: name,
-      description: descriptions[name], // You can customize the description
+      description: descriptions[name],
+      thumnails: thumbnails[name],
       createdAt: new Date(),
       updatedAt: new Date(),
     }));

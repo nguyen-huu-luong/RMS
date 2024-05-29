@@ -38,11 +38,11 @@ module.exports = {
       end_date: {
         type: Sequelize.DATE
       },
-      created_at: {
-        type: Sequelize.DATE
+      can_redeem: {
+        type: Sequelize.BOOLEAN
       },
-      updated_at: {
-        type: Sequelize.DATE
+      redeemedNumber: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

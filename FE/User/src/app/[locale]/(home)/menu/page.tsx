@@ -65,8 +65,8 @@ export default function Menu() {
     const onChange: PaginationProps["onChange"] = (page) => {
         setCurrentPage(page);
     };
-    if (foodError) return <div>Failed to load</div>;
-    if (categoryError) return <div>Failed to load</div>;
+    if (foodError) return <div><Loading/></div>;
+    if (categoryError) return <div><Loading/></div>;
     if (foodLoading || categoryLoading) return <Loading/>;
     return (
         <div className='w-full h-auto flex flex-col justify-start gap-5'>

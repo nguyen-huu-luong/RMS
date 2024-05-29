@@ -3,22 +3,28 @@ import User from "./User";
 import fetchClient from "@/lib/fetch-client";
 import { fetchData } from "next-auth/client/_utils";
 import Loading from "../loading";
+import { useTranslations } from "next-intl";
 
 const ChatList = ({
+    id,
+    channel,
     setChannel,
     socket,
     setIndex,
     staffId,
 }: {
+    id: any;
+    channel: any;
     setChannel: any;
     socket: any;
     setIndex: any;
     staffId: any;
 }) => {
     const [channels, setChannels] = useState<any>(null);
-    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const [searchParams, setSearchParams] = useState<string>("");
     const [channelStatus, setChannelStatus] = useState<any>({});
+    const t = useTranslations('Chat');
     const fetchChannels = useCallback(async () => {
         try {
             const fetchedData = await fetchClient({
@@ -26,7 +32,14 @@ const ChatList = ({
                 data_return: true,
             });
             setChannels(fetchedData);
-            console.log(fetchedData)
+            fetchedData.channel.map((item: any) => {
+                if (
+                    item.channel.clientId == parseInt(id, 10) &&
+                    channel == -1
+                ) {
+                    setChannel(item.channel.id);
+                }
+            });
         } catch (error) {
             console.log(error);
         }
@@ -39,31 +52,79 @@ const ChatList = ({
         socket.on("channel:status:update", (updatedChannels: any) => {
             setChannelStatus(updatedChannels);
         });
-        socket.on("anonymous:channel:create", async (channelId: string, userName: string, clientId: string) => {
-            if (channels !== null) {
-                const newChannels = [...channels.channel];
-                const newChannel = {
-                    channel:{
-                        id: channelId,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                    },
-                    latestMessage: {
-                        id: userName,
-                        content: "Click to chat",
-                        status: "Not seen",
-                        employeeId: null,
-                        clientId: clientId,
-                        channelId: channelId,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                    },
-                    userName: userName
+
+        const handleClientMessage = async (
+            channelId: any,
+            message: string,
+            clientId: string
+        ) => {
+            if (channels) {
+                const channelExists = channels.channel.some(
+                    (channel: any) => channel.channel.id === channelId
+                );
+                if (!channelExists) {
+                    const response = await socket.emitWithAck(
+                        "newClient:message:info",
+                        clientId
+                    );
+                    const newChannel = {
+                        channel: {
+                            id: channelId,
+                        },
+                        latestMessage: {
+                            content: message,
+                            createdAt: new Date(),
+                            employeeId: null,
+                            clientId: clientId,
+                            status: "Not seen",
+                        },
+                        updateTime: new Date(),
+                        userAvatar: response.client.userAvatar,
+                        userName: response.client.userName,
+                    };
+                    setChannels((prevChannels: any) => {
+                        return {
+                            ...prevChannels,
+                            channel: [...prevChannels.channel, newChannel],
+                        };
+                    });
                 }
-                newChannels.push(newChannel)
-                setChannels({channel: newChannels})
             }
-        });
+        };
+
+        socket.on(
+            "anonymous:channel:create",
+            async (channelId: string, userName: string, clientId: string) => {
+                if (channels !== null) {
+                    const newChannels = [...channels.channel];
+                    const newChannel = {
+                        channel: {
+                            id: channelId,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        },
+                        latestMessage: {
+                            id: userName,
+                            content: "New user want to chat!",
+                            status: "Not seen",
+                            employeeId: null,
+                            clientId: clientId,
+                            channelId: channelId,
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                        },
+                        userName: userName,
+                    };
+                    newChannels.unshift(newChannel);
+                    setChannels({ channel: newChannels });
+                }
+            }
+        );
+        socket.on("message:send:fromClient", handleClientMessage);
+
+        return () => {
+            socket.off("message:send:fromClient", handleClientMessage);
+        };
     }, [socket, channels]);
     const handleKeyDown = (event: any) => {
         if (event.key === "Enter") {
@@ -78,14 +139,14 @@ const ChatList = ({
         fetchChannels();
     }, [fetchChannels]);
 
-    if (!channels) return <Loading/>;
+    if (!channels) return <Loading />;
     return (
         <>
             <div
                 className='header h-10 items-center align-middle w-full text-lg font-bold flex flex-row 
             justify-center border-b-2 border-primary border-opacity-10 shadow-sm'
             >
-                <p>All customers</p>
+                <p>{t('all')}</p>
             </div>
             <div
                 className='z-0 search h-14 items-center align-middle w-full text-base font-medium flex flex-row 
@@ -94,7 +155,7 @@ const ChatList = ({
                 <input
                     id='search'
                     type='text'
-                    placeholder={"Enter name"}
+                    placeholder={t('enter')}
                     className='rounded-full border-gray-100 font-normal
                                         border-2 text-placeholder pl-2 p-1 focus:bg-primary-white
                                         focus:cursor-text focus:border-primary outline-none focus:pr-2

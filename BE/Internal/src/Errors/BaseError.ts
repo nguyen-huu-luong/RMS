@@ -3,6 +3,7 @@ abstract class BaseError {
 		public code: number,
 		public name: string,
 		public message: string,
+		public fieldError?: string,
 		public stackTrace?: string
 	) {}
 
@@ -12,6 +13,7 @@ abstract class BaseError {
 				code: this.code,
 				name: this.name,
 				message: this.message,
+				fieldError: this.fieldError || ""
 				// stackTrace: this.stackTrace,
 			};
 		}
@@ -20,6 +22,8 @@ abstract class BaseError {
 			code: this.code,
 			name: this.name,
 			message: this.message,
+			fieldError: this.fieldError || ""
+			
 		};
 	}
 }

@@ -10,6 +10,7 @@ export class UnauthorizedError extends BaseError {
 			HttpStatusCode.Unauthorized,
 			ErrorName.UNAUTHORIZED,
 			message,
+			"",
 			stackTrace
 		);
 	}

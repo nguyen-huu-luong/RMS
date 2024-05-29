@@ -1,17 +1,10 @@
-import { Button, Form, Input, Select, Space, Spin, Upload, message } from "antd"
-
-
-import { ExpandAltOutlined, UploadOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Select, Space, Spin, Tooltip, Upload, message } from "antd"
+import { ExpandAltOutlined, InfoCircleFilled, UploadOutlined } from "@ant-design/icons";
 import React, { useEffect, useRef, useState } from 'react';
-const ReactQuill = typeof window === 'object' ?
-    require('react-quill')
-
-
-    : () => false
-import 'node_modules/react-quill/dist/quill.snow.css'
 import axios from "axios";
 import { ChooseTemplateModal } from "./Modals/ChooseTemplateModel";
 import fetchClient from "@/lib/fetch-client";
+import EmailTextEditor from "./EmailTextEditor/TextEditor";
 
 
 
@@ -19,30 +12,24 @@ const adminEmail = [
     "admin@admin.com", "rms@gmail.com", "support.rms@gmail.com"
 ]
 
-
-
 export interface ISendEmailFormProps {
     customerEmailLists: string[],
     closeModal: () => void
 }
 
-type CustomElement = { type: 'paragraph'; children: CustomText[] }
-type CustomText = { text: string }
 export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailLists, closeModal }) => {
     const [content, setContent] = useState("")
-    const quillRef = useRef<typeof ReactQuill>(null);
     const [loading, setLoading] = useState(false)
     const [emailTemplateData, setEmailTemplateData] = useState({
         isUsing: false,
         template: {
             content: "",
             name: "",
-            desscription: ""
+            desscription: "",
+            type: ""
         }
     })
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
-
-
 
     const loadMjMl = async (emailData: any) => {
         setLoading(true)
@@ -80,46 +67,10 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
     };
 
     useEffect(() => {
-        if (emailTemplateData.isUsing) {
+        if (emailTemplateData.isUsing && emailTemplateData.template.type === "dnd") {
             loadMjMl(JSON.parse(emailTemplateData.template.content));
         }
     }, [emailTemplateData]);
-
-
-    const Quill = ReactQuill.Quill;
-    var Font = Quill.import("formats/font");
-    Font.whitelist = ["Roboto", "Raleway", "Montserrat", "Lato", "Rubik"];
-    Quill.register(Font, true);
-
-    const quillModules = {
-        toolbar: [
-            [{ font: Font.whitelist }],
-            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            ['link', 'image'],
-            [{ align: [] }],
-            [{ color: [] }, { 'background': [] }],
-            ['clean']
-        ],
-    };
-
-
-    const quillFormats = [
-        'header',
-        'bold',
-        'italic',
-        'underline',
-        'strike',
-        'blockquote',
-        'list',
-        'bullet',
-        'link',
-        'image',
-        'align',
-        'color',
-        'code-block',
-    ];
 
 
     const handleEditorChange = (newContent: any) => {
@@ -132,8 +83,8 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
             receivers: customerEmailLists,
             subject: values["subject"],
             campaignName: values["emailCampaign"],
-            html: emailTemplateData.template.content || content,
-            type: emailTemplateData.template.content ? "mjml" : "html"
+            html: emailTemplateData.template.type === "dnd" ? emailTemplateData.template.content : content,
+            type: emailTemplateData.template.type === "dnd" ? "mjml" : "html"
         }
 
         console.log(data)
@@ -144,7 +95,7 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
     const sendEmail = async (emailData: any) => {
         try {
             setLoading(true)
-            const response = await fetchClient({url: "/send-email", method: "POST", body: {emailData} })
+            const response = await fetchClient({ url: "/send-email", method: "POST", body: { emailData } })
             console.log('sent email', response.data);
             message.success('Sent email successfully');
             setLoading(false)
@@ -161,6 +112,9 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
             isUsing: true,
             template
         })
+        if (template.type === "text") {
+            setContent(template.content)
+        }
     }
 
     return (
@@ -187,7 +141,12 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
                     </Space>
                 </Form.Item>
 
-                <Form.Item name="emailCampaign" label={<b>Email campaign:</b>} required>
+                <Form.Item name="emailCampaign" label={<div className="flex items-center">
+                    <Tooltip title="Create and campagin help you will status of email sent, tracking click event and open event.">
+                        <InfoCircleFilled className="text-primary" />
+                    </Tooltip>
+                    <b className="ms-2">Email campaign:</b>
+                </div>}>
                     <Input />
                 </Form.Item>
 
@@ -203,25 +162,26 @@ export const SendEmailForm: React.FC<ISendEmailFormProps> = ({ customerEmailList
                 </div>
 
                 {emailTemplateData.isUsing ? (
-                    <div className="border relative">
-                        <iframe
-                            ref={iframeRef}
-                            title="Email preview"
-                            className="block w-full"
-                        ></iframe>
-                    </div>
+                    <>
+                        {emailTemplateData.template.type === "text" &&
+                            <div className="w-full flex items-center">
+                                <EmailTextEditor content={content} onContentChange={(str) => setContent(str)} />
+                            </div>
+                        }
+                        {emailTemplateData.template.type === "dnd" && <div className="border relative">
+                            <iframe
+                                ref={iframeRef}
+                                title="Email preview"
+                                className="block w-full"
+                            ></iframe>
+                        </div>}
+                    </>
                 )
                     :
                     (
+
                         <div className="w-full flex items-center">
-                            <ReactQuill
-                                ref={(el: any) => { quillRef.current = el }}
-                                value={content}
-                                onChange={handleEditorChange}
-                                modules={quillModules}
-                                formats={quillFormats}
-                                className="w-full h-full mt-10 bg-white"
-                            />
+                            <EmailTextEditor content={content} onContentChange={(str) => setContent(str)} />
                         </div>
                     )}
 

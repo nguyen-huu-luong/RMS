@@ -29,13 +29,15 @@ export class FloorService {
             }
             let floors = await this.floorRepository.findAllFloor()
             let dicFloors: Dictionary<any> = {}
-            await Promise.all(
-                floors.map(async (item: any) => {
-                    let tables_ = await this.tableRepository.viewTables(item.id)
-                    let index = item.name
-                    dicFloors[index] = tables_
-                })
-            );
+
+
+            for (let idx in floors) {
+                const item: any = floors[idx]
+                let tables_ = await this.tableRepository.viewTables(item.id)
+                let index = item.name
+                dicFloors[index] = tables_
+            }
+
             return dicFloors
         }
         catch (err) {
@@ -87,22 +89,20 @@ export class FloorService {
             let dicFloors: Dictionary<any> = {}
             let dicReservations: Dictionary<any> = {}
 
-            await Promise.all(
-                floors.map(async (item: any) => {
-                    let tables_ = await this.tableRepository.viewTables(item.id)
-                    let index = item.name
-                    dicFloors[index] = tables_
-                })
-            );
+            for (let idx in floors) {
+                const item: any = floors[idx]
+                let tables_ = await this.tableRepository.viewTables(item.id)
+                let index = item.name
+                dicFloors[index] = tables_
+            }
 
+            for (let idx in dates) {
+                const item: any = dates[idx]
+                let ress = await this.reservationRepository.viewRes(item.dateTo)
+                let index = item.dateTo
+                dicReservations[index] = ress
+            }
 
-            await Promise.all(
-                dates.map(async (item: any) => {
-                    let ress = await this.reservationRepository.viewRes(item.dateTo)
-                    let index = item.dateTo
-                    dicReservations[index] = ress
-                })
-            );
 
             let table_reservations_info: Dictionary<string> = {}
 

@@ -17,7 +17,7 @@ const items: IElementCard[] = [
             tagName: "mj-column"
         },
         index: 2
-    },
+    }
 ]
 
 export default function LayoutItems() {

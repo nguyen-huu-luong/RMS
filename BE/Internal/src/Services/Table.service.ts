@@ -46,13 +46,12 @@ export class TableService {
             }
             let floors = await this.floorRepository.findAllFloor()
             let dicFloors: Dictionary<any> = {}
-            await Promise.all(
-                floors.map(async (item: any) => {
-                    let tables_ = await this.tableRepository.viewTables(item.id)
-                    let index = item.name
-                    dicFloors[index] = tables_
-                })
-            );
+            for (let idx in floors) {
+                const item: any = floors[idx]
+                let tables_ = await this.tableRepository.viewTables(item.id)
+                let index = item.name
+                dicFloors[index] = tables_
+            }
             return dicFloors
         }
         catch (err) {
@@ -111,22 +110,20 @@ export class TableService {
             let dicFloors: Dictionary<any> = {}
             let dicReservations: Dictionary<any> = {}
 
-            await Promise.all(
-                floors.map(async (item: any) => {
-                    let tables_ = await this.tableRepository.viewTables(item.id)
-                    let index = item.name
-                    dicFloors[index] = tables_
-                })
-            );
+            for (let idx in floors) {
+                const item: any = floors[idx]
+                let tables_ = await this.tableRepository.viewTables(item.id)
+                let index = item.name
+                dicFloors[index] = tables_
+            }
 
 
-            await Promise.all(
-                dates.map(async (item: any) => {
-                    let ress = await this.reservationRepository.viewRes(item.dateTo)
-                    let index = item.dateTo
-                    dicReservations[index] = ress
-                })
-            );
+            for (let idx in dates) {
+                const item: any = dates[idx]
+                let ress = await this.reservationRepository.viewRes(item.dateTo)
+                let index = item.dateTo
+                dicReservations[index] = ress
+            }
 
             let table_reservations_info: Dictionary<string> = {}
 
@@ -322,13 +319,13 @@ export class TableService {
             if (req.action = "create:any") {
                 const data = req.body
                 const table_id = Number(req.params.id);
-                const client = await this.clientRepository.checkExist(data.phone, data.email)
+                const client = await this.clientRepository.checkExist(data.email)
                 var table_cart = await this.cartRepository.getCartTable(Number(table_id))
                 var new_client: any
                 const { pay_method, ...client_data } = data
                 var cart: any;
                 if (client.length == 0) {
-                    new_client = await this.clientRepository.create({ ...client_data, createAt: new Date(), updateAt: new Date() })
+                    new_client = await this.clientRepository.create({ ...client_data, createAt: new Date(), updateAt: new Date(), convertDate: new Date() })
                     await this.cartRepository.update(table_cart.id, { clientId: new_client.id, tableId: null })
                     await this.cartRepository.create({
                         tableId: table_id,
@@ -339,6 +336,7 @@ export class TableService {
                 }
                 else {
                     new_client = client[0]
+                    await this.clientRepository.update(new_client.id, {...client_data})
                     cart = table_cart
                 }
 
@@ -359,7 +357,7 @@ export class TableService {
                         parseInt(cart?.getDataValue("amount")) +
                         parseInt(order.getDataValue("shippingCost")),
                 });
-                
+
                 const cartItems = await cart.getProducts();
 
                 await Promise.all(
@@ -375,6 +373,12 @@ export class TableService {
                         });
                     })
                 );
+                
+                await this.clientRepository.update(new_client.id, {
+                    profit: new_client.profit +  parseInt(cart?.getDataValue("amount")) + parseInt(order.getDataValue("shippingCost")),
+                    total_items: new_client.total_items + cart?.getDataValue("total"),
+                    lastPurchase: new Date()
+                })
 
                 await cart.setProducts([]);
                 await this.cartRepository.update(cart?.getDataValue("id"), {
@@ -384,6 +388,7 @@ export class TableService {
 
                 res.send({ status: "Success" })
                 Message.logMessage(req, HttpStatusCode.Success);
+                return new_client.id
             }
             else {
                 throw new UnauthorizedError()
@@ -395,8 +400,8 @@ export class TableService {
         }
     }
 
-    public async makePaymentMoMO(req: Request, res: Response, next: NextFunction){
-        await this.makePayment(req, res, next)
+    public async makePaymentMoMO(req: Request, res: Response, next: NextFunction) {
+        return await this.makePayment(req, res, next)
     }
 
 }

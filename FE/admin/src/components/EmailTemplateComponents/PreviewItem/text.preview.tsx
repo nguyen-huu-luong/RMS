@@ -6,6 +6,8 @@ import {
 import useEmailStore from "@/store/email";
 import { CSSProperties } from "styled-components";
 import HoverInfo from "./ItemOnHover";
+import TextEditor from "@/components/EmailTextEditor/TextEditor";
+import TestTextEditor from "../RightSidebar/TextAttributes/TestTextEditor";
 
 interface ITextPreview {
   section: any;
@@ -61,11 +63,19 @@ const TextPreview = ({ section, index, textIndex, path }: ITextPreview) => {
       onMouseEnter={() => setIsHovered(false)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
-      style={{ ...getStyle() }} 
+      style={{ ...getStyle() }}
+      className="w-full"
     >
       {/* <textarea style={{width: "100%"}} value={textValue} onChange={handleTextChange} /> */}
-      <div dangerouslySetInnerHTML={{ __html: section.content }} />
-      
+      <div className="w-full">
+        {
+          // !showControls ?
+            <div dangerouslySetInnerHTML={{ __html: section.content }} />
+            // :
+            // <TestTextEditor content={section.content}/>
+        }
+      </div>
+
       {(isHovered || showControls) && (
         <HoverInfo section={section} path={path} />
       )}
