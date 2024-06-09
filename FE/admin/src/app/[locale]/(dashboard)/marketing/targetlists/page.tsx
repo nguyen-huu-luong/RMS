@@ -10,12 +10,12 @@ import {
 } from "antd";
 import type { TableProps } from "antd";
 
-import Link from "next/link";
 import TableRender, { FilterItemType } from "@/components/TableComponents";
-import TextArea from "antd/es/input/TextArea";
 import TimeFormatter from "@/components/TimeFormatter";
 import { useRouter } from "next/navigation";
 import fetchClient from "@/lib/fetch-client";
+import { CreateTargetListModal } from "@/components/Modals/CreateTargetListModal";
+import LinkWithRef from "next-intl/link";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 
@@ -31,6 +31,8 @@ interface DataType {
 
 const TargetList: React.FC = () => {
     const [selectedRows, setSelectedRows] = useState<DataType[]>([])
+    const [reload, setReload] = useState(false)
+    const [data, setData] = useState<DataType[]>([])
     const router = useRouter()
     const columns: ColumnsType<DataType> = [
         {
@@ -42,7 +44,7 @@ const TargetList: React.FC = () => {
             title: "Name",
             dataIndex: "name",
             key: "name",
-            render: (text, row, record) => <Link href={`targetlists/${row.id}`}>{text}</Link>
+            render: (text, row, record) => <LinkWithRef href={`targetlists/${row.id}`}>{text}</LinkWithRef>
         },
         {
             title: "Description",
@@ -53,6 +55,12 @@ const TargetList: React.FC = () => {
             title: "Type",
             dataIndex: "type",
             key: "type",
+        },
+        {
+            title: "CreatedAt",
+            dataIndex: "createdAt",
+            key: "createdAt",
+            render: (text) => <TimeFormatter time={text} />
         },
         {
             title: "UpdatedAt",
@@ -84,7 +92,7 @@ const TargetList: React.FC = () => {
         }
     ];
 
-    const handleDelete = async () =>  {
+    const handleDelete = async () => {
         try {
             const result = await fetchClient({
                 method: "DELETE",
@@ -94,10 +102,16 @@ const TargetList: React.FC = () => {
                 }
             })
 
-            const deletedIds = selectedRows.map(item => item.id) ;
+            // const deletedIds = selectedRows.map(item => item.id);
+            // setData(prev => {
+            //     const  newData = data.filter(item => !deletedIds.includes(item.id))
+            //     return  newData ;
+            // })
+            setSelectedRows([])
+            setReload(!reload)
 
 
-        } catch (error:any) {
+        } catch (error: any) {
             console.log(error)
             message.error(error.response.data.message)
             throw new Error(error)
@@ -111,26 +125,40 @@ const TargetList: React.FC = () => {
             <Popconfirm title={`Delete ${selectedRows.length} targetlist. Are you sure?`} onConfirm={handleDelete}>
                 <Button>Delete</Button>
             </Popconfirm>
-           
-        </Space> 
+
+        </Space>
     }
+
+    const handleCreateTargetlist = async (values: any) => {
+        try {
+            const result = await fetchClient({
+                method: "POST",
+                url: "/targetlists",
+                body: {
+                    ...values
+                }
+            })
+            // setReload(!reload)
+        //    const  newData = [...data, result.data]
+           setData(prev => ([...prev, result.data]))
+        } catch (error) {
+            message.error("Đã xảy ra lỗi")
+            throw error
+        }
+    }
+
 
     return (
         <>
             <TableRender<DataType>
+                data={data}
+                setData={setData}
                 columns={columns}
                 url="/targetlists"
+                reload={reload}
                 onSelected={onSelectedRows}
-                formCreateElement={
-                    <>
-                        <Form.Item label="Name" name="name" required rules={[{ required: true, message: 'Please input the group name !' }]}>
-                            <Input placeholder='Group name' />
-                        </Form.Item>
-                        <Form.Item label="Description" name="description" required rules={[{ required: true, message: 'Please input the group description !' }]}>
-                            <TextArea placeholder='Group description' />
-                        </Form.Item>
-                    </>
-                }
+                createModal={<CreateTargetListModal onOk={handleCreateTargetlist} triggerText="New" />}
+                createModalTitle="Create new targetlist"
                 filterItems={filterItems}
             />
         </>

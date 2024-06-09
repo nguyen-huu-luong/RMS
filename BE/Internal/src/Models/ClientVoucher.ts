@@ -25,9 +25,9 @@ ClientVoucher.init(
 			allowNull: false,
 			onDelete: "CASCADE",
 		},
-		quantity: {
+		status: {
 			allowNull: false,
-			type: DataTypes.INTEGER,	
+			type: DataTypes.BOOLEAN,	
 		},
 		createdAt: {
 			allowNull: false,

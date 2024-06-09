@@ -11,7 +11,7 @@ import { Space } from "antd";
 const defaultStyle: CSSProperties = {
     position: "relative",
     width: "100%",
-    maxWidth: 600,
+    // maxWidth: 600,
     minHeight: "200px",
     height: "auto",
 };
@@ -105,6 +105,17 @@ const SectionPreview = ({ section, index, path }: ISectionPreview) => {
                 );
             }
 
+            case "mj-carousel": {
+                return (
+                    <SpacerPreview
+                        section={pSection}
+                        index={index}
+                        key={nIndex}
+                        path={`${path}.children.${nIndex}`}
+                    />
+                );
+            }
+
             default:
                 break;
         }
@@ -143,14 +154,14 @@ const SectionPreview = ({ section, index, path }: ISectionPreview) => {
                 onClick={handleClick}
                 className="border border-dashed"
             >
-                <div className="flex space-x-1">
+                <div className="">
                     {hasChildren.length > 0 &&
                         hasChildren.map((tsection: any, tindex: number) => {
                             return loadHtmlElements(tsection, tindex);
                         })}
                 </div>
                 {hasChildren.length === 0 && (
-                    <div className="flex justify-center align-center w-full">
+                    <div className="flex-row justify-center align-center w-full">
                         <p>Drop Column here</p>
                     </div>
                 )}

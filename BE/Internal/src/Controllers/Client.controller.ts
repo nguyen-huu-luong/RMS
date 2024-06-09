@@ -3,10 +3,12 @@ import { NextFunction, Request, Response } from "express";
 import { ClientService } from "../Services";
 import { EmailService } from '../Services/Email.service';
 import { QueryOptions, TYPES } from "../Types/type";
-import { ensurePermissionIsValid, parseRequesQueries } from "../Helper/helper";
+import { ensureDataIsValidated, ensurePermissionIsValid, parseRequesQueries } from "../Helper/helper";
 import { ForbiddenError, ValidationError } from "../Errors";
 import { validationResult } from "express-validator";
 import { AddTryCatchBlock, LogRequests } from "../Utils/decorators";
+
+
 
 @LogRequests
 @AddTryCatchBlock
@@ -21,14 +23,37 @@ class ClientController {
 	// "/customers/all?type=lead&firstname=fafda&age=31&page=2&pageSize=10&sort_by=asc(number)"
 	public async getAllClient(req: Request, res: Response, next: NextFunction) {
 		ensurePermissionIsValid(req.action, "read:any");
-		const queries = { ...req.body["filter"], ...req.query };
+		const queries = { ...req.query };
 
-		if (!req.query["type"] || req.query["type"] === "customer") {
-			queries.type = "Customer"
+		if (!req.query["type"]) {
+			queries.type = "customer"
 		} else if (req.query["type"] === "lead") {
-			queries.type = "Lead"
+			queries.type = "lead"
 		}
+		if (queries["sort"] && queries["sort"] === "fullname") {
+			queries["sort"] = ["firstname", "lastname"];
+		} 
+
+		if (queries["sort"] === "age") {
+			queries["sort"] = "birthday"
+		}
+
+		if (queries["sort"] === "group") {
+			queries["sort"] = "groupId"
+		}
+
+
+		if (queries["group_in"]) {
+			queries["groupId_in"] = queries["group_in"]
+		}
+
+		if (queries["group"]) {
+			queries["groupId"] = queries["group"]
+		}
+
 		const options: QueryOptions = parseRequesQueries(queries);
+
+
 		const data = await this.clientService.getAll(options);
 
 		res.send(data);
@@ -41,6 +66,7 @@ class ClientController {
 			res.send(data);
 		} if (req.action === "read:own") {
 			const data = await this.clientService.getById(Number(req.userId));
+			console.log(data)
 			res.send(data);
 		} else {
 			throw new ForbiddenError();
@@ -48,6 +74,7 @@ class ClientController {
 	}
 
 	public async createClient(req: Request, res: Response, next: NextFunction) {
+		ensureDataIsValidated(req)
 		if (req.action === "create:any") {
 			const customerInfo = req.body["data"];
 			const data = await this.clientService.create(customerInfo);
@@ -111,7 +138,15 @@ class ClientController {
 		} else {
 			throw new ForbiddenError();
 		}
+	}
 
+	public async deleteMany(req:Request, res: Response, next: NextFunction) {
+		ensureDataIsValidated(req)
+		ensurePermissionIsValid(req.action,  "delete:any")
+		const ids = req.body["ids"]
+		const result = await this.clientService.deleteMany(ids)
+
+		res.send({message: `${result} deleted`})
 	}
 
 	public async getOpporturnityCustomer(req: Request, res: Response, next: NextFunction) {
@@ -165,6 +200,28 @@ class ClientController {
 			else {
 				throw new ForbiddenError();
 			}
+		}
+		catch (err) {
+			console.log(err)
+		}
+	}
+
+	public async getCustomerPerGroup(req: Request, res: Response, next: NextFunction) {
+		try {
+
+			let groupIds: any = req.query.groupIds
+			let array_ids: any = []
+			if (typeof groupIds == 'undefined') {}
+			else {
+				groupIds = groupIds.substring(1, groupIds.length - 1)
+				const array_str_ids = groupIds.split(',')
+				array_ids = array_str_ids.map((item: any) => {
+					return Number(item)
+				})
+			}
+			const data = await this.clientService.getCustomerPerGroup(array_ids)
+			res.send(data)
+
 		}
 		catch (err) {
 			console.log(err)

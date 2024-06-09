@@ -11,6 +11,7 @@ import TextPreview from "./text.preview";
 import { CSSProperties } from "styled-components";
 import ButtonPreview from "./button.preview";
 import ImagePreview from "./image.preview";
+import CaroselPreview from "./carousel.preview";
 
 interface ITextPreview {
     section: any;
@@ -24,8 +25,8 @@ const defaultStyle: CSSProperties = {
     height: "auto",
     outline: "2px dashed black",
     position: "relative",
-    margin: 16,
-    padding: 16
+    // margin: 16,
+    // padding: 16
 };
 
 const hoverStyle = {
@@ -38,7 +39,7 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const [{ isOver, canDrop }, drop] = useDrop(() => ({
-        accept: ["mj-image", "mj-text", "mj-button"],
+        accept: ["mj-image", "mj-text", "mj-button", "mj-carousel"],
         drop: (item: any, monitor) => {
             if (!monitor.didDrop()) {
                 const nestedPath = `${path}.children`;
@@ -79,6 +80,7 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
                     <ButtonPreview
                         section={pSection}
                         index={index}
+                        buttonIndex={tindex}
                         key={tindex}
                         path={`${path}.children.${tindex}`}
                     />
@@ -91,6 +93,17 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
                         section={pSection}
                         imageIndex={tindex}
                         columnIndex={columnIndex}
+                        index={index}
+                        key={index}
+                        path={`${path}.children.${tindex}`}
+                    />
+                );
+            }
+            
+            case "mj-carousel": {
+                return (
+                    <CaroselPreview
+                        section={pSection}
                         index={index}
                         key={index}
                         path={`${path}.children.${tindex}`}
@@ -150,7 +163,7 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
     };
 
     return (
-        <div className="flex-1" ref={drop}>
+        <div className="w-full h-auto" ref={drop}>
             <div
                 style={{
                     ...getBoxStyle()
@@ -158,6 +171,7 @@ const ColumnPreview = ({ section, index, columnIndex, path }: ITextPreview) => {
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
                 onClick={handleClick}
+                className="h-auto"
             >
                 {hasChildren.length > 0 &&
                     hasChildren.map((tsection: any, tindex: any) => {

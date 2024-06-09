@@ -8,6 +8,7 @@ import {
     Select,
     Space,
     Table,
+    Tooltip,
     message,
 } from "antd";
 import type { TableProps, GetProp } from "antd";
@@ -16,11 +17,12 @@ import type {
     Key,
     SortOrder,
 } from "antd/es/table/interface";
-import Link from "next/link";
 import { EditFilled, PlusCircleFilled, SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons";
 import TimeFormatter from "@/components/TimeFormatter";
 import { BiTrash } from "react-icons/bi";
 import fetchClient from "@/lib/fetch-client";
+import { useTranslations } from "next-intl";
+import LinkWithRef from "next-intl/link";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -76,6 +78,9 @@ const EmailTemplate: React.FC = () => {
         title: "",
     });
 
+    const t: any = useTranslations("Marketing.MessageTemplate")
+    const t_general: any = useTranslations("General")
+
     // rowSelection object indicates the need for row selection
     const rowSelection = {
         onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
@@ -93,43 +98,48 @@ const EmailTemplate: React.FC = () => {
     const handleDelete = async (id: number) => {
         try {
             const response = await fetchClient({ method: "DELETE", url: `/message-templates/${id}` });
-            console.log('Delete email template', response.data);
-            message.success('Delete email template successfully');
+            message.success(t('delete-success-msg'));
             fetchData()
         } catch (error) {
             console.error('Error delete email  Email template:', error);
-            message.error('Failed to delete Email template');
+            message.error(t('delete-faild-msg'));
         }
     }
     const columns: ColumnsType<DataType> = [
         { title: "ID", dataIndex: "id", key: "id" },
         {
-            title: "Name", dataIndex: "name", key: "name", render: (text, record, index) => (
-                <Link href={`templates/${record.id}/`}>{text}</Link>
+            title: t("name"), dataIndex: "name", key: "name", render: (text, record, index) => (
+                <LinkWithRef href={`templates/${record.id}/`}>{text}</LinkWithRef>
             )
         },
-        { title: "type", dataIndex: "type", key: "type" },
+        { title: t("description"), dataIndex: "description", key: "description" },
         {
-            title: "CreatedAt", dataIndex: "createdAt", key: "createdAt", render: (text) => (
+            title: t("created-at"), dataIndex: "createdAt", key: "createdAt", render: (text) => (
                 <TimeFormatter time={text} />
             )
         },
 
-        { title: "UpdatedAt", dataIndex: "updatedAt", key: "updatedAt", render: (text) => <TimeFormatter time={text} /> },
+        { title: t("updated-at"), dataIndex: "updatedAt", key: "updatedAt", render: (text) => <TimeFormatter time={text} /> },
         {
-            title: "Action",
+            title: t("action"),
             render: (text, record, index) => (
                 <Space>
-                    <Link href={`templates/${record["id"]}`}><Button type="primary" className="bg-primary" icon={<EditFilled />}>Update</Button></Link>
-                    <Popconfirm
-                        title="Delete the task"
-                        description="Are you sure to delete this task?"
-                        onConfirm={() => handleDelete(record.id)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button danger icon={<BiTrash />}>Delete</Button>
-                    </Popconfirm>
+                    <Tooltip title={t_general("update")}>
+                        <LinkWithRef href={`templates/${record["id"]}`}>
+                            <Button type="primary" className="bg-primary" icon={<EditFilled />} />
+                        </LinkWithRef>
+                    </Tooltip>
+                    <Tooltip title={t_general("delete")}>
+                        <Popconfirm
+                            title={(t("delele-confirm-title"))}
+                            description={t("delete-confirm-msg")}
+                            onConfirm={() => handleDelete(record.id)}
+                            okText={t_general("yes")}
+                            cancelText={t_general("no")}
+                        >
+                            <Button danger icon={<BiTrash />} />
+                        </Popconfirm>
+                    </Tooltip>
                 </Space>
             )
         }
@@ -173,7 +183,7 @@ const EmailTemplate: React.FC = () => {
             setLoading(false)
             setError({
                 isError: true,
-                title: error?.name || "Something went wrong!",
+                title: error?.name || t_general("something-wrong"),
                 message: error?.message || "Unknown error",
             });
         }
@@ -190,7 +200,6 @@ const EmailTemplate: React.FC = () => {
     ) => {
         if (Array.isArray(sorter)) {
             const firstSorter = sorter[0];
-            console.log("Sorter is array");
             setTableParams(prev => ({
                 ...prev,
                 pagination,
@@ -201,7 +210,6 @@ const EmailTemplate: React.FC = () => {
                 },
             }));
         } else {
-            console.log("Sorter is not an array");
 
             setTableParams(prev => ({
                 pagination,
@@ -273,7 +281,7 @@ const EmailTemplate: React.FC = () => {
                             }))}
                         />
 
-                        <p>Order: </p>
+                        <p>{t_general("order")}:</p>
 
                         <Button onClick={handleToggleSorter} icon={tableParams.sorter?.order === "ascend" ? (
                             <SortAscendingOutlined />
@@ -281,7 +289,9 @@ const EmailTemplate: React.FC = () => {
                             <SortDescendingOutlined />
                         )} />
                     </div>
-                    <Button type="link" href="templates/new" className="border ms-auto" icon={<PlusCircleFilled />}>New</Button>
+                    <LinkWithRef type="link" href="/marketing/templates/new" className="ms-auto" >
+                        {t_general("new")}
+                    </LinkWithRef>
                 </div>
                 <Table
                     rowSelection={{
@@ -290,7 +300,7 @@ const EmailTemplate: React.FC = () => {
                     columns={columns}
                     pagination={{
                         className: "bg-white rounded px-4 py-2",
-                        showTotal: (total: number) => `Total ${total} items`,
+                        showTotal: (total: number) => t_general("total-n-items", {n: total}),
                         position: ["bottomCenter", "bottomRight"],
                         showSizeChanger: true,
                         showQuickJumper: true,

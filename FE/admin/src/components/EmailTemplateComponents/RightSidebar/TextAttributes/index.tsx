@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import TextEditor from "./TextEditor";
 import useEmailDataStore from "@/store/email";
 import { Button } from "antd";
+import TestTextEditor from "./TestTextEditor";
 
 
 const TextAttributes = () => {
@@ -13,12 +14,10 @@ const TextAttributes = () => {
   }, [])
 
 
-
-
   if (!activeNode || (activeNode && activeNode.section.tagName !== "mj-text"))
     return <></>;
     
-  return <TextEditor />
+  return <TestTextEditor />
 }
 
 export default TextAttributes;

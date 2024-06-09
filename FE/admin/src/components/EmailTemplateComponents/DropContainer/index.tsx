@@ -11,7 +11,7 @@ export interface IDropContainerProps  {
     view?:  "edit" | "preview" | "desktop-preview",
 }
 const DropContainer: React.FC<IDropContainerProps> = ({view}) => {
-    const { emailData, setEmailData, pushTagElement, activeNode } = useEmailDataStore();
+    const { emailData, setEmailData, pushTagElement, activeNode, setActiveNode } = useEmailDataStore();
     const { pushToUndoStack } = useEmailHistoryStore();
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [currentView, setCurrentView] = useState<
@@ -56,6 +56,14 @@ const DropContainer: React.FC<IDropContainerProps> = ({view}) => {
     //     setEmailData(emailDataClone);
     // };
 
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        console.log("cliclclcdcakoc")
+        event.preventDefault();
+        event.stopPropagation();
+    
+        setActiveNode(null);
+      }
+
     return (
         <div className="flex flex-col border items-center px-2 h-screen overflow-auto" style={{width: activeNode ? "50%" : "80%"}}>
             <ResponsiveControl
@@ -64,7 +72,7 @@ const DropContainer: React.FC<IDropContainerProps> = ({view}) => {
                 currentView={currentView}
             />
             <div className="m-2 p-2 border flex justify-center w-full">
-                <div ref={drop} className="flex flex-col items-center w-full">
+                <div ref={drop} className="flex flex-col items-center w-full" onClick={handleClick}>
                     {currentView == "edit" && <EditMode />}
                     {["preview", "desktop-preview"].includes(currentView) && (
                         <PreviewMode isMobile={isMobile} />

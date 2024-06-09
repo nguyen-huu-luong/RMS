@@ -30,7 +30,7 @@ import dayjs from "dayjs";
 import useSocket from "@/socket";
 import { message, ConfigProvider, Drawer } from "antd";
 import Loading from "@/components/loading";
-
+import { useLocale, useTranslations } from "next-intl";
 const Context = React.createContext({ name: "Default" });
 
 function Home() {
@@ -43,6 +43,8 @@ function Home() {
     const [notifications, setNotifications] = useState<any>()
     const [resInfo, setResInfo] = useState<any>()
     const [isLoading, setIsLoading] = useState(true)
+    const t_general: any = useTranslations("General")
+	const t_reservation: any = useTranslations("Reservation")
     const dateFormat = "YYYY-MM-DD";
     const timeFormat = "HH:mm";
     interface Dictionary {
@@ -73,27 +75,42 @@ function Home() {
     };
 
     const fetchResInfo = async () => {
-        setIsLoading(true)
-        const data = await fetchClient({ url: `/reservations/all`, data_return: true })
-        setResInfo(data)
-        setIsLoading(false)
+        try{
+            setIsLoading(true)
+            const data = await fetchClient({ url: `/reservations/all`, data_return: true })
+            setResInfo(data)
+            setIsLoading(false)
+        }
+        catch(err) {
+            console.log(err)
+        }
     }
 
     const fetchNotification = async () => {
-        setIsLoading(true)
-        const data = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
-        setNotifications(data)
-        setIsLoading(false)
+        try{
+            setIsLoading(true)
+            const data = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
+            setNotifications(data)
+            setIsLoading(false)
+        }
+        catch(err) {
+            console.log(err)
+        }
     }
 
     const fetchAllData = async () => {
-        setIsLoading(true)
-        const res_info = await fetchClient({ url: `/reservations/all`, data_return: true })
-        const notification = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
-        setResInfo(res_info)
-        console.log(notification)
-        setNotifications(notification)
-        setIsLoading(false)
+        try{
+            setIsLoading(true)
+            const res_info = await fetchClient({ url: `/reservations/all`, data_return: true })
+            const notification = await fetchClient({ url: `/pos_notifications/all`, data_return: true })
+            setResInfo(res_info)
+            console.log(notification)
+            setNotifications(notification)
+            setIsLoading(false)
+        }
+        catch (err) {
+            console.log(err)
+        }
     }
 
     const showDetailTable = (tableId: any) => {
@@ -111,12 +128,17 @@ function Home() {
         let end_date = event.target.end_date.value;
         let table_id = event.target.table_id.value;
         let status = "";
-        let data = await fetchClient({
-            url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
-            data_return: true,
-        });
-        setResInfo({ ...resInfo, reservarions: data.reservarions })
-        setChecker((current_value) => !current_value);
+        try {
+            let data = await fetchClient({
+                url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
+                data_return: true,
+            });
+            setResInfo({ ...resInfo, reservarions: data.reservarions })
+            setChecker((current_value) => !current_value);
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     const handelFilterShortCut = async (table_id_: any) => {
@@ -124,72 +146,94 @@ function Home() {
         let end_date = "";
         let table_id = table_id_;
         let status = "Waiting";
-        let data = await fetchClient({
-            url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
-            data_return: true,
-        });
-        setResInfo({ ...resInfo, reservarions: data.reservarions })
-        setChecker((current_value) => !current_value);
+        try {
+            let data = await fetchClient({
+                url: `/reservations/detail?start=${start_date}&end=${end_date}&table=${table_id}&status=${status}`,
+                data_return: true,
+            });
+            console.log(resInfo)
+            setResInfo({ ...resInfo, reservarions: data.reservarions })
+            setChecker((current_value) => !current_value);
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     const handelCreateFloor: FormProps<FieldType>["onFinish"] = async (
         values
     ) => {
-        setMessError("");
-        let floor_name_ = values.floor_name;
-        let data = await fetchClient({
-            method: "POST",
-            url: "/floors/all",
-            body: { floor_name: floor_name_ },
-            data_return: true,
-        });
-        if (data.status) {
-            setResInfo({ ...resInfo, floors: data.floors })
-            form_floor.resetFields()
-            setIsModalFloorOpen(false);
-            setChecker((current_value) => !current_value);
-        } else {
-            setMessError(data.message);
+        try {
+            setMessError("");
+            let floor_name_ = values.floor_name;
+            let data = await fetchClient({
+                method: "POST",
+                url: "/floors/all",
+                body: { floor_name: floor_name_ },
+                data_return: true,
+            });
+            if (data.status) {
+                setResInfo({ ...resInfo, floors: data.floors })
+                form_floor.resetFields()
+                setIsModalFloorOpen(false);
+                setChecker((current_value) => !current_value);
+            } else {
+                setMessError(data.message);
+            }
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 
     const handelCreateTable: FormProps<FieldType>["onFinish"] = async (
         values
     ) => {
-        let table_name_ = values.table_name;
-        let floor_name_ = values.floor_name_temp;
-        setMessError("");
-        let data = await fetchClient({
-            method: "POST",
-            url: "/tables/detail",
-            body: {
-                floor_name: floor_name_,
-                table_name: table_name_,
-            },
-            data_return: true,
-        });
-        if (data.status) {
-            resInfo.floors = data.floors;
-            resInfo.tables = data.tables;
-            form_table.resetFields()
-            setIsModalTableOpen(false);
-            setChecker((current_value) => !current_value);
-        } else {
-            setMessError(data.message);
+        try {
+            let table_name_ = values.table_name;
+            let floor_name_ = values.floor_name_temp;
+            setMessError("");
+            let data = await fetchClient({
+                method: "POST",
+                url: "/tables/detail",
+                body: {
+                    floor_name: floor_name_,
+                    table_name: table_name_,
+                },
+                data_return: true,
+            });
+            if (data.status) {
+                resInfo.floors = data.floors;
+                resInfo.tables = data.tables;
+                form_table.resetFields()
+                setIsModalTableOpen(false);
+                setChecker((current_value) => !current_value);
+            } else {
+                setMessError(data.message);
+            }
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 
     const handleUpdateReservationStatus = async (status: any, id: any) => {
-        const data = await fetchClient({
-            method: "PUT",
-            url: `/reservations/detail?id=${id}`,
-            body: { status: status },
-            data_return: true,
-        });
-        resInfo.floors = data.floors;
-        resInfo.tables = data.tables;
-        resInfo.reservarions = data.reservarions;
-        setChecker((current_value) => !current_value);
+        try {
+            const data = await fetchClient({
+                method: "PUT",
+                url: `/reservations/detail?id=${id}`,
+                body: { status: status },
+                data_return: true,
+            });
+            resInfo.floors = data.floors;
+            resInfo.tables = data.tables;
+            resInfo.reservarions = data.reservarions;
+            setChecker((current_value) => !current_value);
+        }
+        catch (err) {
+            console.log(err)
+        }
+
     };
     const [isModalTableOpen, setIsModalTableOpen] = useState(false);
 
@@ -218,28 +262,35 @@ function Home() {
 
     const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
     const handleDeleteItem = async (values: any) => {
-        let item_names = values.item_name;
-        let item_type = values.item_type;
-        var data: any;
-        if (item_type == "floor") {
-            data = await fetchClient({
-                method: "DELETE",
-                url: `/floors/all`,
-                body: { floor_names: item_names },
-                data_return: true,
-            });
-        } else {
-            data = await fetchClient({
-                method: "DELETE",
-                url: `/tables/detail`,
-                body: { table_names: item_names },
-                data_return: true,
-            });
-        }
+        try {
 
-        setResInfo(data)
-        setChecker((current_value) => !current_value);
-        setIsModalDeleteOpen(false);
+
+            let item_names = values.item_name;
+            let item_type = values.item_type;
+            var data: any;
+            if (item_type == "floor") {
+                data = await fetchClient({
+                    method: "DELETE",
+                    url: `/floors/all`,
+                    body: { floor_names: item_names },
+                    data_return: true,
+                });
+            } else {
+                data = await fetchClient({
+                    method: "DELETE",
+                    url: `/tables/detail`,
+                    body: { table_names: item_names },
+                    data_return: true,
+                });
+            }
+
+            setResInfo(data)
+            setChecker((current_value) => !current_value);
+            setIsModalDeleteOpen(false);
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     const showModalDetete = () => {
@@ -281,38 +332,43 @@ function Home() {
     };
 
     const handleCreateReservation = async (values: any) => {
-        const start_time: any = values.start_time.format("HH:mm");
-        const end_time: any = values.end_time.format("HH:mm");
+        try {
+            const start_time: any = values.start_time.format("HH:mm");
+            const end_time: any = values.end_time.format("HH:mm");
 
-        if (start_time > end_time) {
-            setMessError("Start time must be less than end time");
-        } else {
-            const request_body: any = {
-                customerCount: values.quantity,
-                customerName: values.customer_name,
-                customerPhone: values.phone_number,
-                status: "Waiting",
-                dateTo: values.date_reserve.format("YYYY-MM-DD"),
-                timeTo: values.start_time.format("HH:mm"),
-                timeEnd: values.end_time.format("HH:mm"),
-                table_ids: values.table_reservation,
-                description: values.note,
-            };
-            const data = await fetchClient({
-                method: "POST",
-                url: `/reservations/detail`,
-                body: request_body,
-                data_return: true,
-            });
-
-            if (data.hasOwnProperty("message")) {
-                setMessError(data["message"]);
+            if (start_time > end_time) {
+                setMessError("Start time must be less than end time");
             } else {
-                setResInfo(data)
-                form_reservation_detail.resetFields()
-                setChecker((current_value) => !current_value);
-                setIsModalReservationOpen(false);
+                const request_body: any = {
+                    customerCount: values.quantity,
+                    customerName: values.customer_name,
+                    customerPhone: values.phone_number,
+                    status: "Waiting",
+                    dateTo: values.date_reserve.format("YYYY-MM-DD"),
+                    timeTo: values.start_time.format("HH:mm"),
+                    timeEnd: values.end_time.format("HH:mm"),
+                    table_ids: values.table_reservation,
+                    description: values.note,
+                };
+                const data = await fetchClient({
+                    method: "POST",
+                    url: `/reservations/detail`,
+                    body: request_body,
+                    data_return: true,
+                });
+
+                if (data.hasOwnProperty("message")) {
+                    setMessError(data["message"]);
+                } else {
+                    setResInfo(data)
+                    form_reservation_detail.resetFields()
+                    setChecker((current_value) => !current_value);
+                    setIsModalReservationOpen(false);
+                }
             }
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 
@@ -357,51 +413,61 @@ function Home() {
     };
 
     const handleReservationDetail = async (values: any) => {
-        const start_time: any = values.start_time.format("HH:mm");
-        const end_time: any = values.end_time.format("HH:mm");
+        try {
+            const start_time: any = values.start_time.format("HH:mm");
+            const end_time: any = values.end_time.format("HH:mm");
 
-        if (start_time > end_time) {
-            setMessError("Start time must be less than end time");
-        } else {
-            const request_body: any = {
-                res_id: values.res_id,
-                customerCount: values.quantity,
-                customerName: values.customer_name,
-                customerPhone: values.phone_number,
-                status: values.status,
-                dateTo: values.date_reserve.format("YYYY-MM-DD"),
-                timeTo: values.start_time.format("HH:mm"),
-                timeEnd: values.end_time.format("HH:mm"),
-                table_ids: values.table_reservation,
-                description: values.note,
-            };
-            const data = await fetchClient({
-                method: "PUT",
-                url: `/reservations/all`,
-                body: request_body,
-                data_return: true,
-            });
-
-            if (data.hasOwnProperty("message")) {
-                setMessError(data["message"]);
+            if (start_time > end_time) {
+                setMessError("Start time must be less than end time");
             } else {
-                setResInfo(resInfo)
-                setChecker((current_value) => !current_value);
-                setIsModalReservationDetailOpen(false);
+                const request_body: any = {
+                    res_id: values.res_id,
+                    customerCount: values.quantity,
+                    customerName: values.customer_name,
+                    customerPhone: values.phone_number,
+                    status: values.status,
+                    dateTo: values.date_reserve.format("YYYY-MM-DD"),
+                    timeTo: values.start_time.format("HH:mm"),
+                    timeEnd: values.end_time.format("HH:mm"),
+                    table_ids: values.table_reservation,
+                    description: values.note,
+                };
+                const data = await fetchClient({
+                    method: "PUT",
+                    url: `/reservations/all`,
+                    body: request_body,
+                    data_return: true,
+                });
+
+                if (data.hasOwnProperty("message")) {
+                    setMessError(data["message"]);
+                } else {
+                    setResInfo(data)
+                    setChecker((current_value) => !current_value);
+                    setIsModalReservationDetailOpen(false);
+                }
             }
+        }
+        catch (err) {
+            console.log(err)
         }
     };
 
     const handelDeleteReservation = async () => {
-        let res_id = form_reservation_detail.getFieldValue("res_id");
-        let data = await fetchClient({
-            method: "DELETE",
-            url: `/reservations/detail?id=${res_id}`,
-            data_return: true,
-        });
-        setResInfo(data)
-        setChecker((current_value) => !current_value);
-        setIsModalReservationDetailOpen(false);
+        try {
+            let res_id = form_reservation_detail.getFieldValue("res_id");
+            let data = await fetchClient({
+                method: "DELETE",
+                url: `/reservations/detail?id=${res_id}`,
+                data_return: true,
+            });
+            setResInfo(data)
+            setChecker((current_value) => !current_value);
+            setIsModalReservationDetailOpen(false);
+        }
+        catch (err) {
+            console.log(err)
+        }
     };
 
     type FieldType = {
@@ -426,9 +492,9 @@ function Home() {
         if (!socket) return;
         socket.on(
             "tableItem:finish:fromChef",
-            (tableId: string, name: string) => {
+            async (tableId: string, name: string) => {
                 message.info(`Finish ${name} for table ${tableId}`);
-                fetchNotification();
+                await fetchNotification();
             }
         );
         return () => {
@@ -437,10 +503,16 @@ function Home() {
     }, [socket]);
 
     useEffect(() => {
-        fetchAllData()
+        const fetchData = async () => {
+            await fetchAllData();
+            await fetchNotification();
+        };
+        fetchData();
     }, [])
 
+
     if (isLoading) return <Loading />;
+
     return (
         <>
             {resInfo ? (
@@ -476,7 +548,7 @@ function Home() {
                             }}
                         >
                             <Drawer
-                                title='Notification'
+                                title={t_reservation('notification')}
                                 placement='right'
                                 closable={false}
                                 onClose={onClose}
@@ -508,7 +580,7 @@ function Home() {
                         <div className='flex-1 pt-2 bg-white'>
                             <div>
                                 <h2 className='font-semibold text-lg text-center'>
-                                    Reservations
+                                    {t_reservation('reservations')}
                                 </h2>
                                 <div className=' w-4/5  m-auto px-3 mt-3'>
                                     <form
@@ -517,7 +589,7 @@ function Home() {
                                         <div className='flex mt-2 justify-between'>
                                             <div className='flex'>
                                                 <label className='pr-3 font-semibold text-sm'>
-                                                    From
+                                                {t_reservation('from')}
                                                 </label>
                                                 <input
                                                     type='date'
@@ -528,7 +600,7 @@ function Home() {
                                             </div>
                                             <div className='flex'>
                                                 <label className='pr-3 font-semibold text-sm'>
-                                                    To
+                                                {t_reservation('to')}
                                                 </label>
                                                 <input
                                                     type='date'
@@ -548,7 +620,18 @@ function Home() {
                                                             "#4A58EC",
                                                     }}
                                                 >
-                                                    Search
+                                                    {t_reservation('search')}
+                                                </button>
+                                                <button
+                                                    type="reset"
+                                                    className='p-1 px-1 text-sm rounded border-0 ml-2'
+                                                    style={{
+                                                        color: "white",
+                                                        backgroundColor:
+                                                            "#4A58EC",
+                                                    }}
+                                                >
+                                                    {t_reservation('reset')}
                                                 </button>
                                             </div>
                                             <div className='flex'>
@@ -559,14 +642,14 @@ function Home() {
                                                     defaultValue={""}
                                                 >
                                                     <option value={""} hidden>
-                                                        Table
+                                                    {t_reservation('table')}
                                                     </option>
                                                     {resInfo.tables.map(
                                                         (item: any) => (
                                                             <option
                                                                 value={item.id}
                                                             >
-                                                                Table{" "}
+                                                                {t_reservation('table')}{" "}
                                                                 {item.name}
                                                             </option>
                                                         )
@@ -587,7 +670,7 @@ function Home() {
                                     >
                                         <Modal
                                             destroyOnClose={true}
-                                            title='Reservation information detail'
+                                            title={t_reservation('reservation_information_detail')}
                                             open={isModalReservationDetail}
                                             onCancel={
                                                 handleCanceModalReservationDetail
@@ -611,7 +694,7 @@ function Home() {
                                                                 width: "48%",
                                                             }}
                                                         >
-                                                            <p>Customer name</p>
+                                                            <p>{t_reservation('customer_name')}</p>
                                                             <Form.Item<FieldType>
                                                                 name='customer_name'
                                                                 rules={[
@@ -631,7 +714,7 @@ function Home() {
                                                                 width: "48%",
                                                             }}
                                                         >
-                                                            <p>Phone number</p>
+                                                            <p>{t_reservation('phone')}</p>
                                                             <Form.Item<FieldType>
                                                                 name='phone_number'
                                                                 rules={[
@@ -649,7 +732,7 @@ function Home() {
                                                     </div>
                                                     <div className='flex justify-between'>
                                                         <div>
-                                                            <p>Date</p>
+                                                            <p>{t_reservation('date')}</p>
                                                             <Form.Item
                                                                 name='date_reserve'
                                                                 rules={[
@@ -669,7 +752,7 @@ function Home() {
                                                             </Form.Item>
                                                         </div>
                                                         <div>
-                                                            <p>Start time</p>
+                                                            <p>{t_reservation('start_time')}</p>
                                                             <Form.Item
                                                                 name='start_time'
                                                                 rules={[
@@ -689,7 +772,7 @@ function Home() {
                                                             </Form.Item>
                                                         </div>
                                                         <div>
-                                                            <p>End time</p>
+                                                            <p>{t_reservation('end_time')}</p>
                                                             <Form.Item
                                                                 name='end_time'
                                                                 rules={[
@@ -715,7 +798,7 @@ function Home() {
                                                                 width: "48%",
                                                             }}
                                                         >
-                                                            <p>Quantity</p>
+                                                            <p>{t_reservation('quantity')}</p>
                                                             <Form.Item
                                                                 name='quantity'
                                                                 rules={[
@@ -741,7 +824,7 @@ function Home() {
                                                                 width: "48%",
                                                             }}
                                                         >
-                                                            <p>Status</p>
+                                                            <p>{t_general('status')}</p>
                                                             <Form.Item
                                                                 name='status'
                                                                 rules={[
@@ -770,7 +853,7 @@ function Home() {
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <p>Table</p>
+                                                        <p>{t_reservation('table')}</p>
                                                         <Form.Item
                                                             name='table_reservation'
                                                             rules={[
@@ -805,7 +888,7 @@ function Home() {
                                                         </Form.Item>
                                                     </div>
                                                     <div>
-                                                        <p>Note</p>
+                                                        <p>{t_reservation('note')}</p>
                                                         <Form.Item<FieldType> name='note'>
                                                             <Input />
                                                         </Form.Item>
@@ -849,7 +932,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='submit'
                                                                 >
-                                                                    CHANGE
+                                                                    {t_reservation('change').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                             <div>
@@ -864,7 +947,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='button'
                                                                 >
-                                                                    DELETE
+                                                                    {t_reservation('delete').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -1006,7 +1089,7 @@ function Home() {
                                                                                                     </div>
                                                                                                     <div>
                                                                                                         <p>
-                                                                                                            Customer:{" "}
+                                                                                                            {t_reservation('customer')}:{" "}
                                                                                                             {
                                                                                                                 item.customerName
                                                                                                             }
@@ -1107,11 +1190,11 @@ function Home() {
                                         }}
                                         onClick={showModalReservation}
                                     >
-                                        Reserve
+                                        {t_reservation('reserve')}
                                     </button>
                                     <Modal
                                         destroyOnClose={true}
-                                        title='Reservation information form'
+                                        title={t_reservation('reservation_information_form')}
                                         open={isModalReservation}
                                         onCancel={handleCanceModalReservation}
                                         footer={(_, { OkBtn, CancelBtn }) => (
@@ -1128,7 +1211,7 @@ function Home() {
                                                     <div
                                                         style={{ width: "48%" }}
                                                     >
-                                                        <p>Customer name</p>
+                                                        <p>{t_reservation('customer_name')}</p>
                                                         <Form.Item<FieldType>
                                                             name='customer_name'
                                                             rules={[
@@ -1146,7 +1229,7 @@ function Home() {
                                                     <div
                                                         style={{ width: "48%" }}
                                                     >
-                                                        <p>Phone number</p>
+                                                        <p>{t_reservation('phone')}</p>
                                                         <Form.Item<FieldType>
                                                             name='phone_number'
                                                             rules={[
@@ -1164,7 +1247,7 @@ function Home() {
                                                 </div>
                                                 <div className='flex justify-between'>
                                                     <div>
-                                                        <p>Date</p>
+                                                        <p>{t_reservation('date')}</p>
                                                         <Form.Item
                                                             name='date_reserve'
                                                             rules={[
@@ -1184,7 +1267,7 @@ function Home() {
                                                         </Form.Item>
                                                     </div>
                                                     <div>
-                                                        <p>Start time</p>
+                                                        <p>{t_reservation('start_time')}</p>
                                                         <Form.Item
                                                             name='start_time'
                                                             rules={[
@@ -1204,7 +1287,7 @@ function Home() {
                                                         </Form.Item>
                                                     </div>
                                                     <div>
-                                                        <p>End time</p>
+                                                        <p>{t_reservation('end_time')}</p>
                                                         <Form.Item
                                                             name='end_time'
                                                             rules={[
@@ -1228,7 +1311,7 @@ function Home() {
                                                     <div
                                                         style={{ width: "48%" }}
                                                     >
-                                                        <p>Quantity</p>
+                                                        <p>{t_reservation('quantity')}</p>
                                                         <Form.Item
                                                             name='quantity'
                                                             rules={[
@@ -1251,7 +1334,7 @@ function Home() {
                                                     <div
                                                         style={{ width: "48%" }}
                                                     >
-                                                        <p>Table</p>
+                                                        <p>{t_reservation('table')}</p>
                                                         <Form.Item
                                                             name='table_reservation'
                                                             rules={[
@@ -1287,7 +1370,7 @@ function Home() {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <p>Note</p>
+                                                    <p>{t_reservation('note')}</p>
                                                     <Form.Item<FieldType> name='note'>
                                                         <Input />
                                                     </Form.Item>
@@ -1324,7 +1407,7 @@ function Home() {
                                                                     handleCanceModalReservation
                                                                 }
                                                             >
-                                                                CANCEL
+                                                                {t_general('cancel').toUpperCase()}
                                                             </Button>
                                                         </div>
                                                         <div>
@@ -1336,7 +1419,7 @@ function Home() {
                                                                 }}
                                                                 htmlType='submit'
                                                             >
-                                                                CONFIRM
+                                                                 {t_general('confirm').toUpperCase()}
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -1355,12 +1438,12 @@ function Home() {
                                             backgroundColor: "#4A58EC",
                                         }}
                                     >
-                                        Create floor
+                                        {t_reservation('create_floor')}
                                     </button>
 
                                     <Modal
                                         destroyOnClose={true}
-                                        title='Floor'
+                                        title={t_reservation('floor')}
                                         open={isModalFloorOpen}
                                         onCancel={handleCanceModalFloor}
                                         footer={(_, { OkBtn, CancelBtn }) => (
@@ -1386,7 +1469,7 @@ function Home() {
                                                                 top: "5%",
                                                             }}
                                                         >
-                                                            Floor name:
+                                                            {t_reservation('floor_name')}:
                                                         </p>
                                                     </div>
                                                     <div
@@ -1446,7 +1529,7 @@ function Home() {
                                                                         handleCanceModalFloor
                                                                     }
                                                                 >
-                                                                    CANCEL
+                                                                   {t_general('cancel').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                             <div>
@@ -1458,7 +1541,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='submit'
                                                                 >
-                                                                    CONFIRM
+                                                                    {t_general('confirm').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -1478,11 +1561,11 @@ function Home() {
                                             backgroundColor: "#DB3A34",
                                         }}
                                     >
-                                        Delete
+                                        {t_reservation('delete')}
                                     </button>
                                     <Modal
                                         destroyOnClose={true}
-                                        title='Item option'
+                                        title={t_reservation('item_option')}
                                         open={isModalDeleteOpen}
                                         onCancel={handleCanceModalDelete}
                                         footer={(_, { OkBtn, CancelBtn }) => (
@@ -1508,7 +1591,7 @@ function Home() {
                                                                 top: "5%",
                                                             }}
                                                         >
-                                                            Item type:
+                                                            {t_reservation('item_type')}:
                                                         </p>
                                                     </div>
                                                     <div
@@ -1535,10 +1618,10 @@ function Home() {
                                                                 }
                                                             >
                                                                 <Select.Option value='floor'>
-                                                                    Floor
+                                                                {t_reservation('floor')}
                                                                 </Select.Option>
                                                                 <Select.Option value='table'>
-                                                                    Table
+                                                                {t_reservation('table')}
                                                                 </Select.Option>
                                                             </Select>
                                                         </Form.Item>
@@ -1560,7 +1643,7 @@ function Home() {
                                                                 top: "5%",
                                                             }}
                                                         >
-                                                            Name:
+                                                            {t_reservation('name')}:
                                                         </p>
                                                     </div>
                                                     <div
@@ -1619,7 +1702,7 @@ function Home() {
                                                                         handleCanceModalDelete
                                                                     }
                                                                 >
-                                                                    CANCEL
+                                                                    {t_general('cancel').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                             <div>
@@ -1631,7 +1714,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='submit'
                                                                 >
-                                                                    CONFIRM
+                                                                    {t_general('confirm').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -1653,7 +1736,7 @@ function Home() {
                                 <>
                                     <Modal
                                         destroyOnClose={true}
-                                        title='Table'
+                                        title={t_reservation('table')}
                                         open={isModalTableOpen}
                                         onCancel={handleCanceModalTable}
                                         footer={(_, { OkBtn, CancelBtn }) => (
@@ -1681,7 +1764,7 @@ function Home() {
                                                                 top: "5%",
                                                             }}
                                                         >
-                                                            Table name:
+                                                            {t_reservation('table_name')}:
                                                         </p>
                                                     </div>
                                                     <div
@@ -1755,7 +1838,7 @@ function Home() {
                                                                         handleCanceModalTable
                                                                     }
                                                                 >
-                                                                    CANCEL
+                                                                    {t_general('cancel').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                             <div>
@@ -1767,7 +1850,7 @@ function Home() {
                                                                     }}
                                                                     htmlType='submit'
                                                                 >
-                                                                    CONFIRM
+                                                                    {t_general('confirm').toUpperCase()}
                                                                 </Button>
                                                             </div>
                                                         </div>

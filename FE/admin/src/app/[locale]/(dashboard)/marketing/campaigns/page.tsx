@@ -20,6 +20,9 @@ import type {
 import { SearchOutlined } from "@ant-design/icons";
 import fetchClient from "@/lib/fetch-client";
 import { CreateCampaignModal } from "@/components/Modals/CreateCampaignModal";
+import { useTranslations } from "next-intl";
+import TimeFormatter from "@/components/TimeFormatter";
+import LinkWithRef from "next-intl/link";
 
 type ColumnsType<T> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -60,6 +63,7 @@ const Campaign: React.FC = () => {
     const [data, setData] = useState<DataType[]>([]);
     const [loading, setLoading] = useState(false);
     const [selectedRows, setSelectedRows] = useState<DataType[]>([]);
+    const t: any = useTranslations("Marketing.Campaign")
     const [error, setError] = useState<ErrorType>({
         isError: false,
         message: "",
@@ -101,30 +105,35 @@ const Campaign: React.FC = () => {
             key: "id",
         },
         {
-            title: "Name",
+            title: t("name"),
             dataIndex: "name",
             key: "name",
-            render: (text, row) => <a style={{ color: "#4A58EC" }} href={`./campaigns/${row.id}`}>{text}</a>
+            render: (text, row) => <LinkWithRef style={{ color: "#4A58EC" }} href={`./campaigns/${row.id}`}>{text}</LinkWithRef>
         },
         {
-            title: "Type",
+            title: t('type'),
             dataIndex: "type",
             key: "type",
+            render: (text) => t(text)
         },
         {
-            title: "Status",
+            title: t("status"),
             dataIndex: "status",
             key: "status",
+            render: (text) => t(text)
+
         },
         {
-            title: "Sart date",
-            dataIndex: "start_date",
-            key: "start_date",
+            title: t("start-date"),
+            dataIndex: "startDate",
+            key: "startDte",
+            render: (text) =>  <TimeFormatter time={text}/>
         },
         {
-            title: "End date",
-            dataIndex: "end_date",
-            key: "end_date",
+            title: t("end-date"),
+            dataIndex: "endDate",
+            key: "endDate",
+            render: (text) =>  <TimeFormatter time={text}/>
         }
     ];
 
@@ -198,7 +207,6 @@ const Campaign: React.FC = () => {
                 },
             }));
         } else {
-            console.log("Sorter is not an array");
 
             setTableParams(prev => ({
                 pagination,
@@ -259,29 +267,25 @@ const Campaign: React.FC = () => {
         >
 
             <div className="w-full h-auto flex-col gap-3">
-                <div className="bg-white w-full py-2 px-3 rounded-md border">
-                    <Flex>
+                <div className="bg-white w-full py-2 px-3 rounded-md border flex justify-between">
+                    <Space>
                         {
-                            <Space>
-                                <Input
-                                    placeholder="Enter keywork to search...."
-                                    prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
-                                    className="flex items-center"
-                                />
-                            </Space>
+                            <Input
+                                placeholder={`${t("search-placeholder")}`}
+                                prefix={<SearchOutlined className="site-form-item-icon px-2 text-gray-500" />}
+                                className="flex items-center"
+                            />
                         }
 
                         {selectedRows.length > 0 &&
-                            <Popconfirm title='Are you sure' onConfirm={handleDeleteCampaign}>
+                            <Popconfirm title={t('are-you-sure')} onConfirm={handleDeleteCampaign}>
                                 <Button danger>
-                                    Delete {selectedRows.length} campaigns
+                                    {`${t("delete-n-campaigns", { n: selectedRows.length })}`}
                                 </Button>
                             </Popconfirm>
                         }
-                        <CreateCampaignModal afterCreated={() => fetchData()}/>
-                    </Flex>
-
-
+                    </Space>
+                    <CreateCampaignModal afterCreated={() => fetchData()} />
                 </div>
 
                 <div className="mt-2">
@@ -289,7 +293,7 @@ const Campaign: React.FC = () => {
                         rowSelection={{
                             ...rowSelection,
                         }}
-                        columns={columns}   
+                        columns={columns}
                         pagination={{
                             className: "bg-white rounded px-4 py-2",
                             showTotal: (total: number) => `Total ${total} items`,

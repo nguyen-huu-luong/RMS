@@ -2,6 +2,8 @@
 import axios from 'axios';
 import { useState } from 'react';
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 export const uploadImage = async (image: any) => {
     try {
         const upload_api = "https://api.cloudinary.com/v1_1/djdpobmlv/image/upload"
@@ -23,7 +25,7 @@ export const uploadImage = async (image: any) => {
 export const editProfile = async (token: any, requestBody: object) => {
     try {
         const response = await axios.put(
-            `${process.env.BASE_URL}/customers`,
+            `${backend_api}/customers`,
             requestBody,
             {
                 headers: {
@@ -42,7 +44,7 @@ export const editProfile = async (token: any, requestBody: object) => {
 export const getProfile = async (token: any) => {
     try {
         const response = await axios.get(
-            `${process.env.BASE_URL}/customers`,
+            `${backend_api}/customers`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

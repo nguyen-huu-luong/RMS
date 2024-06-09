@@ -2,6 +2,8 @@ import { CopyFilled, CopyOutlined } from "@ant-design/icons";
 import { Button, Table, TableProps } from "antd";
 import Link from "next/link";
 import { CreateTrackUrlModal } from "../Modals/CreateTrackurlModal";
+import { useTranslations } from "next-intl";
+import { BsTrash } from "react-icons/bs";
 
 interface DataType {
     key: number;
@@ -20,6 +22,7 @@ export interface ICampaignTrackUrlProps {
 }
 
 export const CampaignTrackUrl: React.FC<ICampaignTrackUrlProps> = ({ trackUrls, isEditmode, ...props }) => {
+    const t: any = useTranslations("Marketing.Campaign")
 
     const dataSource = trackUrls.map((item: any, index: number) => ({
         key: index,
@@ -34,26 +37,20 @@ export const CampaignTrackUrl: React.FC<ICampaignTrackUrlProps> = ({ trackUrls, 
     }
     const columns: TableProps<DataType>['columns'] = [
         {
-            title: 'Id',
-            dataIndex: 'id',
-            key: 'id',
-            align: "center"
-        },
-        {
-            title: 'Name',
+            title: t('name'),
             dataIndex: 'name',
             key: 'name',
             align: "center"
         },
         {
-            title: "Redirect Url",
+            title: t("campaignDetail.redirect-url"), 
             dataIndex: "redirectUrl",
             key: "redirectUrl",
             render: (text) => <Link className="link text-primary" href={text}>{text}</Link>,
             align: "center"
         },
         {
-            title: "Code to inserted instead of link",
+            title: t("campaignDetail.code-to-insert"),
             dataIndex: "codeToInsert",
             key: "redirectUrl",
             render: (text) => (
@@ -64,15 +61,17 @@ export const CampaignTrackUrl: React.FC<ICampaignTrackUrlProps> = ({ trackUrls, 
             align: "center"
         },
         {
-            title: "Actions",
-            dataIndex: "actions",
+            title: t("campaignDetail.actions"),
+            dataIndex: "",
             key: "actions",
             align: "center",
-            render: (text, row) => (<p 
+            render: (text, row) => (<Button
                 className="text-primary decoration cursor-pointer"
-                onClick={() => handleDeleteTrackUrl(row.id)}>Remove
-            </p>
-            )
+                onClick={() => handleDeleteTrackUrl(row.id)}
+                    icon={<BsTrash />}
+             />
+            ),
+            
         }
     ];
 
@@ -87,6 +86,6 @@ export const CampaignTrackUrl: React.FC<ICampaignTrackUrlProps> = ({ trackUrls, 
                 />
 
             </div>
-            <Table dataSource={dataSource} columns={columns} size="small" pagination={false} />
+            {dataSource.length > 0 && <Table dataSource={dataSource} columns={columns} size="small" pagination={false} />}
         </div>)
 }

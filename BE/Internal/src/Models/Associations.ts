@@ -50,11 +50,6 @@ class Association {
 			ClickEvent.associate();
 			Notification.associate();
 
-			EmailCampaign.create({
-				name: "stewkrfawk",
-				campaignId: 1
-			})
-
 		} catch (err) {
 			console.log("Initialize association failed!");
 			console.log(`Err: ${err}`);

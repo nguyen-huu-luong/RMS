@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
 module.exports = {
 	up: async (queryInterface, Sequelize) => {
-		await queryInterface.addColumn("Vouchers", "categoryId", {
+		await queryInterface.addColumn("Subscribers", "clientId", {
 			type: Sequelize.INTEGER,
 			references: {
-				model: "Categories",
+				model: "Clients",
 				key: "id",
 			},
 			onUpdate: "CASCADE",
@@ -14,6 +14,6 @@ module.exports = {
 	},
 
 	down: async (queryInterface, Sequelize) => {
-		await queryInterface.removeColumn("Vouchers", "categoryId");
+		await queryInterface.removeColumn("Subscribers", "clientId");
 	},
 };

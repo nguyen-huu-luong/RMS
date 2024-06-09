@@ -43,8 +43,8 @@ export default function LocaleSwitcher() {
 	return (
 		<div>
 			<Dropdown menu={menuProps}>
-				<Button className="border-white items-center flex hover:border">
-					<GlobalOutlined />
+					
+				<Button className="border-white items-center flex hover:border" icon={<GlobalOutlined />}>
 					<span>{localeNames[locale as Locale]}</span>
 				</Button>
 			</Dropdown>

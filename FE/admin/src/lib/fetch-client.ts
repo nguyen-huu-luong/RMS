@@ -1,21 +1,31 @@
-import axios from "axios";
+import axios, { Axios, AxiosError } from "axios";
 import { getSession, signOut } from "next-auth/react";
+import { redirect } from "next/navigation";
+import getConfig from 'next/config';
 
 interface fetchClientProps {
   method?: string;
   url: string;
   body?: any;
   token?: string;
-  data_return?: boolean
+  data_return?: boolean,
+  auth?: boolean
 }
 
-async function fetchClient({ method = "GET", url, body = "", token, data_return = false }: fetchClientProps) {
+
+async function fetchClient({ method = "GET", url, body = "", token, data_return = false, auth = false }: fetchClientProps) {
   try {
+    let backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+    console.log(backend_api)
     const session = await getSession();
     const accessToken = token || session?.accessToken;
 
+    if (!accessToken) {
+
+    }
+
     // console.log("Fetch client" , url, session, accessToken, process.env.NEXT_BACKEND_API_URL )
-    const response = await axios(process.env.NEXT_PUBLIC_BACKEND_URL + url, {
+    const response = await axios(backend_api + url, {
       method: method,
       headers: {
         Accept: "application/json",
@@ -35,9 +45,11 @@ async function fetchClient({ method = "GET", url, body = "", token, data_return 
     if (error instanceof Response) {
       if (error.status === 401) {
         signOut();
+        redirect("/signin")
       }
-
-      throw error;
+      // throw error;
+    } else if (error instanceof AxiosError) {
+      throw error
     }
 
     throw new Error("Failed to fetch data", { cause: error });

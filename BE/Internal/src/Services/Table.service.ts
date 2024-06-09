@@ -281,7 +281,7 @@ export class TableService {
             const table_id = Number(req.params.id);
             const cart = await this.cartRepository.getCartTable(table_id)
             let amount_items: number = cart.amount
-
+            let total_items: number = cart.total
             await Promise.all(
                 cart_items.map(async (item: any) => {
                     let same_items = await this.cartItemRepository.findByCond({ productId: item.id, cartId: cart.id, status: "Preparing" })
@@ -304,7 +304,7 @@ export class TableService {
                 })
             )
 
-            await this.cartRepository.update(Number(cart.id), { amount: amount_items * 1.0, total: amount_items * 1.0 })
+            await this.cartRepository.update(Number(cart.id), { amount: amount_items * 1.0, total: total_items + cart_items.length })
             const cart_new = await this.cartRepository.getCartTable(table_id)
             this.getCartItemInternal(req, res, next, cart.id)
         }
@@ -319,13 +319,13 @@ export class TableService {
             if (req.action = "create:any") {
                 const data = req.body
                 const table_id = Number(req.params.id);
-                const client = await this.clientRepository.checkExist(data.phone, data.email)
+                const client = await this.clientRepository.checkExist(data.email)
                 var table_cart = await this.cartRepository.getCartTable(Number(table_id))
                 var new_client: any
                 const { pay_method, ...client_data } = data
                 var cart: any;
                 if (client.length == 0) {
-                    new_client = await this.clientRepository.create({ ...client_data, createAt: new Date(), updateAt: new Date() })
+                    new_client = await this.clientRepository.create({ ...client_data, gender: true, source: "At Restaurant", createAt: new Date(), updateAt: new Date(), convertDate: new Date(), lastPurchase: new Date() })
                     await this.cartRepository.update(table_cart.id, { clientId: new_client.id, tableId: null })
                     await this.cartRepository.create({
                         tableId: table_id,
@@ -336,9 +336,14 @@ export class TableService {
                 }
                 else {
                     new_client = client[0]
+                    if (new_client.type == "lead") {
+                        await this.clientRepository.update(new_client.id, {...client_data, convertDate: new Date(), lastPurchase: new Date()})
+                    }
+                    else{
+                        await this.clientRepository.update(new_client.id, {...client_data})
+                    }
                     cart = table_cart
                 }
-
 
                 const order = await this.orderRepository.create({
                     status: "Done",
@@ -372,6 +377,12 @@ export class TableService {
                         });
                     })
                 );
+                
+                await this.clientRepository.update(new_client.id, {
+                    profit: new_client.profit +  parseInt(cart?.getDataValue("amount")) + parseInt(order.getDataValue("shippingCost")),
+                    total_items: new_client.total_items + parseInt(cart?.getDataValue("total"))
+                    // ,lastPurchase: new Date()
+                })
 
                 await cart.setProducts([]);
                 await this.cartRepository.update(cart?.getDataValue("id"), {
@@ -381,6 +392,7 @@ export class TableService {
 
                 res.send({ status: "Success" })
                 Message.logMessage(req, HttpStatusCode.Success);
+                return new_client.id
             }
             else {
                 throw new UnauthorizedError()
@@ -393,7 +405,7 @@ export class TableService {
     }
 
     public async makePaymentMoMO(req: Request, res: Response, next: NextFunction) {
-        await this.makePayment(req, res, next)
+        return await this.makePayment(req, res, next)
     }
 
 }

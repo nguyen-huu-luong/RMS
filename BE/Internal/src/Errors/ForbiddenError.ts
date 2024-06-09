@@ -6,6 +6,6 @@ export class ForbiddenError extends BaseError {
 		public message = "Can not access this API",
 		public stackTrace?: string
 	) {
-		super(HttpStatusCode.Forbidden, ErrorName.FORBIDDEN, message, stackTrace);
+		super(HttpStatusCode.Forbidden, ErrorName.FORBIDDEN, message,"", stackTrace);
 	}
 }

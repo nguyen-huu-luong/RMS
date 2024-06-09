@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import { Channel, Client, Message } from "../Models";
+import { Cart, Channel, Client, Message, Table } from "../Models";
 import { TokenUtil } from "../Utils";
 import type { Socket } from "socket.io";
 class SocketConnection {
@@ -19,11 +19,15 @@ class SocketConnection {
                         },
                     });
                     if (existClient && customId) {
-                        socket.join("Channel_" + existClient?.dataValues.id);
+                        const channel = await Channel.findOne({
+                            where: { clientId: existClient?.dataValues.id },
+                        });
+                        await socket.join("Channel_" + channel?.dataValues.id);
                     } else {
                         const client = {
                             firstname: socket.id,
                             lastname: "User",
+                            email: `${socket.id}@gmail.com`,
                             isRegistered: true,
                             isActive: true,
                             language: "vi",
@@ -35,15 +39,21 @@ class SocketConnection {
                         const anonymousChannel = await Channel.create({
                             clientId: anonymousClient.getDataValue("id"),
                         });
-                        socket.join(
+                        await Message.create({
+                            channelId: anonymousChannel.getDataValue("id"),
+                            clientId: anonymousClient.getDataValue("id"),
+                            content: "New user want to chat!",
+                            status: "Not seen",
+                        });
+                        await socket.join(
                             "Channel_" + anonymousChannel?.dataValues.id
                         );
-                        this.employee.map((item: Socket) => {
-                            item.join(
+                        this.employee.map(async (item: Socket) => {
+                            await item.join(
                                 "Channel_" + anonymousChannel?.dataValues.id
                             );
                         });
-                        socket
+                        await socket
                             .to("Channel_" + anonymousChannel?.dataValues.id)
                             .emit(
                                 "anonymous:channel:create",
@@ -60,8 +70,8 @@ class SocketConnection {
                             where: { clientId: id },
                         });
                         this.client.push(channel?.dataValues.id);
-                        socket.join("Channel_" + channel?.dataValues.id);
-                        socket.join("PrivateChannel_" + id);
+                        await socket.join("Channel_" + channel?.dataValues.id);
+                        await socket.join("PrivateChannel_" + id);
                         this.employee.map((item: Socket) => {
                             let channelId = "Channel_" + channel?.dataValues.id;
                             if (!(channelId in item.rooms)) {
@@ -77,8 +87,9 @@ class SocketConnection {
                         channels.forEach((channel: any) => {
                             socket.join("Channel_" + channel.dataValues.id);
                         });
-                        socket.join("Kitchen");
-                        socket.join("Employee");
+                        await socket.join("Kitchen");
+                        await socket.join("Employee");
+                        await socket.join("Order");
                         this.employee.push(socket);
                     }
                 }
@@ -89,46 +100,116 @@ class SocketConnection {
             }
         });
         io.on("connection", (socket: any) => {
-            socket.to("Employee").emit("initial:channels", this.channels);
+            io.to("Employee").emit("initial:channels", this.channels);
 
             // Chat service
             socket.on(
                 "client:message:send",
-                (channelId: string, message: string, clientId: string) => {
-                    io.to("Channel_" + channelId).emit(
-                        "message:send:fromClient",
-                        channelId,
-                        message,
-                        clientId
-                    );
+                async (
+                    channelId: string,
+                    message: string,
+                    clientId: string,
+                    callback: any
+                ) => {
+                    try {
+                        await Message.create({
+                            channelId: channelId,
+                            clientId: clientId,
+                            content: message,
+                            status: "Not seen",
+                        });
+                        await io
+                            .to("Channel_" + channelId)
+                            .emit(
+                                "message:send:fromClient",
+                                channelId,
+                                message,
+                                clientId
+                            );
+                        callback({
+                            status: true,
+                        });
+                    } catch (error: any) {
+                        callback({
+                            status: false,
+                            error: error.message,
+                        });
+                    }
                 }
             );
+
             socket.on(
                 "staff:message:send",
-                (channelId: string, message: string, employeeId: string) => {
-                    io.to("Channel_" + channelId).emit(
-                        "message:send:fromStaff",
-                        channelId,
-                        message,
-                        employeeId
-                    );
+                async (
+                    channelId: string,
+                    message: string,
+                    employeeId: string,
+                    callback: any
+                ) => {
+                    try {
+                        await Message.create({
+                            channelId: channelId,
+                            employeeId: employeeId,
+                            content: message,
+                            status: "Not seen",
+                        });
+                        await io
+                            .to("Channel_" + channelId)
+                            .emit(
+                                "message:send:fromStaff",
+                                channelId,
+                                message,
+                                employeeId
+                            );
+                        callback({
+                            status: true,
+                        });
+                    } catch (error: any) {
+                        callback({
+                            status: true,
+                            error: error.message,
+                        });
+                    }
                 }
             );
-            socket.on("client:message:read", (channelId: string) => {
-                io.to("Channel_" + channelId).emit(
-                    "message:read:fromClient",
-                    channelId
-                );
+
+            socket.on(
+                "newClient:message:info",
+                async (clientId: string, callback: any) => {
+                    try {
+                        const user = await Client.findByPk(clientId);
+                        callback({
+                            status: true,
+                            client: {
+                                userAvatar: user?.getDataValue("avatar"),
+                                userName:
+                                    user?.getDataValue("lastname") +
+                                    " " +
+                                    user?.getDataValue("firstname"),
+                            },
+                        });
+                    } catch (error: any) {
+                        callback({
+                            status: true,
+                            error: error.message,
+                        });
+                    }
+                }
+            );
+
+            socket.on("client:message:read", async (channelId: string) => {
+                await io
+                    .to("Channel_" + channelId)
+                    .emit("message:read:fromClient", channelId);
             });
-            socket.on("staff:message:read", (channelId: string) => {
-                io.to("Channel_" + channelId).emit(
-                    "message:read:fromStaff",
-                    channelId
-                );
+            socket.on("staff:message:read", async (channelId: string) => {
+                await io
+                    .to("Channel_" + channelId)
+                    .emit("message:read:fromStaff", channelId);
             });
             socket.on(
                 "staff:channel:join",
-                (channelId: string, staffId: string, callback: any) => {
+                async (channelId: string, staffId: string, callback: any) => {
                     if (
                         this.channels[channelId] &&
                         this.channels[channelId] != socket.id
@@ -145,7 +226,7 @@ class SocketConnection {
                             delete this.channels[previousChannelId];
                         }
                         this.channels[channelId] = socket.id;
-                        io.emit("channel:status:update", this.channels);
+                        await io.emit("channel:status:update", this.channels);
                         callback({
                             status: "1",
                         });
@@ -154,7 +235,7 @@ class SocketConnection {
             );
             socket.on(
                 "staff:channel:leave",
-                (channelId: string, staffId: string, callback: any) => {
+                async (channelId: string, staffId: string, callback: any) => {
                     if (this.channels[channelId] === socket.id) {
                         delete this.channels[channelId];
                         if (callback) {
@@ -173,90 +254,122 @@ class SocketConnection {
             // Chat service - anonymous client
             socket.on(
                 "anonymousclient:message:send",
-                async (message: string) => {
-                    const id = socket.handshake.query.customId
-                        ? socket.handshake.query.customId
-                        : socket.id;
-                    const client = await Client.findOne({
-                        where: {
-                            firstname: id,
-                        },
-                    });
-                    const channel = await Channel.findOne({
-                        where: {
+                async (message: string, socketId: string, callback: any) => {
+                    try {
+                        const id = socketId;
+                        const client = await Client.findOne({
+                            where: {
+                                firstname: id,
+                            },
+                        });
+                        if (!client) {
+                        }
+                        const channel = await Channel.findOne({
+                            where: {
+                                clientId: client?.dataValues.id,
+                            },
+                        });
+                        await Message.create({
+                            channelId: channel?.dataValues.id,
                             clientId: client?.dataValues.id,
-                        },
-                    });
-                    await Message.create({
-                        channelId: channel?.dataValues.id,
-                        clientId: client?.dataValues.id,
-                        content: message,
-                        status: "Not seen",
-                    });
-                    console.log(message, channel?.dataValues.id);
-                    io.to("Channel_" + channel?.dataValues.id).emit(
-                        "message:send:fromClient",
-                        channel?.dataValues.id,
-                        message,
-                        client?.dataValues.id
-                    );
+                            content: message,
+                            status: "Not seen",
+                        });
+                        await io
+                            .to("Channel_" + channel?.dataValues.id)
+                            .emit(
+                                "message:send:fromClient",
+                                channel?.dataValues.id,
+                                message,
+                                client?.dataValues.id
+                            );
+                        callback({
+                            status: true,
+                        });
+                    } catch (error: any) {
+                        console.log(error);
+                        callback({
+                            status: false,
+                            error: error.message,
+                        });
+                    }
                 }
             );
 
             // Kitchen display service
-            socket.on("chef:order:finish", (orderId: string) => {
-                io.to("Kitchen").emit("order:finish:fromChef", orderId);
+            socket.on("chef:order:finish", async (orderId: string) => {
+                await io.to("Kitchen").emit("order:finish:fromChef", orderId);
             });
-            socket.on("staff:order:prepare", (orderId: string) => {
-                io.to("Kitchen").emit("order:prepare:fromStaff", orderId);
+            socket.on("staff:order:prepare", async (orderId: string) => {
+                await io.to("Kitchen").emit("order:prepare:fromStaff", orderId);
             });
 
             // Table service
-            socket.on("staff:table:prepare", (tableId: string) => {
-                io.to("Kitchen").emit("table:prepare:fromStaff", tableId);
+            socket.on("staff:table:prepare", async (tableId: string) => {
+                const table = await Table.findByPk(tableId);
+                io.to("Kitchen").emit(
+                    "table:prepare:fromStaff",
+                    table?.getDataValue("name")
+                );
             });
-            socket.on("chef:tableItem:finish", (tableId: string, name: string) => {
-                io.to("Kitchen").emit("tableItem:finish:fromChef", tableId, name);
-            });
+            socket.on(
+                "chef:tableItem:finish",
+                async (tableId: string, name: string) => {
+                    const cart = await Cart.findByPk(tableId);
+                    const table = await Table.findByPk(
+                        cart?.getDataValue("tableId")
+                    );
+                    io.to("Kitchen").emit(
+                        "tableItem:finish:fromChef",
+                        table?.getDataValue("name"),
+                        name
+                    );
+                }
+            );
 
             //Notification service
             socket.on(
                 "staff:notifications:prepare",
-                (clientId: string, orderId: string) => {
-                    console.log("Channel_" + clientId);
-                    io.to("PrivateChannel_" + clientId).emit(
-                        "notification:prepare:fromStaff",
-                        orderId
-                    );
+                async (clientId: string, orderId: string) => {
+                    await io
+                        .to("PrivateChannel_" + clientId)
+                        .emit("notification:prepare:fromStaff", orderId);
                 }
             );
+
             socket.on(
                 "staff:notifications:deliver",
-                (clientId: string, orderId: string) => {
-                    io.to("PrivateChannel_" + clientId).emit(
-                        "notification:deliver:fromStaff",
-                        orderId
-                    );
+                async (clientId: string, orderId: string) => {
+                    await io
+                        .to("PrivateChannel_" + clientId)
+                        .emit("notification:deliver:fromStaff", orderId);
                 }
             );
+
             socket.on(
                 "staff:notifications:done",
-                (clientId: string, orderId: string) => {
-                    io.to("PrivateChannel_" + clientId).emit(
-                        "notification:done:fromStaff",
-                        orderId
-                    );
+                async (clientId: string, orderId: string) => {
+                    await io
+                        .to("PrivateChannel_" + clientId)
+                        .emit("notification:done:fromStaff", orderId);
                 }
             );
             socket.on(
                 "staff:notifications:reject",
-                (clientId: string, orderId: string) => {
-                    io.to("PrivateChannel_" + clientId).emit(
-                        "notification:reject:fromStaff",
-                        orderId
-                    );
+                async (clientId: string, orderId: string) => {
+                    await io
+                        .to("PrivateChannel_" + clientId)
+                        .emit("notification:reject:fromStaff", orderId);
                 }
             );
+
+            // New order from clients or cancel orders from clients
+            socket.on("client:newOrder", async (name: any) => {
+                await io.to("Order").emit("newOrder:fromClient", name);
+            });
+            socket.on("client:cancelOrder", async (orderId: any) => {
+                await io.to("Order").emit("cancelOrder:fromClient", orderId);
+            });
 
             // Disconnect
             socket.on("disconnect", () => {

@@ -4,7 +4,7 @@ import { CSSProperties } from 'styled-components';
 
 
 interface ITimeFormatter {
-    time: string,
+    time?: string,
     className?: string,
     style?: CSSProperties,
     icon?: boolean
@@ -12,9 +12,10 @@ interface ITimeFormatter {
 
 export const TimeFormatter: React.FC<ITimeFormatter> = ({ time, className, style, icon }) => {
     const format = useFormatter();
-    const dateTime = new Date(time);
-
+    
     // Renders "Nov 20, 2020"
+    if (!time) return "Unknown"
+    const dateTime = new Date(time);
     return <>
         <span className={`me-2 ${className}`} style={{...style}}> 
             {format.dateTime(dateTime, {

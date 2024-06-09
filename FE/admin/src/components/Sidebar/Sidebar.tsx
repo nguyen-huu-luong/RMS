@@ -1,12 +1,16 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Navigation from "./Navigation";
 import {
 	UserAddOutlined,
 	AccountBookOutlined,
 	LeftOutlined,
-	SnippetsOutlined
-	
+	SnippetsOutlined,
+	LineChartOutlined,
+	PicRightOutlined,
+	DeliveredProcedureOutlined,
+	HomeOutlined, 
+	FireOutlined
 } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { Button } from "antd";
@@ -14,29 +18,19 @@ import { getSession, useSession } from "next-auth/react";
 import { INavItemProps } from "./NavItem";
 
 
-
-export default function Sidebar() {
-	const [role, setRole] = useState("")
+interface ISideBarProps {
+	role: string
+}
+export const SidebarContainer: React.FC<ISideBarProps>  = ({role}) => {
 	const t = useTranslations("Sidebar");
-	
-	useEffect(() => {
-		const setSessionRole = async () => {
-			const session = await getSession();
-			if (session) {
-				console.log(session)
-				setRole(session.user.role)
-			}
-		}
-		setSessionRole()
-	}, [])
-
+	const t_general = useTranslations("General");
 
 	const allItems = [
 		{
 			title: t("overview"),
 			itemId: "/overview",
 			navigateTo: "/overview",
-			icon: <UserAddOutlined />,
+			icon: <LineChartOutlined />,
 		},
 		{
 			title: t("customer"),
@@ -54,7 +48,7 @@ export default function Sidebar() {
 			title: t("organization"),
 			itemId: "/organization",
 			navigateTo: "#",
-			icon: <UserAddOutlined />,
+			icon: <PicRightOutlined />,
 			subNavs: [
 				{
 					title: t("employee"),
@@ -79,23 +73,23 @@ export default function Sidebar() {
 					itemId: "/sale/reservations",
 					navigateTo: "/sale/reservations",
 				},
+				{
+					title: t("opportunity"),
+					itemId: "/sale/opportunities",
+					navigateTo: "/sale/opportunities",
+				},
 			],
 		},
 		{
 			title: t("marketing"),
 			itemId: "/marketing",
 			navigateTo: "#",
-			icon: <UserAddOutlined />,
+			icon: <DeliveredProcedureOutlined />,
 			subNavs: [
 				{
 					title: t("campaign"),
 					itemId: "/marketing/campaigns",
 					navigateTo: "/marketing/campaigns",
-				},
-				{
-					title: t("automated-message"),
-					itemId: "/marketing/automations",
-					navigateTo: "/marketing/automations",
 				},
 				{
 					title: t("message-template"),
@@ -114,7 +108,7 @@ export default function Sidebar() {
 			title: t("bussiness"),
 			itemId: "/bussiness",
 			navigateTo: "#",
-			icon: <UserAddOutlined />,
+			icon: <HomeOutlined />,
 			subNavs: [
 				{
 					title: t("product"),
@@ -122,65 +116,42 @@ export default function Sidebar() {
 					navigateTo: "/bussiness/products",
 				},
 				{
-					title: t("news"),
-					itemId: "/bussiness/news",
-					navigateTo: "/bussiness/news",
-				},
-				{
 					title: t("voucher"),
 					itemId: "/bussiness/vouchers",
 					navigateTo: "/bussiness/vouchers",
-				},
-				{
-					title: t("information"),
-					itemId: "/bussiness/infomation",
-					navigateTo: "/bussiness/information",
-				},
+				}
 			],
 		},
-
-		{
-			title: t("report"),
-			itemId: "/report",
-			navigateTo: "#",
-			icon: <UserAddOutlined />,
-			subNavs: [
-				{
-					title: t("crm-report"),
-					itemId: "/report/crm",
-					navigateTo: "/report/crm",
-				},
-				{
-					title: t("bussiness-report"),
-					itemId: "/report/rbussiness",
-					navigateTo: "/report/rbussiness",
-				},
-			],
-		},
-
 		{
 			title: t("chat-center"),
 			itemId: "/chat",
 			navigateTo: "/chat",
 			icon: <UserAddOutlined />,
 		},
+		{
+			title: t("chef"),
+			itemId: "/chef",
+			navigateTo: "/chef",
+			icon: <FireOutlined />,
+		},
 	]
 
 	const employeeTabs = ["/overview", "/customers", "/leads", "/sale", "/chat" ]
-	const chefTab = []
+	const chefTab = ["/chef"]
 
 	let items:INavItemProps[] = []
-	console.log(role)
 	if (role === "manager") {
-		items = allItems
+		items = allItems.filter(item => item.itemId !== "/chef")
 	} else if (role === "employee") {
 		items = allItems.filter(item => employeeTabs.includes(item.itemId))
+	} else if (role === "chef"){
+		items = allItems.filter(item => chefTab.includes(item.itemId))
 	}
 	
 	
 	return (
 		<main className="flex-col h-screen border-r  bg-white fixed left-0 top-0 w-sidebar" >
-			<h2 className="text-center font-bold my-4 text-2xl"> Admin dashboard</h2>
+			<h2 className="text-center font-bold my-4 text-2xl">{t_general("admin_dashboard")}</h2>
 			<div className="flex-1 h-full">
 				<Navigation
                     type="expand"

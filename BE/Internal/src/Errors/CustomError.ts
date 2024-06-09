@@ -6,8 +6,9 @@ export class CustomError extends BaseError {
 		public code: HttpStatusCode,
 		public name: ErrorName,
 		public message: string,
+		public fieldError?: string,
 		public stackTrace?: string
 	) {
-		super(code, name, message, stackTrace);
+		super(code, name, message,fieldError, stackTrace);
 	}
 }

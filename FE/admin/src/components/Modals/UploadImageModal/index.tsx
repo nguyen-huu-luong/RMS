@@ -19,7 +19,7 @@ export const UploadImageModal: React.FC<IUploadImageModal> = ({upload}) => {
         {
             key: '1',
             label: 'Upload from your computer',
-            children: <UploadFromComputer />,
+            children: <UploadFromComputer  onUploadedImage ={(url:string) => setUrl(url)}/>,
         },
         {
             key: '2',
@@ -58,6 +58,7 @@ export const UploadImageModal: React.FC<IUploadImageModal> = ({upload}) => {
             cancelText="Cancel"
             onCancel={handleCancel}
             width={1000}
+            // destroyOnClose
         >
             <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
         </Modal>

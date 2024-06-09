@@ -5,10 +5,13 @@ import type { UploadProps } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadImage } from '@/app/api/upload';
 import fetchClient from '@/lib/fetch-client';
+import { useLocale, useTranslations } from "next-intl";
 
 const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreate: any, setIsCreate: any, setIsReFetch: any, data: any }) => {
 
     const [form_create_category] = Form.useForm();
+    const t_product: any = useTranslations("Product")
+    const t_general: any = useTranslations("General")
 
     const handleUpload = async ({
         file,
@@ -59,13 +62,13 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
     return (
         <>
 
-            <Modal title="Category Information" open={isCreate} onCancel={handleCancel} destroyOnClose={true} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
+            <Modal title={t_product('category_information')} open={isCreate} onCancel={handleCancel} destroyOnClose={true} footer={(_, { OkBtn, CancelBtn }) => (<></>)}>
                 <Form form={form_create_category} name="basic" onFinish={handleCreate}>
                     <div className='relative'>
                         <div className='flex justify-between'>
                             <div style={{ width: "48%" }}>
                                 <p>
-                                    Name
+                                {t_general('name')}
                                 </p>
                                 <Form.Item
                                     name="category_name"
@@ -87,7 +90,7 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
                             </div>
                             <div style={{ width: "48%" }}>
                                 <p>
-                                    Description
+                                {t_general('description')}
                                 </p>
                                 <Form.Item
                                     name="description"
@@ -100,11 +103,12 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
                             <Form.Item name="upload">
                                 <Upload
                                     {...props}
+                                    accept="image/*"
                                     listType="picture"
                                     maxCount={1}
                                     onRemove={handleRemove}
                                 >
-                                    <Button icon={<UploadOutlined />}>Upload Icon</Button>
+                                    <Button icon={<UploadOutlined />}>{t_product('upload_icon')}</Button>
                                 </Upload>
                             </Form.Item>
                         </div>
@@ -119,10 +123,10 @@ const CreateCategory = ({ isCreate, setIsCreate, setIsReFetch, data }: { isCreat
                         <Form.Item >
                             <div className='flex justify-end mt-3' style={{ width: "100%" }}>
                                 <div className='pr-3'>
-                                    <Button style={{ backgroundColor: "#989898", color: "white" }} htmlType="button" onClick={handleCancel}>CANCEL</Button>
+                                    <Button style={{ backgroundColor: "#989898", color: "white" }} htmlType="button" onClick={handleCancel}>{t_general('cancel').toUpperCase()}</Button>
                                 </div>
                                 <div>
-                                    <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">CONFIRM</Button>
+                                    <Button style={{ backgroundColor: "#4A58EC", color: "white" }} htmlType="submit">{t_general('confirm').toUpperCase()}</Button>
                                 </div>
                             </div>
                         </Form.Item>

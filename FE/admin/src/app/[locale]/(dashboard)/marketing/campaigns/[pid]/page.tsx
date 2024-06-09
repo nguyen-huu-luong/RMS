@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { EllipsisOutlined } from '@ant-design/icons';
-import { useParams } from 'next/navigation'
+import { redirect, useParams } from 'next/navigation'
 import {
     Button,
     Form,
@@ -15,8 +15,8 @@ import { CampaignTargetList } from "@/components/CampaignComponents/CampaignTarg
 import { CampaignTrackUrl } from "@/components/CampaignComponents/CampaignTrackUrl";
 import { CampaignHistoryAndStatistic } from "@/components/CampaignComponents/CampaignHistoryAndStatistic";
 import fetchClient from "@/lib/fetch-client";
-import PreviewMode from "@/components/EmailTemplateComponents/DropContainer/preview-mode";
 import { AxiosError } from "axios";
+import { useTranslations } from "next-intl";
 
 
 type CampaignData = {
@@ -39,6 +39,8 @@ const CampaignDetail = () => {
     const [editmode, setEditmode] = useState(false)
     const [loading, setLoading] = useState(false);
     const [campaignData, setCampaignData] = useState<CampaignData>()
+    const t : any= useTranslations("Marketing.Campaign")
+    const t_general: any = useTranslations("General")
 
     const params = useParams<{ locale: string; pid: string }>()
 
@@ -54,7 +56,16 @@ const CampaignDetail = () => {
             setLoading(false)
         } catch (error: AxiosError | any) {
             setLoading(false)
-            message.error(error as any)
+            if (error instanceof AxiosError) {
+                if (error.response) {
+                    const { name, code, message } = error.response.data
+                    if (name === "RecordNotFound") {
+                        redirect("/404")
+                    }
+                }
+                message.error((error.response && error.response.data.message) || "Faild to fetch!")
+                throw error
+            }
             throw new Error(error.cause.response.data.message)
         }
     }
@@ -64,9 +75,34 @@ const CampaignDetail = () => {
 
     if (!campaignData) return ""
 
+   
+
+    // const handleUpdateTargetlist = async (ids: number[], action: string) => {
+    //     try {
+    //         const result = await fetchClient({
+    //             method: "PUT",
+    //             url: `/campaigns/${params.pid}`,
+    //             body: {
+    //                 targetlists: {
+    //                     action,
+    //                     ids
+    //                 }
+    //             },
+    //             data_return: true
+    //         })
+    //         message.success(`${action === "add" ? "Add targetlist to campaign successfully" :
+    //             "Remove targetlist from campaign successfully"}`)
+    //         setCampaignData(result)
+
+    //     } catch (error: any) {
+    //         console.log(error)
+    //         message.error("Add targetlist failds")
+    //         throw new Error(error.data.respone.message)
+    //     }
+    // }
+
     const handleSaveChange = async (values: any) => {
         const dataUpdate = { ...values };
-
         try {
             const updatedCampaign = await fetchClient({
                 url: `/campaigns/${params.pid}`,
@@ -76,42 +112,21 @@ const CampaignDetail = () => {
             setCampaignData(updatedCampaign);
             setEditmode(false)
         } catch (error: any) {
-            message.error("Something wrong!", error?.message)
+            if (error instanceof AxiosError && error.response) {
+                message.error(error.response.data.message)
+                throw error
+            }
             throw new Error(error)
         }
     }
 
-    const handleCancelChange = () => {
-        setEditmode(false)
-    }
-
-    const handleUpdateTargetlist = async (ids: number[], action: string) => {
-        try {
-            const result = await fetchClient({
-                method: "PUT",
-                url: `/campaigns/${params.pid}`,
-                body: {
-                    targetlists: {
-                        action,
-                        ids
-                    }
-                },
-                data_return: true
-            })
-            message.success(`${action === "add" ? "Add targetlist to campaign successfully" :
-                "Remove targetlist from campaign successfully"}`)
-            setCampaignData(result)
-
-        } catch (error: any) {
-            console.log(error)
-            message.error("Add targetlist failds")
-            throw new Error(error.data.respone.message)
-        }
-    }
+    // const handleCancelChange = () => {
+    //     setEditmode(false)
+    // }
 
     const handleCreateEmailCampaign = async (values: any) => {
         console.log(values)
-        const {sendTo, ...createData} = values 
+        const { sendTo, ...createData } = values
         try {
             const newEmail = await fetchClient({
                 method: "POST",
@@ -129,9 +144,6 @@ const CampaignDetail = () => {
                 const newEmailCampaign = [...campaignData.emailCampaigns || [], newEmail]
                 setCampaignData(prev => (prev && { ...prev, emailCampaigns: newEmailCampaign }))
             }
-
-
-
         } catch (error) {
             console.log(error)
             throw error
@@ -149,7 +161,7 @@ const CampaignDetail = () => {
             if (result) {
                 const newEmailCampaigns = campaignData.emailCampaigns.filter(item => item.id !== id)
                 setCampaignData(prev => (prev && { ...prev, emailCampaigns: newEmailCampaigns }))
-                message.success("Delete email campaign successfully")
+                message.success(t("delete-email-campaign-success-msg"))
             }
         } catch (error) {
             message.error("Faild to delete email campaign")
@@ -158,16 +170,16 @@ const CampaignDetail = () => {
         }
     }
 
-    const handleCreateTrackUrl = async (values:any) => {
+    const handleCreateTrackUrl = async (values: any) => {
         try {
             const newTrackUrl = await fetchClient({
                 method: "POST",
                 url: `/campaigns/${params.pid}/track-url`,
                 body: {
-                    data: {...values}
+                    data: { ...values }
                 },
-                data_return:true
-            }) 
+                data_return: true
+            })
 
             const newTrackUrls = [...campaignData.trackUrls || [], newTrackUrl]
             setCampaignData(prev => (prev && { ...prev, trackUrls: newTrackUrls }))
@@ -178,7 +190,7 @@ const CampaignDetail = () => {
             throw new Error(error as any)
         }
     }
-    const handleDeleteTrackUrl = async (id:number) => {
+    const handleDeleteTrackUrl = async (id: number) => {
         try {
             const result = await fetchClient({
                 method: "DELETE",
@@ -212,72 +224,39 @@ const CampaignDetail = () => {
                 }
             }}
         >
-            <Form
-                layout="vertical"
-                onFinish={handleSaveChange}
-            >
+            <div className="mt-3 grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                    <CampaignOverview 
+                        editmode={editmode} 
+                        setEditmode={setEditmode}
+                        campaignInfo={overview} 
+                        targetlists={targetLists} 
+                        handleSaveChange={handleSaveChange}
+                    />
+                    {/* <CampaignTargetList
+                        isEditmode={editmode}
+                        targetLists={targetLists || []}
+                        campaignId={params.pid}
+                        handleUpdateTargetlist={handleUpdateTargetlist}
+                    /> */}
+                    <CampaignMarketing
+                        isEditmode={editmode}
+                        emails={emailCampaigns || []}
+                        // targitlists={targetLists || []}
+                        targetlists={targetLists}
+                        campaignId={params.pid}
+                        handleCreate={handleCreateEmailCampaign}
+                        handleDelete={handleDeleteEmailCampaign}
 
-                <div>
-                    {
-                        editmode ?
-                            (<Form.Item className="flex">
-                                <Button
-                                    className="p-1 px-1 text-white"
-                                    style={{
-                                        border: "1px solid #DADAD9",
-                                        borderRadius: "4px 0px 0px 4px",
-                                        backgroundColor: "#4A58EC"
-                                    }}
-                                    htmlType="submit"
-                                >
-                                    Save
-                                </Button>
-                                <Popconfirm title="Your change will not save. Are you sure?">
-                                    <Button
-                                        className="p-1 px-1"
-                                        style={{
-                                            borderWidth: "1px 0px 1px 0px", borderBlockColor: "#DADAD9",
-                                            borderStyle: "solid", backgroundColor: "#F9FAFB"
-                                        }}
-                                        onClick={handleCancelChange}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </Popconfirm>
-                                <button className="p-1 px-1" type="button" style={{ borderWidth: "1px 1px 1px 1px", borderBlockColor: "#DADAD9", borderStyle: "solid", borderRadius: "0px 4px 4px 0px", backgroundColor: "#F9FAFB" }}>
-                                    <EllipsisOutlined />
-                                </button>
-                            </Form.Item>) : <Button onClick={() => setEditmode(true)}>Edit</Button>
-                    }
-                    <div className="mt-3 grid grid-cols-3 gap-4">
-                        <div className="col-span-2">
-                            <CampaignOverview isEditmode={editmode} campaignInfo={overview} />
-                            <CampaignTargetList
-                                isEditmode={editmode}
-                                targetLists={targetLists || []}
-                                campaignId={params.pid}
-                                handleUpdateTargetlist={handleUpdateTargetlist}
-                            />
-                            <CampaignMarketing
-                                isEditmode={editmode}
-                                emails={emailCampaigns || []}
-                                // targitlists={targetLists || []}
-                                targetlists={targetLists}
-                                campaignId={params.pid}
-                                handleCreate={handleCreateEmailCampaign}
-                                handleDelete={handleDeleteEmailCampaign}
-
-                            />
-                            <CampaignTrackUrl 
-                                handleCreate = {handleCreateTrackUrl}
-                                handleDelete = {handleDeleteTrackUrl}
-                                isEditmode={editmode} 
-                                trackUrls={trackUrls || []} />
-                        </div>
-                        <CampaignHistoryAndStatistic campaignId={params.pid} statisticInfo={statisticInfo} />
-                    </div>
+                    />
+                    <CampaignTrackUrl
+                        handleCreate={handleCreateTrackUrl}
+                        handleDelete={handleDeleteTrackUrl}
+                        isEditmode={editmode}
+                        trackUrls={trackUrls || []} />
                 </div>
-            </Form>
+                <CampaignHistoryAndStatistic createdAt={campaignData.createdAt} updatedAt={campaignData.updatedAt} campaignId={params.pid} statisticInfo={statisticInfo} />
+            </div>
         </ConfigProvider>
 
     )

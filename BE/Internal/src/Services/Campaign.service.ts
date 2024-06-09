@@ -4,6 +4,7 @@ import { QueryOptions, TYPES } from "../Types/type";
 import { IClientRepository } from "../Repositories/IClientRepository";
 import { IOrderRepository } from "../Repositories/IOrderRepository";
 import {
+    BadRequestError,
     CustomError,
     InternalServerError,
     RecordNotFoundError,
@@ -14,6 +15,8 @@ import { Model, Transaction } from "sequelize";
 import { ITargetListRepository } from "../Repositories/ITargetListRepository";
 import { EmailCampaign } from "../Models";
 import { IEmailCampaignRepository } from "../Repositories/IEmailCampaignRepository";
+import { JobType, QUEUE_NAMES, QueueService } from "./Queue.service";
+import JobService from "./JobService";
 
 type AssociationWithResourceType = {
     action: string;
@@ -24,9 +27,10 @@ export type CampaignData = {
     type?: string;
     status?: string;
     startDate?: Date;
-    endDate?: number;
+    endDate?: Date;
     budget?: number;
     targetlists?: AssociationWithResourceType;
+    targetlistIds?: number [];
     emailCampaigns?: AssociationWithResourceType;
     trackUrls?: number[];
 };
@@ -42,9 +46,11 @@ export type EmailCampaignData = {
     name: string,
     status: string,
     startDate: string,
-    subjext: string,
+    subject: string,
     targetlistIds: Array<any>,
-    templateId: number
+    templateId: number,
+    sendFrom: string,
+    content: string
 }
 
 export type TrackUrlData = {
@@ -87,9 +93,9 @@ export class CampaignService {
     }
 
     public async create(data: CampaignData) {
-        const { name, type, status, startDate, endDate, budget } = data;
+        const { name, type, status, startDate, endDate, budget, targetlistIds } = data;
 
-        return await this.campaignRepository.create({
+        const campaign =  await this.campaignRepository.create({
             name,
             type,
             status,
@@ -97,6 +103,12 @@ export class CampaignService {
             endDate,
             budget,
         });
+
+        if (targetlistIds) {
+            await campaign.addTargetLists(targetlistIds)
+        } 
+
+        return campaign 
     }
 
     public async update(id: number, data: CampaignData) {
@@ -104,7 +116,7 @@ export class CampaignService {
             // validate actions
             if (!["add", "remove", "replace"].includes(data.targetlists.action)) {
                 throw new ValidationError(
-                    "Invalid params targetlist.action. Allow action in ['add', 'remove', 'replace'"
+                    "Invalid params targetlist.action. Allow action in ['add', 'remove', 'replace']"
                 );
             }
             const allTargetListIds = await this.targetlistRepository.getIds();
@@ -144,15 +156,57 @@ export class CampaignService {
         return true;
     }
 
-    public async createEmailCampaign(campaignId: number, data: EmailCampaignData) {
-        const dataToCreate = {
-            ...data,
-            campaignId,
-        }
+    public async getEmailCampaign(campaignId: number, emailId: number) {
+        const emailCampaign = await this.emailCampaignRepository.findById(emailId)
 
-        const result = await this.emailCampaignRepository.create(dataToCreate)
+        return emailCampaign
+    }
+
+    public async getAllJob(campaignId: number | string, emailCampaignId: number | string, ) {
+        const jobService = new JobService()
+
+        const result = await jobService.getAll(QUEUE_NAMES.CAMPAIGN, {
+            data: {
+                campaignId,
+                emailCampaignId,
+            }
+        })
 
         return result ;
+    }
+
+    public async createEmailCampaign(campaignId: number, data: EmailCampaignData) {
+        console.log(data)
+        const {name , startDate, subject, sendFrom, targetlistIds, templateId, content} = data
+
+        let status = "Pending"
+        const campaignQueue = new QueueService().getQueue(QUEUE_NAMES.CAMPAIGN) ;
+        
+        console.log(new Date(startDate).toLocaleString())
+        console.log(new Date().toLocaleString())
+        console.log(new Date(startDate).getTime() - new Date().getTime())
+        
+        const emailCampaign = await this.emailCampaignRepository.create({
+            name, status, startDate, subject, sendFrom, campaignId
+        }) 
+        
+        console.log(targetlistIds)
+        if (targetlistIds) {
+            await emailCampaign.setTargetLists(targetlistIds) ;
+        }
+        
+        campaignQueue.add(JobType.SEND_EMAIL_TO_TARGETLIST, {
+            campaignId, 
+            emailCampaignId: emailCampaign.getDataValue("id"),
+            targetlistIds,
+            startDate,
+            sendFrom,
+            templateId,
+            content,
+            subject
+        })
+
+        return emailCampaign ;
     }
 
     public async deleteEmailCampaign(campaignId: number, emailId: number) {

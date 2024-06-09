@@ -9,7 +9,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       phone: {
         type: Sequelize.STRING
@@ -41,11 +42,24 @@ module.exports = {
       type: {
         type: Sequelize.STRING
       },
+      convertDate: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      segmentDate: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      lastPurchase: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
       hashedPassword: {
         type: Sequelize.STRING
       },
       isRegistered: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       isActive: {
         type: Sequelize.BOOLEAN
@@ -63,10 +77,6 @@ module.exports = {
       },
       average: {
         type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
-      convertDate: {
-        type: Sequelize.DATE,
         defaultValue: 0,
       },
       createdAt: {

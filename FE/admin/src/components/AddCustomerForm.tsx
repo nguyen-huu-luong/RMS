@@ -17,13 +17,15 @@ interface AddCustomerFormProps {
     afterCancel: () => void
 }
 
+const backend_api = `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
+
 export const AddCustomerForm: React.FC<AddCustomerFormProps> = (props) => {
 
     const [form] = Form.useForm();
 
     const onFinish = async (values: any) => {
         try {
-            const response = await axios.post('http://localhost:3003/api/customers', { data: values }, {
+            const response = await axios.post(`${backend_api}/customers`, { data: values }, {
                 headers: {
                     Authorization:
                         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmdWxsTmFtZSI6Ik1hbmFnZXIgTWFuYWdlciIsImVtYWlsIjoiTWFyaW9fS29zc0B5YWhvby5jb20iLCJyb2xlIjoibWFuYWdlciIsImlhdCI6MTcwODM1NjUwNCwiZXhwIjoxNzE0MzU2NTA0fQ.naMCtTR_QKTwTMkqjIL6QaMNnbZdOk7wzuojI_H5RNc",

@@ -5,11 +5,12 @@ import { BaseRepository } from "./BaseRepository";
 import Message from "../../Models/Message";
 import TargetList from "../../Models/Targetlist";
 import { ITargetListRepository } from "../ITargetListRepository";
-import { RecordNotFoundError } from "../../Errors";
+import { CustomError, RecordNotFoundError } from "../../Errors";
 import { Client } from "../../Models";
 import { sequelize } from "../../Configs";
 import { Transaction } from "sequelize";
 import { TargelistData } from "../../Services/TargetList.service";
+import { ErrorName } from "../../Constants";
 
 @injectable()
 export class TargetListRepository
@@ -37,6 +38,25 @@ export class TargetListRepository
 		return targetList;
 	}
 
+	public async create(data: any) {
+		const t = await sequelize.getSequelize().transaction()
+		try {
+			const {name, description, clientIds} = data
+			let result = await this._model.create({name, description}, {transaction: t}) ; 
+			if (clientIds) {
+				await result.addClients(clientIds, {transaction: t})
+			}
+			await t.commit()
+			return result ;
+		} catch (error: any) {
+			await t.rollback()
+			if (error.name === "SequelizeForeignKeyConstraintError") {
+				throw new CustomError(400, ErrorName.BAD_REQUEST, "Some customer or lead not found in the system")
+			} 
+			throw error
+		}
+	}
+
 	public async update(id: number, data: TargelistData): Promise<TargetList> {
 		console.log("update api", data)
 		const t = await sequelize.getSequelize().transaction();
@@ -60,6 +80,48 @@ export class TargetListRepository
 		}
     }
 
+	public async getSubscriber(id: number) {
+		let subscripbers =  await this._model.findOne({
+			where: {
+				type: "default",
+				name: "Subscriber",
+				
+			}
+		})
+
+		if (!subscripbers) {
+			subscripbers = await this._model.create({
+				type: "default",
+				name: "Subscriber",
+				description: "This is the default targetlist was created to store subscriber list"
+			})
+		} 
+
+		const result = await subscripbers.getClients({
+			where: {
+				id
+			}
+		})
+
+		return result.length > 0 ? result[0] : null;
+	}
+
+	/**
+	 * addSubscriber
+id: number | string	 */
+	public async addSubscriber(id: number) {
+		let subscripbers =  await this._model.findOne({
+			where: {
+				type: "default",
+				name: "Subscriber",
+				
+			}
+		})
+
+		return await subscripbers?.addClient(id)
+	}
+	
+
 	private async updateClientsInTargetlist(targetlistInstance: TargetList, action: string, ids: number[], t?: Transaction) {
 		if (action === "add") {
 			console.log("add target list to campaign")
@@ -71,6 +133,5 @@ export class TargetListRepository
 		}
 	}
 
-
-
+	
 }

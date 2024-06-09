@@ -15,7 +15,7 @@ class VoucherRouter {
             .route("/vouchers/all")
             .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>
                 this.voucherController.getAll(req, res, next)
-            );
+            )
         router
             .route("/vouchers/:id")
             .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>
@@ -31,13 +31,18 @@ class VoucherRouter {
                 this.voucherController.updateVoucher(req, res, next)
             )
             .patch(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
-                this.voucherController.consumeVoucher(req, res, next)
+                this.voucherController.redeemVoucher(req, res, next)
             );
         router
             .route("/vouchers")
             .post(AuthMiddleware.initialize, Authorization.initialize, (req: Request, res: Response, next: NextFunction) =>
                 this.voucherController.createVoucher(req, res, next)
             );
+        router
+            .route("/vouchers/clients/:id")
+            .get(AuthMiddleware.initialize, Authorization.initialize,(req: Request, res: Response, next: NextFunction) =>
+                this.voucherController.getVoucherClients(req, res, next)
+            )
     }
 }
 

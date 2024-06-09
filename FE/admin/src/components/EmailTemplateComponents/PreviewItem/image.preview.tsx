@@ -64,9 +64,17 @@ const ImagePreview = ({
 
     const objectCss = objectToCSS(getCamelCasedAttributes(section.attributes));
 
+    // Hanlde padding  as offset  is mjml  different  from padding css when  image rendered
+    const newObjCss = Object.keys(objectCss).reduce((acc: { [key: string]: string }, key: string) => {
+        const newKey = ["paddingLeft", "paddingRight", "paddingTop", "paddingBottom"].includes(key) ?
+                                key.replace("padding", "margin") : key;
+        acc[newKey] = objectCss[key];
+        return acc;
+    }, {});
+
     const allStyle: CSSProperties = {
         ...getStyle(),
-        ...objectCss,
+        ...newObjCss,
     };
     return (
         <div 
@@ -77,10 +85,11 @@ const ImagePreview = ({
             onClick={handleMouseClick}
         >
             <Image
-                className="cursor-pointer"
+                className="cursor-pointer max-w-full"
                 src={section.attributes.src}
                 width={section.attributes.width}
                 height={section.attributes.height}
+                preview={false}
                 style={{
                     ...allStyle
                 }}
